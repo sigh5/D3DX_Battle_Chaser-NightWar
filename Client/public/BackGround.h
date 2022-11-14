@@ -30,7 +30,8 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;	
-	CTransform	*			m_pTransCom = nullptr;
+	CTransform*				m_pTransCom = nullptr;
+
 private:
 	_float4x4				m_WorldMatrix;
 	_float4x4				m_ViewMatrix;
