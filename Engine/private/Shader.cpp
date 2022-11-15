@@ -109,6 +109,19 @@ HRESULT CShader::Set_Matrix(const char * pConstantName, const _float4x4* pMatrix
 	return pVariable->SetMatrix((_float*)pMatrix);
 }
 
+HRESULT CShader::Set_ShaderResourceView(const char * pConstantName, ID3D11ShaderResourceView * pSRV)
+{
+	if (nullptr == m_pEffect)
+		return E_FAIL;
+
+	ID3DX11EffectShaderResourceVariable*		pVariable = m_pEffect->GetVariableByName(pConstantName)->AsShaderResource();
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	return pVariable->SetResource(pSRV);
+
+}
+
 CShader * CShader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, const _uint iNumElements)
 {
 	CShader*		pInstance = new CShader(pDevice, pContext);

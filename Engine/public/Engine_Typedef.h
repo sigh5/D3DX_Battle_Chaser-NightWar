@@ -23,8 +23,8 @@ namespace Engine
 
 	typedef		XMFLOAT2				_float2;
 	typedef		XMFLOAT3				_float3;
-	typedef		XMFLOAT4				_float4;
-	typedef		XMVECTOR				_vector;
+	typedef		XMFLOAT4				_float4;	// 데이터 전체를 묶음
+	typedef		XMVECTOR				_vector;	// 계산 용 지역변수로 사용권장
 	typedef		FXMVECTOR				_fvector;
 	typedef		CXMVECTOR				_cvector;
 	typedef		HXMVECTOR				_hvector;

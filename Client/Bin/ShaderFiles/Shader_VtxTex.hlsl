@@ -1,4 +1,10 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+texture2D		g_Texture;
+
+sampler			DefaultSampler = sampler_state
+{
+
+};
 
 struct VS_IN
 {
@@ -44,7 +50,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = vector(1.f, 0.f, 0.f, 1.f);
+	Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexUV);
 	
 	return Out;
 }

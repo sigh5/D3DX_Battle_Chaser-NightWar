@@ -76,6 +76,9 @@
     <Filter Include="81.Utils">
       <UniqueIdentifier>{7b1c93b6-4d3a-4080-bc8e-5bb52208ef18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\05.Texture">
+      <UniqueIdentifier>{082152dc-1fd3-49d0-84cb-bc8d1960a0aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -204,6 +207,9 @@
     <ClInclude Include="..\public\GameUtils.h">
       <Filter>81.Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Texture.h">
+      <Filter>01.Utility\03.Components\05.Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -307,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GameUtils.cpp">
       <Filter>81.Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Texture.cpp">
+      <Filter>01.Utility\03.Components\05.Texture</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

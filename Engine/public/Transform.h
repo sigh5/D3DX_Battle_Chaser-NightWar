@@ -32,11 +32,23 @@ public:
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
 
+	_float3 Get_Scaled() const {
+		return _float3(XMVectorGetX(XMVector3Length(Get_State(STATE_RIGHT))),
+			XMVectorGetX(XMVector3Length(Get_State(STATE_UP))),
+			XMVectorGetX(XMVector3Length(Get_State(STATE_LOOK))));
+	}
+
 	void Set_State(STATE eState, _fvector vState) {
 		_float4		vTmp;
 		XMStoreFloat4(&vTmp, vState);
 		memcpy(&m_WorldMatrix.m[eState][0], &vTmp, sizeof vTmp);			
 	}
+
+	void Set_Scaled(STATE eState, _float fScale);	// _float 형으로 길이를 변형한다
+	void Set_Scaled(_float3 vScale);				// _float3 형으로 길이를 변형한다.
+	void Scaling(STATE eState, _float fScale);		// _float 배수로 늘린다.
+
+
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -52,11 +64,16 @@ public:
 	void Turn(_fvector vAxis, _double TimeDelta); /* Dynamic */
 	void Rotation(_fvector vAxis, _float fRadian); /* Static */
 
+	// 쳐다본다.
+	void LookAt(const CTransform *pTarget);
+	void LookAt(_fvector vTargetPos);
 
+	// 추적한다.
+	void Chase(const CTransform* pTarget, _double Timdelta, _float fLimit = 0.1f);
+	void Chase(_fvector vTargetPos, _double Timedelta, _float fLimit = 0.1f);
 
-
-
-
+public:
+	HRESULT Bind_ShaderResource(const char* pConstantName, class CShader* pShaderCom);
 
 
 private:	

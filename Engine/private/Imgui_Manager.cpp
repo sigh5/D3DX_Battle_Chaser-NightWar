@@ -71,7 +71,6 @@ void CImgui_Manager::Add_ImguiTabObject(CImguiObject* ImguiObject)
 	if (ImguiObject == nullptr)
 		return;
 
-	Safe_AddRef(ImguiObject);
 	m_vecTab.push_back(ImguiObject);
 }
 
@@ -80,7 +79,6 @@ void CImgui_Manager::Add_ImguiWindowObject(CImguiObject* ImguiObject)
 	if (ImguiObject == nullptr)
 		return;
 
-	Safe_AddRef(ImguiObject);
 	m_vecWin.push_back(ImguiObject);
 }
 

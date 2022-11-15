@@ -5,6 +5,8 @@
 
 #include <d3d11.h>
 #include <Effects11/d3dx11effect.h>
+#include <DirectXTK/DDSTextureLoader.h>
+#include <DirectXTK/WICTextureLoader.h>
 #include <d3dcompiler.h>
 
 #define DIRECTINPUT_VERSION 0x0800

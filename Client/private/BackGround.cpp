@@ -30,22 +30,14 @@ HRESULT CBackGround::Initialize(void * pArg)
 
 	m_fSizeX = (_float)g_iWinSizeX;
 	m_fSizeY = (_float)g_iWinSizeY;
-
 	m_fX = m_fSizeX * 0.5f;
-	m_fY = m_fSizeY * 0.5f;	
+	m_fY = m_fSizeY * 0.5f;
 
-	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
-
-	m_WorldMatrix._11 = m_fSizeX;
-	m_WorldMatrix._22 = m_fSizeY;
-
-	m_WorldMatrix._41 = m_fX - g_iWinSizeX * 0.5f;
-	m_WorldMatrix._42 = -m_fY + g_iWinSizeY * 0.5f;
+	m_pTransfromCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
+	m_pTransfromCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
-
-
 
 	return S_OK;
 }
@@ -83,17 +75,36 @@ HRESULT CBackGround::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"), 
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
-
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"), TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+
+
+	/* For.Com_Transfrom */
+	CTransform::TRANSFORMDESC TransfromDesc;
+	ZeroMemory(&TransfromDesc, sizeof(CTransform::TRANSFORMDESC));
+	
+	TransfromDesc.fSpeedPerSec = 5.f;
+	TransfromDesc.fRotationPerSec = 90.f;
+
+	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_Transfrom"),
+		(CComponent**)&m_pTransfromCom,&TransfromDesc)))
+		return E_FAIL;
+
+
+
+
 
 	return S_OK;
 }
@@ -103,9 +114,17 @@ HRESULT CBackGround::SetUp_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	m_pShaderCom->Set_Matrix("g_WorldMatrix", &m_WorldMatrix);
-	m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix);
-	m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix);
+	if (FAILED(m_pTransfromCom->Bind_ShaderResource("g_WorldMatrix", m_pShaderCom)))
+		return E_FAIL;
+	
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -138,6 +157,8 @@ void CBackGround::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pTransfromCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
