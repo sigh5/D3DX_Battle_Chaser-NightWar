@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "VIBuffer_Rect.h"
+#include "VI_Buffer_Terrain.h"
 #include "Transform.h"
 #include "Texture.h"
 /* 다양한 컴포넌트(원형)들을 담고 있는다. -> 사본컴포넌트들은 사용해야할 객체들이 보유한다. */

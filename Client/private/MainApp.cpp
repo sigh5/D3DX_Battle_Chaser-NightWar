@@ -8,6 +8,10 @@ CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 {
 	Safe_AddRef(m_pGameInstance);
+
+//	D3D11_SAMPLER_DESC		samplerDesc;
+
+
 }
 
 HRESULT CMainApp::Initialize()
