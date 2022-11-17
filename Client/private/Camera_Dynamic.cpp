@@ -3,12 +3,12 @@
 #include "GameInstance.h"
 
 CCamera_Dynamic::CCamera_Dynamic(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CCamera(pDevice, pContext)
+	: CCamera(pDevice, pContext)
 {
 }
 
 CCamera_Dynamic::CCamera_Dynamic(const CCamera_Dynamic & rhs)
-	:CCamera(rhs)
+	: CCamera(rhs)
 {
 }
 
@@ -22,14 +22,19 @@ HRESULT CCamera_Dynamic::Initialize_Prototype()
 
 HRESULT CCamera_Dynamic::Initialize(void * pArg)
 {
-	CAMERADESC CameraDesc;
-	ZeroMemory(&CameraDesc, sizeof(CameraDesc));
+	CCamera::CAMERADESC			CameraDesc;
+	ZeroMemory(&CameraDesc, sizeof CameraDesc);
 
-	CameraDesc.vEye = _float4(0.f, 0.f, -10.f, 1.f);
-	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
-	CameraDesc.TransformDesc.fSpeedPerSec = 5.f;
-	CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	if (nullptr != pArg)
+		memcpy(&CameraDesc, pArg, sizeof(CAMERADESC));
+	else
+	{
+		CameraDesc.vEye = _float4(0.f, 20.f, -10.f, 1.f);
+		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
+		CameraDesc.TransformDesc.fSpeedPerSec = 5.f;
+		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	}
 
 	if (FAILED(__super::Initialize(&CameraDesc)))
 		return E_FAIL;
@@ -53,6 +58,8 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 void CCamera_Dynamic::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+
 }
 
 HRESULT CCamera_Dynamic::Render()
@@ -65,8 +72,10 @@ HRESULT CCamera_Dynamic::Render()
 
 HRESULT CCamera_Dynamic::SetUp_Components()
 {
+
 	return S_OK;
 }
+
 
 CCamera_Dynamic * CCamera_Dynamic::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
@@ -91,7 +100,10 @@ CGameObject * CCamera_Dynamic::Clone(void * pArg)
 	}
 	return pInstance;
 }
+
 void CCamera_Dynamic::Free()
 {
 	__super::Free();
+
+
 }
