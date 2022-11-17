@@ -32,4 +32,8 @@ namespace Engine
 
 	typedef		XMFLOAT4X4				_float4x4;
 	typedef		XMMATRIX				_matrix;
+	typedef		FXMMATRIX				_fmatrix;
+	typedef		CXMMATRIX				_cmatrix;
+
+
 }

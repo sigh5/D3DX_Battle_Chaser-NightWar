@@ -1,15 +1,25 @@
 #pragma once
 
-#include "Base.h"
+#include "Transform.h"
 
 BEGIN(Engine)
 
 class ENGINE_DLL CGameObject abstract : public CBase
 {
+public:
+	typedef struct tagGameObjectDesc
+	{
+		CTransform::TRANSFORMDESC  TransformDesc;
+	}GAMEOBJECTDESC;
+
+
 protected:
 	CGameObject(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CGameObject(const CGameObject& rhs);
 	virtual ~CGameObject() = default;
+
+public:
+	static	const wstring		m_pTransformComTag;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -32,7 +42,7 @@ protected:
 protected:
 	/* 객체들이 사용해야 할 컴포넌트들을 보관한다. */
 	map<const wstring, class CComponent*>			m_Components;
-
+	CTransform*				m_pTransformCom = nullptr;
 protected:	
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	class CComponent* Find_Component(const wstring& pComponentTag);

@@ -76,7 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		else
 		{
-			pMainApp->Tick(0.0);
+			pMainApp->Tick(0.016);
 			pMainApp->Render();
 		}
 	}

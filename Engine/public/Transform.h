@@ -28,6 +28,10 @@ protected:
 	virtual ~CTransform() = default;
 
 public:
+	_matrix Get_WorldMatrix_Inverse() {
+		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
+	}
+
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
@@ -41,14 +45,12 @@ public:
 	void Set_State(STATE eState, _fvector vState) {
 		_float4		vTmp;
 		XMStoreFloat4(&vTmp, vState);
-		memcpy(&m_WorldMatrix.m[eState][0], &vTmp, sizeof vTmp);			
+		memcpy(&m_WorldMatrix.m[eState][0], &vTmp, sizeof vTmp);
 	}
 
-	void Set_Scaled(STATE eState, _float fScale);	// _float 형으로 길이를 변형한다
-	void Set_Scaled(_float3 vScale);				// _float3 형으로 길이를 변형한다.
-	void Scaling(STATE eState, _float fScale);		// _float 배수로 늘린다.
-
-
+	void Set_Scaled(STATE eState, _float fScale); /* fScale값으로 길이를 변형한다. */
+	void Set_Scaled(_float3 vScale); /* fScale값으로 길이를 변형한다. */
+	void Scaling(STATE eState, _float fScale); /* fScale배수로 늘린다. */
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -64,19 +66,17 @@ public:
 	void Turn(_fvector vAxis, _double TimeDelta); /* Dynamic */
 	void Rotation(_fvector vAxis, _float fRadian); /* Static */
 
-	// 쳐다본다.
-	void LookAt(const CTransform *pTarget);
+												   /* 쳐다본다. */
+												   /*void LookAt(const CTransform* pTarget);*/
 	void LookAt(_fvector vTargetPos);
 
-	// 추적한다.
-	void Chase(const CTransform* pTarget, _double Timdelta, _float fLimit = 0.1f);
-	void Chase(_fvector vTargetPos, _double Timedelta, _float fLimit = 0.1f);
+	/* 추적한다 .*/
+	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
 
 public:
-	HRESULT Bind_ShaderResource(const char* pConstantName, class CShader* pShaderCom);
+	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName);
 
-
-private:	
+private:
 	_float4x4				m_WorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
 

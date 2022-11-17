@@ -7,7 +7,6 @@ BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CVIBuffer_Rect;
-class CTransform;
 class CTexture;
 END
 
@@ -31,8 +30,8 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;	
-	CTransform*				m_pTransfromCom = nullptr;
 	CTexture*				m_pTextureCom = nullptr;
+
 private:
 	_float4x4				m_ViewMatrix;
 	_float4x4				m_ProjMatrix;

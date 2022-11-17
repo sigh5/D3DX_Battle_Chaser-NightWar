@@ -4,6 +4,7 @@
 #include "BackGround.h"
 #include "Terrain.h"
 
+
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
 	, m_pContext(pContext)
@@ -69,7 +70,7 @@ HRESULT CLoader::Loading_ForLogo()
 
 
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
-
+	
 	/* For.Prototype_GameObject_BackGround */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
 		CBackGround::Create(m_pDevice, m_pContext))))

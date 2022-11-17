@@ -22,7 +22,13 @@ HRESULT CTerrain::Initialize_Prototype()
 
 HRESULT CTerrain::Initialize(void * pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	/*GAMEOBJECTDESC GameObjectDesc;
+	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
+
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 5.f;
+	GameObjectDesc.TransformDesc.fSpeedPerSec = XMConvertToRadians(90.0f);
+*/
+	if (FAILED(__super::Initialize(&pArg)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
@@ -62,7 +68,7 @@ HRESULT CTerrain::Render()
 HRESULT CTerrain::SetUp_Components()
 {
 	/* For.Com_Renderer */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
 	/* For.Com_Shader */
@@ -81,19 +87,6 @@ HRESULT CTerrain::SetUp_Components()
 		return E_FAIL;
 
 
-	/* For.Com_Transfrom */
-	CTransform::TRANSFORMDESC TransfromDesc;
-	ZeroMemory(&TransfromDesc, sizeof(CTransform::TRANSFORMDESC));
-
-	TransfromDesc.fSpeedPerSec = 5.f;
-	TransfromDesc.fRotationPerSec = 90.f;
-
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_Transfrom"),
-		(CComponent**)&m_pTransfromCom, &TransfromDesc)))
-		return E_FAIL;
-
-
-
 
 
 	return S_OK;
@@ -104,22 +97,21 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	if (FAILED(m_pTransfromCom->Bind_ShaderResource("g_WorldMatrix", m_pShaderCom)))
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
 		return E_FAIL;
 
-	_float4x4			ViewMatrix, ProjMatrix;
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(XMVectorSet(0.f, 20.f, -30.f, 1.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(XMConvertToRadians(60.0f), g_iWinSizeX / (_float)g_iWinSizeY, 0.2f, 300.f));
-
-
-	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &ProjMatrix)))
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
+
 
 
 	return S_OK;
@@ -154,7 +146,6 @@ void CTerrain::Free()
 	__super::Free();
 
 	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pTransfromCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);

@@ -22,7 +22,14 @@ HRESULT CBackGround::Initialize_Prototype()
 
 HRESULT CBackGround::Initialize(void * pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	CGameObject::GAMEOBJECTDESC GameObjectDesc;
+	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
+
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 5.f;
+	GameObjectDesc.TransformDesc.fRotationPerSec = 90.f;
+
+
+	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
@@ -33,8 +40,8 @@ HRESULT CBackGround::Initialize(void * pArg)
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
-	m_pTransfromCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransfromCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
@@ -72,16 +79,16 @@ HRESULT CBackGround::Render()
 HRESULT CBackGround::SetUp_Components()
 {
 	/* For.Com_Renderer */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"), 
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
@@ -92,15 +99,15 @@ HRESULT CBackGround::SetUp_Components()
 
 
 	/* For.Com_Transfrom */
-	CTransform::TRANSFORMDESC TransfromDesc;
+	/*CTransform::TRANSFORMDESC TransfromDesc;
 	ZeroMemory(&TransfromDesc, sizeof(CTransform::TRANSFORMDESC));
 	
 	TransfromDesc.fSpeedPerSec = 5.f;
 	TransfromDesc.fRotationPerSec = 90.f;
 
-	if (FAILED(__super::Add_Component(LEVEL_STATIC, TEXT("Prototype_Component_Transform"), TEXT("Com_Transfrom"),
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Transform"), TEXT("Com_Transfrom"),
 		(CComponent**)&m_pTransfromCom,&TransfromDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
 
 
@@ -114,13 +121,17 @@ HRESULT CBackGround::SetUp_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	if (FAILED(m_pTransfromCom->Bind_ShaderResource("g_WorldMatrix", m_pShaderCom)))
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix" )))
 		return E_FAIL;
 	
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
+
+	RELEASE_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
@@ -158,7 +169,7 @@ void CBackGround::Free()
 	__super::Free();
 
 	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pTransfromCom);
+
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
