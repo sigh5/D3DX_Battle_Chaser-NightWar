@@ -28,9 +28,6 @@
     <Filter Include="02.GameObjects">
       <UniqueIdentifier>{e41e8875-419b-4b63-9229-2273345ad05a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\BackGround">
-      <UniqueIdentifier>{4802a01c-abcc-4482-81b4-37cfe572eb1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{9a0f34b9-2838-4e5d-87a4-eb8bf6420099}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,15 @@
     </Filter>
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{6b361b72-e841-4213-91a0-2697c2510717}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround">
+      <UniqueIdentifier>{736b5dd5-5d59-4789-adeb-42fe0c8ccf73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\BackGround">
+      <UniqueIdentifier>{4802a01c-abcc-4482-81b4-37cfe572eb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\Logo">
+      <UniqueIdentifier>{0a4bf59e-658b-4782-aac3-26d8f8b3bdef}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -85,7 +91,7 @@
       <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObjects\BackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -99,6 +105,7 @@
     <ClInclude Include="..\Public\Hero_Gully.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MainLogo.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -123,7 +130,7 @@
       <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObjects\BackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -137,6 +144,7 @@
     <ClCompile Include="..\Private\Hero_Gully.cpp">
       <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\MainLogo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

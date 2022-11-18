@@ -118,9 +118,13 @@ HRESULT CShader::Set_ShaderResourceView(const char * pConstantName, ID3D11Shader
 	if (nullptr == pVariable)
 		return E_FAIL;
 
+
 	return pVariable->SetResource(pSRV);
 
 }
+
+
+
 
 CShader * CShader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, const _uint iNumElements)
 {

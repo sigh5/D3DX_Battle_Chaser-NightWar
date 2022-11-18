@@ -21,6 +21,7 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject * pGame
 
 HRESULT CRenderer::Draw_RenderGroup()
 {
+
 	if (FAILED(Render_Priority()))
 		return E_FAIL;
 	if (FAILED(Render_NonAlphaBlend()))

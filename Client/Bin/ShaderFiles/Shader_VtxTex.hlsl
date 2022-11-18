@@ -9,17 +9,17 @@ texture2D		g_Texture;
 sampler				LinearSampler = sampler_state
 {
 	filter = MIN_MAG_MIP_LINEAR;		//D3D11_SAMPLER_DESC 참고
-	AddressU = WRAP;	// 기본적으로 안적으면 CLamp가 기본이다.
-	AddressV = WRAP;	
+	AddressU = CLAMP;	// 기본적으로 안적으면 CLamp가 기본이다.
+	AddressV = CLAMP;
 };
 
 //sampler				PointSampler = sampler_state
 //{
-//	fileter = MIN_MAG_MIP_POINT;
+//	fileter = MIN_MAG_MIP_LINEAR;
 //	AddressU = CLAMP;
 //	AddressV = CLAMP;
 //};
-
+//
 
 struct VS_IN
 {
@@ -65,8 +65,11 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexUV*2.f);
 	
+	
+	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexUV);
+
+
 	return Out;
 }
 

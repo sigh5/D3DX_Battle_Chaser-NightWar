@@ -19,6 +19,10 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_Logo(TEXT("Layer_Logo"))))
+		return E_FAIL;
+
+
 	CGameInstance::GetInstance()->Clear_ImguiObjects();
 	CGameInstance::GetInstance()->Add_ImguiTabObject(CImgui_PropertyEditor::Create());
 
@@ -65,6 +69,19 @@ HRESULT CLevel_Logo::Ready_Layer_BackGround(const wstring& pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_BackGround"))))
+		return E_FAIL;
+
+	Safe_Release(pGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLevel_Logo::Ready_Layer_Logo(const wstring & pLayerTag)
+{
+	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+	Safe_AddRef(pGameInstance);
+
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_BackGroundLogo"))))
 		return E_FAIL;
 
 	Safe_Release(pGameInstance);

@@ -6,7 +6,7 @@
 
 #include "Hero_Gully.h"
 #include "HpBar.h"
-
+#include "MainLogo.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -59,9 +59,14 @@ HRESULT CLoader::Loading_ForLogo()
 
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));	
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_LogoBackGround"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LogoBackGround.png")))))
 		return E_FAIL;
+	
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/BattleChasersLogo.png")))))
+		return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 	
@@ -79,7 +84,9 @@ HRESULT CLoader::Loading_ForLogo()
 		CBackGround::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
+		CMainLogo::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 

@@ -152,6 +152,8 @@ HRESULT CMainApp::Ready_Prototype_GameObject()
 	return S_OK;
 }
 
+
+
 CMainApp * CMainApp::Create()
 {
 	CMainApp*		pInstance = new CMainApp;
