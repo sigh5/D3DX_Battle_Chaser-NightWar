@@ -40,6 +40,15 @@
     <Filter Include="02.GameObjects\Camera">
       <UniqueIdentifier>{ad103151-317b-4107-9e0d-6af6112e0605}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI">
+      <UniqueIdentifier>{6e243f85-6474-4acf-ad18-c4d2d71ceee9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\HPBar">
+      <UniqueIdentifier>{9095ff33-1570-4247-91bc-087c2668ee74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player">
+      <UniqueIdentifier>{6b361b72-e841-4213-91a0-2697c2510717}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -84,6 +93,12 @@
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\HpBar.h">
+      <Filter>02.GameObjects\UI\HPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Hero_Gully.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -115,6 +130,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>02.GameObjects\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HpBar.cpp">
+      <Filter>02.GameObjects\UI\HPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Hero_Gully.cpp">
+      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -4,6 +4,9 @@
 #include "BackGround.h"
 #include "Terrain.h"
 
+#include "Hero_Gully.h"
+#include "HpBar.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -115,7 +118,6 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
 
-
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 	
 	/* For.Prototype_GameObject_BackGround */
@@ -124,6 +126,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
+	/* For.Prototype_GameObject_Hero_Gully */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+		CHero_Gully::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_HP_BarUI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HP_BarUI"),
+		CHpBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
