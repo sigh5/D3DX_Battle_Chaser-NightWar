@@ -32,6 +32,7 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 		CameraDesc.vEye = _float4(0.f, 20.f, -10.f, 1.f);
 		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
+		CameraDesc.fMouse_sensitivity = 0.1f;
 		CameraDesc.TransformDesc.fSpeedPerSec = 5.f;
 		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	}
@@ -47,10 +48,44 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 
 void CCamera_Dynamic::Tick(_double TimeDelta)
 {
-	if (GetKeyState(VK_UP) & 0x8000)
+	if (GetKeyState('W') & 0x8000)
 	{
 		m_pTransformCom->Go_Straight(TimeDelta);
 	}
+
+	if (GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(TimeDelta);
+	}
+
+	if (GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Left(TimeDelta);
+	}
+
+	if (GetKeyState('D') & 0x8000)
+	{
+		m_pTransformCom->Go_Right(TimeDelta);
+	}
+	CGameInstance * pGameInstance = GET_INSTANCE(CGameInstance);
+	_long			MouseMove = 0;
+
+	if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_X))
+	{
+		// 월드의 up벡터시 고정된 상태로 회전
+		// 트랜스폼의 UP 벡터시 조금 휘청휘청한 회전
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove *	m_CameraDesc.fMouse_sensitivity);
+	}
+
+	if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_Y))
+	{
+		// 월드의 up벡터시 고정된 상태로 회전
+		// 트랜스폼의 UP 벡터시 조금 휘청휘청한 회전
+		m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove *	m_CameraDesc.fMouse_sensitivity);
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
 
 	__super::Tick(TimeDelta);
 }

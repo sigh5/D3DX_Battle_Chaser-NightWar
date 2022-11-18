@@ -88,6 +88,12 @@
     <Filter Include="01.Utility\04.PipeLine">
       <UniqueIdentifier>{2192eb09-23f3-4dd2-b07a-6af1cdf4d4c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="05.Timer">
+      <UniqueIdentifier>{e1ec1b97-e01e-4c65-8283-8e8cd5c128cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="05.Timer\Manager">
+      <UniqueIdentifier>{02300155-f5ee-4db2-a5af-4d17d673a62b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -228,6 +234,12 @@
     <ClInclude Include="..\public\Camera.h">
       <Filter>01.Utility\02.GameObject\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Timer.h">
+      <Filter>05.Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Timer_Manager.h">
+      <Filter>05.Timer\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -343,6 +355,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera.cpp">
       <Filter>01.Utility\02.GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Timer.cpp">
+      <Filter>05.Timer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Timer_Manager.cpp">
+      <Filter>05.Timer\Manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

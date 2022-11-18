@@ -12,6 +12,7 @@ public:
 	typedef struct tagCameraDesc : public CGameObject::GAMEOBJECTDESC
 	{
 		_float4		vEye, vAt, vUp;
+		_float		fMouse_sensitivity;
 	}CAMERADESC;
 
 protected:
@@ -31,9 +32,13 @@ public:
 	//m_pDevice->SetTransform();
 	//m_pDevice->GetTransform();
 
+
+protected:
+	CAMERADESC					m_CameraDesc;
+
 private:
 	class CPipeLine*			m_pPipeLine = nullptr;
-	CAMERADESC					m_CameraDesc;
+	
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

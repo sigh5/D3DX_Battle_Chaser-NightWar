@@ -50,8 +50,6 @@ public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);
 
-
-
 public: // for imgui manager
 	void Add_ImguiTabObject(class CImguiObject* ImguiObject);
 	void Add_ImguiWindowObject(class CImguiObject* ImguiObject);
@@ -63,14 +61,26 @@ public: /* For.PipeLine */
 	_matrix Get_TransformMatrix_Inverse(CPipeLine::TRANSFORMSTATE eState);
 	void Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
 
+public:/* For.TimeManager */
+	_double		Get_TimeDelta(const _tchar* pTimerTag);
+	HRESULT		Ready_Timer(const _tchar* pTimerTag);
+	void		Update_Timer(const _tchar* pTimerTag);
+
+
+
+
+
 private:
-	class CGraphic_Device*			m_pGraphic_Device = nullptr;
-	class CInput_Device*			m_pInput_Device = nullptr;
-	class CLevel_Manager*			m_pLevel_Manager = nullptr;
-	class CObject_Manager*			m_pObject_Manager = nullptr;
-	class CComponent_Manager*		m_pComponent_Manager = nullptr;
-	class CImgui_Manager*			m_pImgui_Manager = nullptr;
-	class CPipeLine*				m_pPipeLine = nullptr;
+	class CGraphic_Device*			m_pGraphic_Device		= nullptr;
+	class CInput_Device*			m_pInput_Device			= nullptr;
+	class CLevel_Manager*			m_pLevel_Manager		= nullptr;
+	class CObject_Manager*			m_pObject_Manager		= nullptr;
+	class CComponent_Manager*		m_pComponent_Manager	= nullptr;
+	class CImgui_Manager*			m_pImgui_Manager		= nullptr;
+	class CPipeLine*				m_pPipeLine				= nullptr;
+	class CTimer_Manager*			m_pTimer_Manager		= nullptr;
+
+
 private:
 	static				_uint		m_iStaticLevelIndex;
 

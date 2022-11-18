@@ -3,6 +3,7 @@
 #include "Level_Manager.h"
 #include "Object_Manager.h"
 #include "Imgui_Manager.h"
+#include "Timer_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -18,7 +19,9 @@ CGameInstance::CGameInstance()
 	, m_pComponent_Manager(CComponent_Manager::GetInstance())
 	, m_pImgui_Manager(CImgui_Manager::GetInstance())
 	, m_pPipeLine(CPipeLine::GetInstance())
+	, m_pTimer_Manager(CTimer_Manager::GetInstance())
 {
+	Safe_AddRef(m_pTimer_Manager);
 	Safe_AddRef(m_pPipeLine);
 	Safe_AddRef(m_pComponent_Manager);
 	Safe_AddRef(m_pObject_Manager);
@@ -253,10 +256,34 @@ void CGameInstance::Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix Tra
 	m_pPipeLine->Set_Transform(eState, TransformMatrix);
 }
 
+_double CGameInstance::Get_TimeDelta(const _tchar * pTimerTag)
+{
+	if (nullptr == m_pTimer_Manager)
+		return E_FAIL; 
+	
+	return m_pTimer_Manager->Get_TimeDelta(pTimerTag);
+}
 
+HRESULT CGameInstance::Ready_Timer(const _tchar * pTimerTag)
+{
+	if (nullptr == m_pTimer_Manager)
+		return E_FAIL;
+
+	return m_pTimer_Manager->Ready_Timer(pTimerTag);
+}
+
+void CGameInstance::Update_Timer(const _tchar * pTimerTag)
+{
+	if (nullptr == m_pTimer_Manager)
+		return;
+
+	m_pTimer_Manager->Update_Timer(pTimerTag);
+}
 
 void CGameInstance::Release_Engine()
 {
+	CTimer_Manager::GetInstance()->DestroyInstance();
+
 	CImgui_Manager::GetInstance()->DestroyInstance();
 
 	CGameInstance::GetInstance()->DestroyInstance();
@@ -276,6 +303,8 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+
+	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pPipeLine);
 	Safe_Release(m_pComponent_Manager);
 	Safe_Release(m_pObject_Manager);

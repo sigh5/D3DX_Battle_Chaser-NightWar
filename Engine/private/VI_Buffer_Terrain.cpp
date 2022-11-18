@@ -35,7 +35,7 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 	pPixel = new _ulong[m_iNumVertices];
 	ZeroMemory(pPixel, sizeof(_ulong) * m_iNumVertices);
 
-	ReadFile(hFile, pPixel, sizeof(sizeof(_ulong) * m_iNumVertices), &dwByte, nullptr);
+	ReadFile(hFile, pPixel, sizeof(_ulong) * m_iNumVertices, &dwByte, nullptr);
 	CloseHandle(hFile);
 
 	m_iNumVertexBuffers = 1;
