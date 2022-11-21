@@ -15,7 +15,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
-		
+	if (FAILED(Ready_Lights()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 	
@@ -28,7 +30,6 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	CLevel::ClearBroadCaster();
 
 	return S_OK;
 
@@ -87,10 +88,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+	CGameObject*		pBroadCaster = nullptr;
+
 	if (FAILED(pGameInstance->Clone_BroadCasterObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"), &pBroadCaster)))
 		return E_FAIL;
 
-	CLevel::Add_BroadCaster(TEXT("Prototype_GameObject_Hero_Gully"), pBroadCaster);
+	// 누수가 남 지금 레이어가 map이라서 
+	CUI::UIDESC UIDesc;
+	ZeroMemory(&UIDesc, sizeof(UIDesc));
+	UIDesc.pBroadCaster = pBroadCaster;
+
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"), &UIDesc)))
+		return E_FAIL;
+
+	// 누수가 남 지금 레이어가 map이라서 
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -101,12 +112,27 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CUI::UIDESC UIDesc;
-	ZeroMemory(&UIDesc, sizeof(UIDesc));
 
-	UIDesc.pBroadCaster = Get_BroadCaster(TEXT("Prototype_GameObject_Hero_Gully"));
+	RELEASE_INSTANCE(CGameInstance);
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"),&UIDesc)))
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Lights()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	LIGHTDESC		LightDesc;
+	ZeroMemory(&LightDesc, sizeof(LightDesc));
+
+	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
+	LightDesc.isEnable = true;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

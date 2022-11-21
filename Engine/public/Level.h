@@ -23,18 +23,9 @@ public:
 
 
 protected:
-	void						ClearBroadCaster();
-	virtual	 void				Add_BroadCaster(const wstring& pBroadCasterTag, class CGameObject* pBroadCaster);
-	virtual	 class CGameObject*	Get_BroadCaster(const wstring& pBroadCasterTag);
-
-private:
-	class CGameObject*			Find_BroadCaster(const wstring& pBroadCasterTag);
-
-
-protected:
 	ID3D11Device*				m_pDevice = nullptr;
 	ID3D11DeviceContext*		m_pContext = nullptr;
-	map<const wstring, class CGameObject*> m_mapBroadCasters;
+
 public:
 	virtual void Free();
 };

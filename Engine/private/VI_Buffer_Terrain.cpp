@@ -49,16 +49,6 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
 
 #pragma region VERTEX_BUFFER
-
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
-	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	m_BufferDesc.StructureByteStride = m_iStride;
-	m_BufferDesc.CPUAccessFlags = 0;
-	m_BufferDesc.MiscFlags = 0;
-
 	VTXNORTEX*			pVertices = new VTXNORTEX[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXNORTEX));
 
@@ -77,28 +67,13 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.0f), i / (m_iNumVerticesZ - 1.0f));
 		}
 	}
-	
-	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pVertices;
 
-	if (FAILED(__super::Create_VertexBuffer()))
-		return E_FAIL;
 
-	Safe_Delete_Array(pVertices);
+	Safe_Delete_Array(pPixel);
 
 #pragma endregion
 
 #pragma region INDEX_BUFFER
-
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
-	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.StructureByteStride = 0;
-	m_BufferDesc.CPUAccessFlags = 0;
-	m_BufferDesc.MiscFlags = 0;
-
 	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
 	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
 
@@ -117,19 +92,66 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 				iIndex
 			};
 
+			_vector		vSour, vDest, vNormal;
+
 			pIndices[iNumFaces]._0 = iIndices[0];
 			pIndices[iNumFaces]._1 = iIndices[1];
 			pIndices[iNumFaces]._2 = iIndices[2];
+			
+			vSour = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) -  XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
+			vDest = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+			
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal));
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal));
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal));
+
 			++iNumFaces;
 
 			pIndices[iNumFaces]._0 = iIndices[0];
 			pIndices[iNumFaces]._1 = iIndices[2];
 			pIndices[iNumFaces]._2 = iIndices[3];
+
+			vSour = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vPosition);
+			vDest = XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vPosition) - XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vPosition);
+			vNormal = XMVector3Normalize(XMVector3Cross(vSour, vDest));
+
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._0].vNormal) + vNormal));
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._1].vNormal) + vNormal));
+			XMStoreFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal, XMVector3Normalize(XMLoadFloat3(&pVertices[pIndices[iNumFaces]._2].vNormal) + vNormal));
+
 			++iNumFaces;
 		}
 	}
 
+#pragma region VERTEX
 
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.StructureByteStride = m_iStride;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
+
+	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+	m_SubResourceData.pSysMem = pVertices;
+
+	if (FAILED(__super::Create_VertexBuffer()))
+		return E_FAIL;
+
+#pragma endregion VERTEX
+
+#pragma region INDEX
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
+	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	m_BufferDesc.StructureByteStride = 0;
+	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.MiscFlags = 0;
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
 	m_SubResourceData.pSysMem = pIndices;
@@ -137,8 +159,13 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 	if (FAILED(__super::Create_IndexBuffer()))
 		return E_FAIL;
 
+#pragma endregion INDEX
+
+
+
+	Safe_Delete_Array(pVertices);
 	Safe_Delete_Array(pIndices);
-	Safe_Delete_Array(pPixel);
+
 
 #pragma endregion
 

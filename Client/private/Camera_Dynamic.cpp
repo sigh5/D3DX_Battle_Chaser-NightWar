@@ -53,7 +53,7 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 		m_pTransformCom->Go_Straight(TimeDelta);
 	}
 
-	if (GetKeyState('A') & 0x8000)
+	if (GetKeyState('S') & 0x8000)
 	{
 		m_pTransformCom->Go_Backward(TimeDelta);
 	}

@@ -11,6 +11,26 @@ namespace Engine
 		HWND			hWnd;		
 	}GRAPHIC_DESC;
 
+	typedef struct tagLightDesc
+	{
+		enum TYPE {TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END};
+		TYPE		eType;
+
+		bool		isEnable;
+
+		XMFLOAT4	vDirection;
+
+		// 모든 정점이 받는 빛의 방향벡터가 다 다르게 표현되야하기때문이다.
+		// 셰이더내에서 빛의 방향벡터를 구해서 연산을 해야한다.
+		XMFLOAT4	vPosition;
+		float		fRange;
+		XMFLOAT4	vDiffuse;
+		XMFLOAT4	vAmbient;
+		XMFLOAT4	vSpecular;
+	}LIGHTDESC;
+
+
+
 	typedef struct tagFaceIndices16
 	{
 		unsigned short			_0, _1, _2;

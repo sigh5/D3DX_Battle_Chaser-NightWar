@@ -61,15 +61,21 @@ public: /* For.PipeLine */
 	_float4x4 Get_TransformFloat4x4(CPipeLine::TRANSFORMSTATE eState);
 	_matrix Get_TransformMatrix_Inverse(CPipeLine::TRANSFORMSTATE eState);
 	void Set_Transform(CPipeLine::TRANSFORMSTATE eState, _fmatrix TransformMatrix);
+	_float4		Get_CamPositon();
 
 public:/* For.TimeManager */
 	_double		Get_TimeDelta(const _tchar* pTimerTag);
 	HRESULT		Ready_Timer(const _tchar* pTimerTag);
 	void		Update_Timer(const _tchar* pTimerTag);
 
+public:/* For.Light_Manager */
+public:
+	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;
+	HRESULT				Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
 
 
-
+private:
+	static				_uint		m_iStaticLevelIndex;
 
 private:
 	class CGraphic_Device*			m_pGraphic_Device		= nullptr;
@@ -80,10 +86,9 @@ private:
 	class CImgui_Manager*			m_pImgui_Manager		= nullptr;
 	class CPipeLine*				m_pPipeLine				= nullptr;
 	class CTimer_Manager*			m_pTimer_Manager		= nullptr;
+	class CLight_Manager*			m_pLight_Manager		= nullptr;
 
 
-private:
-	static				_uint		m_iStaticLevelIndex;
 
 
 
