@@ -55,6 +55,9 @@
     <Filter Include="02.GameObjects\LogoBackGround\Logo">
       <UniqueIdentifier>{0a4bf59e-658b-4782-aac3-26d8f8b3bdef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\LoadingImage">
+      <UniqueIdentifier>{63b8bfc7-7ca1-4ca0-a575-b02f59be3c5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -105,7 +108,12 @@
     <ClInclude Include="..\Public\Hero_Gully.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MainLogo.h" />
+    <ClInclude Include="..\Public\MainLogo.h">
+      <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoadingImage.h">
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -144,7 +152,12 @@
     <ClCompile Include="..\Private\Hero_Gully.cpp">
       <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MainLogo.cpp" />
+    <ClCompile Include="..\Private\MainLogo.cpp">
+      <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadingImage.cpp">
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

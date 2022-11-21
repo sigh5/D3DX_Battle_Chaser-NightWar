@@ -2,6 +2,7 @@
 #include "Layer.h"
 #include "GameObject.h"
 #include "GameUtils.h"
+#include "GameInstance.h"
 
 IMPLEMENT_SINGLETON(CObject_Manager)
 
@@ -30,6 +31,22 @@ HRESULT CObject_Manager::Clear(_uint iLevelIndex)
 		Safe_Release(Pair.second);
 
 	m_pLayers[iLevelIndex].clear();
+
+	return S_OK;
+}
+
+HRESULT CObject_Manager::Loading_Objects()
+{
+	// 로딩 레벨 삭제
+	CGameInstance* pGameInstance = CGameInstance::GetInstance();
+	Safe_AddRef(pGameInstance);
+	for (auto &Pair : m_pLayers[pGameInstance->Get_StaticLevelIndex() - 1])
+	{
+		Safe_Release(Pair.second);
+	}
+	m_pLayers[pGameInstance->Get_StaticLevelIndex() - 1].clear();
+	Safe_Release(pGameInstance);
+
 
 	return S_OK;
 }

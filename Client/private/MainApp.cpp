@@ -4,7 +4,7 @@
 #include "GameInstance.h"
 #include "Level_Loading.h"
 #include "Camera_Dynamic.h"
-
+#include "LoadingImage.h"
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 {
@@ -19,6 +19,8 @@ HRESULT CMainApp::Initialize()
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
+
+	m_iLoadingIndex = -1;
 
 	/* 게임엔진 초기화 */
 	GRAPHIC_DESC			GraphicDesc;
@@ -120,8 +122,6 @@ HRESULT CMainApp::Ready_Prototype_Component()
 		m_pRenderer = CRenderer::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
-
-
 	/* For.Prototype_Component_VIBuffer_Rect */
 	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
@@ -131,6 +131,12 @@ HRESULT CMainApp::Ready_Prototype_Component()
 	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Shader_VtxTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTex.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
+
+	/* For.Prototype_Component_Shader_VtxTex */
+	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingImage"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LoadingImage/LoadScreen%d.png"),11))))
+		return E_FAIL;
+
 
 
 	Safe_AddRef(m_pRenderer);
@@ -146,6 +152,10 @@ HRESULT CMainApp::Ready_Prototype_GameObject()
 	/* For.Prototype_GameObject_Camera_Dynamic */
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Camera_Dynamic"),
 		CCamera_Dynamic::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingImage"),
+		CLoadingImage::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

@@ -17,6 +17,11 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
+
+private:
+	HRESULT Ready_Layer_BackGround(const wstring& pLayerTag);
+
+
 private:
 	class CLoader*	m_pLoader = nullptr;
 	LEVEL			m_eNextLevelID = LEVEL_END;

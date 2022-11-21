@@ -198,6 +198,13 @@ HRESULT CGameInstance::Clone_BroadCasterObject(_uint iLevelIndex, const wstring 
 	return m_pObject_Manager->Clone_BroadCasterObject(iLevelIndex, pLayerTag, pPrototypeTag, pObserverObject,pArg);
 }
 
+HRESULT CGameInstance::Loading_Objects()
+{
+	if (nullptr == m_pObject_Manager)
+		return E_FAIL;
+	return m_pObject_Manager->Loading_Objects();
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)

@@ -41,7 +41,7 @@ private:
 	HRESULT Start_Level(LEVEL eLevelID);	
 	HRESULT Ready_Prototype_Component();
 	HRESULT Ready_Prototype_GameObject();
-
+	
 
 
 public:

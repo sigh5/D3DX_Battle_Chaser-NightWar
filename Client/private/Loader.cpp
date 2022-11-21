@@ -147,6 +147,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	m_isFinished = true;
 
+	
+
 	Safe_Release(pGameInstance);
 
 	return S_OK;

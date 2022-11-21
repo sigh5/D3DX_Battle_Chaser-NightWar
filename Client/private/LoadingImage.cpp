@@ -1,19 +1,21 @@
 #include "stdafx.h"
-#include "..\public\MainLogo.h"
+#include "..\public\LoadingImage.h"
 
 #include "GameInstance.h"
 
-CMainLogo::CMainLogo(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+
+
+CLoadingImage::CLoadingImage(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {
 }
 
-CMainLogo::CMainLogo(const CMainLogo & rhs)
-	:CUI(rhs)
+CLoadingImage::CLoadingImage(const CLoadingImage & rhs)
+	: CUI(rhs)
 {
 }
 
-HRESULT CMainLogo::Initialize_Prototype()
+HRESULT CLoadingImage::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -21,8 +23,9 @@ HRESULT CMainLogo::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CMainLogo::Initialize(void * pArg)
+HRESULT CLoadingImage::Initialize(void * pArg)
 {
+	++m_iLoadingIndex;
 
 	CUI::UIDESC Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
@@ -34,28 +37,28 @@ HRESULT CMainLogo::Initialize(void * pArg)
 		return E_FAIL;
 
 
-	m_fSizeX = (_float)g_iWinSizeX/2;
-	m_fSizeY = (_float)g_iWinSizeY/2;
+	m_fSizeX = (_float)g_iWinSizeX;
+	m_fSizeY = (_float)g_iWinSizeY;
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 0.5f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
 
-
-
 	return S_OK;
+
+
 }
 
-void CMainLogo::Tick(_double TimeDelta)
+void CLoadingImage::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 }
 
-void CMainLogo::Late_Tick(_double TimeDelta)
+void CLoadingImage::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
@@ -63,7 +66,7 @@ void CMainLogo::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CMainLogo::Render()
+HRESULT CLoadingImage::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -77,7 +80,7 @@ HRESULT CMainLogo::Render()
 	return S_OK;
 }
 
-HRESULT CMainLogo::SetUp_Components()
+HRESULT CLoadingImage::SetUp_Components()
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
@@ -94,15 +97,14 @@ HRESULT CMainLogo::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"), TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingImage"), TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	return S_OK;
-
 }
 
-HRESULT CMainLogo::SetUp_ShaderResources()
+HRESULT CLoadingImage::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -117,39 +119,40 @@ HRESULT CMainLogo::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iLoadingIndex)))
 		return E_FAIL;
 
 
 	return S_OK;
 }
 
-CMainLogo * CMainLogo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CLoadingImage * CLoadingImage::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CMainLogo*		pInstance = new CMainLogo(pDevice, pContext);
+	CLoadingImage*		pInstance = new CLoadingImage(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CBackGround");
+		MSG_BOX("Failed to Created : CLoadingImage");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CMainLogo::Clone(void * pArg)
+CGameObject * CLoadingImage::Clone(void * pArg)
 {
-	CMainLogo*		pInstance = new CMainLogo(*this);
+	CLoadingImage*		pInstance = new CLoadingImage(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CBackGround");
+		MSG_BOX("Failed to Cloned : CLoadingImage");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CMainLogo::Free()
+void CLoadingImage::Free()
 {
 	__super::Free();
 

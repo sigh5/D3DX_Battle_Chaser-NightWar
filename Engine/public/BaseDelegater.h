@@ -31,6 +31,7 @@ public:
 			else
 			{
 				iter->second(args...);
+				Safe_Release(iter->first);
 				++iter;
 			}
 		}

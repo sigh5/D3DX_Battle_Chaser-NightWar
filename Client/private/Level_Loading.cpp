@@ -5,6 +5,7 @@
 #include "GameInstance.h"
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
+#include "LoadingImage.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -26,6 +27,11 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 
 	/* 로딩씬 구성을 위한 객체를 생성한다. */
 	/* 로딩바. 배경. 등등등. */
+
+	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
@@ -49,10 +55,11 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 		if (GetKeyState(VK_RETURN) & 0x8000)
 		{
 			CLevel*		pLevel = nullptr;
-
+			pGameInstance->Loading_Objects();
 			switch (m_eNextLevelID)
 			{
 			case LEVEL_LOGO:
+				
 				pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 				break;
 
@@ -84,6 +91,23 @@ HRESULT CLevel_Loading::Render()
 	return S_OK;
 }
 
+HRESULT CLevel_Loading::Ready_Layer_BackGround(const wstring & pLayerTag)
+{
+
+	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+	Safe_AddRef(pGameInstance);
+
+	if (FAILED(pGameInstance->Clone_GameObject(pGameInstance->Get_StaticLevelIndex()-1, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
+		return E_FAIL;
+
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BackGround"))))
+	//	return E_FAIL;
+
+	Safe_Release(pGameInstance);
+
+	return S_OK;
+}
+
 CLevel_Loading * CLevel_Loading::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, LEVEL eNextLevelID)
 {
 	CLevel_Loading*		pInstance = new CLevel_Loading(pDevice, pContext);
@@ -101,5 +125,6 @@ void CLevel_Loading::Free()
 	__super::Free();
 
 	Safe_Release(m_pLoader);
+	
 
 }
