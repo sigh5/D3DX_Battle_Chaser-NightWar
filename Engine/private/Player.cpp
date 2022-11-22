@@ -32,6 +32,11 @@ HRESULT CPlayer::Initialize(void * pArg)
 	return S_OK;
 }
 
+HRESULT CPlayer::Last_Initialize()
+{
+	return E_NOTIMPL;
+}
+
 void CPlayer::Tick(_double TimeDelta)
 {
 }

@@ -119,6 +119,19 @@ HRESULT CObject_Manager::Clone_BroadCasterObject(_uint iLevelIndex, const wstrin
 	return S_OK;
 }
 
+CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
+{
+	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
+
+	for (auto & iter : pLayer->GetGameObjects())
+	{
+		if (iter != nullptr && !lstrcmpW(iter->Get_ObjectName(), pObjectNameTag.c_str()))
+			return iter;
+	}
+
+	return nullptr;
+}
+
 void CObject_Manager::Tick(_double TimeDelta)
 {
 	for (_uint i = 0; i < m_iNumLevels; ++i)

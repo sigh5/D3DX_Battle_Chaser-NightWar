@@ -25,6 +25,8 @@ HRESULT CLoadingImage::Initialize_Prototype()
 
 HRESULT CLoadingImage::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("Loading_Images");
+
 	++m_iLoadingIndex;
 
 	CUI::UIDESC Desc;
@@ -51,6 +53,11 @@ HRESULT CLoadingImage::Initialize(void * pArg)
 	return S_OK;
 
 
+}
+
+HRESULT CLoadingImage::Last_Initialize()
+{
+	return E_NOTIMPL;
 }
 
 void CLoadingImage::Tick(_double TimeDelta)

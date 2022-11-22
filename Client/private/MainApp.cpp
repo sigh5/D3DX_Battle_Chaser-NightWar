@@ -61,16 +61,17 @@ HRESULT CMainApp::Render()
 		return E_FAIL;
 
 
+	m_pGameInstance->Render_ImGui();
 
-	m_pGameInstance->Clear_Graphic_Device(&_float4(0.0f, 0.f, 1.f, 1.f));	
+	m_pGameInstance->Clear_Graphic_Device(&_float4(0.5f, 0.5f, 0.5f, 1.f));
 
 	m_pRenderer->Draw_RenderGroup();
+
+	m_pGameInstance->Render_Update_ImGui();
 
 	m_pGameInstance->Render_Level();
 
 	m_pGameInstance->Present();
-
-	Resize_BackBuffer();
 
 	return S_OK;
 }

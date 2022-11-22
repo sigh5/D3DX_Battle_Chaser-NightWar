@@ -41,6 +41,8 @@ HRESULT CGameObject::Initialize(void * pArg)
 	return S_OK;
 }
 
+
+
 void CGameObject::Tick(_double TimeDelta)
 {
 }
@@ -64,6 +66,7 @@ void CGameObject::Imgui_RenderComponentProperties()
 
 		ImGui::Text("%s", szName);
 		com.second->Imgui_RenderProperty();
+
 	}
 }
 

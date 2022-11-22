@@ -33,6 +33,11 @@ HRESULT CUI::Initialize(void * pArg)
 	return S_OK;
 }
 
+HRESULT CUI::Last_Initialize()
+{
+	return S_OK;
+}
+
 void CUI::Tick(_double TimeDelta)
 {
 }

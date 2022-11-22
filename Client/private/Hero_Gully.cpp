@@ -20,7 +20,17 @@ HRESULT CHero_Gully::Initialize_Prototype()
 
 HRESULT CHero_Gully::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("Hero_Gully");
+
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
 	return S_OK;
+}
+
+HRESULT CHero_Gully::Last_Initialize()
+{
+	return E_NOTIMPL;
 }
 
 void CHero_Gully::Tick(_double TimeDelta)

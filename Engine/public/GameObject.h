@@ -22,8 +22,12 @@ public:
 	static	const wstring		m_pTransformComTag;
 
 public:
+	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Last_Initialize() = 0;
 	virtual void Tick(_double TimeDelta);
 	virtual void Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
@@ -46,8 +50,9 @@ protected:
 protected:	
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	class CComponent* Find_Component(const wstring& pComponentTag);
+	const					_tchar*					m_ObjectName = TEXT("");
 
-
+	_bool											m_bLast_Initlize = false;
 public:	
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

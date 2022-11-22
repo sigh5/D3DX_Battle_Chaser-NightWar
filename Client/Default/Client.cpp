@@ -87,16 +87,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		else
 		{
+			static _double OneFrameSec = 1.0 / 60.0;
 			pGameInstance->Update_Timer(TEXT("Timer_Default"));
 
 			TimerAcc += pGameInstance->Get_TimeDelta(TEXT("Timer_Default"));
 
-			if (TimerAcc > 1.0 / 60.0)
+			if (TimerAcc > OneFrameSec)
 			{
 				pGameInstance->Update_Timer(TEXT("Timer_60"));
 
 				pMainApp->Tick(pGameInstance->Get_TimeDelta(TEXT("Timer_60")));
 				pMainApp->Render();
+				pMainApp->Resize_BackBuffer();
+				g_bNeedResizeSwapChain = false;
 
 				TimerAcc = 0.0;
 			}

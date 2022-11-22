@@ -42,6 +42,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 		nullptr == m_pObject_Manager ||
 		nullptr == m_pComponent_Manager)
 		return E_FAIL;
+	m_hWnd = GraphicDesc.hWnd;
 
 	/* 그래픽 디바이스 초기화. */
 	if (FAILED(m_pGraphic_Device->Ready_Graphic_Device(GraphicDesc.hWnd, GraphicDesc.eWindowMode, GraphicDesc.iViewportSizeX, GraphicDesc.iViewportSizeY, ppDeviceOut, ppContextOut)))
@@ -89,7 +90,6 @@ void CGameInstance::Tick_Engine(_double TimeDelta)
 
 	m_pPipeLine->Tick();
 
-
 	m_pObject_Manager->Late_Tick(TimeDelta);
 	m_pLevel_Manager->Late_Tick(TimeDelta);
 }
@@ -109,8 +109,6 @@ HRESULT CGameInstance::Clear_Graphic_Device(const _float4 * pColor)
 		return E_FAIL;
 
 	HRESULT			hr = 0;
-
-	m_pImgui_Manager->Render_Imgui();
 
 	hr = m_pGraphic_Device->Clear_BackBuffer_View(*pColor);
 	hr = m_pGraphic_Device->Clear_DepthStencil_View();
@@ -172,8 +170,6 @@ HRESULT CGameInstance::Render_Level()
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	m_pImgui_Manager->Render_Update_ImGui();
-
 	return m_pLevel_Manager->Render();
 }
 
@@ -208,6 +204,13 @@ HRESULT CGameInstance::Loading_Objects()
 	return m_pObject_Manager->Loading_Objects();
 }
 
+CGameObject * CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+	return m_pObject_Manager->Get_GameObject(iLevelIndex, pLayerTag, pObjectNameTag);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)
@@ -222,6 +225,22 @@ CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring& pP
 		return nullptr;
 
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, pPrototypeTag, pArg);
+}
+
+void CGameInstance::Render_ImGui()
+{
+	if (nullptr == m_pImgui_Manager)
+		return;
+
+	m_pImgui_Manager->Render_Imgui();
+}
+
+void CGameInstance::Render_Update_ImGui()
+{
+	if (nullptr == m_pImgui_Manager)
+		return;
+
+	m_pImgui_Manager->Render_Update_ImGui();
 }
 
 void CGameInstance::Add_ImguiTabObject(CImguiObject* ImguiObject)
@@ -241,6 +260,7 @@ void CGameInstance::Clear_ImguiObjects()
 	if (m_pImgui_Manager == nullptr) return;
 	m_pImgui_Manager->Clear_ImguiObjects();
 }
+
 
 _matrix CGameInstance::Get_TransformMatrix(CPipeLine::TRANSFORMSTATE eState)
 {

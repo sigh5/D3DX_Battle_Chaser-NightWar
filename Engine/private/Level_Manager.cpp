@@ -11,12 +11,12 @@ CLevel_Manager::CLevel_Manager()
 HRESULT CLevel_Manager::Open_Level(_uint iLevelIndex, CLevel * pNewLevel)
 {
 	if (nullptr == pNewLevel)
-		return E_FAIL;	
+		return E_FAIL;
 
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
-	Safe_AddRef(pGameInstance);	
+	Safe_AddRef(pGameInstance);
 
-	if(nullptr != m_pCurrentLevel)
+	if (nullptr != m_pCurrentLevel)
 		pGameInstance->Clear_Level(m_iLevelIndex);
 
 	Safe_Release(m_pCurrentLevel);
@@ -25,6 +25,7 @@ HRESULT CLevel_Manager::Open_Level(_uint iLevelIndex, CLevel * pNewLevel)
 	m_iLevelIndex = iLevelIndex;
 
 	Safe_Release(pGameInstance);
+
 
 	return S_OK;
 }

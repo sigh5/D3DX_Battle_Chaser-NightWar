@@ -41,6 +41,11 @@ HRESULT CCamera::Initialize(void * pArg)
 	return S_OK;
 }
 
+HRESULT CCamera::Last_Initialize()
+{
+	return S_OK;
+}
+
 void CCamera::Tick(_double TimeDelta)
 {
 	if (nullptr == m_pPipeLine)

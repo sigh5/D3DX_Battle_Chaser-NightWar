@@ -71,6 +71,7 @@ void CImgui_Manager::Add_ImguiTabObject(CImguiObject* ImguiObject)
 	if (ImguiObject == nullptr)
 		return;
 
+	// 여기서 바로 ImguiObject삭제하기 위해서 add ref 생략
 	m_vecTab.push_back(ImguiObject);
 }
 
@@ -79,6 +80,7 @@ void CImgui_Manager::Add_ImguiWindowObject(CImguiObject* ImguiObject)
 	if (ImguiObject == nullptr)
 		return;
 
+	// 여기서 바로 ImguiObject삭제하기 위해서 add ref 생략
 	m_vecWin.push_back(ImguiObject);
 }
 

@@ -22,6 +22,9 @@ HRESULT CTerrain::Initialize_Prototype()
 
 HRESULT CTerrain::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("Terrain");
+
+
 	if (FAILED(__super::Initialize(&pArg)))
 		return E_FAIL;
 
@@ -30,6 +33,11 @@ HRESULT CTerrain::Initialize(void * pArg)
 
 
 	return S_OK;
+}
+
+HRESULT CTerrain::Last_Initialize()
+{
+	return E_NOTIMPL;
 }
 
 void CTerrain::Tick(_double TimeDelta)

@@ -22,6 +22,9 @@ HRESULT CBackGround::Initialize_Prototype()
 
 HRESULT CBackGround::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("BackGround");
+
+
 	CGameObject::GAMEOBJECTDESC GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
 
@@ -46,6 +49,11 @@ HRESULT CBackGround::Initialize(void * pArg)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
 
+	return S_OK;
+}
+
+HRESULT CBackGround::Last_Initialize()
+{
 	return S_OK;
 }
 

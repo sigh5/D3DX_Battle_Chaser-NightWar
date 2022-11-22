@@ -64,9 +64,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
 		return E_FAIL;
 
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BackGround"))))
-	//	return E_FAIL;
-
 	Safe_Release(pGameInstance);
 
 	return S_OK;
@@ -88,18 +85,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject*		pBroadCaster = nullptr;
+	//CGameObject*		pBroadCaster = nullptr;
 
-	if (FAILED(pGameInstance->Clone_BroadCasterObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"), &pBroadCaster)))
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
 		return E_FAIL;
 
-	// 누수가 남 지금 레이어가 map이라서 
-	CUI::UIDESC UIDesc;
-	ZeroMemory(&UIDesc, sizeof(UIDesc));
-	UIDesc.pBroadCaster = pBroadCaster;
+	//// 누수가 남 지금 레이어가 map이라서 
+	//CUI::UIDESC UIDesc;
+	//ZeroMemory(&UIDesc, sizeof(UIDesc));
+	//UIDesc.pBroadCaster = pBroadCaster;
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"), &UIDesc)))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"), &UIDesc)))
+	//	return E_FAIL;
 
 	// 누수가 남 지금 레이어가 map이라서 
 
@@ -111,7 +108,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
+	
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 

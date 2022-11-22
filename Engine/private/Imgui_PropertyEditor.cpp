@@ -13,7 +13,7 @@ HRESULT CImgui_PropertyEditor::Initialize(void* pArg)
 void CImgui_PropertyEditor::Imgui_RenderTab()
 {
 	CObject_Manager::GetInstance()->Imgui_ObjectViewer(
-		CLevel_Manager::GetInstance()->GetCurLevelIdx(), 
+		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
 		m_pSelectedObject);
 
 	// todo: 마우스 피킹으로 오브젝트 선택하는 기능 추가
@@ -42,9 +42,4 @@ CImgui_PropertyEditor* CImgui_PropertyEditor::Create(void* pArg)
 	}
 
 	return inst;
-}
-
-void CImgui_PropertyEditor::Free()
-{
-	__super::Free();
 }

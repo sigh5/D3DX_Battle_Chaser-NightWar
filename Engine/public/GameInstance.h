@@ -20,6 +20,8 @@ private:
 public:
 	static	 _uint  Get_StaticLevelIndex() { return m_iStaticLevelIndex; }
 
+	HWND GetHWND() { return m_hWnd; }
+
 public: /* For.GameInstance*/
 	static const		_tchar*     m_pPrototypeTransformTag;
 
@@ -47,11 +49,16 @@ public: /* For.Object_Manager */
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
 	HRESULT Clone_BroadCasterObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** pObserverObject, void * pArg = nullptr);
 	HRESULT Loading_Objects();
+	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
+
+
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);
 
 public: // for imgui manager
+	void Render_ImGui();
+	void Render_Update_ImGui();
 	void Add_ImguiTabObject(class CImguiObject* ImguiObject);
 	void Add_ImguiWindowObject(class CImguiObject* ImguiObject);
 	void Clear_ImguiObjects();
@@ -90,10 +97,12 @@ private:
 
 
 
-
-
 public:
 	static void Release_Engine();
+
+private:
+	HWND m_hWnd;
+
 
 public:
 	virtual void Free() override;
