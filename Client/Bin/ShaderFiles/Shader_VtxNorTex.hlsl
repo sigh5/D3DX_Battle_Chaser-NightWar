@@ -4,6 +4,8 @@ vector			g_vCamPosition;
 
 /* 빛정보 */
 vector			g_vLightDir;
+vector			g_vLightPos;		// For_PointLight
+float			g_fRange;			// For_PointLight
 vector			g_vLightDiffuse;
 vector			g_vLightAmbient;
 vector			g_vLightSpecular;
@@ -13,6 +15,9 @@ vector			g_vLightSpecular;
 texture2D		g_DiffuseTexture;
 vector			g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
 vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
+
+/* 지형 셰이딩*/
+texture2D		g_BrushTexture;
 
 sampler				LinearSampler = sampler_state
 {
@@ -68,8 +73,10 @@ VS_OUT VS_MAIN(VS_IN In)
 	vector	vReflect = reflect(normalize(g_vLightDir), normalize(vWorldNormal));
 	vector	vLook	 = vWorldPosition - g_vCamPosition;
 
-	Out.fSpecular = saturate(dot(normalize(vReflect) * -1.f,
-		normalize(vLook)));
+	/* 두 벡터 : 빛의 반사벡터, 정점을 바라보는 시선벡터 */
+	/* pow 를 이용하여 1과 가까울때만 반사값을 크게만들고 나머지는 누워있게만든다.*/
+	Out.fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f,
+		normalize(vLook))), 30.f);
 
 	return Out;
 }
@@ -104,7 +111,7 @@ PS_OUT PS_MAIN(PS_IN In)
 
 technique11 DefaultTechnique
 {
-	pass Rect
+	pass Terrain
 	{
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
