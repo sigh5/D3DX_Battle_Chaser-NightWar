@@ -130,7 +130,7 @@ HRESULT CGameInstance::Update_SwapChain(HWND hWnd, _uint iWinCX, _uint iWinCY, _
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	return m_pGraphic_Device->Update_SwapChain(hWnd, iWinCX, iWinCY, bIsFullScreen, bNeedUpdate);
+	return  m_pGraphic_Device->Update_SwapChain(hWnd, iWinCX, iWinCY, bIsFullScreen, bNeedUpdate);
 }
 
 _byte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
