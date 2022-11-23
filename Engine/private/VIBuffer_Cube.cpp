@@ -25,8 +25,8 @@ HRESULT CVIBuffer_Cube::Initialize_Prototype()
 	m_iNumVertices = 8;
 	m_iNumPrimitive = 12;	
 	m_eTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
-	m_iIndicesSizePerPrimitive = sizeof(FACEINDICES16);
+	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
+	m_iIndicesSizePerPrimitive = sizeof(FACEINDICES32);
 	m_iNumIndicesPerPrimitive = 3;
 	m_iNumIndices = m_iNumPrimitive*m_iNumIndicesPerPrimitive;
 
@@ -45,35 +45,35 @@ HRESULT CVIBuffer_Cube::Initialize_Prototype()
 	m_vPos = new _float4[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXCUBETEX));
 
-	pVertices[0].vPosition = _float3(-1.f, 1.f, -1.f);
+	pVertices[0].vPosition = _float3(-0.5f, 0.5f, -0.5f);
 	pVertices[0].vTexUV = pVertices[0].vPosition;
 	m_vPos[0] = _float4( pVertices[0].vPosition.x, pVertices[0].vPosition.y, pVertices[0].vPosition.z,1.f );
 
-	pVertices[1].vPosition = _float3(1.f, 1.f, -1.f);
+	pVertices[1].vPosition = _float3(0.5f, 0.5f, -0.5f);
 	pVertices[1].vTexUV = pVertices[1].vPosition;
 	m_vPos[1] = _float4(pVertices[1].vPosition.x, pVertices[1].vPosition.y, pVertices[1].vPosition.z, 1.f);
 
-	pVertices[2].vPosition = _float3(1.f, -1.f, -1.f);
+	pVertices[2].vPosition = _float3(0.5f, -0.5f, -0.5f);
 	pVertices[2].vTexUV = pVertices[2].vPosition;
 	m_vPos[2] = _float4(pVertices[2].vPosition.x, pVertices[2].vPosition.y, pVertices[2].vPosition.z, 1.f);
 
-	pVertices[3].vPosition = _float3(-1.f, -1.f, -1.f);
+	pVertices[3].vPosition = _float3(-0.5f, -0.5f, -0.5f);
 	pVertices[3].vTexUV = pVertices[3].vPosition;
 	m_vPos[3] = _float4(pVertices[3].vPosition.x, pVertices[3].vPosition.y, pVertices[3].vPosition.z, 1.f);
 
-	pVertices[4].vPosition = _float3(-1.f, 1.f, 1.f);
+	pVertices[4].vPosition = _float3(-0.5f, 0.5f, 0.5f);
 	pVertices[4].vTexUV = pVertices[4].vPosition;
 	m_vPos[4] = _float4(pVertices[4].vPosition.x, pVertices[4].vPosition.y, pVertices[4].vPosition.z, 1.f);
 
-	pVertices[5].vPosition = _float3(1.f, 1.f, 1.f);
+	pVertices[5].vPosition = _float3(0.5f, 0.5f, 0.5f);
 	pVertices[5].vTexUV = pVertices[5].vPosition;
 	m_vPos[5] = _float4(pVertices[5].vPosition.x, pVertices[5].vPosition.y, pVertices[5].vPosition.z, 1.f);
 
-	pVertices[6].vPosition = _float3(1.f, -1.f, 1.f);
+	pVertices[6].vPosition = _float3(0.5f, -0.5f, 0.5f);
 	pVertices[6].vTexUV = pVertices[6].vPosition;
 	m_vPos[6] = _float4(pVertices[6].vPosition.x, pVertices[6].vPosition.y, pVertices[6].vPosition.z, 1.f);
 
-	pVertices[7].vPosition = _float3(-1.f, -1.f, 1.f);
+	pVertices[7].vPosition = _float3(-0.5f, -0.5f, 0.5f);
 	pVertices[7].vTexUV = pVertices[7].vPosition;
 	m_vPos[7] = _float4(pVertices[7].vPosition.x, pVertices[7].vPosition.y, pVertices[7].vPosition.z, 1.f);
 
@@ -98,8 +98,8 @@ HRESULT CVIBuffer_Cube::Initialize_Prototype()
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 
-	FACEINDICES16*		pIndices = new FACEINDICES16[m_iNumPrimitive];
-	ZeroMemory(pIndices, sizeof(FACEINDICES16) * m_iNumPrimitive);
+	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
+	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
 
 	pIndices[0]._0 = 1;
 	pIndices[0]._1 = 5;
@@ -196,20 +196,18 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 	ViewPort.Height = 720;
 	
 
-	vPoint.x = ptMouse.x / (ViewPort.Width * 0.5f) - 1.f;
-	vPoint.y = ptMouse.y / -(ViewPort.Height * 0.5f) + 1.f;
+	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
+	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
 	vPoint.z = 1.f;
 	vPoint.w = 1.f;
 
 	_matrix		matProj;
-	matProj = pGameIntance->Get_TransformMatrix(CPipeLine::D3DTS_PROJ);
-	XMMatrixInverse(nullptr, matProj);
-	XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj);
+	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
+	XMStoreFloat4( &vPoint ,XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
 
 	_matrix		matView;
-	matView = pGameIntance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
-	XMMatrixInverse(nullptr, matView);
-	XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView);
+	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
 
 	_float4		vRayPos;
 	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
@@ -218,13 +216,11 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 
 
 	_matrix		matWorld;
-	matWorld = pCubeTransCom->Get_WorldMatrix();
-	XMMatrixInverse(nullptr, matWorld);
+	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
 	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
 	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
 
-	
-
+	//_vector f=   XMVector3Normalize(XMLoadFloat4(&vRayDir));
 
 	_ulong	dwVtxIdx[3]{};
 	_float	fDist = 0;
@@ -233,6 +229,7 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 1;
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 6;
+	
 	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
 		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
