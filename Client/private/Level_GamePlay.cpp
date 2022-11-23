@@ -27,8 +27,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
+	/*if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
+		return E_FAIL;*/
 
 
 	return S_OK;
@@ -90,15 +90,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
 		return E_FAIL;
 
-	//// 누수가 남 지금 레이어가 map이라서 
-	//CUI::UIDESC UIDesc;
-	//ZeroMemory(&UIDesc, sizeof(UIDesc));
-	//UIDesc.pBroadCaster = pBroadCaster;
-
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_HP_BarUI"), &UIDesc)))
-	//	return E_FAIL;
-
-	// 누수가 남 지금 레이어가 map이라서 
 
 	RELEASE_INSTANCE(CGameInstance);
 

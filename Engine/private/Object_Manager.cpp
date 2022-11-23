@@ -88,36 +88,7 @@ HRESULT CObject_Manager::Clone_GameObject(_uint iLevelIndex, const wstring& pLay
 	return S_OK;
 }
 
-HRESULT CObject_Manager::Clone_BroadCasterObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring&  pPrototypeTag, OUT CGameObject ** pObserverObject, void * pArg)
-{
-	CGameObject*		pPrototype = Find_Prototype(pPrototypeTag);
-	if (nullptr == pPrototype)
-		return E_FAIL;
 
-	CGameObject*		pGameObject = pPrototype->Clone(pArg);
-
-	CLayer*		pLayer = Find_Layer(iLevelIndex, pLayerTag);
-
-	if (nullptr == pLayer)
-	{
-		pLayer = CLayer::Create();
-		if (nullptr == pLayer)
-			return E_FAIL;
-
-		if (FAILED(pLayer->Add_GameObject(pGameObject)))
-			return E_FAIL;
-
-		m_pLayers[iLevelIndex].emplace(pLayerTag, pLayer);
-	}
-	else
-		pLayer->Add_GameObject(pPrototype);
-
-
-	*pObserverObject = pGameObject;
-
-
-	return S_OK;
-}
 
 CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
 {

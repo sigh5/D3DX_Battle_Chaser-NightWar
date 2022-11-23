@@ -118,8 +118,7 @@ HRESULT CShader::Set_ShaderResourceViewArray(const char * pConstantName, ID3D11S
 	if (nullptr == pVariable)
 		return E_FAIL;
 
-
-	return pVariable->SetResourceArray(ppSRV,0,iNumTextures);
+	return pVariable->SetResourceArray(ppSRV, 0, iNumTextures);
 }
 
 HRESULT CShader::Set_ShaderResourceView(const char * pConstantName, ID3D11ShaderResourceView * pSRV)

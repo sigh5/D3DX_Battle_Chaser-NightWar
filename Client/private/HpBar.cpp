@@ -34,30 +34,30 @@ HRESULT CHpBar::Initialize(void * pArg)
 
 HRESULT CHpBar::Last_Initialize()
 {
-	if(!m_bLast_Initlize)
-	{
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	
-		CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
-		
-		if (nullptr == dynamic_cast<CHero_Gully*>((pObserver)))	// 구독할 클라스를 알아야됌
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+
+	if (nullptr == dynamic_cast<CHero_Gully*>((pObserver)))	// 구독할 클라스를 알아야됌
 		return E_FAIL;
-	
-		dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
 
-		m_bLast_Initlize = true;
+	dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
 
-		RELEASE_INSTANCE(CGameInstance);
-	}
+	m_bLast_Initlize = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 
 void CHpBar::Tick(_double TimeDelta)
 {
-	Last_Initialize();
-
-
 	__super::Tick(TimeDelta);
+	
+	if (!m_bLast_Initlize)
+		Last_Initialize();
+
 }
 
 void CHpBar::Late_Tick(_double TimeDelta)

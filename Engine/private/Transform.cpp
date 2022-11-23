@@ -132,7 +132,6 @@ void CTransform::Imgui_RenderProperty()
 		mCurrentGizmoMode,
 		reinterpret_cast<float*>(&m_WorldMatrix),
 		nullptr, useSnap ? &snap[0] : nullptr);
-
 }
 
 void CTransform::Go_Straight(_double TimeDelta)

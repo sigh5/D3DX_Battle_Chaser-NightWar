@@ -130,7 +130,7 @@ HRESULT CGameInstance::Update_SwapChain(HWND hWnd, _uint iWinCX, _uint iWinCY, _
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	return  m_pGraphic_Device->Update_SwapChain(hWnd, iWinCX, iWinCY, bIsFullScreen, bNeedUpdate);
+	return m_pGraphic_Device->Update_SwapChain(hWnd, iWinCX, iWinCY, bIsFullScreen, bNeedUpdate);
 }
 
 _byte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
@@ -189,13 +189,7 @@ HRESULT CGameInstance::Clone_GameObject(_uint iLevelIndex, const wstring& pLayer
 	return m_pObject_Manager->Clone_GameObject(iLevelIndex, pLayerTag, pPrototypeTag, pArg);
 }
 
-HRESULT CGameInstance::Clone_BroadCasterObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pPrototypeTag, OUT CGameObject ** pObserverObject, void * pArg)
-{
-	if (nullptr == m_pObject_Manager)
-		return E_FAIL;
 
-	return m_pObject_Manager->Clone_BroadCasterObject(iLevelIndex, pLayerTag, pPrototypeTag, pObserverObject,pArg);
-}
 
 HRESULT CGameInstance::Loading_Objects()
 {

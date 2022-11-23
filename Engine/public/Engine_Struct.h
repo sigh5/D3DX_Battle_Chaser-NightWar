@@ -47,6 +47,14 @@ namespace Engine
 		XMFLOAT2		vTexUV;
 	}VTXTEX;
 
+
+	typedef struct tagVertexCubePositionTexture
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vTexUV;
+	}VTXCUBETEX;
+
+
 	typedef struct ENGINE_DLL tagVertexPositionTexture_Declaration
 	{
 		static const unsigned int		iNumElements = 2;

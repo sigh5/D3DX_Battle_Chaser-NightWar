@@ -121,6 +121,9 @@ PS_OUT PS_MAIN(PS_IN In)
 	vector		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexUV * 30.f);
 	vector		vFilter = g_FilterTexture.Sample(LinearSampler, In.vTexUV);
 
+
+
+	/*vector		*/
 	vector		vBrush = (vector)0.f;
 
 	if (g_vBrushPos.x - g_fBrushRange <= In.vWorldPos.x && In.vWorldPos.x < g_vBrushPos.x + g_fBrushRange &&
@@ -134,7 +137,6 @@ PS_OUT PS_MAIN(PS_IN In)
 		vBrush = g_BrushTexture.Sample(LinearSampler, vUV);
 	}
 
-
 	vector		vMtrlDiffuse = vSourDiffuse * vFilter.r +
 		vDestDiffuse * (1.f - vFilter.r) + vBrush;
 
@@ -146,6 +148,7 @@ PS_OUT PS_MAIN(PS_IN In)
 	vector		vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
 	vector		vLook = In.vWorldPos - g_vCamPosition;
 
+	/* µÎ º¤ÅÍ : ºûÀÇ ¹Ý»çº¤ÅÍ, Á¤Á¡À» ¹Ù¶óº¸´Â ½Ã¼±º¤ÅÍ */
 	float		fSpecular = pow(saturate(dot(normalize(vReflect) * -1.f,
 		normalize(vLook))), 30.f);
 

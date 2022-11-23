@@ -4,7 +4,7 @@
 
 namespace Client
 {																			
-	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY, LEVEL_LOADING_OBJECT ,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1
+	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY ,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1
 }
 
 extern HWND			g_hWnd;
