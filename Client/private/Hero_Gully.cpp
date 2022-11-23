@@ -63,10 +63,18 @@ void CHero_Gully::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 
 
-	/*if (m_pVIBufferCom->PickingCube(g_hWnd, m_pTransformCom))
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+
+
+	if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_LB))
 	{
-		_bool b = false;
-	}*/
+		if (m_pVIBufferCom->PickingCube(g_hWnd, m_pTransformCom))
+			bool b = false;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CHero_Gully::Render()

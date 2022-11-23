@@ -210,10 +210,6 @@ CLayer * CObject_Manager::Find_Layer(_uint iLevelIndex, const wstring& pLayerTag
 
 void CObject_Manager::Free()
 {
-
-
-
-
 	for (_uint i = 0; i < m_iNumLevels; ++i)
 	{
 		for (auto& Pair : m_pLayers[i])
