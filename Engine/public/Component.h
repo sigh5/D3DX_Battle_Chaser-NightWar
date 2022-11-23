@@ -25,12 +25,11 @@ public: /* imgui */
 protected:
 	ID3D11Device*				m_pDevice = nullptr;
 	ID3D11DeviceContext*		m_pContext = nullptr;
-	_bool						m_bClone=false;
 
 public:
 	virtual CComponent* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;
-	
+
 };
 
 END

@@ -116,12 +116,6 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
-	/* For.Prototype_Component_Texture_Filter */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Filter"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Filter.bmp"), 1))))
-		return E_FAIL;
-
-
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
 	/* For.Prototype_Component_VIBuffer_Terrain */
