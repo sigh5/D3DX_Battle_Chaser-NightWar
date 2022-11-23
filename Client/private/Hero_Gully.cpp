@@ -35,7 +35,7 @@ HRESULT CHero_Gully::Last_Initialize()
 
 void CHero_Gully::Tick(_double TimeDelta)
 {
-	if (GetKeyState(VK_RETURN) & 0x8000)
+	if (GetKeyState('Q') & 0x8000)
 	{
 		int testi = 0;
 		int teste = 1;
