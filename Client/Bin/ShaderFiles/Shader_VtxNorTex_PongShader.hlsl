@@ -12,7 +12,7 @@ vector			g_vLightSpecular;
 
 
 /* 재질정보 */
-texture2D		g_DiffuseTexture;
+texture2D		g_DiffuseTexture[2];
 vector			g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
 vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 
@@ -20,6 +20,7 @@ vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 texture2D		g_BrushTexture;
 vector			g_vBrushPos;
 float			g_fBrushRange = 5.f;
+texture2D		g_FilterTexture;
 
 sampler				LinearSampler = sampler_state
 {
@@ -116,7 +117,9 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	vector		vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vFilter = g_FilterTexture.Sample(LinearSampler, In.vTexUV);
 
 	vector		vBrush = (vector)0.f;
 
@@ -131,7 +134,11 @@ PS_OUT PS_MAIN(PS_IN In)
 		vBrush = g_BrushTexture.Sample(LinearSampler, vUV);
 	}
 
-	vector		vDiffuse = (g_vLightDiffuse * vMtrlDiffuse) + vBrush;
+
+	vector		vMtrlDiffuse = vSourDiffuse * vFilter.r +
+		vDestDiffuse * (1.f - vFilter.r) + vBrush;
+
+	vector		vDiffuse = (g_vLightDiffuse * vMtrlDiffuse);
 
 	float		fShade = saturate(dot(normalize(g_vLightDir) * -1.f,
 		normalize(In.vNormal)));
@@ -160,7 +167,7 @@ PS_OUT PS_MAIN_PHONG(PS_IN_PHONG In)
 {
 	PS_OUT Out = (PS_OUT)0;
 
-	vector	vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV* 30.f);
+	vector	vMtrlDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV* 30.f);
 	vector	vDiffuse = g_vLightDiffuse * vMtrlDiffuse;
 
 	float	fShade = saturate(dot(normalize(g_vLightDir)*-1.f,
@@ -184,7 +191,7 @@ PS_OUT PS_MAIN_POINT(PS_IN_PHONG In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	vector		vMtrlDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vMtrlDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
 
 	vector		vDiffuse = g_vLightDiffuse * vMtrlDiffuse;
 

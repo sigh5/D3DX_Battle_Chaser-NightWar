@@ -17,13 +17,13 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 public:
+	HRESULT Bind_ShaderResources(class CShader* pShaderCom, const char* pConstantName);
 	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName, _uint iTextureIndex = 0);
 
 
 private:
 	_uint										m_iNumTextures = 0;
-	vector<ID3D11ShaderResourceView*>			m_Textures;
-	typedef vector<ID3D11ShaderResourceView*>	TEXTURES;
+	ID3D11ShaderResourceView**					m_pTextures=nullptr;
 
 public:
 	static CTexture* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& pTextureFilePath, _uint iNumTextures = 1);
