@@ -29,6 +29,15 @@ void CLayer::Late_Tick(_double TimeDelta)
 	}
 }
 
+void CLayer::Final_Update()
+{
+	for (auto& pGameObject : m_GameObjects)
+	{
+		if (nullptr != pGameObject)
+			pGameObject->Final_Update();
+	}
+}
+
 HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 {
 	if (nullptr == pGameObject)

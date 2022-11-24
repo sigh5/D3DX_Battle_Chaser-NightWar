@@ -43,6 +43,15 @@ void CTransform::Scaling(STATE eState, _float fScale)
 	Set_State(eState, Get_State(eState) * fScale);
 }
 
+void CTransform::Final_Update()
+{
+	if (nullptr != m_pParentTransfrom)
+	{
+		XMStoreFloat4x4(&m_WorldMatrix, m_pParentTransfrom->Get_WorldMatrix()* XMLoadFloat4x4(&m_WorldMatrix));
+	}
+
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());

@@ -15,7 +15,7 @@ public:
 	HRESULT Initialize();
 	void Tick(_double TimeDelta);
 	void Late_Tick(_double TimeDelta);
-	
+	void Final_Update();
 	list<class CGameObject*>& GetGameObjects() { return m_GameObjects; }
 
 private:

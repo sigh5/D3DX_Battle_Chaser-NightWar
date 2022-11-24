@@ -21,6 +21,8 @@ public:
 	static	 _uint  Get_StaticLevelIndex() { return m_iStaticLevelIndex; }
 
 	HWND GetHWND() { return m_hWnd; }
+	const GRAPHIC_DESC&	Get_GraphicDesc()const { return m_GraphicDesc; }
+
 
 public: /* For.GameInstance*/
 	static const		_tchar*     m_pPrototypeTransformTag;
@@ -101,6 +103,7 @@ public:
 	static void Release_Engine();
 
 private:
+	GRAPHIC_DESC		m_GraphicDesc;
 	HWND m_hWnd;
 
 

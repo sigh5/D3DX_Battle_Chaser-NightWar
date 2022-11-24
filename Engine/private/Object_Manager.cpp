@@ -83,7 +83,7 @@ HRESULT CObject_Manager::Clone_GameObject(_uint iLevelIndex, const wstring& pLay
 		m_pLayers[iLevelIndex].emplace(pLayerTag, pLayer);
 	}
 	else
-		pLayer->Add_GameObject(pPrototype);
+		pLayer->Add_GameObject(pGameObject);
 
 	return S_OK;
 }
@@ -123,6 +123,18 @@ void CObject_Manager::Late_Tick(_double TimeDelta)
 		{
 			if (nullptr != Pair.second)
 				Pair.second->Late_Tick(TimeDelta);
+		}
+	}
+}
+
+void CObject_Manager::Final_Update()
+{
+	for (_uint i = 0; i < m_iNumLevels; ++i)
+	{
+		for (auto& Pair : m_pLayers[i])
+		{
+			if (nullptr != Pair.second)
+				Pair.second->Final_Update();
 		}
 	}
 }

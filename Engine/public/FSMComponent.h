@@ -89,7 +89,7 @@ public:
 	static CFSMComponent* Create();
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Imgui_RenderProperty() override;
-
+	virtual		void	Final_Update()override {};
 private:
 	void StateHistoryUpdate(const _tchar* pNextStateName);
 

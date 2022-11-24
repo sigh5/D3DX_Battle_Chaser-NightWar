@@ -56,6 +56,15 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+void CGameObject::Final_Update()
+{
+	for (const auto& com : m_Components)
+	{
+		com.second->Final_Update();
+	}
+
+}
+
 void CGameObject::Imgui_RenderComponentProperties()
 {
 	for (const auto& com : m_Components)

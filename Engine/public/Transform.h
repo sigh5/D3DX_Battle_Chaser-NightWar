@@ -28,14 +28,8 @@ protected:
 	virtual ~CTransform() = default;
 
 public:
-	_matrix Get_WorldMatrix_Inverse() {
-		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
-	}
-	_matrix Get_WorldMatrix() {
-		return XMLoadFloat4x4(&m_WorldMatrix);
-	}
-
-
+	_matrix Get_WorldMatrix_Inverse() { return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));}
+	_matrix Get_WorldMatrix() {return XMLoadFloat4x4(&m_WorldMatrix);}
 
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
@@ -56,7 +50,7 @@ public:
 	void Set_Scaled(STATE eState, _float fScale); /* fScale값으로 길이를 변형한다. */
 	void Set_Scaled(_float3 vScale); /* fScale값으로 길이를 변형한다. */
 	void Scaling(STATE eState, _float fScale); /* fScale배수로 늘린다. */
-
+	virtual		void	Final_Update()override;
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -86,11 +80,15 @@ private:
 	_float4x4				m_WorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
 
+private:
+	CTransform*				m_pParentTransfrom = nullptr;
+
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
+
 
 };
 

@@ -42,6 +42,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 		nullptr == m_pObject_Manager ||
 		nullptr == m_pComponent_Manager)
 		return E_FAIL;
+	
+	m_GraphicDesc = GraphicDesc;
 	m_hWnd = GraphicDesc.hWnd;
 
 	/* 그래픽 디바이스 초기화. */
@@ -68,6 +70,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (FAILED(m_pComponent_Manager->Add_Prototype(m_iStaticLevelIndex, m_pPrototypeTransformTag, CTransform::Create(*ppDeviceOut, *ppContextOut))))
 		return E_FAIL;
 
+	if (FAILED(m_pPipeLine->Ready_PipeLine()))
+		return E_FAIL;
 
 
 	return S_OK;
@@ -92,6 +96,8 @@ void CGameInstance::Tick_Engine(_double TimeDelta)
 
 	m_pObject_Manager->Late_Tick(TimeDelta);
 	m_pLevel_Manager->Late_Tick(TimeDelta);
+
+	m_pObject_Manager->Final_Update();
 }
 
 void CGameInstance::Clear_Level(_uint iLevelIndex)

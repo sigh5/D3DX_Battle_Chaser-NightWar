@@ -12,6 +12,7 @@ CCamera::CCamera(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 CCamera::CCamera(const CCamera & rhs)
 	: CGameObject(rhs)
 	, m_pPipeLine(rhs.m_pPipeLine)
+	
 {
 	Safe_AddRef(m_pPipeLine);
 
@@ -24,6 +25,8 @@ HRESULT CCamera::Initialize_Prototype()
 
 HRESULT CCamera::Initialize(void * pArg)
 {
+	CGameInstance*	pGameInstance = GET_INSTANCE(CGameInstance);
+
 	ZeroMemory(&m_CameraDesc, sizeof(CAMERADESC));
 
 	if (nullptr != pArg)
@@ -35,8 +38,9 @@ HRESULT CCamera::Initialize(void * pArg)
 	/* 카메라(게임오브젝트)가 들고있는 트랜스폼에 카메라의 상태를 동기화하낟. */
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_CameraDesc.vEye));
 	m_pTransformCom->LookAt(XMLoadFloat4(&m_CameraDesc.vAt));
-
-
+	
+	
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }

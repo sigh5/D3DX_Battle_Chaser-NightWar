@@ -29,6 +29,8 @@ public:
 	
 	void Tick(_double TimeDelta);
 	void Late_Tick(_double TimeDelta);
+	virtual		void	Final_Update();
+
 
 public: /* imgui */
 	// 모든 원본 Object를 Imgui로 출력한다.

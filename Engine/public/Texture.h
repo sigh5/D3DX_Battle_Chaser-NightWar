@@ -17,7 +17,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_TYPE eType, _uint iNumTextures);
 	virtual HRESULT Initialize(void* pArg) override;
-
+	virtual		void	Final_Update()override {}
 public:
 
 	HRESULT Bind_ShaderResources(class CShader* pShaderCom, const char* pConstantName);

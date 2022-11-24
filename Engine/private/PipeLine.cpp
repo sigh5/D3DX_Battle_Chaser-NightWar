@@ -1,9 +1,21 @@
 #include "..\public\PipeLine.h"
 
+#include "GameInstance.h"
 IMPLEMENT_SINGLETON(CPipeLine)
 
 CPipeLine::CPipeLine()
 {
+
+}
+
+HRESULT CPipeLine::Ready_PipeLine()
+{
+	CGameInstance*	pGameInstance = GET_INSTANCE(CGameInstance);
+
+	Set_Transform(CPipeLine::D3DTS_ORTH, XMMatrixOrthographicLH((_float)pGameInstance->Get_GraphicDesc().iViewportSizeX, (_float)pGameInstance->Get_GraphicDesc().iViewportSizeY, 0.f, 1.f));
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
 }
 
 _matrix CPipeLine::Get_TransformMatrix(TRANSFORMSTATE eState) const
@@ -32,6 +44,8 @@ void CPipeLine::Tick()
 		XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_TransformMatrices[D3DTS_VIEW])));
 	XMStoreFloat4x4(&m_TransformMatrices_Inverse[D3DTS_PROJ],
 		XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_TransformMatrices[D3DTS_PROJ])));
+
+	
 
 	memcpy(&m_vCamPosition, &m_TransformMatrices_Inverse[D3DTS_VIEW].m[3][0], sizeof(_float4));
 }

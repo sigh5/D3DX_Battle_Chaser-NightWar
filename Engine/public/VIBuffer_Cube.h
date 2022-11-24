@@ -14,7 +14,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
-
+	virtual		void	Final_Update()override {}
 
 	const _float4*		Get_vPos() { return m_vPos; }
 
