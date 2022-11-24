@@ -124,6 +124,9 @@
     <Filter Include="01.Utility\03.Components\07.Calculator">
       <UniqueIdentifier>{127f36db-5355-417f-92d5-98ce3c1da1a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model">
+      <UniqueIdentifier>{606dd25a-263f-4392-b2dd-ee71e5a0f0f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -294,6 +297,9 @@
     <ClInclude Include="..\Public\Calculator.h">
       <Filter>01.Utility\03.Components\07.Calculator</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Model.h">
+      <Filter>01.Utility\03.Components\08.Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -436,6 +442,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Calculator.cpp">
       <Filter>01.Utility\03.Components\07.Calculator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp">
+      <Filter>01.Utility\03.Components\08.Model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

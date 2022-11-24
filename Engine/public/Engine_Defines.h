@@ -7,7 +7,12 @@
 #include <Effects11/d3dx11effect.h>
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
+#include <DirectXTK/ScreenGrab.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include <d3dcompiler.h>
+#include <TypeInfo.h>
 #include <DirectXCollision.h>
 
 #define DIRECTINPUT_VERSION 0x0800

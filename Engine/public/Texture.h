@@ -20,7 +20,9 @@ public:
 
 	HRESULT Bind_ShaderResources(class CShader* pShaderCom, const char* pConstantName);
 	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName, _uint iTextureIndex = 0);
-
+	
+public:
+	virtual void Imgui_RenderProperty();
 
 private:
 	_uint										m_iNumTextures = 0;

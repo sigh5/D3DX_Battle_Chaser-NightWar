@@ -73,6 +73,27 @@ HRESULT CTexture::Bind_ShaderResource(CShader * pShaderCom, const char * pConsta
 	return pShaderCom->Set_ShaderResourceView(pConstantName, m_pTextures[iTextureIndex]);
 }
 
+void CTexture::Imgui_RenderProperty()
+{
+	ImGui::Begin("Terrain_Texture");
+	ImGui::NewLine();
+	if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+	
+		for (_uint i = 0; i < m_iNumTextures; ++i)
+		{
+			if (ImGui::ImageButton((void*)m_pTextures[i], ImVec2(32.f, 32.f)))
+			{
+				_bool f = false;
+			}
+			if (i == 0 || (i + 1) % 6)
+				ImGui::SameLine();
+		}
+	}
+	ImGui::End();
+
+}
+
 
 
 CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pTextureFilePath, _uint iNumTextures)

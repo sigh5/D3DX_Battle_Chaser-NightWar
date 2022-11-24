@@ -42,6 +42,8 @@ private:
 	HRESULT Ready_Prototype_Component();
 	HRESULT Ready_Prototype_GameObject();
 	
+private:
+	HRESULT	Ready_BufferLock_UnLock();
 
 
 public:
