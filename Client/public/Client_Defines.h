@@ -16,7 +16,7 @@ extern unsigned int	g_iWinSizeY;
 extern const unsigned int	g_iFullWinSizeX;
 extern const unsigned int	g_iFullWinSizeY;
 
-static unsigned int			m_iLoadingIndex;
+static  int			m_iLoadingIndex;
 
 using namespace Client;
 

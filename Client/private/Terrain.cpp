@@ -67,6 +67,11 @@ HRESULT CTerrain::Render()
 	return S_OK;
 }
 
+_float4 CTerrain::Get_Position() const
+{
+	return m_pVIBufferCom->PickingTerrain(g_hWnd, m_pTransformCom);
+}
+
 HRESULT CTerrain::SetUp_Components()
 {
 	/* For.Com_Renderer */
@@ -137,7 +142,10 @@ HRESULT CTerrain::SetUp_ShaderResources()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+	_uint	m_iDiffuseTextureIndex = 1;
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_iDiffuseTextureIndex", &m_iDiffuseTextureIndex, sizeof(_uint))))
+		return E_FAIL;
 
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
@@ -145,6 +153,8 @@ HRESULT CTerrain::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResource(m_pShaderCom, "g_FilterTexture", 0)))
 		return E_FAIL;
+
+
 
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vBrushPos", &_float4(15.f, 0.f, 15.f, 1.f), sizeof(_float4))))

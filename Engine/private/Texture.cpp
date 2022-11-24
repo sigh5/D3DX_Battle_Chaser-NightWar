@@ -11,13 +11,14 @@ CTexture::CTexture(const CTexture & rhs)
 	: CComponent(rhs)
 	, m_pTextures(rhs.m_pTextures)
 	, m_iNumTextures(rhs.m_iNumTextures)
+	, m_szName(rhs.m_szName)
 {
 	for (_uint i = 0; i < m_iNumTextures; ++i)
 		Safe_AddRef(m_pTextures[i]);
 
 }
 
-HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, _uint iNumTextures)
+HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_TYPE eType, _uint iNumTextures)
 {
 	m_pTextures = new ID3D11ShaderResourceView*[iNumTextures];
 
@@ -48,6 +49,17 @@ HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, _uint iN
 
 	}
 
+
+	if (eType == CTexture::TYPE_DIFFUSE)
+		m_szName = "Diffuse_Textures";
+
+	else if (eType == CTexture::TYPE_BRUSH)
+		m_szName = "Brush_Textures";
+
+	else if (eType == CTexture::TYPE_FILTER)
+		m_szName = "Filter_Textures";
+	else
+		m_szName = "Textures";
 	return S_OK;
 }
 
@@ -77,7 +89,11 @@ void CTexture::Imgui_RenderProperty()
 {
 	ImGui::Begin("Terrain_Texture");
 	ImGui::NewLine();
-	if (ImGui::CollapsingHeader("Textures", ImGuiTreeNodeFlags_DefaultOpen))
+
+
+
+
+	if (ImGui::CollapsingHeader(m_szName, ImGuiTreeNodeFlags_DefaultOpen))
 	{
 	
 		for (_uint i = 0; i < m_iNumTextures; ++i)
@@ -96,11 +112,11 @@ void CTexture::Imgui_RenderProperty()
 
 
 
-CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pTextureFilePath, _uint iNumTextures)
+CTexture * CTexture::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pTextureFilePath, TEXTURE_TYPE eType, _uint iNumTextures)
 {
 	CTexture*		pInstance = new CTexture(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(pTextureFilePath, iNumTextures)))
+	if (FAILED(pInstance->Initialize_Prototype(pTextureFilePath, eType,iNumTextures)))
 	{
 		MSG_BOX("Failed to Created : CTexture");
 		Safe_Release(pInstance);

@@ -121,11 +121,11 @@
     <Filter Include="01.Utility\03.Components\02.VIBuffer\Cube">
       <UniqueIdentifier>{4df4b4fa-6cdf-46de-9cfd-aab66450e825}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.Components\07.Calculator">
-      <UniqueIdentifier>{127f36db-5355-417f-92d5-98ce3c1da1a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.Components\08.Model">
       <UniqueIdentifier>{606dd25a-263f-4392-b2dd-ee71e5a0f0f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="81.Utils\07.Calculator">
+      <UniqueIdentifier>{127f36db-5355-417f-92d5-98ce3c1da1a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -295,7 +295,7 @@
       <Filter>01.Utility\03.Components\02.VIBuffer\Cube</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Calculator.h">
-      <Filter>01.Utility\03.Components\07.Calculator</Filter>
+      <Filter>81.Utils\07.Calculator</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\03.Components\08.Model</Filter>
@@ -441,7 +441,7 @@
       <Filter>01.Utility\03.Components\02.VIBuffer\Cube</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Calculator.cpp">
-      <Filter>01.Utility\03.Components\07.Calculator</Filter>
+      <Filter>81.Utils\07.Calculator</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Model.cpp">
       <Filter>01.Utility\03.Components\08.Model</Filter>

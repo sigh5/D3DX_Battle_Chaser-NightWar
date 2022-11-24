@@ -17,9 +17,15 @@ public:
 	virtual HRESULT Initialize_Prototype(const wstring& terrainFilePath);
 	virtual HRESULT Initialize(void* pArg);
 
+	_float4	PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
+
+
+	
 private:
 	_uint		m_iNumVerticesX = 0;
 	_uint		m_iNumVerticesZ = 0;
+	_float4*	m_pVtx = nullptr;
+
 
 public:
 	static CVI_Buffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& terrainFilePath);

@@ -54,6 +54,7 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 	{
 		if (GetKeyState(VK_RETURN) & 0x8000)
 		{
+			
 			CLevel*		pLevel = nullptr;
 			pGameInstance->Loading_Objects();
 			switch (m_eNextLevelID)
@@ -73,6 +74,8 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 
 			if (FAILED(pGameInstance->Open_Level(m_eNextLevelID, pLevel)))
 				return;
+
+		
 		}
 	}
 

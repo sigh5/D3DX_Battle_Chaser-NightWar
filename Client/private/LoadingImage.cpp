@@ -17,6 +17,8 @@ CLoadingImage::CLoadingImage(const CLoadingImage & rhs)
 
 HRESULT CLoadingImage::Initialize_Prototype()
 {
+	m_iLoadingIndex = -1;
+
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
@@ -25,9 +27,8 @@ HRESULT CLoadingImage::Initialize_Prototype()
 
 HRESULT CLoadingImage::Initialize(void * pArg)
 {
+	m_iLoadingIndex++;
 	m_ObjectName = TEXT("Loading_Images");
-
-	++m_iLoadingIndex;
 
 	CUI::UIDESC Desc;
 	ZeroMemory(&Desc, sizeof(Desc));

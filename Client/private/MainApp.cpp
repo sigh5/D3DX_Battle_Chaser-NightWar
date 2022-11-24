@@ -20,7 +20,7 @@ HRESULT CMainApp::Initialize()
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
 
-	m_iLoadingIndex = -1;
+
 
 	/* 게임엔진 초기화 */
 	GRAPHIC_DESC			GraphicDesc;
@@ -138,7 +138,7 @@ HRESULT CMainApp::Ready_Prototype_Component()
 
 	/* For.Prototype_Component_Shader_VtxTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingImage"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LoadingImage/LoadScreen%d.png"),11))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LoadingImage/LoadScreen%d.png"),CTexture::TYPE_END,6))))
 		return E_FAIL;
 
 

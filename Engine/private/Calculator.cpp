@@ -1,32 +1,33 @@
 #include "..\public\Calculator.h"
+#include "GameInstance.h"
 
+IMPLEMENT_SINGLETON(CCalculator)
 
-
-
-CCalculator::CCalculator(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CComponent(pDevice,pContext)
+CCalculator::CCalculator()
 {
+
 }
 
-CCalculator::CCalculator(const CCalculator & rhs)
-	:CComponent(rhs)
-{
-}
-
-HRESULT CCalculator::Initialize_Prototype()
+HRESULT CCalculator::Ready_Calculator()
 {
 	return S_OK;
 }
 
-HRESULT CCalculator::Initialize(void * pArg)
+_vector CCalculator::MovePicking_Point(CGameObject * pMoveObject, CGameObject * pTerrainObject)
 {
-	return S_OK;
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
+	//if (PickingCube(pGameInstance->GetHWND(), ))
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return _vector();
 }
 
-CComponent * CCalculator::Clone(void * pArg)
-{
-	return S_OK;
-}
+
 
 void CCalculator::Free()
 {

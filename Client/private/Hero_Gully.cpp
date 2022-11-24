@@ -2,6 +2,7 @@
 #include "..\public\Hero_Gully.h"
 
 #include "GameInstance.h"
+#include "Terrain.h"
 
 CHero_Gully::CHero_Gully(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
@@ -71,7 +72,15 @@ void CHero_Gully::Late_Tick(_double TimeDelta)
 	if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_LB))
 	{
 		if (m_pVIBufferCom->PickingCube(g_hWnd, m_pTransformCom))
-			bool b = false;
+		{
+			//CGameObject* pTerrain =   pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BackGround"), TEXT("Terrain"));
+
+			_bool f = false;
+			//_float4 Temp = dynamic_cast<CTerrain*>(pTerrain)->Get_Position();
+
+			//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&Temp));
+
+		}
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
