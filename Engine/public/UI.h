@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
-
+#include <memory>
+#include <memory.h>
 BEGIN(Engine)
 
 
@@ -27,12 +28,24 @@ public:
 	virtual HRESULT Render()override;
 
 
+protected:
+	virtual HRESULT SetUp_UI()sealed;
+
+	virtual void Begin_UI()sealed;
+	virtual void End_UI()sealed;
+
 public: /* imgui */
 	virtual void Imgui_RenderComponentProperties() {}
 	virtual void Imgui_RenderProperty()override {}
 
 protected:
-	UIDESC				m_UIDesc;
+	UIDESC						m_UIDesc;
+	
+	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
+	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
+
+	
+	UINT                        m_StencilRef = 0;
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

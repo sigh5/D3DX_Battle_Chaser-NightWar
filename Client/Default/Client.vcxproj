@@ -182,6 +182,7 @@
     <ClInclude Include="..\Public\LoadingImage.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
+    <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\Private\LoadingImage.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
+    <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -36,6 +36,9 @@ HRESULT CLoadingImage::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
+	if (FAILED(CUI::SetUp_UI()))
+		return E_FAIL;
+
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
@@ -58,11 +61,12 @@ HRESULT CLoadingImage::Initialize(void * pArg)
 
 HRESULT CLoadingImage::Last_Initialize()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 void CLoadingImage::Tick(_double TimeDelta)
 {
+	
 	__super::Tick(TimeDelta);
 }
 
@@ -82,8 +86,12 @@ HRESULT CLoadingImage::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
+	CUI::Begin_UI();
+
 	m_pShaderCom->Begin(0);
 	m_pVIBufferCom->Render();
+
+	CUI::End_UI();
 
 	return S_OK;
 }
@@ -116,6 +124,8 @@ HRESULT CLoadingImage::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
+	
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -124,17 +134,20 @@ HRESULT CLoadingImage::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
-
-	
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iLoadingIndex)))
 		return E_FAIL;
 
+	RELEASE_INSTANCE(CGameInstance);
+	
+	
 
 	return S_OK;
 }
+
+
 
 CLoadingImage * CLoadingImage::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

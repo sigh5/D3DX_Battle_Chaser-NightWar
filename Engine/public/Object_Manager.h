@@ -42,6 +42,9 @@ public: /* imgui */
 	// 해당 Object가 없거나 사라지면 nullptr로 돌려준다.
 	void Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
+	void Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
+
+
 private: /* 원형객체들을ㅇ 모아놓는다. */
 	map<const wstring, class CGameObject*>			m_Prototypes;
 	typedef map<const wstring, class CGameObject*>	PROTOTYPES;

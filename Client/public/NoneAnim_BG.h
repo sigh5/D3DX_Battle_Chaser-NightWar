@@ -3,21 +3,20 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 
+
 BEGIN(Engine)
 class CShader;
 class CRenderer;
-class CVIBuffer_Rect;
-class CTexture;
+class CModel;
 END
 
 BEGIN(Client)
-
-class CBackGround final : public CGameObject
+class CNoneAnim_BG final : public CGameObject
 {
 private:
-	CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CBackGround(const CBackGround& rhs);
-	virtual ~CBackGround() = default;
+	CNoneAnim_BG(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CNoneAnim_BG(const CNoneAnim_BG& rhs);
+	virtual ~CNoneAnim_BG() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -27,29 +26,21 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
-	CTransform*			Get_Transform() { return m_pTransformCom; }
-
-
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
-	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;	
-	CTexture*				m_pTextureCom = nullptr;
-
-private:
-	_float4x4				m_ViewMatrix;
-	_float4x4				m_ProjMatrix;
-
-	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+	CModel*					m_pModelCom = nullptr;
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 
 public:
-	static CBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CNoneAnim_BG* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
+
+
 };
 
 END

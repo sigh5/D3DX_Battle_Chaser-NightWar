@@ -2,7 +2,7 @@
 #include "..\public\MainLogo.h"
 
 #include "GameInstance.h"
-
+#include "BackGround.h"
 CMainLogo::CMainLogo(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {
@@ -40,18 +40,21 @@ HRESULT CMainLogo::Initialize(void * pArg)
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 0.5f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f , -m_fY + m_fSizeY * 0.5f+ 50.f , 0.1f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
 
-
+	if (FAILED(CUI::SetUp_UI()))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 void CMainLogo::Tick(_double TimeDelta)
 {
+	Last_Initialize();
+
 	__super::Tick(TimeDelta);
 }
 
@@ -70,12 +73,35 @@ HRESULT CMainLogo::Render()
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
+	
+	CUI::Begin_UI();
 
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(1);
 	m_pVIBufferCom->Render();
+
+	CUI::End_UI();
 
 	return S_OK;
 }
+
+HRESULT CMainLogo::Last_Initialize()
+{
+	if (m_bLast_Initlize)
+		return S_OK;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pBackGround = pGameInstance->Get_GameObject(LEVEL_LOGO, TEXT("Layer_BackGround"), TEXT("BackGround"));
+
+
+	m_pTransformCom->Set_ParentTransform(dynamic_cast<CBackGround*>(pBackGround)->Get_Transform());
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	m_bLast_Initlize = true;
+}
+
+
 
 HRESULT CMainLogo::SetUp_Components()
 {
@@ -107,6 +133,9 @@ HRESULT CMainLogo::SetUp_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -114,16 +143,19 @@ HRESULT CMainLogo::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
 
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 
+	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
 }
+
+
 
 CMainLogo * CMainLogo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

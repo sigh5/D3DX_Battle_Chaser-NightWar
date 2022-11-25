@@ -36,6 +36,9 @@ public:
 	HRESULT Loading_ForLogo();
 	HRESULT Loading_ForGamePlay();
 
+	
+
+
 private:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pContext = nullptr;

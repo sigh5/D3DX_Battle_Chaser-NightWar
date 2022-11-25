@@ -177,8 +177,6 @@ HRESULT CVIBuffer_Cube::Initialize(void * pArg)
 }
 
 
-
-
 _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);

@@ -139,6 +139,43 @@ void CObject_Manager::Final_Update()
 	}
 }
 
+void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& pSelectedObject)
+{
+	const LAYERS& targetLevel = m_pLayers[iLevel];
+	ImGui::Begin("Select_ParentObject");
+	ImGui::NewLine();
+
+	if (ImGui::CollapsingHeader("Select_ObjectTab", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		if (ImGui::TreeNode("GameObjects"))  // for object loop listbox
+		{
+			for (auto& Pair : targetLevel)
+			{
+				if (ImGui::BeginListBox("##"))
+				{
+					for (auto& obj : Pair.second->GetGameObjects())
+					{
+						if (ImGui::Selectable(typeid(*obj).name()))
+						{
+							if (obj != pSelectedObject)
+							{
+								pSelectedObject->Set_parent(obj);
+							}
+						}
+					}
+					ImGui::EndListBox();
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+	
+	if(pSelectedObject !=nullptr  &&pSelectedObject->Get_parentName() != nullptr)
+		ImGui::Text("%s", typeid(*pSelectedObject->Get_parentName()).name());
+
+	ImGui::End();
+}
+
 void CObject_Manager::Imgui_ProtoViewer(const _tchar*& szSelectedProto)
 {
 }

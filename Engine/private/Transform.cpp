@@ -47,7 +47,18 @@ void CTransform::Final_Update()
 {
 	if (nullptr != m_pParentTransfrom)
 	{
-		XMStoreFloat4x4(&m_WorldMatrix, m_pParentTransfrom->Get_WorldMatrix()* XMLoadFloat4x4(&m_WorldMatrix));
+		_matrix  matParent = XMMatrixIdentity();
+		_vector vRight = m_pParentTransfrom->Get_State(CTransform::STATE_RIGHT);
+		_vector vUp	   = m_pParentTransfrom->Get_State(CTransform::STATE_UP);
+		_vector vLook = m_pParentTransfrom->Get_State(CTransform::STATE_LOOK);
+		_vector vTranslate = m_pParentTransfrom->Get_State(CTransform::STATE_TRANSLATION);
+
+		memcpy(&matParent.r[0], &XMVector3Normalize(vRight), sizeof(_vector));
+		memcpy(&matParent.r[1], &XMVector3Normalize(vUp), sizeof(_vector));
+		memcpy(&matParent.r[2], &XMVector3Normalize(vLook), sizeof(_vector));
+		memcpy(&matParent.r[3], &vTranslate, sizeof(_vector));
+
+		XMStoreFloat4x4(&m_ParentAndChildWorldMatrix,  XMLoadFloat4x4(&m_WorldMatrix) * matParent );
 	}
 
 }
@@ -245,6 +256,9 @@ HRESULT CTransform::Bind_ShaderResource(CShader * pShaderCom, const char * pCons
 	if (nullptr == pShaderCom)
 		return E_FAIL;
 
+	if(m_pParentTransfrom != nullptr)
+		return pShaderCom->Set_Matrix(pConstantName, &m_ParentAndChildWorldMatrix);
+
 	return pShaderCom->Set_Matrix(pConstantName, &m_WorldMatrix);
 }
 
@@ -278,5 +292,6 @@ void CTransform::Free()
 {
 	__super::Free();
 
-
+	if (m_pParentTransfrom != nullptr)
+		Safe_Release(m_pParentTransfrom);
 }

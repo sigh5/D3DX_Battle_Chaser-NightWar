@@ -28,8 +28,20 @@ protected:
 	virtual ~CTransform() = default;
 
 public:
-	_matrix Get_WorldMatrix_Inverse() { return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));}
-	_matrix Get_WorldMatrix() {return XMLoadFloat4x4(&m_WorldMatrix);}
+	_matrix Get_WorldMatrix_Inverse() { //부모가 없으면 월드 있으면 로컬임
+		
+		if(nullptr == m_pParentTransfrom)
+			return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
+		
+		return  XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_ParentAndChildWorldMatrix));
+	
+	}
+	_matrix Get_WorldMatrix() {		//부모가 없으면 월드 있으면 로컬임
+		if (nullptr == m_pParentTransfrom)
+			return XMLoadFloat4x4(&m_WorldMatrix);
+	
+		return  XMLoadFloat4x4(&m_ParentAndChildWorldMatrix);
+	}
 
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
@@ -50,6 +62,14 @@ public:
 	void Set_Scaled(STATE eState, _float fScale); /* fScale값으로 길이를 변형한다. */
 	void Set_Scaled(_float3 vScale); /* fScale값으로 길이를 변형한다. */
 	void Scaling(STATE eState, _float fScale); /* fScale배수로 늘린다. */
+
+
+	void	Set_ParentTransform(CTransform* pTransform) { 
+		m_pParentTransfrom = pTransform;
+		Safe_AddRef(m_pParentTransfrom);
+	}
+
+
 	virtual		void	Final_Update()override;
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -78,6 +98,7 @@ public:
 
 private:
 	_float4x4				m_WorldMatrix;
+	_float4x4				m_ParentAndChildWorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
 
 private:

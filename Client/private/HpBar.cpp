@@ -71,6 +71,12 @@ HRESULT CHpBar::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
+	if (FAILED(CUI::SetUp_UI()))
+		return E_FAIL;
+
+
+	CUI::End_UI();
+
 	return S_OK;
 }
 

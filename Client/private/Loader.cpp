@@ -10,6 +10,10 @@
 #include "HpBar.h"
 #include "MainLogo.h"
 
+#include "NoneAnim_BG.h"
+
+
+
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
 	, m_pContext(pContext)
@@ -139,10 +143,20 @@ HRESULT CLoader::Loading_ForGamePlay()
 	
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
-	/* For.Prototype_Component_Model_Fiona */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
-		return E_FAIL;
+	///* For.Prototype_Component_Model_Fiona */
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
+	//	return E_FAIL;
+
+	///* For.Prototype_Component_ScrollingCloud */
+
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_ScrollingCloud"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Flower/Lily/Lily.fbx"))))
+	//	return E_FAIL;
+
+	//
+
+
 
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
@@ -179,16 +193,22 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CHero_Gully::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
-		CHero_Alumon::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 	/* For.Prototype_GameObject_HP_BarUI */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HP_BarUI"),
 		CHpBar::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	///* For.Prototype_GameObject_NoneAnim */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
+	//	CNoneAnim_BG::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -200,6 +220,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	return S_OK;
 }
+
+
 
 CLoader * CLoader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, LEVEL eNextLevelID)
 {

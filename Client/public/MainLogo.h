@@ -25,6 +25,7 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual HRESULT Last_Initialize()override;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -40,6 +41,9 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
+	
+
+
 
 public:
 	static CMainLogo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

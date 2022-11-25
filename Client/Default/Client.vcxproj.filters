@@ -58,6 +58,9 @@
     <Filter Include="02.GameObjects\LogoBackGround\LoadingImage">
       <UniqueIdentifier>{63b8bfc7-7ca1-4ca0-a575-b02f59be3c5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround">
+      <UniqueIdentifier>{7a8efa89-8fd5-4af5-983c-7a9e4a0592b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -117,6 +120,9 @@
     <ClInclude Include="..\Public\Hero_Alumon.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\NoneAnim_BG.h">
+      <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -163,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Hero_Alumon.cpp">
       <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NoneAnim_BG.cpp">
+      <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

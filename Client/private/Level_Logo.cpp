@@ -89,6 +89,8 @@ HRESULT CLevel_Logo::Ready_Layer_Logo(const wstring & pLayerTag)
 	return S_OK;
 }
 
+
+
 CLevel_Logo * CLevel_Logo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CLevel_Logo*		pInstance = new CLevel_Logo(pDevice, pContext);

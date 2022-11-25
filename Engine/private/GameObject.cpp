@@ -67,6 +67,8 @@ void CGameObject::Final_Update()
 
 void CGameObject::Imgui_RenderComponentProperties()
 {
+
+
 	for (const auto& com : m_Components)
 	{
 		ImGui::Separator();
@@ -77,6 +79,11 @@ void CGameObject::Imgui_RenderComponentProperties()
 		com.second->Imgui_RenderProperty();
 
 	}
+
+	
+
+	
+
 }
 
 
