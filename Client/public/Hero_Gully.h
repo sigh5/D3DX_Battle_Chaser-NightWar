@@ -29,11 +29,6 @@ public:
 	virtual HRESULT Render();
 
 
-
-
-public:
-	virtual void	Imgui_RenderProperty()override {}
-
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -43,7 +38,6 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-
 
 
 public:

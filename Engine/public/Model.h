@@ -3,7 +3,7 @@
 
 BEGIN(Engine)
 
-class CModel :public CComponent
+class ENGINE_DLL CModel final:public CComponent
 {
 public:
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
@@ -13,15 +13,31 @@ private:
 	virtual ~CModel() = default;
 
 public:
+	_uint	Get_MeshNum()const { return m_iMeshNum; }
+
+public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const char* pModelFilePath);
 	virtual HRESULT Initialize(void* pArg);
-
+	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
 public:
 	const  aiScene*						m_pAIScene = nullptr;
 	Assimp::Importer					m_Importer;
 	TYPE								m_eType = TYPE_END;
+	
+	_uint								m_iMeshNum = 0;
+	vector<class CMesh*>				m_Meshs;
 
-	vector<class CMesh*>				m_MeshContainers;
+	_uint								m_iNumMaterials;	// 모델의 메터리얼 숫자
+	vector<MODELMATERIAL>				m_Materials;		// 
+
+public:
+	HRESULT		Ready_MeshContainers();
+	HRESULT		Ready_Materials(const char* pModelFilePath);
+
+public:
+	HRESULT		SetUp_Material(class CShader* pShader, const char * pConstantName, _uint iMeshIndex, aiTextureType eType);
+
+
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const char* pModelFilePath);

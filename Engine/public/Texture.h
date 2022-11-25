@@ -15,11 +15,15 @@ protected:
 	virtual ~CTexture() = default;
 
 public:
+	ID3D11ShaderResourceView* Get_TextureResouceView(_uint iIndex = 0) const {
+		return m_pTextures[iIndex];
+	}
+
+public:
 	virtual HRESULT Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_TYPE eType, _uint iNumTextures);
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual		void	Final_Update()override {}
 public:
-
 	HRESULT Bind_ShaderResources(class CShader* pShaderCom, const char* pConstantName);
 	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName, _uint iTextureIndex = 0);
 	

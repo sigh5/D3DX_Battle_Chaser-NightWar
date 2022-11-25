@@ -127,8 +127,8 @@
     <Filter Include="81.Utils\07.Calculator">
       <UniqueIdentifier>{127f36db-5355-417f-92d5-98ce3c1da1a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.Components\02.VIBuffer\Sphere">
-      <UniqueIdentifier>{990b03cb-0763-4eac-9dc8-a97320ba05a9}</UniqueIdentifier>
+    <Filter Include="01.Utility\03.Components\08.Model\Mesh">
+      <UniqueIdentifier>{9f0a5cd3-4a1d-4c22-86fa-4ef410d2f106}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +303,9 @@
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\03.Components\08.Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Mesh.h">
+      <Filter>01.Utility\03.Components\08.Model\Mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -448,6 +451,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Model.cpp">
       <Filter>01.Utility\03.Components\08.Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Mesh.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Mesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

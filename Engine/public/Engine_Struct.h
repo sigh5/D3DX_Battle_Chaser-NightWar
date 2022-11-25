@@ -11,6 +11,13 @@ namespace Engine
 		HWND			hWnd;		
 	}GRAPHIC_DESC;
 
+
+	typedef struct tagModelMaterial
+	{
+		class CTexture*		pTexture[AI_TEXTURE_TYPE_MAX]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
+	}MODELMATERIAL;
+
+
 	typedef struct tagLightDesc
 	{
 		enum TYPE {TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END};
@@ -73,6 +80,21 @@ namespace Engine
 		static const unsigned int		iNumElements = 3;
 		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
 	}VTXNORTEX_DECLARATION;
+
+
+	typedef struct tagVertexModel
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT2		vTexUV;
+		XMFLOAT3		vTangent;
+	}VTXMODEL;
+
+	typedef struct ENGINE_DLL tagVertexModel_Declaration
+	{
+		static const unsigned int		iNumElements = 4;
+		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
+	}VTXMODEL_DECLARATION;
 
 
 
