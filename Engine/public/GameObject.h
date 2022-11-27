@@ -41,13 +41,13 @@ public: /* imgui */
 	// 이 오브젝트에서 보여줄 데이터를 imgui로 작성한다.
 	virtual void Imgui_RenderProperty(){}
 
-	void					Set_parent(CGameObject* pGameObject) { }    //m_pParentObject = pGameObject; }
-	CGameObject*			Get_parentName() { 
-		/*if (m_pParentObject == nullptr)
-			return nullptr;
-		return m_pParentObject;*/
-		return nullptr;
-	}
+	//void					Set_parent(CGameObject* pGameObject) { }    //m_pParentObject = pGameObject; }
+	//CGameObject*			Get_parentName() { 
+	//	/*if (m_pParentObject == nullptr)
+	//		return nullptr;
+	//	return m_pParentObject;*/
+	//	return nullptr;
+	//}
 private:
 	//CGameObject*			m_pParentObject = nullptr;
 

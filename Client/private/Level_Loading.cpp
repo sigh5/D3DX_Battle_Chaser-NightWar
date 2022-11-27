@@ -103,9 +103,6 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(pGameInstance->Get_StaticLevelIndex() - 1, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
 		return E_FAIL;
 
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BackGround"))))
-	//	return E_FAIL;
-
 	Safe_Release(pGameInstance);
 
 	return S_OK;

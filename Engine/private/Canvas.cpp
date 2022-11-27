@@ -37,8 +37,8 @@ HRESULT CCanvas::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	for (auto &pChildUI : m_ChildrenVec)
-		pChildUI->Set_parent(this);
+	/*for (auto &pChildUI : m_ChildrenVec)
+		pChildUI->Set_parent(this);*/
 	
 
 

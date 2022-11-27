@@ -33,7 +33,7 @@ _uint APIENTRY LoadingThread(void* pArg)
 	switch (pLoader->Get_NextLevelID())
 	{
 	case LEVEL_LOGO:
-		//pLoader->Loading_ForLogo();
+		pLoader->Loading_ForLogo();
 		break;
 	case LEVEL_GAMEPLAY:
 		pLoader->Loading_ForGamePlay();
@@ -87,13 +87,13 @@ HRESULT CLoader::Loading_ForLogo()
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 	
 	/* For.Prototype_GameObject_BackGround */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
-	//	CBackGround::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
+		CBackGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
-	//	CMainLogo::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
+		CMainLogo::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -159,9 +159,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
 	///* For.Prototype_Component_Model_Fiona */
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
+		return E_FAIL;
 
 		/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
 			CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully/Dungeon_Hero_Gullyout.fbx"))))
@@ -209,14 +209,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 
 	///* For.Prototype_GameObject_Hero_Gully */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-	//	CHero_Gully::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+		CHero_Gully::Create(m_pDevice, m_pContext))))
+		return E_FAIL;*/
 
 	/////* For.Prototype_GameObject_Hero_Alumon */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
-	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+		CHero_Alumon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 

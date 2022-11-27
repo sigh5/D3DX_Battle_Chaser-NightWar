@@ -159,7 +159,7 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 						{
 							if (obj != pSelectedObject)
 							{
-								pSelectedObject->Set_parent(obj);
+								//pSelectedObject->Set_parent(obj);
 							}
 						}
 					}
@@ -170,9 +170,9 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 		}
 	}
 	
-	if(pSelectedObject !=nullptr  &&pSelectedObject->Get_parentName() != nullptr)
+	/*if(pSelectedObject !=nullptr  &&pSelectedObject->Get_parentName() != nullptr)
 		ImGui::Text("%s", typeid(*pSelectedObject->Get_parentName()).name());
-
+*/
 	ImGui::End();
 }
 

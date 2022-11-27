@@ -16,9 +16,9 @@ void CImgui_PropertyEditor::Imgui_RenderTab()
 		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
 		m_pSelectedObject);
 
-	CObject_Manager::GetInstance()->Imgui_SelectParentViewer(
-		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
-		m_pSelectedObject);
+	//CObject_Manager::GetInstance()->Imgui_SelectParentViewer(
+	//	CLevel_Manager::GetInstance()->GetCurLevelIdx(),
+	//	m_pSelectedObject);
 
 
 	// todo: 마우스 피킹으로 오브젝트 선택하는 기능 추가

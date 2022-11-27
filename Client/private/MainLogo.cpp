@@ -88,12 +88,12 @@ HRESULT CMainLogo::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	/*CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pBackGround = pGameInstance->Get_GameObject(LEVEL_LOGO, TEXT("Layer_BackGround"), TEXT("BackGround"));
 	m_pTransformCom->Set_ParentTransform(dynamic_cast<CBackGround*>(pBackGround)->Get_Transform());
 
-	RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);*/
 
 	m_bLast_Initlize = true;
 
