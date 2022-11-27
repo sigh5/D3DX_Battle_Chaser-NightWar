@@ -9,8 +9,8 @@ class ENGINE_DLL CUI abstract : public CGameObject
 public:
 	typedef struct tag_UIDesc :public GAMEOBJECTDESC
 	{
-		CGameObject*	pBroadCaster;
-		wstring			m_pTextureTag;
+		const _tchar*			pBroadCasterTag =  TEXT("");
+		const _tchar*			m_pTextureTag = TEXT("");
 	}UIDESC;
 
 protected:
@@ -43,7 +43,6 @@ protected:
 	
 	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
 	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
-
 	UINT                        m_StencilRef = 0;
 
 public:

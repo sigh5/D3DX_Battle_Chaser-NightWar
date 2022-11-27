@@ -23,12 +23,7 @@ HRESULT CUI::Initialize_Prototype()
 
 HRESULT CUI::Initialize(void * pArg)
 {
-	ZeroMemory(&m_UIDesc, sizeof(m_UIDesc));
-
-	if (nullptr != pArg)
-		memcpy(&m_UIDesc, pArg, sizeof(m_UIDesc));
-
-	if (FAILED(__super::Initialize(&m_UIDesc)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	return S_OK;
@@ -56,7 +51,7 @@ HRESULT CUI::Render()
 
 HRESULT CUI::SetUp_UI()
 {
-	// 이거나중에 GameInstance 에서 뺴야될듯
+	//// 이거나중에 GameInstance 에서 뺴야될듯
 	m_pContext->OMGetDepthStencilState(&m_OldDepthStencilState, &m_StencilRef);
 	//Safe_AddRef(m_OldDepthStencilState);
 
@@ -107,8 +102,10 @@ void CUI::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_UIDesc.pBroadCaster);
+	//if(m_UIDesc.pBroadCaster != nullptr)
+	//	Safe_Release(m_UIDesc.pBroadCaster);
+	//
 	Safe_Release(m_OldDepthStencilState);
 	Safe_Release(m_UIdepthStencilState);
-	Safe_Release(m_pTransformCom);
+	
 }

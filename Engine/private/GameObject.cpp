@@ -65,6 +65,17 @@ void CGameObject::Final_Update()
 
 }
 
+
+void CGameObject::Set_parent(CGameObject* pGameObject)
+{
+	m_pParentObject = pGameObject;
+
+	m_pTransformCom->Set_ParentTransform(m_pParentObject->m_pTransformCom);
+	
+
+}
+
+
 void CGameObject::Imgui_RenderComponentProperties()
 {
 

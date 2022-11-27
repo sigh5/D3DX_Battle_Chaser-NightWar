@@ -141,6 +141,32 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
+	/* For.Prototype_Component_UI_Trun_Garrison */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_Garrison"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Garrison.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_UI_Trun_WarGolem */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_WarGolem"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_WarGolem.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	
+	/* For.Prototype_Component_UI_Trun_Ly_Armorless1 */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_Ly_Armorless1"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Ly_Armorless1.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_UI_Trun_SlimeGreen */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_SlimeGreen"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_SlimeGreen.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	/* For.Prototype_Component_UI_Trun__BoneMageFire */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun__BoneMageFire"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_BoneMageFire.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
@@ -159,9 +185,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
 	///* For.Prototype_Component_Model_Fiona */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 		/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
 			CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully/Dungeon_Hero_Gullyout.fbx"))))
@@ -213,14 +239,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CHero_Gully::Create(m_pDevice, m_pContext))))
 		return E_FAIL;*/
 
-	/////* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
-		CHero_Alumon::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///////* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 
 	/* For.Prototype_GameObject_TurnCanvas_UI */
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnCanvas_UI"),
 		CTurnUICanvas::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -229,6 +256,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HP_BarUI"),
 	//	CHpBar::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
+
+	/* For.Prototype_GameObject_CharUI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CharUI"),
+		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	///* For.Prototype_GameObject_NoneAnim */

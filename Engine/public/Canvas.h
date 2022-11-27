@@ -26,7 +26,7 @@ public:
 	virtual HRESULT Render()override;
 
 
-protected:
+public:
 	virtual HRESULT	Add_ChildUI(CUI* pUI)sealed;
 
 protected:

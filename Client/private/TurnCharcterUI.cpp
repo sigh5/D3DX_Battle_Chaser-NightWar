@@ -24,20 +24,19 @@ HRESULT CTurnCharcterUI::Initialize_Prototype()
 
 HRESULT CTurnCharcterUI::Initialize(void * pArg)
 {
-	CUI::UIDESC Desc;
-	ZeroMemory(&Desc, sizeof(Desc));
-
+	
 	if (nullptr != pArg)
-		memcpy(&Desc, pArg, sizeof(UIDESC));
+		memcpy(&m_UIDesc, pArg, sizeof(UIDESC));
 
-	if (FAILED(__super::Initialize(&Desc)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-	m_fSizeX = (_float)g_iWinSizeX / 2;
-	m_fSizeY = (_float)g_iWinSizeY / 2;
+
+	m_fSizeX = (_float)g_iWinSizeX / 16;
+	m_fSizeY = (_float)g_iWinSizeY / 16;
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
@@ -57,7 +56,7 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-
+	m_ObjectName = m_UIDesc.m_pTextureTag;
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -112,7 +111,7 @@ HRESULT CTurnCharcterUI::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"), TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 

@@ -44,6 +44,9 @@ public: /* imgui */
 
 	void Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
+	
+	void Imgui_Save();
+	void Imgui_Load();
 
 private: /* 원형객체들을ㅇ 모아놓는다. */
 	map<const wstring, class CGameObject*>			m_Prototypes;
@@ -53,9 +56,20 @@ private: /* 사본객체들을 보관하기위한 컨테이너. */
 	map<const wstring, class CLayer*>*			m_pLayers = nullptr;
 	typedef map<const wstring, class CLayer*>	LAYERS;
 	_uint										m_iNumLevels = 0;
+	char						m_szSaveDataname[MAX_PATH] = "";
+
+	char						m_szTexturName[MAX_PATH] = "";
+	char						m_szProtoName[MAX_PATH] = "";
+	char						m_szLayerName[MAX_PATH] = "";
+
+
+	vector<_tchar*>				m_vecNameArray;
+
 
 private:
-	class CGameObject* Find_Prototype(const wstring& pPrototypeTag);
+	class CGameObject* Find_Prototype(const wstring&  pObjectNameTag);
+	
+	
 	class CLayer* Find_Layer(_uint iLevelIndex, const wstring& pLayerTag);
 
 public:

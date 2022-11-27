@@ -22,6 +22,8 @@ HRESULT CCamera_Dynamic::Initialize_Prototype()
 
 HRESULT CCamera_Dynamic::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("dynamic_Camera");
+
 	CCamera::CAMERADESC			CameraDesc;
 	ZeroMemory(&CameraDesc, sizeof CameraDesc);
 

@@ -28,12 +28,9 @@ HRESULT CLoadingImage::Initialize_Prototype()
 HRESULT CLoadingImage::Initialize(void * pArg)
 {
 	m_iLoadingIndex++;
-	//m_ObjectName = TEXT("Loading_Images");
+	m_ObjectName = TEXT("Loading_Images");
 
-	CUI::UIDESC Desc;
-	ZeroMemory(&Desc, sizeof(Desc));
-
-	if (FAILED(__super::Initialize(&Desc)))
+	if (FAILED(CUI::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(CUI::SetUp_UI()))

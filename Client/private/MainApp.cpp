@@ -34,8 +34,8 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_Engine(g_hInst, LEVEL_END, GraphicDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 
-	if (FAILED(Ready_BufferLock_UnLock()))
-		return E_FAIL;
+	/*if (FAILED(Ready_BufferLock_UnLock()))
+		return E_FAIL;*/
 
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;

@@ -18,6 +18,7 @@ HRESULT CTurnUICanvas::Initialize_Prototype()
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
+
 	return S_OK;
 }
 
@@ -56,17 +57,19 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 HRESULT CTurnUICanvas::Last_Initialize()
 {
 	// ToDo 자식 UI 가져오기
-	
+	if (m_bLast_Initlize)
+		return S_OK;
 
+	m_ObjectName = TEXT("Prototype_GameObject_TurnCanvas_UI");
 
-	if (FAILED(__super::Last_Initialize()))
-		return E_FAIL;
+	m_bLast_Initlize = true;
 
 	return S_OK;
 }
 
 void CTurnUICanvas::Tick(_double TimeDelta)
 {
+	Last_Initialize();
 	__super::Tick(TimeDelta);
 }
 
