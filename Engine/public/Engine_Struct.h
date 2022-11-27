@@ -14,7 +14,7 @@ namespace Engine
 
 	typedef struct tagModelMaterial
 	{
-		class CTexture*		pTexture[AI_TEXTURE_TYPE_MAX]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
+		class CTexture*		pTexture[18]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
 	}MODELMATERIAL;
 
 

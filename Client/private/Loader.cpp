@@ -33,7 +33,7 @@ _uint APIENTRY LoadingThread(void* pArg)
 	switch (pLoader->Get_NextLevelID())
 	{
 	case LEVEL_LOGO:
-		pLoader->Loading_ForLogo();
+		//pLoader->Loading_ForLogo();
 		break;
 	case LEVEL_GAMEPLAY:
 		pLoader->Loading_ForGamePlay();
@@ -87,9 +87,9 @@ HRESULT CLoader::Loading_ForLogo()
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 	
 	/* For.Prototype_GameObject_BackGround */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
-		CBackGround::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
+	//	CBackGround::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
 	//	CMainLogo::Create(m_pDevice, m_pContext))))
@@ -230,11 +230,6 @@ HRESULT CLoader::Loading_ForGamePlay()
 	//	CHpBar::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 
-
-	/* For.Prototype_GameObject_TrunCharUI */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrunCharUI"),
-		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
 
 	///* For.Prototype_GameObject_NoneAnim */
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
