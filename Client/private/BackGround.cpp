@@ -24,7 +24,6 @@ HRESULT CBackGround::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("BackGround");
 
-
 	CGameObject::GAMEOBJECTDESC GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
 

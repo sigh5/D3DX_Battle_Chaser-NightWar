@@ -41,10 +41,12 @@ HRESULT CUI::Last_Initialize()
 
 void CUI::Tick(_double TimeDelta)
 {
+	__super::Tick(TimeDelta);
 }
 
 void CUI::Late_Tick(_double TimeDelta)
 {
+	__super::Late_Tick(TimeDelta);
 }
 
 HRESULT CUI::Render()
@@ -56,7 +58,7 @@ HRESULT CUI::SetUp_UI()
 {
 	// 이거나중에 GameInstance 에서 뺴야될듯
 	m_pContext->OMGetDepthStencilState(&m_OldDepthStencilState, &m_StencilRef);
-	Safe_AddRef(m_OldDepthStencilState);
+	//Safe_AddRef(m_OldDepthStencilState);
 
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
@@ -105,6 +107,8 @@ void CUI::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_UIdepthStencilState);
+	//Safe_Release(m_UIDesc.pBroadCaster);
 	Safe_Release(m_OldDepthStencilState);
+	Safe_Release(m_UIdepthStencilState);
+	Safe_Release(m_pTransformCom);
 }

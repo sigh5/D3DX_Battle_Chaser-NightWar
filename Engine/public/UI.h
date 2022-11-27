@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
-#include <memory>
-#include <memory.h>
+
 BEGIN(Engine)
 
 
@@ -11,6 +10,7 @@ public:
 	typedef struct tag_UIDesc :public GAMEOBJECTDESC
 	{
 		CGameObject*	pBroadCaster;
+		wstring			m_pTextureTag;
 	}UIDESC;
 
 protected:
@@ -44,7 +44,6 @@ protected:
 	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
 	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
 
-	
 	UINT                        m_StencilRef = 0;
 
 public:

@@ -61,6 +61,15 @@
     <Filter Include="02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround">
       <UniqueIdentifier>{7a8efa89-8fd5-4af5-983c-7a9e4a0592b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle">
+      <UniqueIdentifier>{fd606b99-856d-4b8e-bc88-302cd8a94fd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TurnUICanvas">
+      <UniqueIdentifier>{bba96f99-16ab-4401-8caa-e663ba052774}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TrunCharcterUI">
+      <UniqueIdentifier>{1d838962-f722-40fc-93a4-47b2074b35f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -123,6 +132,12 @@
     <ClInclude Include="..\public\NoneAnim_BG.h">
       <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TurnUICanvas.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnUICanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TurnCharcterUI.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunCharcterUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -172,6 +187,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\NoneAnim_BG.cpp">
       <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TurnUICanvas.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnUICanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TurnCharcterUI.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunCharcterUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

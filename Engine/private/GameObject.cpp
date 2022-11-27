@@ -127,6 +127,8 @@ CComponent * CGameObject::Find_Component(const wstring & pComponentTag)
 
 void CGameObject::Free()
 {
+//	Safe_Release(m_pParentObject);
+
 	Safe_Release(m_pTransformCom);
 
 	for (auto& Pair : m_Components)

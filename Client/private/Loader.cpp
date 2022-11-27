@@ -7,6 +7,8 @@
 #include "Hero_Gully.h"
 #include "Hero_Alumon.h"
 
+#include "TurnUICanvas.h"
+#include "TurnCharcterUI.h"
 #include "HpBar.h"
 #include "MainLogo.h"
 
@@ -89,9 +91,9 @@ HRESULT CLoader::Loading_ForLogo()
 		CBackGround::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
-		CMainLogo::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
+	//	CMainLogo::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -127,6 +129,19 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Filter.bmp"), CTexture::TYPE_FILTER, 1))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_UI_Turn_canvas */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Turn_canvas"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Bar_BG.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	/* For.Prototype_Component_UI_Trun_GullyUI */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_GullyUI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Gully.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
@@ -147,6 +162,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
 	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
 	//	return E_FAIL;
+
+		/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+			CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully/Dungeon_Hero_Gullyout.fbx"))))
+			return E_FAIL;
+	*/
 
 	///* For.Prototype_Component_ScrollingCloud */
 
@@ -188,20 +208,32 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
-	/* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Gully::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	//	CHero_Gully::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
-	///* For.Prototype_GameObject_Hero_Alumon */
+	/////* For.Prototype_GameObject_Hero_Alumon */
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
 	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
 
 
-	/* For.Prototype_GameObject_HP_BarUI */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HP_BarUI"),
-		CHpBar::Create(m_pDevice, m_pContext))))
+
+	/* For.Prototype_GameObject_TurnCanvas_UI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnCanvas_UI"),
+		CTurnUICanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	///* For.Prototype_GameObject_HP_BarUI */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HP_BarUI"),
+	//	CHpBar::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+
+
+	/* For.Prototype_GameObject_TrunCharUI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrunCharUI"),
+		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	///* For.Prototype_GameObject_NoneAnim */

@@ -1,6 +1,5 @@
-
-
 #pragma once
+
 #include "Client_Defines.h"
 #include "UI.h"
 
@@ -11,15 +10,13 @@ class CVIBuffer_Rect;
 class CTexture;
 END
 
-
 BEGIN(Client)
-
-class CLoadingImage final : public CUI
+class CTurnCharcterUI final : public CUI
 {
 private:
-	CLoadingImage(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CLoadingImage(const CLoadingImage& rhs);
-	virtual ~CLoadingImage() = default;
+	CTurnCharcterUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTurnCharcterUI(const CTurnCharcterUI& rhs);
+	virtual ~CTurnCharcterUI() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -37,21 +34,16 @@ private:
 
 private:
 	_float4x4				m_ViewMatrix;
-	_float4x4				m_ProjMatrix;
-
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-	_uint					iTextureIndex = 0;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 
-
-	
 public:
-	static CLoadingImage* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTurnCharcterUI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
-
 
 };
 

@@ -130,6 +130,9 @@
     <Filter Include="01.Utility\03.Components\08.Model\Mesh">
       <UniqueIdentifier>{9f0a5cd3-4a1d-4c22-86fa-4ef410d2f106}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\02.GameObject\UI\Canvas">
+      <UniqueIdentifier>{c790757b-2833-4b2c-925a-5596a1e74aeb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -306,6 +309,9 @@
     <ClInclude Include="..\Public\Mesh.h">
       <Filter>01.Utility\03.Components\08.Model\Mesh</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Canvas.h">
+      <Filter>01.Utility\02.GameObject\UI\Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -454,6 +460,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Mesh.cpp">
       <Filter>01.Utility\03.Components\08.Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Canvas.cpp">
+      <Filter>01.Utility\02.GameObject\UI\Canvas</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

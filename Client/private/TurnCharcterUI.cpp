@@ -1,76 +1,76 @@
 #include "stdafx.h"
-#include "..\public\LoadingImage.h"
+#include "..\public\TurnCharcterUI.h"
 
 #include "GameInstance.h"
 
-
-
-CLoadingImage::CLoadingImage(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CUI(pDevice, pContext)
+CTurnCharcterUI::CTurnCharcterUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+	:CUI(pDevice,pContext)
 {
 }
 
-CLoadingImage::CLoadingImage(const CLoadingImage & rhs)
+CTurnCharcterUI::CTurnCharcterUI(const CTurnCharcterUI & rhs)
 	: CUI(rhs)
 {
+
 }
 
-HRESULT CLoadingImage::Initialize_Prototype()
+HRESULT CTurnCharcterUI::Initialize_Prototype()
 {
-	m_iLoadingIndex = -1;
-
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLoadingImage::Initialize(void * pArg)
+HRESULT CTurnCharcterUI::Initialize(void * pArg)
 {
-	m_iLoadingIndex++;
-	//m_ObjectName = TEXT("Loading_Images");
-
 	CUI::UIDESC Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
+
+	if (nullptr != pArg)
+		memcpy(&Desc, pArg, sizeof(UIDESC));
 
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
 
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-
-
-	m_fSizeX = (_float)g_iWinSizeX;
-	m_fSizeY = (_float)g_iWinSizeY;
+	m_fSizeX = (_float)g_iWinSizeX / 2;
+	m_fSizeY = (_float)g_iWinSizeY / 2;
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f, -m_fY + m_fSizeY * 0.5f + 50.f, 0.1f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH((_float)g_iWinSizeX, (_float)g_iWinSizeY, 0.f, 1.f));
 
-	return S_OK;
+	if (FAILED(CUI::SetUp_UI()))
+		return E_FAIL;
 
-
-}
-
-HRESULT CLoadingImage::Last_Initialize()
-{
 	return S_OK;
 }
 
-void CLoadingImage::Tick(_double TimeDelta)
+HRESULT CTurnCharcterUI::Last_Initialize()
 {
-	
+	if (m_bLast_Initlize)
+		return S_OK;
+
+
+
+	m_bLast_Initlize = true;
+	return S_OK;
+}
+
+void CTurnCharcterUI::Tick(_double TimeDelta)
+{
+	Last_Initialize();
+
 	__super::Tick(TimeDelta);
 }
 
-void CLoadingImage::Late_Tick(_double TimeDelta)
+void CTurnCharcterUI::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
@@ -78,7 +78,7 @@ void CLoadingImage::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CLoadingImage::Render()
+HRESULT CTurnCharcterUI::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -88,7 +88,7 @@ HRESULT CLoadingImage::Render()
 
 	CUI::Begin_UI();
 
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(1);
 	m_pVIBufferCom->Render();
 
 	CUI::End_UI();
@@ -96,9 +96,8 @@ HRESULT CLoadingImage::Render()
 	return S_OK;
 }
 
-HRESULT CLoadingImage::SetUp_Components()
+HRESULT CTurnCharcterUI::SetUp_Components()
 {
-	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -113,19 +112,20 @@ HRESULT CLoadingImage::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingImage"), TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"), TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CLoadingImage::SetUp_ShaderResources()
+HRESULT CTurnCharcterUI::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-	
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -137,43 +137,40 @@ HRESULT CLoadingImage::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_iLoadingIndex)))
+
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
-	
-	
 
 	return S_OK;
 }
 
-
-
-CLoadingImage * CLoadingImage::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CTurnCharcterUI * CTurnCharcterUI::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CLoadingImage*		pInstance = new CLoadingImage(pDevice, pContext);
+	CTurnCharcterUI*		pInstance = new CTurnCharcterUI(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CLoadingImage");
+		MSG_BOX("Failed to Created : CTurnCharcterUI");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CLoadingImage::Clone(void * pArg)
+CGameObject * CTurnCharcterUI::Clone(void * pArg)
 {
-	CLoadingImage*		pInstance = new CLoadingImage(*this);
+	CTurnCharcterUI*		pInstance = new CTurnCharcterUI(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CLoadingImage");
+		MSG_BOX("Failed to Cloned : CTurnCharcterUI");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CLoadingImage::Free()
+void CTurnCharcterUI::Free()
 {
 	__super::Free();
 

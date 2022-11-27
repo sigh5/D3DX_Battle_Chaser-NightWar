@@ -100,7 +100,7 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
-	if (FAILED(pGameInstance->Clone_GameObject(pGameInstance->Get_StaticLevelIndex()-1, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
+	if (FAILED(pGameInstance->Clone_GameObject(pGameInstance->Get_StaticLevelIndex() - 1, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
 		return E_FAIL;
 
 	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_BackGround"))))
