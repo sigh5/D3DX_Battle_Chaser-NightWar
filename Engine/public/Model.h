@@ -18,6 +18,8 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const char* pModelFilePath);
 	virtual HRESULT Initialize(void* pArg);
+public:
+	HRESULT	Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
 public:
 	const  aiScene*						m_pAIScene = nullptr;
@@ -33,10 +35,6 @@ public:
 public:
 	HRESULT		Ready_MeshContainers();
 	HRESULT		Ready_Materials(const char* pModelFilePath);
-
-public:
-	HRESULT		SetUp_Material(class CShader* pShader, const char * pConstantName, _uint iMeshIndex, aiTextureType eType);
-
 
 
 public:

@@ -96,6 +96,21 @@ namespace Engine
 		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
 	}VTXMODEL_DECLARATION;
 
+	typedef struct tagVertexAnimModel
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT2		vTexUV;
+		XMFLOAT3		vTangent;
+		XMUINT4			vBlendIndex; // 이 정점이 사용해야하는 뼈의 인덱스(전체뼈중의 순서(x) 이정점이 소속된 메시에 영향을 주는 뼈중의 순서(0))
+		XMFLOAT4		vBlendWeight;
+	}VTXANIMMODEL;
+
+	typedef struct ENGINE_DLL tagVertexAnimModel_Declaration
+	{
+		static const unsigned int		iNumElements = 6;
+		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
+	}VTXANIMMODEL_DECLARATION;
 
 
 }

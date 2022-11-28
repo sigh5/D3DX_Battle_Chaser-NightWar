@@ -14,8 +14,16 @@ CModel::CModel(const CModel & rhs)
 	, m_eType(rhs.m_eType)
 	, m_Meshs(rhs.m_Meshs)
 	, m_iMeshNum(rhs.m_iMeshNum)
-	,m_Materials(rhs.m_Materials)
+	, m_Materials(rhs.m_Materials)
+	, m_iNumMaterials(rhs.m_iNumMaterials)
 {
+	for (auto & Materail : m_Materials)
+	{
+		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
+			Safe_AddRef(Materail.pTexture[i]);
+	}
+
+
 	for (auto &pMesh : m_Meshs)
 		Safe_AddRef(pMesh);
 }
@@ -23,6 +31,8 @@ CModel::CModel(const CModel & rhs)
 HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath)
 {
 	_uint			iFlag = 0;
+
+	m_eType = eType;
 
 	if (TYPE_NONANIM == eType)
 		iFlag = aiProcess_PreTransformVertices | aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
@@ -33,16 +43,19 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath)
 
 	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
 
+	/* 뼈. */
+	//m_pAIScene->mRootNode->mChildren->mChildren;
+
+	//m_pAIScene->mAnimations[0]->mChannels[0];
+
+	//m_pAIScene->mMeshes[0]->mBones[0] // 뼈를 가져올때 제일먼저
+
+
 	if (FAILED(Ready_MeshContainers()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Materials(pModelFilePath)))
 		return E_FAIL;
-
-
-	
-
-	//m_pAIScene->HasAnimations(); // 애니메이션 있는지 확인하는 함수
 
 
 	return S_OK;
@@ -53,21 +66,37 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
+HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)
+{	
+	if (iMeshIndex >= m_iMeshNum)
+		return E_FAIL;
+
+	_uint iMaterialIndex = m_Meshs[iMeshIndex]->Get_MaterialIndex();
+
+	if (iMaterialIndex >= m_iNumMaterials)
+		return E_FAIL;
+
+	if (nullptr != m_Materials[iMaterialIndex].pTexture[eType])
+	{
+		m_Materials[iMaterialIndex].pTexture[eType]->Bind_ShaderResource(pShader, pConstantName);
+	}
+	else
+	{
+		MSG_BOX("(nullptr == m_Materials[iMaterialIndex]");
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iPassIndex)
 {
-	//for (_uint i = 0; i < m_iMeshNum; ++i)
-	//{
-	//	/* 셰이더에 맵핑해야할 재질(텍스쳐)을 던진다. */
-
-	//	if (nullptr != m_Meshs[i])
-	//		m_Meshs[i]->Render();
-	//}
-
 	pShader->Begin(iPassIndex);
 
-	m_Meshs[iMeshIndex]->Render();
+	if(nullptr != m_Meshs[iMeshIndex])
+		m_Meshs[iMeshIndex]->Render();
 
-	return S_OK;		// 나중에 클라로 뺄거임
+	return S_OK;	
 }
 
 HRESULT CModel::Ready_MeshContainers()
@@ -81,7 +110,7 @@ HRESULT CModel::Ready_MeshContainers()
 	{
 		aiMesh*		pAiMesh = m_pAIScene->mMeshes[i];
 		
-		CMesh*		pMesh = CMesh::Create(m_pDevice, m_pContext, pAiMesh);
+		CMesh*		pMesh = CMesh::Create(m_pDevice, m_pContext, m_eType,pAiMesh);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -100,7 +129,8 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 
 	char		szDirectory[MAX_PATH] = "";
 	_splitpath_s(pModelFilePath, nullptr, 0, szDirectory, MAX_PATH, nullptr, 0, nullptr, 0);
-
+	
+	/* 텍스쳐에 기록되어있는 픽셀단위 재질 정보를 로드한다. */
 	for (_uint i = 0; i < m_iNumMaterials; ++i)
 	{
 		char		szTextureFileName[MAX_PATH] = "";
@@ -147,23 +177,6 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 	return S_OK;
 }
 
-HRESULT CModel::SetUp_Material(CShader * pShader, const char * pConstantName, _uint iMeshIndex, aiTextureType eType)
-{
-	if (iMeshIndex >= m_iNumMaterials)
-		return E_FAIL;
-	
-	ID3D11ShaderResourceView* pSRV = nullptr;
-	MODELMATERIAL modleMateral = m_Materials[m_Meshs[iMeshIndex]->Get_MaterialIndex()];
-	if (modleMateral.pTexture[eType])
-	{
-		pSRV = modleMateral.pTexture[eType]->Get_TextureResouceView();
-		return pShader->Set_ShaderResourceView(pConstantName, pSRV);
-	}
-	else
-	{
-		return E_FAIL;
-	}
-}
 
 CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, TYPE eType, const char * pModelFilePath)
 {
