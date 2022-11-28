@@ -173,7 +173,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	/* For.Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height.bmp")))))
+		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Ground/Ground9nmp.bmp")))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Cube */
@@ -184,10 +184,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 	
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
-	/* For.Prototype_Component_Model_Fiona */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
-		return E_FAIL;
+	///* For.Prototype_Component_Model_Fiona */
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx"))))
+	//	return E_FAIL;
 
 		/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
 			CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully/Dungeon_Hero_Gullyout.fbx"))))
@@ -239,10 +239,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CHero_Gully::Create(m_pDevice, m_pContext))))
 		return E_FAIL;*/
 
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
-		CHero_Alumon::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 

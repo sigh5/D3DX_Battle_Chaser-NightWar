@@ -67,8 +67,8 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 			//& 00000000 00000000 00000000 11111111	& 연산 시 제일 마지막이 B다.
 			//  다른쪽을 and 연산하면 16진수라 숫자가 커서 B로하는게 속도적으로 이득이다.
 
-			//pVertices[iIndex].vPosition = _float3((_float)j, (pPixel[iIndex] & 0x000000ff) / 15.f, (_float)i);
-			pVertices[iIndex].vPosition = _float3((_float)j, 0.f, (_float)i);
+			pVertices[iIndex].vPosition = _float3((_float)j, (pPixel[iIndex] & 0x000000ff) / 100.f, (_float)i);
+			//pVertices[iIndex].vPosition = _float3((_float)j, 0.f, (_float)i);
 			m_pVtx[iIndex] = _float4(pVertices[iIndex].vPosition.x, pVertices[iIndex].vPosition.y, pVertices[iIndex].vPosition.z, 1.f);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.0f), i / (m_iNumVerticesZ - 1.0f));

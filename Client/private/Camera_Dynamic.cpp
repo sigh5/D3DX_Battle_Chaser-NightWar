@@ -71,7 +71,7 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 	}
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
-	if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_RB) & 0x80)
+	//if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_RB) & 0x80)
 	{
 		_long			MouseMove = 0;
 
