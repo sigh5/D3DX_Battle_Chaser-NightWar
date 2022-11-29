@@ -23,7 +23,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual	void	Final_Update()override;
 
-
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom)override;
 private:
 	CModel::TYPE		m_eType;
 	// 이 메쉬는 m_iMaterialIndex번째 머테리얼을 사용한다.
@@ -31,7 +31,7 @@ private:
 
 	// 이메시의 정점들에게 영향을 주는 뼈의개수
 	_uint			m_iNumBones = 0;
-
+	_float3*		m_pVtx = nullptr;
 private:
 	HRESULT			Ready_VertexBuffer_NonAnimModel(aiMesh* pAIMesh);
 	HRESULT			Ready_VertexBuffer_AnimModel(aiMesh* pAIMesh);

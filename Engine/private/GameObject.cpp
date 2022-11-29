@@ -1,6 +1,7 @@
 #include "..\public\GameObject.h"
 #include "GameInstance.h"
 #include "GameUtils.h"
+#include "Object_Manager.h"
 
 const wstring CGameObject::m_pTransformComTag = TEXT("Com_Transform");
 
@@ -31,7 +32,9 @@ HRESULT CGameObject::Initialize(void * pArg)
 	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
 
 	if (pArg != nullptr)
-		GameObjectDesc = *static_cast<GAMEOBJECTDESC*>(pArg);
+		memcpy(&GameObjectDesc, pArg, sizeof(GAMEOBJECTDESC));
+	
+
 	
 	if (FAILED(Add_Component(CGameInstance::Get_StaticLevelIndex(),
 		CGameInstance::m_pPrototypeTransformTag, m_pTransformComTag, (CComponent**)&m_pTransformCom, &GameObjectDesc.TransformDesc)))
@@ -65,21 +68,34 @@ void CGameObject::Final_Update()
 
 }
 
-
 void CGameObject::Set_parent(CGameObject* pGameObject)
 {
 	m_pParentObject = pGameObject;
 
 	m_pTransformCom->Set_ParentTransform(m_pParentObject->m_pTransformCom);
 	
-
 }
 
 
+
+CComponent * CGameObject::Get_Component(const wstring & ComponentTag)
+{
+	auto MyPair = find_if(m_Components.begin(), m_Components.end(), [&](auto Pair)->bool
+	{
+		if (Pair.first == ComponentTag)
+			return true;
+		return false;
+	});
+
+	if (MyPair == m_Components.end())
+		return nullptr;
+
+
+	return MyPair->second;
+}
+
 void CGameObject::Imgui_RenderComponentProperties()
 {
-
-
 	for (const auto& com : m_Components)
 	{
 		ImGui::Separator();
@@ -90,13 +106,7 @@ void CGameObject::Imgui_RenderComponentProperties()
 		com.second->Imgui_RenderProperty();
 
 	}
-
-	
-
-	
-
 }
-
 
 HRESULT CGameObject::Add_Component(_uint iLevelIndex, const wstring & pPrototypeTag, const wstring & pComponentTag, CComponent** ppOut, void * pArg)
 {

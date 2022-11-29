@@ -18,6 +18,10 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const char* pModelFilePath);
 	virtual HRESULT Initialize(void* pArg);
+
+public:
+	_bool			PicikingModel(HWND hWnd, class CTransform* pTransform);
+
 public:
 	HRESULT	Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);

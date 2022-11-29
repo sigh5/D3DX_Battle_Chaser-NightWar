@@ -24,7 +24,6 @@ HRESULT CTerrain::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Terrain");
 
-
 	if (FAILED(__super::Initialize(&pArg)))
 		return E_FAIL;
 
@@ -70,6 +69,14 @@ HRESULT CTerrain::Render()
 _float4 CTerrain::Get_Position() const
 {
 	return m_pVIBufferCom->PickingTerrain(g_hWnd, m_pTransformCom);
+}
+
+_bool CTerrain::Piciking_GameObject()
+{
+	if (m_pVIBufferCom->PickingBuffer(g_hWnd,m_pTransformCom))
+		return false;
+
+	return false;
 }
 
 HRESULT CTerrain::SetUp_Components()
@@ -128,7 +135,6 @@ HRESULT CTerrain::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))

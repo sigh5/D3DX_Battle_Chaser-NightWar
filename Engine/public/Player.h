@@ -27,8 +27,7 @@ public:
 
 
 public: /* imgui */
-	virtual void Imgui_RenderComponentProperties() {}
-	virtual void Imgui_RenderProperty()override {}
+	virtual _bool Piciking_GameObject()override { return false; }
 
 protected:
 	PLAYERDESC				m_PlayerDesc;

@@ -113,4 +113,15 @@ namespace Engine
 	}VTXANIMMODEL_DECLARATION;
 
 
+	typedef struct tag_UIData
+	{
+		_tchar* LayerTag = TEXT("");
+		_tchar* ProtoName = TEXT("");
+		_tchar* ParentName = TEXT("");
+		_tchar* TextureName = TEXT("");
+		_tchar* DelegaterName = TEXT("");
+
+	}UIDATA;
+
+
 }

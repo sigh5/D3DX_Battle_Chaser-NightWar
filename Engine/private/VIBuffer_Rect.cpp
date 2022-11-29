@@ -1,5 +1,7 @@
 #include "..\public\VIBuffer_Rect.h"
 
+#include "Transform.h"
+
 CVIBuffer_Rect::CVIBuffer_Rect(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer(pDevice, pContext)
 {
@@ -105,6 +107,11 @@ HRESULT CVIBuffer_Rect::Initialize(void * pArg)
 		return E_FAIL;
 
 	return S_OK;
+}
+
+_bool CVIBuffer_Rect::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
+{
+	return false;
 }
 
 

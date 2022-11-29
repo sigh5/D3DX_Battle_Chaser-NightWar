@@ -28,6 +28,8 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
+public: /* Imgui */
+	virtual _bool	Piciking_GameObject()override;
 
 private:
 	CShader*				m_pShaderCom = nullptr;

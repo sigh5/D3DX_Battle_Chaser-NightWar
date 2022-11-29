@@ -17,9 +17,10 @@ public:
 	virtual HRESULT Initialize_Prototype(const wstring& terrainFilePath);
 	virtual HRESULT Initialize(void* pArg);
 
-	_float4	PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
+	_float4				PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
 	virtual		void	Final_Update()override {}
-
+	
+	virtual _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom);
 	
 private:
 	_uint		m_iNumVerticesX = 0;

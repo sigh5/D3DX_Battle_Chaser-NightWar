@@ -135,9 +135,6 @@ HRESULT CShader::Set_ShaderResourceView(const char * pConstantName, ID3D11Shader
 
 }
 
-
-
-
 CShader * CShader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring& pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, const _uint iNumElements)
 {
 	CShader*		pInstance = new CShader(pDevice, pContext);

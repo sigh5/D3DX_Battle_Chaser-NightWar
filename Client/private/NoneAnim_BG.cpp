@@ -73,6 +73,11 @@ HRESULT CNoneAnim_BG::Render()
 	return S_OK;
 }
 
+_bool CNoneAnim_BG::Piciking_GameObject()
+{
+	return _bool();
+}
+
 HRESULT CNoneAnim_BG::SetUp_Components()
 {
 	/* For.Com_Renderer */

@@ -25,6 +25,7 @@ public:
 public:
 	HRESULT Add_Prototype(const wstring& pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
+
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 	
 	void Tick(_double TimeDelta);
@@ -35,18 +36,20 @@ public:
 public: /* imgui */
 	// 모든 원본 Object를 Imgui로 출력한다.
 	// 선택한 원본의 이름을 szSelectedProto로 돌려준다.
-	void Imgui_ProtoViewer(OUT const _tchar*& szSelectedProto);
+	void	Imgui_ProtoViewer(OUT const _tchar*& szSelectedProto);
 	
 	// iLevel에 있는 모든 사본 Object를 Layer별로 Imgui로 출력한다.
 	// 선택한 Object는 pSelectedObject로 돌려준다.
 	// 해당 Object가 없거나 사라지면 nullptr로 돌려준다.
-	void Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
+	void	Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
-	void Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
+	void	Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
+	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
+	void	Imgui_PickingSelcetObject(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
-	
-	void Imgui_Save();
-	void Imgui_Load();
+
+	void	Imgui_Save();
+	void	Imgui_Load();
 
 private: /* 원형객체들을ㅇ 모아놓는다. */
 	map<const wstring, class CGameObject*>			m_Prototypes;
@@ -56,13 +59,16 @@ private: /* 사본객체들을 보관하기위한 컨테이너. */
 	map<const wstring, class CLayer*>*			m_pLayers = nullptr;
 	typedef map<const wstring, class CLayer*>	LAYERS;
 	_uint										m_iNumLevels = 0;
-	char						m_szSaveDataname[MAX_PATH] = "";
 
+private:
+	char						m_szSaveDataname[MAX_PATH] = "";
 	char						m_szTexturName[MAX_PATH] = "";
 	char						m_szProtoName[MAX_PATH] = "";
 	char						m_szLayerName[MAX_PATH] = "";
+	char						m_szObjectName[MAX_PATH] = "";
 
-
+	_float						m_fTransformSpeed = 0.f;
+	_float						m_fTransformRotation = 0.f;
 	vector<_tchar*>				m_vecNameArray;
 
 

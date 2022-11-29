@@ -22,8 +22,11 @@ public:
 	static	const wstring		m_pTransformComTag;
 
 public:
-	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
+	const	 _tchar*				Get_ProtoName() const { return m_ProtoName; }
+	void							Set_ProtoName(const _tchar* pNametag) { m_ProtoName = pNametag; }
 
+	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
+	void							Set_ObjectName(const _tchar* pNametag) { m_ObjectName = pNametag; }
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -40,19 +43,23 @@ public: /* imgui */
 
 	// 이 오브젝트에서 보여줄 데이터를 imgui로 작성한다.
 	virtual void Imgui_RenderProperty(){}
+	virtual _bool Piciking_GameObject() = 0;
 
 	void					Set_parent(CGameObject* pGameObject);
+	virtual void					Set_parentName(const _tchar* pParentTag) {};
+
 	CGameObject*			Get_parentName() { 
 		if (m_pParentObject == nullptr)
 			return nullptr;
 		return m_pParentObject;
-		
 	}
 
 public:
 	CTransform*		Get_Transform() { return m_pTransformCom; }
+	class	CComponent	*Get_Component(const wstring& ComponentTag);
 
-private:
+
+protected:
 	CGameObject*			m_pParentObject = nullptr;
 
 protected:
@@ -66,9 +73,13 @@ protected:
 protected:	
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	class CComponent* Find_Component(const wstring& pComponentTag);
+
+protected:
 	const					_tchar*					m_ObjectName = TEXT("");
+	const					_tchar*					m_ProtoName = TEXT("");
 
 	_bool											m_bLast_Initlize = false;
+
 public:	
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

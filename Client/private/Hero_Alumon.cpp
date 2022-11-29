@@ -22,6 +22,8 @@ HRESULT CHero_Alumon::Initialize_Prototype()
 
 HRESULT CHero_Alumon::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("Hero_Alumon");
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -71,6 +73,14 @@ HRESULT CHero_Alumon::Render()
 
 	
 	return S_OK;
+}
+
+_bool CHero_Alumon::Piciking_GameObject()
+{
+	if (m_pModelCom->PicikingModel(g_hWnd, m_pTransformCom))
+		return true;
+
+	return false;
 }
 
 HRESULT CHero_Alumon::SetUp_Components()

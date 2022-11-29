@@ -26,6 +26,9 @@ public:
 	virtual HRESULT Render()override;
 
 
+public: /* Imgui */
+	virtual _bool Piciking_GameObject()override { return false; }
+
 public:
 	virtual HRESULT	Add_ChildUI(CUI* pUI)sealed;
 

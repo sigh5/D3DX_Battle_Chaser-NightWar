@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "Hero_Gully.h"
+#include "Level_Manager.h"
 CHpBar::CHpBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {
@@ -38,9 +39,6 @@ HRESULT CHpBar::Last_Initialize()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
-
-	if (nullptr == dynamic_cast<CHero_Gully*>((pObserver)))	// 구독할 클라스를 알아야됌
-		return E_FAIL;
 
 	dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
 

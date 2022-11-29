@@ -12,7 +12,7 @@ vector			g_vLightSpecular;
 
 
 /* 재질정보 */
-texture2D		g_DiffuseTexture[3];
+texture2D		g_DiffuseTexture[4];
 vector			g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
 vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 int				g_iDiffuseTextureIndex;
@@ -121,7 +121,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	vector		vSourDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
+	vector		vSourDiffuse = g_DiffuseTexture[3].Sample(LinearSampler, In.vTexUV * 30.f);
 	
 	vector		vDestDiffuse = 2;
 	if (g_iDiffuseTextureIndex == 2)
@@ -130,8 +130,6 @@ PS_OUT PS_MAIN(PS_IN In)
 		vDestDiffuse = g_DiffuseTexture[2].Sample(LinearSampler, In.vTexUV * 30.f);
 	
 	vector		vFilter = g_FilterTexture.Sample(LinearSampler, In.vTexUV);
-
-
 
 	/*vector		*/
 	vector		vBrush = (vector)0.f;

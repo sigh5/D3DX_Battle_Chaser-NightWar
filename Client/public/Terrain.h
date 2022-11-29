@@ -33,6 +33,9 @@ public:
 
 	_float4		Get_Position()const ;
 
+public: /* Imgui */
+	virtual _bool	Piciking_GameObject()override;
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

@@ -27,9 +27,8 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
-	CTransform*			Get_Transform() { return m_pTransformCom; }
-
-
+public: /* Imgui */
+	virtual _bool	Piciking_GameObject()override;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

@@ -83,6 +83,11 @@ HRESULT CBackGround::Render()
 	return S_OK;
 }
 
+_bool CBackGround::Piciking_GameObject()
+{
+	return _bool();
+}
+
 HRESULT CBackGround::SetUp_Components()
 {
 	/* For.Com_Renderer */

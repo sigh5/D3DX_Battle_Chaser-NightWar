@@ -33,7 +33,8 @@ public:
 	//m_pDevice->SetTransform();
 	//m_pDevice->GetTransform();
 
-
+public: /* Imgui */
+	virtual _bool Piciking_GameObject()override { return false; }
 protected:
 	CAMERADESC					m_CameraDesc;
 

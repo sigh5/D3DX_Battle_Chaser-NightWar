@@ -9,8 +9,8 @@ class ENGINE_DLL CUI abstract : public CGameObject
 public:
 	typedef struct tag_UIDesc :public GAMEOBJECTDESC
 	{
-		const _tchar*			pBroadCasterTag =  TEXT("");
-		const _tchar*			m_pTextureTag = TEXT("");
+	 _tchar*			pBroadCasterTag =  TEXT("");
+	 _tchar*			m_pTextureTag = TEXT("");
 	}UIDESC;
 
 protected:
@@ -18,6 +18,10 @@ protected:
 	CUI(const CUI& rhs);
 	virtual ~CUI() = default;
 
+public:
+	 _tchar*						Get_BroadCasterTag()const  { return m_UIDesc.pBroadCasterTag; }
+	 void							Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
+	 virtual void					Set_parentName(const _tchar* pParentTag);
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -26,6 +30,12 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
+
+
+public: /* Imgui */
+	virtual _bool Piciking_GameObject()override { return false; }
+
+public:
 
 
 protected:

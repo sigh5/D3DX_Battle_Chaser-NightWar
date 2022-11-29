@@ -176,11 +176,10 @@ HRESULT CVIBuffer_Cube::Initialize(void * pArg)
 	return S_OK;
 }
 
-
-_bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
+_bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
-	
+
 	POINT		ptMouse{};
 
 	GetCursorPos(&ptMouse);
@@ -192,7 +191,7 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
 	ViewPort.Width = 1280;
 	ViewPort.Height = 720;
-	
+
 
 	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
 	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
@@ -201,7 +200,7 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 
 	_matrix		matProj;
 	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
-	XMStoreFloat4( &vPoint ,XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
 
 	_matrix		matView;
 	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
@@ -210,7 +209,7 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 	_float4		vRayPos;
 	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
 	_float4		vRayDir;
-	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint)- XMLoadFloat4(&vRayPos)));
+	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
 
 
 	_matrix		matWorld;
@@ -227,7 +226,7 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 1;
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 6;
-	
+
 	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
 		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
@@ -387,6 +386,8 @@ _bool CVIBuffer_Cube::PickingCube(HWND hWnd, CTransform * pCubeTransCom)
 
 	return false;
 }
+
+
 
 CVIBuffer_Cube * CVIBuffer_Cube::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

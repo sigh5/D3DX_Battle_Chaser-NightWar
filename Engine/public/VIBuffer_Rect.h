@@ -15,7 +15,7 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual		void	Final_Update()override {}
-
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom)override;
 public:
 	static CVIBuffer_Rect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg = nullptr);

@@ -71,7 +71,7 @@ void CHero_Gully::Late_Tick(_double TimeDelta)
 
 	if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_LB))
 	{
-		if (m_pVIBufferCom->PickingCube(g_hWnd, m_pTransformCom))
+		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom))
 		{
 			//CGameObject* pTerrain =   pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BackGround"), TEXT("Terrain"));
 
@@ -98,6 +98,11 @@ HRESULT CHero_Gully::Render()
 	m_pVIBufferCom->Render();
 
 	return S_OK;
+}
+
+_bool CHero_Gully::Piciking_GameObject()
+{
+	return _bool();
 }
 
 HRESULT CHero_Gully::SetUp_Components()

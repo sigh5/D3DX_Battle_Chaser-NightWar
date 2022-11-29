@@ -3,6 +3,8 @@
 
 #include "Texture.h"
 #include "Shader.h"
+#include "Transform.h"
+
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -64,6 +66,21 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath)
 HRESULT CModel::Initialize(void * pArg)
 {
 	return S_OK;
+}
+
+_bool CModel::PicikingModel(HWND hWnd, CTransform * pTransform)
+{
+	for (auto &pMesh : m_Meshs)
+	{
+		if (pMesh->PickingBuffer(hWnd,pTransform))
+		{
+			return true;
+		}
+	}
+
+	return false;
+
+
 }
 
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)

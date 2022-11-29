@@ -1,7 +1,7 @@
 #include "..\public\UI.h"
 
-
-
+#include "Object_Manager.h"
+#include "Canvas.h"
 CUI::CUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CGameObject(pDevice, pContext)
 {
@@ -47,6 +47,18 @@ void CUI::Late_Tick(_double TimeDelta)
 HRESULT CUI::Render()
 {
 	return S_OK;
+}
+
+void CUI::Set_parentName(const _tchar * pParentTag)
+{
+	CObject_Manager *pObjMgr = GET_INSTANCE(CObject_Manager);
+
+	m_pParentObject = pObjMgr->Get_GameObject(2, TEXT("Layer_UI"), pParentTag);
+
+	dynamic_cast<CCanvas*>(m_pParentObject)->Add_ChildUI(this);
+
+
+	RELEASE_INSTANCE(CObject_Manager);
 }
 
 HRESULT CUI::SetUp_UI()

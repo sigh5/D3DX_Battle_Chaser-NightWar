@@ -32,6 +32,9 @@ private:
 	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
 	CTexture*				m_pTextureCom = nullptr;
 
+public: /* Imgui */
+	//virtual _bool	Piciking_GameObject()override
+
 private:
 	_float4x4				m_ViewMatrix;
 	_float4x4				m_ProjMatrix;

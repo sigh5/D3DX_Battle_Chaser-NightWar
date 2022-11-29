@@ -17,10 +17,10 @@ public:
 	virtual		void	Final_Update()override {}
 
 	const _float4*		Get_vPos() { return m_vPos; }
-
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom)override;
 
 public:
-	_bool	PickingCube(HWND hWnd,  class CTransform * pCubeTransCom);
+	
 
 
 

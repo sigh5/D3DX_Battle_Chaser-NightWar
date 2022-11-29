@@ -67,8 +67,8 @@ HRESULT CVI_Buffer_Terrain::Initialize_Prototype(const wstring & terrainFilePath
 			//& 00000000 00000000 00000000 11111111	& 연산 시 제일 마지막이 B다.
 			//  다른쪽을 and 연산하면 16진수라 숫자가 커서 B로하는게 속도적으로 이득이다.
 
-			pVertices[iIndex].vPosition = _float3((_float)j, (pPixel[iIndex] & 0x000000ff) / 100.f, (_float)i);
-			//pVertices[iIndex].vPosition = _float3((_float)j, 0.f, (_float)i);
+			//pVertices[iIndex].vPosition = _float3((_float)j, (pPixel[iIndex] & 0x000000ff) / 100.f, (_float)i);
+			pVertices[iIndex].vPosition = _float3((_float)j, 0.f, (_float)i);
 			m_pVtx[iIndex] = _float4(pVertices[iIndex].vPosition.x, pVertices[iIndex].vPosition.y, pVertices[iIndex].vPosition.z, 1.f);
 			pVertices[iIndex].vNormal = _float3(0.f, 0.f, 0.f);
 			pVertices[iIndex].vTexUV = _float2(j / (m_iNumVerticesX - 1.0f), i / (m_iNumVerticesZ - 1.0f));
@@ -279,6 +279,99 @@ _float4 CVI_Buffer_Terrain::PickingTerrain(HWND hWnd, CTransform * pCubeTransCom
 
 
 	return _float4(0.f,0.f,0.f,0.f);
+}
+
+_bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
+{
+	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
+
+	POINT		ptMouse{};
+
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	_float4		vPoint;
+
+	D3D11_VIEWPORT		ViewPort;
+	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
+	ViewPort.Width = 1280;
+	ViewPort.Height = 720;
+
+
+	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
+	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
+	vPoint.z = 1.f;
+	vPoint.w = 1.f;
+
+	_matrix		matProj;
+	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
+
+	_matrix		matView;
+	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
+
+	_float4		vRayPos;
+	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
+	_float4		vRayDir;
+	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
+
+
+	_matrix		matWorld;
+	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
+	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
+	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
+
+	_ulong	dwVtxIdx[3]{};
+	_float fDist;
+
+	for (_ulong i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_ulong j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_ulong dwIndex = i * (m_iNumVerticesX)+j;
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + (m_iNumVerticesX)+1;
+			dwVtxIdx[2] = dwIndex + 1;
+
+			_float4 Normal;
+			XMStoreFloat4(&Normal, XMLoadFloat4(&m_pVtx[dwIndex + (m_iNumVerticesX)+1]) + (XMLoadFloat4(&m_pVtx[dwIndex]) / 2));
+
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+
+				return  true;
+			}
+
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + 1;
+			dwVtxIdx[2] = dwIndex;
+
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+
+				//XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
+				return  true;
+			}
+		}
+	}
+
+
+	return false;
 }
 
 CVI_Buffer_Terrain * CVI_Buffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & terrainFilePath)

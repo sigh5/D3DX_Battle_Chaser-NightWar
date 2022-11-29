@@ -4,6 +4,7 @@
 
 BEGIN(Engine)
 
+
 class ENGINE_DLL CVIBuffer abstract : public CComponent
 {
 protected:
@@ -15,7 +16,11 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Render();
-	virtual		void	Final_Update()override {}
+	virtual	void	Final_Update()override {}
+
+public:
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom) = 0;
+
 protected:
 	/* 할당하고자하는 버퍼의 속성을 정의한다. */
 	D3D11_BUFFER_DESC			m_BufferDesc;
