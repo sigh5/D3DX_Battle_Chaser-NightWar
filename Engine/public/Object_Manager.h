@@ -67,6 +67,8 @@ private:
 	char						m_szLayerName[MAX_PATH] = "";
 	char						m_szObjectName[MAX_PATH] = "";
 
+
+
 	_float						m_fTransformSpeed = 0.f;
 	_float						m_fTransformRotation = 0.f;
 	vector<_tchar*>				m_vecNameArray;

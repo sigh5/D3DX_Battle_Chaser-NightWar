@@ -11,6 +11,7 @@ public:
 	{
 	 _tchar*			pBroadCasterTag =  TEXT("");
 	 _tchar*			m_pTextureTag = TEXT("");
+
 	}UIDESC;
 
 protected:
@@ -21,7 +22,12 @@ protected:
 public:
 	 _tchar*						Get_BroadCasterTag()const  { return m_UIDesc.pBroadCasterTag; }
 	 void							Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
-	 virtual void					Set_parentName(const _tchar* pParentTag);
+	
+	 _tchar*						Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
+	 void							Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
+
+	 
+
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -34,9 +40,7 @@ public:
 
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
-
-public:
-
+	virtual void	Set_parentName(const _tchar* pParentTag);
 
 protected:
 	virtual HRESULT SetUp_UI()sealed;
@@ -54,6 +58,9 @@ protected:
 	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
 	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
 	UINT                        m_StencilRef = 0;
+
+public:
+	_tchar*						m_Sibal = TEXT("");
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

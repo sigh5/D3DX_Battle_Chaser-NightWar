@@ -2,7 +2,7 @@
 #include "..\public\TurnCharcterUI.h"
 
 #include "GameInstance.h"
-
+#include "Canvas.h"
 CTurnCharcterUI::CTurnCharcterUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice,pContext)
 {
@@ -56,7 +56,12 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	m_ObjectName = m_UIDesc.m_pTextureTag;
+	/*if (m_pParentObject != nullptr)
+	{
+		dynamic_cast<CCanvas*>(m_pParentObject)->Add_ChildUI(this);
+	}
+*/
+
 
 	m_bLast_Initlize = true;
 	return S_OK;

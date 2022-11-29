@@ -31,7 +31,7 @@ void CImgui_PropertyEditor::Imgui_RenderTab()
 	if (m_pSelectedObject)
 	{
 		ImGui::Separator();
-		ImGui::Text("%s", typeid(*m_pSelectedObject).name());
+		ImGui::Text("%s",typeid(*m_pSelectedObject).name());
 		m_pSelectedObject->Imgui_RenderProperty();
 		m_pSelectedObject->Imgui_RenderComponentProperties();
 	}

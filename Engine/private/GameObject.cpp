@@ -2,6 +2,7 @@
 #include "GameInstance.h"
 #include "GameUtils.h"
 #include "Object_Manager.h"
+#include "Level_Manager.h"
 
 const wstring CGameObject::m_pTransformComTag = TEXT("Com_Transform");
 
@@ -75,8 +76,6 @@ void CGameObject::Set_parent(CGameObject* pGameObject)
 	m_pTransformCom->Set_ParentTransform(m_pParentObject->m_pTransformCom);
 	
 }
-
-
 
 CComponent * CGameObject::Get_Component(const wstring & ComponentTag)
 {

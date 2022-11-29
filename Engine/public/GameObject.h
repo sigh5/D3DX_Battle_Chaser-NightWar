@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Transform.h"
-
+#include "GameUtils.h"
 BEGIN(Engine)
 
 class ENGINE_DLL CGameObject abstract : public CBase
@@ -27,6 +27,7 @@ public:
 
 	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
 	void							Set_ObjectName(const _tchar* pNametag) { m_ObjectName = pNametag; }
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -47,6 +48,7 @@ public: /* imgui */
 
 	void					Set_parent(CGameObject* pGameObject);
 	virtual void					Set_parentName(const _tchar* pParentTag) {};
+
 
 	CGameObject*			Get_parentName() { 
 		if (m_pParentObject == nullptr)

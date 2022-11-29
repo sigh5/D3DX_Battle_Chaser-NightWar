@@ -24,8 +24,6 @@ HRESULT CTurnUICanvas::Initialize_Prototype()
 
 HRESULT CTurnUICanvas::Initialize(void * pArg)
 {
-	m_ObjectName = TEXT("Prototype_GameObject_TurnCanvas_UI");
-
 	CCanvas::CANVASDESC		CanvasDesc;
 	ZeroMemory(&CanvasDesc, sizeof(CanvasDesc));
 
@@ -63,7 +61,6 @@ HRESULT CTurnUICanvas::Last_Initialize()
 		return S_OK;
 
 	
-
 	m_bLast_Initlize = true;
 
 	return S_OK;

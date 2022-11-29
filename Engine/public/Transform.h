@@ -43,6 +43,18 @@ public:
 		return  XMLoadFloat4x4(&m_ParentAndChildWorldMatrix);
 	}
 
+	_matrix	Get_LocalMatrix()
+	{
+		return  XMLoadFloat4x4(&m_WorldMatrix);
+	}
+
+
+	void	Set_WorldMatrix(_float4x4 WorldFlot4x4)
+	{
+		memcpy(&m_WorldMatrix, &WorldFlot4x4, sizeof(WorldFlot4x4));
+	}
+
+
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
