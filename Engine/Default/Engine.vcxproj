@@ -178,6 +178,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Engine_Macro.h" />
     <ClInclude Include="..\public\Engine_Struct.h" />
     <ClInclude Include="..\public\Engine_Typedef.h" />
+    <ClInclude Include="..\Public\Environment_Object.h" />
     <ClInclude Include="..\public\FSMComponent.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -233,6 +234,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\Private\Canvas.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\Component_Manager.cpp" />
+    <ClCompile Include="..\Private\Environment_Object.cpp" />
     <ClCompile Include="..\private\FSMComponent.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />

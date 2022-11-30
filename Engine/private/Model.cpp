@@ -70,13 +70,7 @@ HRESULT CModel::Initialize(void * pArg)
 
 _bool CModel::PicikingModel(HWND hWnd, CTransform * pTransform)
 {
-	for (auto &pMesh : m_Meshs)
-	{
-		if (pMesh->PickingBuffer(hWnd,pTransform))
-		{
-			return true;
-		}
-	}
+	
 
 	return false;
 

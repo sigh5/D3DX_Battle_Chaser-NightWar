@@ -47,7 +47,7 @@ public: /* imgui */
 	virtual _bool Piciking_GameObject() = 0;
 
 	void					Set_parent(CGameObject* pGameObject);
-	virtual void					Set_parentName(const _tchar* pParentTag) {};
+	virtual void			Set_parentName(const _tchar* pParentTag) {};
 
 
 	CGameObject*			Get_parentName() { 

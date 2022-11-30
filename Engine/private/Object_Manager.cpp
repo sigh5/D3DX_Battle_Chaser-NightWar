@@ -5,6 +5,10 @@
 #include "GameInstance.h"
 #include "Canvas.h"
 #include "Level_Manager.h"
+#include "Component_Manager.h"
+#include "Camera.h"
+#include "Environment_Object.h"
+
 IMPLEMENT_SINGLETON(CObject_Manager)
 
 CObject_Manager::CObject_Manager()
@@ -20,6 +24,14 @@ HRESULT CObject_Manager::Reserve_Manager(_uint iNumLevels)
 
 	m_iNumLevels = iNumLevels;
 
+	m_LayerName.push_back(LAYER_BACKGROUND);
+	m_LayerName.push_back(LAYER_ENVIRONMENT);
+	m_LayerName.push_back(LAYER_PLAYER);
+	m_LayerName.push_back(LAYER_Monster);
+	m_LayerName.push_back(LAYER_UI);
+	// Todo  Layer는 상수로 추가했음
+
+
 	return S_OK;
 }
 
@@ -28,7 +40,7 @@ HRESULT CObject_Manager::Clear(_uint iLevelIndex)
 	if (iLevelIndex >= m_iNumLevels)
 		return E_FAIL;
 
-	for (auto& Pair : m_pLayers[iLevelIndex])	
+	for (auto& Pair : m_pLayers[iLevelIndex])
 		Safe_Release(Pair.second);
 
 	m_pLayers[iLevelIndex].clear();
@@ -58,7 +70,7 @@ HRESULT CObject_Manager::Add_Prototype(const wstring& pPrototypeTag, CGameObject
 		return E_FAIL;
 
 	m_Prototypes.emplace(pPrototypeTag, pPrototype);
-	
+
 	return S_OK;
 }
 
@@ -108,10 +120,10 @@ void CObject_Manager::Tick(_double TimeDelta)
 	{
 		for (auto& Pair : m_pLayers[i])
 		{
-			if(nullptr != Pair.second)
-				Pair.second->Tick(TimeDelta);			
+			if (nullptr != Pair.second)
+				Pair.second->Tick(TimeDelta);
 		}
-	}	
+	}
 }
 
 void CObject_Manager::Late_Tick(_double TimeDelta)
@@ -146,27 +158,29 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 	bool bFound = false;
 	if (ImGui::CollapsingHeader("Select_ObjectTab", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		if (ImGui::TreeNode("GameObjects"))  // for object loop listbox
+#pragma region	ParentUI_Canvas
+		if (ImGui::TreeNode("CanvasGameObjects"))  // for object loop listbox
 		{
 			for (auto& Pair : targetLevel)
 			{
 				if (ImGui::BeginListBox("##"))
 				{
 					char szobjectTag[128];
-				
+
 					for (auto& obj : Pair.second->GetGameObjects())
 					{
+						if (dynamic_cast<CCanvas*>(obj) == nullptr)
+							continue;
+
 						if (obj != nullptr)
 							CGameUtils::wc2c((obj->Get_ObjectName()), szobjectTag);
-						
-						const bool bSelected = pSelectedObject != obj;
-						if (ImGui::Selectable(szobjectTag, bSelected))
+
+						if (ImGui::Selectable(szobjectTag))
 						{
-							if (dynamic_cast<CCanvas*>(obj) == nullptr || dynamic_cast<CUI*>(pSelectedObject) == nullptr)
+							if (dynamic_cast<CUI*>(pSelectedObject) == nullptr)
 								return;
 
 							dynamic_cast<CCanvas*>(obj)->Add_ChildUI(dynamic_cast<CUI*>(pSelectedObject));
-
 						}
 					}
 					ImGui::EndListBox();
@@ -174,23 +188,55 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 			}
 			ImGui::TreePop();
 		}
+#pragma endregion ParentUI_Canvas
+
+#pragma region	PickingMapObject_SelectTerrain
+		if (ImGui::TreeNode("SelectGround"))
+		{
+			for (auto& Pair : targetLevel)
+			{
+				if (ImGui::BeginListBox("##"))
+				{
+					char szobjectTag[128];
+
+					for (auto& obj : Pair.second->GetGameObjects())
+					{
+						if (dynamic_cast<CUI*>(obj) != nullptr || dynamic_cast<CCamera*>(obj) != nullptr)
+							continue;
+
+						if (obj != nullptr)
+							CGameUtils::wc2c((obj->Get_ObjectName()), szobjectTag);
+
+						if (ImGui::Selectable(szobjectTag))
+						{
+							m_pSelectTerrain = obj;
+						}
+					}
+					ImGui::EndListBox();
+				}
+			}
+
+			ImGui::TreePop();
+		}
 	}
-	
+#pragma endregion PickingMapObject_SelectTerrain
+
 	if (pSelectedObject != nullptr  &&pSelectedObject->Get_parentName() != nullptr)
 		ImGui::Text("%s", typeid(*pSelectedObject->Get_parentName()).name());
 
 	if (ImGui::CollapsingHeader("Create_Object", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		Imgui_Select_LayerType();
+		Imgui_Select_ProtoType();
+		Imgui_Select_Texture();
+		Imgui_Select_Model();
+
 		CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
 
 		ImGui::InputText("Layer_Name ", m_szLayerName, MAX_PATH);
 		ImGui::InputText("Proto_Name ", m_szProtoName, MAX_PATH);
-		ImGui::InputText("Texture_Name ", m_szTexturName, MAX_PATH);
+		ImGui::InputText("Texture_Or_Model_Name ", m_szTexturName, MAX_PATH);
 		ImGui::InputText("ObjectName ", m_szObjectName, MAX_PATH);
-
-
-		ImGui::InputFloat("Speed", &m_fTransformSpeed);
-		ImGui::InputFloat("Rotation", &m_fTransformRotation);
 
 		if (ImGui::Button("CreateUI"))
 		{
@@ -204,12 +250,12 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szTexturName, sizeof(char[256]), szTextureName, sizeof(_tchar[256]));
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szObjectName, sizeof(char[256]), szObjectName, sizeof(_tchar[256]));
 			m_Desc.m_pTextureTag = szTextureName;
-			
+
 			CGameObject* pGameObject = nullptr;
 			Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &m_Desc);
-		
+
 			if (pGameObject == nullptr)
-				return ;
+				return;
 
 			pGameObject->Set_ProtoName(szProtoName);
 			pGameObject->Set_ObjectName(szObjectName);
@@ -219,14 +265,9 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 			m_vecNameArray.push_back(szProtoName);
 			m_vecNameArray.push_back(szTextureName);
 		}
-
-		if (ImGui::Button("CreateMapObject"))
+		ImGui::SameLine();
+		if (ImGui::Button("CreateEnviromentObj"))	//환경오브젝트
 		{
-			
-			CGameObject::GAMEOBJECTDESC	m_Desc;
-			m_Desc.TransformDesc.fSpeedPerSec = m_fTransformSpeed;
-			m_Desc.TransformDesc.fRotationPerSec = m_fTransformRotation;
-			
 			_tchar* szLayerName = new _tchar[MAX_PATH];
 			_tchar* szProtoName = new _tchar[MAX_PATH];
 			_tchar* szTextureName = new _tchar[MAX_PATH];
@@ -236,18 +277,22 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szProtoName, sizeof(char[256]), szProtoName, sizeof(_tchar[256]));
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szTexturName, sizeof(char[256]), szTextureName, sizeof(_tchar[256]));
 			MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szObjectName, sizeof(char[256]), szObjectName, sizeof(_tchar[256]));
-			
-			//m_Desc.ObjectName = szObjectName;
+
+
+			if (m_pSelectTerrain != nullptr)
+				m_pSelectTerrain->Piciking_GameObject();
+
+			// 환경 오브젝트 
 
 			CGameObject* pGameObject = nullptr;
+			CEnvironment_Object::ENVIRONMENTDESC Desc;
+			ZeroMemory(&Desc, sizeof(CEnvironment_Object::ENVIRONMENTDESC));
+			Desc.m_pModelTag = szTextureName;
 
-			Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject,&m_Desc);
-
-			if (nullptr == pGameObject)
-				MSG_BOX("Error Imgui CloneGameObject");
+			Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject,&Desc);
 
 			pGameObject->Set_ObjectName(szObjectName);
-
+			pGameObject->Set_ProtoName(szProtoName);
 
 			m_vecNameArray.push_back(szLayerName);
 			m_vecNameArray.push_back(szProtoName);
@@ -259,7 +304,31 @@ void CObject_Manager::Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject *& 
 		RELEASE_INSTANCE(CLevel_Manager);
 	}
 
+
 	ImGui::End();
+}
+
+void CObject_Manager::Imgui_PicikingSelectObject(_uint iLevel, OUT CGameObject *& pSelectedObject)
+{
+	const LAYERS& targetLevel = m_pLayers[iLevel];
+
+	for (auto& Pair : targetLevel)
+	{
+		for (auto &pGameObject : Pair.second->GetGameObjects())
+		{
+			if (dynamic_cast<CUI*>(pGameObject) != nullptr)
+				continue;
+
+			if (pGameObject->Piciking_GameObject())
+			{
+				//pSelectedObject = nullptr;
+
+				pSelectedObject = pGameObject;
+			}
+		}
+
+	}
+
 }
 
 HRESULT CObject_Manager::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pPrototypeTag, OUT CGameObject** ppGameObject, void * pArg)
@@ -292,31 +361,110 @@ HRESULT CObject_Manager::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstr
 	return S_OK;
 }
 
-void CObject_Manager::Imgui_PickingSelcetObject(_uint iLevel, OUT CGameObject *& pSelectedObject)
+void CObject_Manager::Imgui_Select_LayerType()
 {
-	// TreeNode 켜져있을때만가능
+	if (ImGui::TreeNode("LayerType"))  // for object loop listbox
+	{
+		for (auto& iter : m_LayerName)
+		{
+			if (ImGui::BeginListBox("##"))
+			{
+				char szobjectTag[MAX_PATH];
+				if (lstrcmp(iter, TEXT("")))
+					CGameUtils::wc2c(iter, szobjectTag);
+
+				if (ImGui::Selectable(szobjectTag))
+				{
+					strcpy_s(m_szLayerName, szobjectTag);
+				}
+			}
+			ImGui::EndListBox();
+		}
+		ImGui::TreePop();
+	}
+
+}
+
+void CObject_Manager::Imgui_Select_ProtoType()
+{
+	const PROTOTYPES& ProtoType = m_Prototypes;
+
+	if (ImGui::TreeNode("ProtoTypes"))  // for object loop listbox
+	{
+		for (auto& Pair : ProtoType)
+		{
+			if (ImGui::BeginListBox("##"))
+			{
+				char szobjectTag[MAX_PATH];
+				if (Pair.second != nullptr)
+					CGameUtils::wc2c(Pair.first.c_str(), szobjectTag);
+
+				if (ImGui::Selectable(szobjectTag))
+				{
+					strcpy_s(m_szProtoName, szobjectTag);
+				}
+			}
+			ImGui::EndListBox();
+		}
+		ImGui::TreePop();
+	}
+
+}
+
+void CObject_Manager::Imgui_Select_Texture()
+{
+	CComponent_Manager* pComponentMgr = GET_INSTANCE(CComponent_Manager);
+	CLevel_Manager*		pLevelMgr = GET_INSTANCE(CLevel_Manager);
+
+	pComponentMgr->Imgui_TextureViewer(pLevelMgr->GetCurLevelIdx(), TextureOrModelName);
+ 	CGameUtils::wc2c(TextureOrModelName.c_str(), m_szTexturName);
+
+	RELEASE_INSTANCE(CComponent_Manager);
+	RELEASE_INSTANCE(CLevel_Manager);
+}
+
+void CObject_Manager::Imgui_Select_Model()
+{
+	CComponent_Manager* pComponentMgr = GET_INSTANCE(CComponent_Manager);
+	CLevel_Manager*		pLevelMgr = GET_INSTANCE(CLevel_Manager);
+
+	pComponentMgr->Imgui_ModelViewer(pLevelMgr->GetCurLevelIdx(), TextureOrModelName);
+	CGameUtils::wc2c(TextureOrModelName.c_str(), m_szTexturName);
+
+	RELEASE_INSTANCE(CComponent_Manager);
+	RELEASE_INSTANCE(CLevel_Manager);
+
+}
+
+
+void CObject_Manager::Imgui_RemoveObject(_uint iLevel, OUT CGameObject ** ppGameObject)
+{
 	const LAYERS& targetLevel = m_pLayers[iLevel];
 
-	if (ImGui::IsMouseClicked(0))
+	if (ImGui::Button("Remove"))
 	{
 		for (auto& Pair : targetLevel)
 		{
 			for (auto& obj : Pair.second->GetGameObjects())
 			{
-				if (obj->Piciking_GameObject())
+				if (nullptr != obj)
 				{
-					pSelectedObject = obj;
+					if (!lstrcmp((*ppGameObject)->Get_ObjectName(), obj->Get_ObjectName()))
+					{
+						*ppGameObject = nullptr;
+						Pair.second->Delete_GameObject(obj);
+						return;
+					}
 				}
-
 			}
-		}
+
+		}	
 	}
-	
 }
 
 void CObject_Manager::Imgui_Save()
 {
-	if (ImGui::Button("UISave"))
+	if (ImGui::Button("Save_Scene"))
 	{
 		_tchar* szName = new _tchar[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
@@ -353,38 +501,52 @@ void CObject_Manager::Imgui_Save()
 		{
 			for (auto& Pair : m_pLayers[i])
 			{
-				if (Pair.first == TEXT("Layer_UI"))
+				lstrcpy(LayerTag, Pair.first.c_str());
+
+				if(!lstrcmp(LayerTag , TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+					continue;
+
+				for (auto& pObject : Pair.second->GetGameObjects())
 				{
-					lstrcpy(LayerTag, Pair.first.c_str());
-
-					for (auto& pObject : Pair.second->GetGameObjects())
+					_float4x4 Worldmatrix = _float4x4();
+					lstrcpy(ProtoName, pObject->Get_ProtoName());
+					lstrcpy(ObjectName, pObject->Get_ObjectName());
+					XMStoreFloat4x4(&Worldmatrix, pObject->Get_Transform()->Get_LocalMatrix());
+					/*if (Pair.first == TEXT("Layer_BackGround"))
 					{
-						_float4x4 Worldmatrix = _float4x4();
-						lstrcpy(ProtoName, pObject->Get_ProtoName());
+						lstrcpy(ParentName, TEXT("Nullptr"));
+						lstrcpy(TextureName, TEXT(""));
+					}*/
+					
+					if (Pair.first == TEXT("Layer_Environment"))
+					{
+						lstrcpy(ParentName, TEXT("Nullptr"));
+						lstrcpy(TextureName, dynamic_cast<CEnvironment_Object*>(pObject)->Get_ModelTag());
+					}
 
+
+					if (Pair.first == TEXT("Layer_UI"))
+					{
 						CGameObject* pParent = pObject->Get_parentName();
 						if (nullptr != pParent)
 							lstrcpy(ParentName, pParent->Get_ObjectName());
-
 						else
 							lstrcpy(ParentName, TEXT("Nullptr"));
 
 						lstrcpy(TextureName, dynamic_cast<CUI*>(pObject)->Get_TextureTag());
-						lstrcpy(ObjectName,	 pObject->Get_ObjectName());
-
-						XMStoreFloat4x4(&Worldmatrix, pObject->Get_Transform()->Get_LocalMatrix());
-						
-						WriteFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
-						WriteFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-						WriteFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-						WriteFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-						WriteFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-						WriteFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-					
 					}
+
+					WriteFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+					WriteFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+					WriteFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+					WriteFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+					WriteFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+					WriteFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+
 				}
 			}
 		}
+
 
 		CloseHandle(hFile);
 		m_vecNameArray.push_back(ObjectName);
@@ -393,18 +555,19 @@ void CObject_Manager::Imgui_Save()
 		m_vecNameArray.push_back(ProtoName);
 		m_vecNameArray.push_back(ParentName);
 		m_vecNameArray.push_back(TextureName);
-	
+
 		MSG_BOX("Save_Complete");
 		RELEASE_INSTANCE(CLevel_Manager);
 
 	}
-	//ImGui::SameLine();
+
+
+
 }
 
 void CObject_Manager::Imgui_Load()
 {
-
-	if (ImGui::Button("UILoad"))
+	if (ImGui::Button("Load_Scene"))
 	{
 		CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
 		_tchar* szName = new _tchar[256];
@@ -433,9 +596,9 @@ void CObject_Manager::Imgui_Load()
 
 		_uint iObjectNumber = 0;
 
-		
+
 		while (true)
-		{	
+		{
 			_float4x4 Worldmatrix = _float4x4();
 			_tchar* LayerTag = new _tchar[MAX_PATH];
 			_tchar* ProtoName = new _tchar[MAX_PATH];
@@ -455,11 +618,37 @@ void CObject_Manager::Imgui_Load()
 			ReadFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 			ReadFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 			ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-		
+
 			if (0 == dwByte)
 				break;
-		
-			if (lstrcmp(ParentName, TEXT("Nullptr")))
+
+			if(!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+				continue;
+
+			/*if (!lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+			{
+				CGameObject* pGameObject = nullptr;
+				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject);
+				(pGameObject)->Set_ProtoName(ProtoName);
+				(pGameObject)->Set_ObjectName(ObjectName);
+				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+			}
+			*/
+			if (!lstrcmp(LayerTag, TEXT("Layer_Environment")))
+			{
+				CEnvironment_Object::ENVIRONMENTDESC Desc;
+				ZeroMemory(&Desc, sizeof(Desc));
+				Desc.m_pModelTag = TextureName;
+
+				CGameObject* pGameObject = nullptr;
+				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject,&Desc);
+				(pGameObject)->Set_ProtoName(ProtoName);
+				(pGameObject)->Set_ObjectName(ObjectName);
+				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+			}
+
+
+			if (!lstrcmp(LayerTag, TEXT("Layer_UI")))
 			{
 				CUI::UIDESC UIDesc;
 				ZeroMemory(&UIDesc, sizeof(UIDesc));
@@ -469,22 +658,15 @@ void CObject_Manager::Imgui_Load()
 				(pGameObject)->Set_ProtoName(ProtoName);
 				(pGameObject)->Set_ObjectName(ObjectName);
 				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-				pGameObject->Set_parentName(ParentName);
-			
+
+				if (lstrcmp(ParentName, TEXT("Nullptr")))
+					pGameObject->Set_parentName(ParentName);
 			}
-			else
-			{
-				CGameObject* pGameObject = nullptr;
-				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject);
-				pGameObject->Set_ProtoName(ProtoName);
-				pGameObject->Set_ObjectName(ObjectName);
-				pGameObject->Get_Transform()->Set_WorldMatrix(Worldmatrix);
 			
-			
-			}
 		}
-	
-		 RELEASE_INSTANCE(CLevel_Manager);
+		
+		CloseHandle(hFile);
+		RELEASE_INSTANCE(CLevel_Manager);
 
 	}
 }
@@ -514,21 +696,22 @@ void CObject_Manager::Imgui_ObjectViewer(_uint iLevel, CGameObject*& pSelectedOb
 				{
 					for (auto& obj : Pair.second->GetGameObjects())
 					{
-						if(obj !=nullptr)
+						if (obj != nullptr)
 							CGameUtils::wc2c((obj->Get_ObjectName()), szobjectTag);
 
 						const bool bSelected = pSelectedObject == obj;
-						if (bSelected) 
+						if (bSelected)
 						{
 							ImGui::SetItemDefaultFocus();
 							bFound = true;
 						}
-						
+
 						if (ImGui::Selectable(szobjectTag, bSelected))
 						{
 							pSelectedObject = obj;
 							bFound = true;
 						}
+
 					}
 					ImGui::EndListBox();
 				}
@@ -538,7 +721,10 @@ void CObject_Manager::Imgui_ObjectViewer(_uint iLevel, CGameObject*& pSelectedOb
 		ImGui::TreePop();
 	}
 
-	ImGui::InputText("File_Name :", m_szSaveDataname,MAX_PATH);	 
+	ImGui::InputText("File_Name :", m_szSaveDataname, MAX_PATH);
+	
+	Imgui_RemoveObject(iLevel,&pSelectedObject);
+	ImGui::NewLine();
 	Imgui_Save();
 	ImGui::SameLine();
 	Imgui_Load();
@@ -595,7 +781,7 @@ void CObject_Manager::Free()
 	}
 
 	Safe_Delete_Array(m_pLayers);
-	
+
 
 	for (auto& Pair : m_Prototypes)
 		Safe_Release(Pair.second);
@@ -603,8 +789,8 @@ void CObject_Manager::Free()
 	m_Prototypes.clear();
 
 
-	
 
-	
+
+
 }
 

@@ -88,57 +88,6 @@ void CMesh::Final_Update()
 {
 }
 
-_bool CMesh::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
-{
-	
-	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
-
-	POINT		ptMouse{};
-
-	GetCursorPos(&ptMouse);
-	ScreenToClient(hWnd, &ptMouse);
-
-	_float4		vPoint;
-
-	D3D11_VIEWPORT		ViewPort;
-	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
-	ViewPort.Width = 1280;
-	ViewPort.Height = 720;
-
-	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
-	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
-	vPoint.z = 1.f;
-	vPoint.w = 1.f;
-
-	_matrix		matProj;
-	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
-	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
-
-	_matrix		matView;
-	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
-
-	_float4		vRayPos;
-	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
-	_float4		vRayDir;
-	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
-
-
-	_matrix		matWorld;
-	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
-	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
-	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
-
-	//_ulong	dwVtxIdx[3]{};
-	//_float fDist;
-
-
-	// 나중에 모델 피킹 배우면 하기
-
-	return false;
-
-}
-
 CMesh * CMesh::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, CModel::TYPE eType, aiMesh * pAIMesh)
 {
 	CMesh*		pInstance = new CMesh(pDevice, pContext);

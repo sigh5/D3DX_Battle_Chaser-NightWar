@@ -59,8 +59,6 @@ protected:
 	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
 	UINT                        m_StencilRef = 0;
 
-public:
-	_tchar*						m_Sibal = TEXT("");
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

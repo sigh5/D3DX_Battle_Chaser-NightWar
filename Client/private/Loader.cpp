@@ -192,11 +192,13 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	///* For.Prototype_Component_ScrollingCloud */
 
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_ScrollingCloud"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Flower/Lily/Lily.fbx"))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Metal_Panel"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_Metal_Panel/Dn_JT_Floor_Metal_Panel.fbx"))))
+		return E_FAIL;
 
-	//
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor_8m"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_8m/Dn_JT_Floor_8m.fbx"))))
+		return E_FAIL;
 
 
 
@@ -231,9 +233,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 
 	/* For.Prototype_GameObject_Hero_Gully */
-	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 		CHero_Gully::Create(m_pDevice, m_pContext))))
-		return E_FAIL;*/
+		return E_FAIL;
 
 	/* For.Prototype_GameObject_Hero_Alumon */
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
@@ -259,10 +261,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
-	///* For.Prototype_GameObject_NoneAnim */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
-	//	CNoneAnim_BG::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	/* For.Prototype_GameObject_NoneAnim */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
+		CNoneAnim_BG::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("·Îµù³¡. "));

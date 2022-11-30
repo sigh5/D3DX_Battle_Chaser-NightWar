@@ -176,7 +176,7 @@ HRESULT CVIBuffer_Cube::Initialize(void * pArg)
 	return S_OK;
 }
 
-_bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
+_bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 &vPosition)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
 
@@ -195,30 +195,32 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 
 	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
 	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
-	vPoint.z = 1.f;
+	vPoint.z = 0.f;
 	vPoint.w = 1.f;
 
 	_matrix		matProj;
 	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
 	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
 
-	_matrix		matView;
-	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
-	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
 
-	_float4		vRayPos;
-	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
-	_float4		vRayDir;
-	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
+	_float4 vecRayPos = _float4(0.0f, 0.f, 0.f, 1.f);
+	_float4 vecRayDir;
+	XMStoreFloat4(&vecRayDir, XMLoadFloat4(&vPoint) - XMLoadFloat4(&vecRayPos));
 
-
+	_matrix      ViewMatrixInv;
+	ViewMatrixInv = pGameIntance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
+	ViewMatrixInv = XMMatrixInverse(nullptr, ViewMatrixInv);
+	XMStoreFloat4(&vecRayPos, XMVector3TransformCoord(XMLoadFloat4(&vecRayPos), ViewMatrixInv));
+	XMStoreFloat4(&vecRayDir, XMVector3TransformNormal(XMLoadFloat4(&vecRayDir), ViewMatrixInv));
+	XMStoreFloat4(&vecRayDir, XMVector3Normalize(XMLoadFloat4(&vecRayDir)));
+	
 	_matrix		matWorld;
 	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
-	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
-	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
+	XMStoreFloat4(&vecRayPos, XMVector3TransformCoord(XMLoadFloat4(&vecRayPos), matWorld));
+	XMStoreFloat4(&vecRayDir, XMVector3TransformNormal(XMLoadFloat4(&vecRayDir), matWorld));
+	XMStoreFloat4(&vecRayDir, XMVector3Normalize(XMLoadFloat4(&vecRayDir)));
 
-	//_vector f=   XMVector3Normalize(XMLoadFloat4(&vRayDir));
-
+	RELEASE_INSTANCE(CGameInstance);
 	_ulong	dwVtxIdx[3]{};
 	_float	fDist = 0;
 
@@ -227,8 +229,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 6;
 
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -240,8 +242,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 1;
 	dwVtxIdx[1] = 6;
 	dwVtxIdx[2] = 2;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -254,8 +256,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 4;
 	dwVtxIdx[1] = 0;
 	dwVtxIdx[2] = 3;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -267,8 +269,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 4;
 	dwVtxIdx[1] = 3;
 	dwVtxIdx[2] = 7;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -280,8 +282,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 4;
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 1;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -292,8 +294,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 4;
 	dwVtxIdx[1] = 1;
 	dwVtxIdx[2] = 0;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -305,8 +307,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 3;
 	dwVtxIdx[1] = 2;
 	dwVtxIdx[2] = 6;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -314,12 +316,11 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 		return true;
 	}
 
-
 	dwVtxIdx[0] = 3;
 	dwVtxIdx[1] = 6;
 	dwVtxIdx[2] = 7;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -332,8 +333,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 7;
 	dwVtxIdx[1] = 6;
 	dwVtxIdx[2] = 5;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -346,8 +347,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 7;
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 4;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -358,8 +359,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 0;
 	dwVtxIdx[1] = 1;
 	dwVtxIdx[2] = 2;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -371,8 +372,8 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	dwVtxIdx[0] = 0;
 	dwVtxIdx[1] = 2;
 	dwVtxIdx[2] = 3;
-	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
-		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+	if (TriangleTests::Intersects(XMLoadFloat4(&vecRayPos),
+		XMLoadFloat4(&vecRayDir),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[1]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[0]]),
 		XMLoadFloat4(&m_vPos[dwVtxIdx[2]]), fDist))
@@ -381,7 +382,7 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	}
 
 
-	RELEASE_INSTANCE(CGameInstance);
+	
 
 
 	return false;

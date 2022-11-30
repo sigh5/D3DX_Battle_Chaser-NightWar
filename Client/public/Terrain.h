@@ -29,7 +29,10 @@ public:
 	virtual void Tick(_double TimeDelta) override;
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
+	
+public:	/*For_Imgui*/
 
+	virtual void Imgui_RenderProperty();
 
 	_float4		Get_Position()const ;
 
@@ -47,7 +50,7 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-
+	_bool					m_bCreateCheck = false;
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

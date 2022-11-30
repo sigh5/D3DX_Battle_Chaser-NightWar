@@ -23,7 +23,7 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 	virtual	void	Final_Update()override;
 
-	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom)override;
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 &vPosition)override { return false; }
 private:
 	CModel::TYPE		m_eType;
 	// 이 메쉬는 m_iMaterialIndex번째 머테리얼을 사용한다.

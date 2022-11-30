@@ -44,10 +44,18 @@ public: /* imgui */
 	void	Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
 	void	Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
+	void	Imgui_PicikingSelectObject(_uint iLevel, OUT CGameObject*& pSelectedObject);
+
+
 	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
-	void	Imgui_PickingSelcetObject(_uint iLevel, OUT CGameObject*& pSelectedObject);
+	
+private:
+	void	Imgui_Select_LayerType();
+	void	Imgui_Select_ProtoType();
+	void	Imgui_Select_Texture();
+	void	Imgui_Select_Model();
 
-
+	void	Imgui_RemoveObject(_uint iLevel,OUT class CGameObject** ppGameObject);
 	void	Imgui_Save();
 	void	Imgui_Load();
 
@@ -67,17 +75,18 @@ private:
 	char						m_szLayerName[MAX_PATH] = "";
 	char						m_szObjectName[MAX_PATH] = "";
 
-
-
-	_float						m_fTransformSpeed = 0.f;
-	_float						m_fTransformRotation = 0.f;
 	vector<_tchar*>				m_vecNameArray;
+	
+	wstring						TextureOrModelName = TEXT("");
+
+
+	class CGameObject*			m_pSelectTerrain = nullptr;
+
+	vector<const _tchar*>		m_LayerName;
 
 
 private:
 	class CGameObject* Find_Prototype(const wstring&  pObjectNameTag);
-	
-	
 	class CLayer* Find_Layer(_uint iLevelIndex, const wstring& pLayerTag);
 
 public:

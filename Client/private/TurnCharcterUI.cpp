@@ -3,8 +3,12 @@
 
 #include "GameInstance.h"
 #include "Canvas.h"
+
+#include "Hero_Gully.h"
+
+
 CTurnCharcterUI::CTurnCharcterUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CUI(pDevice,pContext)
+	: CUI(pDevice,pContext)
 {
 }
 
@@ -24,7 +28,6 @@ HRESULT CTurnCharcterUI::Initialize_Prototype()
 
 HRESULT CTurnCharcterUI::Initialize(void * pArg)
 {
-	
 	if (nullptr != pArg)
 		memcpy(&m_UIDesc, pArg, sizeof(UIDESC));
 
@@ -55,13 +58,13 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	
+	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
-	/*if (m_pParentObject != nullptr)
-	{
-		dynamic_cast<CCanvas*>(m_pParentObject)->Add_ChildUI(this);
-	}
-*/
+	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this,&CTurnCharcterUI::UI_Event);
 
+	RELEASE_INSTANCE(CGameInstance);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -71,6 +74,10 @@ void CTurnCharcterUI::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
+	if(m_bMoveCheck)
+		m_CheckFunction(m_pTransformCom, m_vLimitPos, OBJ_UI);
+
+	
 	__super::Tick(TimeDelta);
 }
 
@@ -92,13 +99,25 @@ HRESULT CTurnCharcterUI::Render()
 
 	CUI::Begin_UI();
 
-	m_pShaderCom->Begin(1);
+	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
 	CUI::End_UI();
 
 	return S_OK;
 }
+
+void CTurnCharcterUI::UI_Event(_double TimeDelta,_uint iMoveSpeed)
+{
+	
+	XMStoreFloat4(&m_vLimitPos,m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	m_vLimitPos.y += 50.f;
+
+	m_CheckFunction = std::bind(&CClient_Manager::distance_Limit_UP, m_pTransformCom, m_vLimitPos,OBJ_UI);
+	m_bMoveCheck = true;
+}
+
+
 
 HRESULT CTurnCharcterUI::SetUp_Components()
 {

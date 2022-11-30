@@ -26,6 +26,11 @@ public:
 
 
 
+public: /*for_Imgui*/
+	void		Imgui_TextureViewer(_uint iLevel,OUT wstring& TextureTag);
+	void		Imgui_ModelViewer(_uint iLevel, OUT wstring& Model_NoAnimTag);
+
+
 private:
 	_uint											m_iNumLevels = 0;
 

@@ -18,6 +18,8 @@ public:
 	void Final_Update();
 	list<class CGameObject*>& GetGameObjects() { return m_GameObjects; }
 
+	void	Delete_GameObject(class CGameObject*& pObject);
+
 private:
 	list<class CGameObject*>			m_GameObjects;
 	typedef list<class CGameObject*>	GAMEOBJECTS;

@@ -4,12 +4,12 @@
 
 
 CNoneAnim_BG::CNoneAnim_BG(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CGameObject(pDevice, pContext)
+	:CEnvironment_Object(pDevice, pContext)
 {
 }
 
 CNoneAnim_BG::CNoneAnim_BG(const CNoneAnim_BG & rhs) 
-	: CGameObject(rhs)
+	: CEnvironment_Object(rhs)
 {
 }
 
@@ -41,6 +41,8 @@ HRESULT CNoneAnim_BG::Last_Initialize()
 
 void CNoneAnim_BG::Tick(_double TimeDelta)
 {
+	//Piciking_GameObject();
+
 	__super::Tick(TimeDelta);
 }
 
@@ -70,12 +72,25 @@ HRESULT CNoneAnim_BG::Render()
 		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, 0)))
 			return E_FAIL;
 	}
+
+	m_pVIBufferCom->Render();
 	return S_OK;
 }
 
 _bool CNoneAnim_BG::Piciking_GameObject()
 {
-	return _bool();
+	_float4 Temp = { 0.f,0.f,0.f,0.f };
+
+	if (ImGui::IsMouseClicked(0))
+	{
+		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, Temp))
+		{
+			return true;
+		}
+
+	}
+
+	return false;
 }
 
 HRESULT CNoneAnim_BG::SetUp_Components()
@@ -90,9 +105,13 @@ HRESULT CNoneAnim_BG::SetUp_Components()
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_ScrollingCloud"), TEXT("Com_Model"),
+	/* For.Com_Model */ //TEXT("Prototype_Component_ScrollingCloud")
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,m_EnviromentDesc.m_pModelTag , TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
+		return E_FAIL;
+	/* For.Com_Model */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"), TEXT("Com_Buffer"),
+		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
 
@@ -149,5 +168,6 @@ void CNoneAnim_BG::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+	Safe_Release(m_pVIBufferCom);
 
 }

@@ -71,5 +71,8 @@
 			return dwRefCnt;									\
 		}
 
-
-
+#define	  LAYER_BACKGROUND		TEXT("Layer_BackGround")
+#define	  LAYER_ENVIRONMENT		TEXT("Layer_Environment")
+#define	  LAYER_PLAYER			TEXT("Layer_Player")
+#define	  LAYER_Monster			TEXT("Layer_Monster")
+#define	  LAYER_UI				TEXT("Layer_UI")

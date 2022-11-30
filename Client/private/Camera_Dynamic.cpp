@@ -50,28 +50,31 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 
 void CCamera_Dynamic::Tick(_double TimeDelta)
 {
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+
 	if (GetKeyState('W') & 0x8000)
 	{
 		m_pTransformCom->Go_Straight(TimeDelta);
 	}
 
-	if (GetKeyState('S') & 0x8000)
+	 if (GetKeyState('S') & 0x8000)
 	{
 		m_pTransformCom->Go_Backward(TimeDelta);
 	}
 
-	if (GetKeyState('A') & 0x8000)
+	 if (GetKeyState('A') & 0x8000)
 	{
 		m_pTransformCom->Go_Left(TimeDelta);
 	}
 
-	if (GetKeyState('D') & 0x8000)
+	 if (GetKeyState('D') & 0x8000)
 	{
 		m_pTransformCom->Go_Right(TimeDelta);
 	}
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-	
-	if (GetKeyState('T') & 0x8000)
+
+
+	if (pGameInstance->Key_Down(DIK_T))
 	{
 		m_bCusorFix = !m_bCusorFix;
 	}
@@ -84,12 +87,12 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 
 			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_X))
 			{
-				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 0.1f);
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 5.f);
 			}
 
 			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_Y))
 			{
-				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 0.1f);
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 5.f);
 			}
 		}
 	}

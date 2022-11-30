@@ -172,6 +172,7 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\Hero_Alumon.h" />
     <ClInclude Include="..\Public\Hero_Gully.h" />
     <ClInclude Include="..\Public\HpBar.h" />
@@ -194,6 +195,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
+    <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\Hero_Alumon.cpp" />
     <ClCompile Include="..\Private\Hero_Gully.cpp" />
     <ClCompile Include="..\Private\HpBar.cpp" />

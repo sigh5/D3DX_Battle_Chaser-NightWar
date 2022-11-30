@@ -20,7 +20,7 @@ public:
 	_float4				PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
 	virtual		void	Final_Update()override {}
 	
-	virtual _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom);
+	virtual  _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom,_float4 &vPosition)override;
 	
 private:
 	_uint		m_iNumVerticesX = 0;

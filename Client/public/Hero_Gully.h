@@ -48,7 +48,7 @@ public:
 	virtual void Free() override;
 
 public:
-	BaseDelegater<int, int> m_Hero_GullyHPDelegater;
+	BaseDelegater<_double, _uint> m_Hero_GullyHPDelegater;
 
 
 };

@@ -38,6 +38,16 @@ void CLayer::Final_Update()
 	}
 }
 
+void CLayer::Delete_GameObject(CGameObject *& pObject)
+{
+	if (pObject != nullptr)
+	{
+		Safe_Release(pObject);
+		m_GameObjects.remove(pObject);
+		bool b = false;
+	}
+}
+
 HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 {
 	if (nullptr == pGameObject)

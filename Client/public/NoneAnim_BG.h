@@ -1,17 +1,18 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Environment_Object.h"
 
 
 BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CModel;
+class CVIBuffer_Cube;
 END
 
 BEGIN(Client)
-class CNoneAnim_BG final : public CGameObject
+class CNoneAnim_BG final : public CEnvironment_Object
 {
 private:
 	CNoneAnim_BG(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -31,7 +32,7 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
-
+	CVIBuffer_Cube*			m_pVIBufferCom = nullptr;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

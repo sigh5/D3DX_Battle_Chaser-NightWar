@@ -19,7 +19,7 @@ public:
 	virtual	void	Final_Update()override {}
 
 public:
-	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom) = 0;
+	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 &vPosition) = 0;
 
 protected:
 	/* 할당하고자하는 버퍼의 속성을 정의한다. */

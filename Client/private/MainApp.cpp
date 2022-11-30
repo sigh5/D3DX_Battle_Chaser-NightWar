@@ -5,8 +5,11 @@
 #include "Level_Loading.h"
 #include "Camera_Dynamic.h"
 #include "LoadingImage.h"
+#include "Client_Manager.h"
+
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
+
 {
 	Safe_AddRef(m_pGameInstance);
 
@@ -19,8 +22,6 @@ HRESULT CMainApp::Initialize()
 {
 	if (nullptr == m_pGameInstance)
 		return E_FAIL;
-
-
 
 	/* 게임엔진 초기화 */
 	GRAPHIC_DESC			GraphicDesc;
@@ -46,6 +47,9 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Start_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
+
+	
+
 	return S_OK;
 }
 
@@ -54,7 +58,11 @@ void CMainApp::Tick(_double TimeDelta)
 	if (nullptr == m_pGameInstance)
 		return;
 
+	CClient_Manager::TimeDelta = TimeDelta;
+
 	m_pGameInstance->Tick_Engine(TimeDelta);
+
+	
 }
 
 HRESULT CMainApp::Render()

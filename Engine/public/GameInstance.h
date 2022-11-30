@@ -41,6 +41,12 @@ public: /* For.Input_Device */
 	_byte		Get_DIKeyState(_ubyte byKeyID);
 	_byte		Get_DIMouseState(CInput_Device::MOUSEKEYSTATE byMouseID);
 	_long		Get_DIMouseMove(CInput_Device::MOUSEMOVESTATE eMoveState);
+	_bool		Mouse_Down(CInput_Device::MOUSEKEYSTATE MouseButton);
+	_bool		Mouse_Up(CInput_Device::MOUSEKEYSTATE MouseButton);
+	_bool		Mouse_DoubleClick(CInput_Device::MOUSEKEYSTATE MouseButton);
+	_bool		Key_Down(_ubyte byKeyID);
+	_bool		Key_Up(_ubyte byKeyID);
+	
 
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel);
@@ -49,7 +55,9 @@ public: /* For.Level_Manager */
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
-	
+	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
+
+
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 

@@ -251,6 +251,22 @@ void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit)
 	}
 }
 
+void CTransform::Go_Up(_double TimeDelta)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vUp = Get_State(CTransform::STATE_UP);
+	/* 이렇게 얻어온 VlOOK은 Z축 스케일을 포함하낟. */
+	vPosition += XMVector3Normalize(vUp) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
+
+	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+
+
+}
+
+void CTransform::Go_Down(_double TimeDelta)
+{
+}
+
 HRESULT CTransform::Bind_ShaderResource(CShader * pShaderCom, const char * pConstantName)
 {
 	if (nullptr == pShaderCom)

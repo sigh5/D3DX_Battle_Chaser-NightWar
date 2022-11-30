@@ -36,11 +36,20 @@ HRESULT CTerrain::Initialize(void * pArg)
 
 HRESULT CTerrain::Last_Initialize()
 {
-	return E_NOTIMPL;
+	if (m_bLast_Initlize)
+		return S_OK;
+
+	m_ProtoName = TEXT("Prototype_GameObject_Terrain");
+
+	m_bLast_Initlize = true;
+
+	return S_OK;
 }
 
 void CTerrain::Tick(_double TimeDelta)
 {
+	Last_Initialize();
+
 	__super::Tick(TimeDelta);
 }
 
@@ -66,6 +75,11 @@ HRESULT CTerrain::Render()
 	return S_OK;
 }
 
+
+void CTerrain::Imgui_RenderProperty()
+{
+}
+
 _float4 CTerrain::Get_Position() const
 {
 	return m_pVIBufferCom->PickingTerrain(g_hWnd, m_pTransformCom);
@@ -73,8 +87,31 @@ _float4 CTerrain::Get_Position() const
 
 _bool CTerrain::Piciking_GameObject()
 {
-	if (m_pVIBufferCom->PickingBuffer(g_hWnd,m_pTransformCom))
-		return false;
+	/*_float4 Temp;
+
+	if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, Temp))
+	{
+
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+		if (pGameInstance->Mouse_Down(CInput_Device::MOUSEKEYSTATE::DIM_LB))
+		{
+			_float4 Temp = { 1.0f,1.0f,1.0f,0.f };
+
+			CGameObject* pGameObject = nullptr;
+			pGameInstance->Clone_GameObject_UseImgui(LEVEL_GAMEPLAY, TEXT("Layer_BackGround"), TEXT("Prototype_GameObject_NoneAnim"), &pGameObject);
+			if (pGameObject == nullptr)
+				MSG_BOX(" CTerrain::Piciking_GameObject");
+
+			pGameObject->Set_ObjectName(TEXT("Prototype_GameObject_NoneAnim"));
+			pGameObject->Set_ProtoName(TEXT("Prototype_GameObject_NoneAnim"));
+			pGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&Temp));
+		}
+
+		RELEASE_INSTANCE(CGameInstance);
+		return true;
+	}*/
+
 
 	return false;
 }
@@ -118,7 +155,7 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom,"g_WorldMatrix")))
+	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
@@ -142,7 +179,7 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vCamPosition", &pGameInstance->Get_CamPositon(),sizeof(_float4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_vCamPosition", &pGameInstance->Get_CamPositon(), sizeof(_float4))))
 		return E_FAIL;
 
 

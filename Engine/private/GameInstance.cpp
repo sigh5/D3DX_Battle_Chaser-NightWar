@@ -73,7 +73,7 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (FAILED(m_pPipeLine->Ready_PipeLine()))
 		return E_FAIL;
 
-
+	
 	return S_OK;
 }
 
@@ -96,6 +96,9 @@ void CGameInstance::Tick_Engine(_double TimeDelta)
 
 	m_pObject_Manager->Late_Tick(TimeDelta);
 	m_pLevel_Manager->Late_Tick(TimeDelta);
+
+	m_pInput_Device->Reset_EveryKey();
+
 
 	m_pObject_Manager->Final_Update();
 }
@@ -163,6 +166,50 @@ _long CGameInstance::Get_DIMouseMove(CInput_Device::MOUSEMOVESTATE eMoveState)
 	return m_pInput_Device->Get_DIMouseMove(eMoveState);
 }
 
+_bool CGameInstance::Mouse_Down(CInput_Device::MOUSEKEYSTATE MouseButton)
+{
+	if (nullptr == m_pInput_Device)
+		return false;
+
+	return m_pInput_Device->Mouse_Down(MouseButton);
+}
+
+_bool CGameInstance::Mouse_Up(CInput_Device::MOUSEKEYSTATE MouseButton)
+{
+	if (nullptr == m_pInput_Device)
+		return false;
+
+	return m_pInput_Device->Mouse_Up(MouseButton);
+}
+
+_bool CGameInstance::Mouse_DoubleClick(CInput_Device::MOUSEKEYSTATE MouseButton)
+{
+	if (nullptr == m_pInput_Device)
+		return false;
+
+	return m_pInput_Device->Mouse_DoubleClick(MouseButton);
+}
+
+_bool CGameInstance::Key_Down(_ubyte byKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return false;
+
+	return m_pInput_Device->Key_Down(byKeyID);
+}
+
+_bool CGameInstance::Key_Up(_ubyte byKeyID)
+{
+	if (nullptr == m_pInput_Device)
+		return false;
+
+	return m_pInput_Device->Key_Up(byKeyID);
+}
+
+
+
+
+
 HRESULT CGameInstance::Open_Level(_uint iLevelIndex, CLevel * pNewLevel)
 {
 	if (nullptr == m_pLevel_Manager)
@@ -193,6 +240,14 @@ HRESULT CGameInstance::Clone_GameObject(_uint iLevelIndex, const wstring& pLayer
 		return E_FAIL;
 
 	return m_pObject_Manager->Clone_GameObject(iLevelIndex, pLayerTag, pPrototypeTag, pArg);
+}
+
+HRESULT CGameInstance::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pPrototypeTag, OUT CGameObject ** ppGameObject, void * pArg)
+{
+	if (nullptr == m_pObject_Manager)
+		return E_FAIL;
+
+	return m_pObject_Manager->Clone_GameObject_UseImgui(iLevelIndex, pLayerTag, pPrototypeTag, ppGameObject,pArg);
 }
 
 

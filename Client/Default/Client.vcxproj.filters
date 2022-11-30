@@ -70,6 +70,9 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TrunCharcterUI">
       <UniqueIdentifier>{1d838962-f722-40fc-93a4-47b2074b35f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="99.Defines\Client_Manager">
+      <UniqueIdentifier>{7486ada0-0ad9-4648-89e8-64b54e013b01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -138,6 +141,9 @@
     <ClInclude Include="..\Public\TurnCharcterUI.h">
       <Filter>02.GameObjects\UI\TrunBattle\TrunCharcterUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Client_Manager.h">
+      <Filter>99.Defines\Client_Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -193,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TurnCharcterUI.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TrunCharcterUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Client_Manager.cpp">
+      <Filter>99.Defines\Client_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

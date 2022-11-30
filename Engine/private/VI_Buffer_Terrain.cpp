@@ -281,7 +281,7 @@ _float4 CVI_Buffer_Terrain::PickingTerrain(HWND hWnd, CTransform * pCubeTransCom
 	return _float4(0.f,0.f,0.f,0.f);
 }
 
-_bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
+_bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _float4 &vPosition)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
 
@@ -322,6 +322,7 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
 	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
 
+	RELEASE_INSTANCE(CGameInstance);
 	_ulong	dwVtxIdx[3]{};
 	_float fDist;
 
@@ -346,7 +347,8 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
 				fDist))
 			{
-
+				XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
+				vPosition = Normal;
 				return  true;
 			}
 
@@ -364,11 +366,14 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom)
 				fDist))
 			{
 
-				//XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
+				XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
+				vPosition = Normal;
 				return  true;
 			}
 		}
 	}
+
+
 
 
 	return false;

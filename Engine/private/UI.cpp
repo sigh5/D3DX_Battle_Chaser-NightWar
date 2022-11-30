@@ -116,9 +116,6 @@ void CUI::Free()
 {
 	__super::Free();
 
-	//if(m_UIDesc.pBroadCaster != nullptr)
-	//	Safe_Release(m_UIDesc.pBroadCaster);
-	//
 	Safe_Release(m_OldDepthStencilState);
 	Safe_Release(m_UIdepthStencilState);
 	

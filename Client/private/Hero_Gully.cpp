@@ -42,17 +42,19 @@ HRESULT CHero_Gully::Last_Initialize()
 
 void CHero_Gully::Tick(_double TimeDelta)
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
 	__super::Tick(TimeDelta);
 
-	if (GetKeyState('Q') & 0x8000)
+	if (pInstance->Key_Down(DIK_SPACE))
 	{
-		int testi = 0;
-		int teste = 1;
-		m_Hero_GullyHPDelegater.broadcast(testi, teste);
+		_uint iMoveSpeed = 100;
+		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
+	
 	}
 
 
-	
+	RELEASE_INSTANCE(CGameInstance);
 
 }
 
@@ -64,26 +66,6 @@ void CHero_Gully::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-
-
-
-	if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_LB))
-	{
-		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom))
-		{
-			//CGameObject* pTerrain =   pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_BackGround"), TEXT("Terrain"));
-
-			_bool f = false;
-			//_float4 Temp = dynamic_cast<CTerrain*>(pTerrain)->Get_Position();
-
-			//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&Temp));
-
-		}
-	}
-
-	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CHero_Gully::Render()

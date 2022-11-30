@@ -38,9 +38,9 @@ HRESULT CHpBar::Last_Initialize()
 	
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	//CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
-	dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
+	//dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
 
 	m_bLast_Initlize = true;
 

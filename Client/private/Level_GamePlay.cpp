@@ -61,13 +61,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
-
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
 		return E_FAIL;
 
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_NoneAnim"))))
-		return E_FAIL;
-*/
 	Safe_Release(pGameInstance);
 
 	return S_OK;
@@ -89,8 +85,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Alumon"))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -101,35 +97,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TurnCanvas_UI"))))
-		return E_FAIL;*/
-
-	//CUI::UIDESC Desc;
-	//Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun_GullyUI");
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-	//	return E_FAIL;
-
-	/*Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun_Garrison");
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-		return E_FAIL;
-
-	Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun_WarGolem");
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-		return E_FAIL;
-
-	Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun_Ly_Armorless1");
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-		return E_FAIL;
-
-	Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun_SlimeGreen");
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-		return E_FAIL;
-
-	Desc.m_pTextureTag = TEXT("Prototype_Component_UI_Trun__BoneMageFire");
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CharUI"), &Desc)))
-		return E_FAIL;*/
-
-
 
 	RELEASE_INSTANCE(CGameInstance);
 

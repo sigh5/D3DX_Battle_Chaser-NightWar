@@ -93,7 +93,7 @@ public:
 	void Go_Backward(_double TimeDelta);
 	void Go_Left(_double TimeDelta);
 	void Go_Right(_double TimeDelta);
-
+	
 	// Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
 	void Turn(_fvector vAxis, _double TimeDelta); /* Dynamic */
 	void Rotation(_fvector vAxis, _float fRadian); /* Static */
@@ -104,6 +104,10 @@ public:
 
 	/* 추적한다 .*/
 	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+
+public: /* for_UI*/
+	void Go_Up(_double TimeDelta);
+	void Go_Down(_double TimeDelta);
 
 public:
 	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName);
