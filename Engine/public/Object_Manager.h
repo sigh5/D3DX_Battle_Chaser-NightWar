@@ -25,9 +25,14 @@ public:
 public:
 	HRESULT Add_Prototype(const wstring& pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
+	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject);
+
 
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
-	
+	void					DeleteGameObject(_uint iLevelIndex, const wstring& ObjName);
+
+
+
 	void Tick(_double TimeDelta);
 	void Late_Tick(_double TimeDelta);
 	virtual		void	Final_Update();

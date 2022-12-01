@@ -29,8 +29,18 @@ public:
 	virtual HRESULT Render() override;
 
 public: /*Observer Pattern*/
-	void	UI_Event(_double TileDelta, _uint iMoveSpeed);
+	
+	void	IsMove();
+		
+	void	Top_Move();
+	void	Bottom_Move() ;
+	void	Normal_Move();
 
+	void	MoveControl(_uint iOption);
+
+	_bool	isUITop(OUT CUI*& pUI);
+	_bool	isUIBottom(OUT CUI*& pUI);
+	_float	Get_PosY();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -42,8 +52,11 @@ private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 
-	_bool					m_bMoveCheck = false;
+	_bool					m_bIsBottom = false;
+	_bool					m_bMove = false;
 	_float4					m_vLimitPos;
+	
+
 
 private:
 	HRESULT SetUp_Components();
@@ -54,9 +67,8 @@ public:
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 
-
 private:
-	std::function<void(CTransform*, _float4&, OBJ_TYPE eType)> m_CheckFunction;
+	std::function<void()> m_Movefun;
 	
 };
 

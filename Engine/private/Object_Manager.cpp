@@ -101,6 +101,43 @@ HRESULT CObject_Manager::Clone_GameObject(_uint iLevelIndex, const wstring& pLay
 	return S_OK;
 }
 
+CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag ,  CGameObject * pGameObject)
+{
+	CGameObject*		pPrototype = Find_Prototype(pGameObject->Get_ProtoName());
+	void *pArg = nullptr;
+
+	CUI::UIDESC m_UIdesc;
+	ZeroMemory(&m_UIdesc, sizeof(m_UIdesc));
+	m_UIdesc.m_pTextureTag = dynamic_cast<CUI*>(pGameObject)->Get_TextureTag();
+
+	CGameObject*		pCloneGameObject = pPrototype->Clone(&m_UIdesc);
+	if (pCloneGameObject == nullptr)
+		return nullptr;
+	
+	_tchar* szObjectName= new _tchar[MAX_PATH];
+	m_vecNameArray.push_back(szObjectName);
+
+	lstrcpy(szObjectName, pGameObject->Get_ObjectName());
+	lstrcat(szObjectName, TEXT("1"));
+	
+	pCloneGameObject->Set_ObjectName(szObjectName);
+
+	pCloneGameObject->Set_ProtoName(pGameObject->Get_ProtoName());
+	pCloneGameObject->Set_parent(pGameObject->Get_parentName());
+
+	CLayer*		pLayer = Find_Layer(iLevel, pLayerTag);
+
+	if (pLayer == nullptr)
+		return nullptr;
+
+	pLayer->Add_GameObject(pCloneGameObject);
+
+
+	pCloneGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-100.f, 50.f, 0.f, 1.f));
+
+	return pCloneGameObject;
+}
+
 CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
@@ -113,6 +150,32 @@ CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring &
 
 	return nullptr;
 }
+
+void CObject_Manager::DeleteGameObject(_uint iLevelIndex ,const wstring& ObjName )
+{
+	const LAYERS& targetLevel = m_pLayers[iLevelIndex];
+
+	
+	for (auto& Pair : targetLevel)
+	{
+		for (auto& obj : Pair.second->GetGameObjects())
+		{
+			if (nullptr != obj)
+			{
+				if (!lstrcmp(obj->Get_ObjectName(), ObjName.c_str()))
+					{
+						Pair.second->Delete_GameObject(obj);
+						return;
+					}
+				}
+			}
+
+	}
+}
+
+
+
+
 
 void CObject_Manager::Tick(_double TimeDelta)
 {
@@ -666,6 +729,7 @@ void CObject_Manager::Imgui_Load()
 		}
 		
 		CloseHandle(hFile);
+		MSG_BOX("Load");
 		RELEASE_INSTANCE(CLevel_Manager);
 
 	}

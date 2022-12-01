@@ -250,6 +250,22 @@ HRESULT CGameInstance::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstrin
 	return m_pObject_Manager->Clone_GameObject_UseImgui(iLevelIndex, pLayerTag, pPrototypeTag, ppGameObject,pArg);
 }
 
+CGameObject* CGameInstance::Clone_UI(_uint iLevel, const wstring & pLayerTag, CGameObject * pGameObject)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Clone_UI(iLevel, pLayerTag, pGameObject);
+}
+
+void CGameInstance::DeleteGameObject(_uint iLevelIndex, const wstring & ObjName)
+{
+	if (nullptr == m_pObject_Manager)
+		return ;
+
+	return m_pObject_Manager->DeleteGameObject(iLevelIndex, ObjName);
+}
+
 
 
 HRESULT CGameInstance::Loading_Objects()

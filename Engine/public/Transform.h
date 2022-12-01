@@ -78,7 +78,7 @@ public:
 
 	void	Set_ParentTransform(CTransform* pTransform) { 
 		m_pParentTransfrom = pTransform;
-		Safe_AddRef(m_pParentTransfrom);
+		//Safe_AddRef(m_pParentTransfrom);
 	}
 
 

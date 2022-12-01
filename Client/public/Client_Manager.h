@@ -11,13 +11,13 @@ class CTransform;
 END
 
 
-enum OBJ_TYPE { OBJ_UI, OBJ_GAMEOBJCET, OBJ_END };
+enum DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
 
 class CClient_Manager  
 {
 
 
-private:
+public:
 	CClient_Manager() = default;
 
 
@@ -25,7 +25,7 @@ public:
 	static void	Client_Manager_Update();	// 전체적인 업무담당
 
 public: /* For_UI */
-	static void distance_Limit_UP(CTransform* pTransform, _float4& vTransformFunction, OBJ_TYPE eType);
+	void distance_Limit_UP(CTransform* pTransform, _float4& vTransformFunction, DIR eType);
 
 
 public:

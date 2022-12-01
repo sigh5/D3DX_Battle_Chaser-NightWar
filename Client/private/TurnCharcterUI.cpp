@@ -2,10 +2,6 @@
 #include "..\public\TurnCharcterUI.h"
 
 #include "GameInstance.h"
-#include "Canvas.h"
-
-#include "Hero_Gully.h"
-
 
 CTurnCharcterUI::CTurnCharcterUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CUI(pDevice,pContext)
@@ -58,14 +54,19 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	
+	/*CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
 	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
 	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this,&CTurnCharcterUI::UI_Event);
 
-	RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);*/
 
+
+
+
+
+	
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -74,8 +75,11 @@ void CTurnCharcterUI::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
-	if(m_bMoveCheck)
-		m_CheckFunction(m_pTransformCom, m_vLimitPos, OBJ_UI);
+	if (m_bMove)
+	{
+		m_Movefun();
+	}
+	Bottom_Move();
 
 	
 	__super::Tick(TimeDelta);
@@ -107,17 +111,123 @@ HRESULT CTurnCharcterUI::Render()
 	return S_OK;
 }
 
-void CTurnCharcterUI::UI_Event(_double TimeDelta,_uint iMoveSpeed)
-{
-	
-	XMStoreFloat4(&m_vLimitPos,m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-	m_vLimitPos.y += 50.f;
 
-	m_CheckFunction = std::bind(&CClient_Manager::distance_Limit_UP, m_pTransformCom, m_vLimitPos,OBJ_UI);
-	m_bMoveCheck = true;
+void CTurnCharcterUI::IsMove()
+{
+	XMStoreFloat4(&m_vLimitPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	m_vLimitPos.x += 100.f;
+
+	m_bIsBottom = true;
 }
 
+void CTurnCharcterUI::Top_Move()
+{
+	_float4		vPos;
 
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	
+	if (vPos.x <= m_vLimitPos.x)
+	{
+		vPos.y = 50.f;
+		m_vLimitPos.x = 0.f;
+		m_bMove = false;
+		m_bIsBottom = true;
+	}
+	else
+	{
+		m_bIsBottom = false;
+		vPos.x -= CClient_Manager::TimeDelta * 200.0;
+	}
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+
+}
+
+void CTurnCharcterUI::Normal_Move()
+{
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y += CClient_Manager::TimeDelta * +100.0;
+
+	if (vPos.y >= m_vLimitPos.y)
+		m_bMove = false;
+
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+}
+
+void CTurnCharcterUI::Bottom_Move()
+{
+	if(m_bIsBottom)
+	{ 
+		_float4		vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.x += CClient_Manager::TimeDelta * +200.0;
+
+		if (vPos.x >= m_vLimitPos.x)
+		{
+			m_bIsBottom = false;
+		}
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+	}
+}
+
+void CTurnCharcterUI::MoveControl(_uint iOption)
+{
+	m_bMove = true;
+
+	XMStoreFloat4(&m_vLimitPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	
+	if (iOption == 0) // TOP
+	{
+		m_vLimitPos.x -= 100;
+		m_Movefun = std::bind(&CTurnCharcterUI::Top_Move, this);
+	}
+	else if (iOption == 1) // Normal
+	{
+		m_vLimitPos.y += 50;
+		m_Movefun = std::bind(&CTurnCharcterUI::Normal_Move, this);
+	}
+	
+}
+
+bool CTurnCharcterUI::isUITop(OUT CUI *& pUI)
+{
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	if (vPos.y >= 300.f)
+	{
+		pUI = this;
+		return true;
+	}
+
+	return false;
+}
+
+_bool CTurnCharcterUI::isUIBottom(OUT CUI *& pUI)
+{
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	if (vPos.y <= 50.f  && vPos.x <= -50.f)
+	{
+		pUI = this;
+		return true;
+	}
+
+	return false;
+}
+
+_float CTurnCharcterUI::Get_PosY()
+{
+
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	return vPos.y;
+}
 
 HRESULT CTurnCharcterUI::SetUp_Components()
 {

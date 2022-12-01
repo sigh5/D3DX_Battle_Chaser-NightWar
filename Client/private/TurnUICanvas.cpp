@@ -2,7 +2,9 @@
 #include "..\public\TurnUICanvas.h"
 #include "GameInstance.h"
 
-
+#include "Hero_Gully.h"
+#include "TurnCharcterUI.h"
+#include <random>
 CTurnUICanvas::CTurnUICanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
 {
@@ -44,8 +46,8 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f  - (585.f), -m_fY + m_fSizeY * 0.5f, 0.1f, 1.f));
-	
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f - (585.f), -m_fY + m_fSizeY * 0.5f, 0.1f, 1.f));
+
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
 	if (FAILED(CUI::SetUp_UI()))
@@ -56,11 +58,17 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 
 HRESULT CTurnUICanvas::Last_Initialize()
 {
-	// ToDo 자식 UI 가져오기
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+
+	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+
+	RELEASE_INSTANCE(CGameInstance);
+
 	m_bLast_Initlize = true;
 
 	return S_OK;
@@ -70,6 +78,18 @@ void CTurnUICanvas::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+
+
+	// Test
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Key_Down(DIK_0))
+	{
+		DeleteCharUI(TEXT("UI_Trun_Garrison1"));
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 void CTurnUICanvas::Late_Tick(_double TimeDelta)
@@ -102,9 +122,9 @@ HRESULT CTurnUICanvas::Render()
 HRESULT CTurnUICanvas::SetUp_Components()
 {
 	/*For.Com_Renderer */
-		if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
-			(CComponent**)&m_pRendererCom)))
-			return E_FAIL;
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
+		(CComponent**)&m_pRendererCom)))
+		return E_FAIL;
 	/* For.Com_Shader */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
@@ -148,6 +168,89 @@ HRESULT CTurnUICanvas::SetUp_ShaderResources()
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CTurnUICanvas::Move_Children()
+{
+	CUI*					m_pCharUI[TURN_UI_END] = { nullptr , nullptr };
+	_bool	bIsTop = false;
+
+	for (auto &pUI : m_ChildrenVec)
+	{
+		if (pUI == nullptr)
+			continue;
+
+		if (dynamic_cast<CTurnCharcterUI*>(pUI)->isUITop(m_pCharUI[TURN_UI_TOP]))
+		{
+			bIsTop = true;
+			break;
+		}
+	}
+
+	for (auto &iter : m_ChildrenVec)
+	{
+		if (iter == nullptr)
+			continue;
+
+		if (iter != m_pCharUI[TURN_UI_TOP])
+			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(1);
+		else
+			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(0);
+	}
+
+}
+
+void CTurnUICanvas::ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed)
+{
+	Move_Children();
+}
+ 
+void CTurnUICanvas::DeleteCharUI(const wstring&  pNametag)
+{
+	/* 나중에 죽었을떄 이 이벤트를 받아야됌*/
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	
+	_float Temp = 0;
+
+	CUI*	pUI = nullptr;
+
+	int  iRandomNum =	rand()	%(m_ChildrenVec.size()-2);
+
+	for (auto iter = m_ChildrenVec.begin(); iter != m_ChildrenVec.end(); )
+	{
+		if (!lstrcmp((*iter)->Get_ObjectName(),pNametag.c_str()) )
+		{
+			Temp = dynamic_cast<CTurnCharcterUI*>(*iter)->Get_PosY();
+			Safe_Release(*iter);
+			pGameInstance->DeleteGameObject(LEVEL_GAMEPLAY,pNametag);
+			iter = m_ChildrenVec.erase(iter);
+			pUI = *(iter+iRandomNum);
+		}
+		else
+		{
+			iter++;
+		}		
+	}
+
+	for (auto &pUI : m_ChildrenVec)
+	{
+		if (Temp > dynamic_cast<CTurnCharcterUI*>(pUI)->Get_PosY())
+			dynamic_cast<CTurnCharcterUI*>(pUI)->MoveControl(1);
+	}
+
+	
+	if (nullptr != pUI)
+	{
+		Add_ChildUI(static_cast<CUI*>(pGameInstance->Clone_UI(LEVEL_GAMEPLAY, TEXT("Layer_UI"), (pUI))));
+		_uint iNumber =	m_ChildrenVec.size();
+		
+		dynamic_cast<CTurnCharcterUI*>(m_ChildrenVec[iNumber-1])->IsMove();
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	
+
 }
 
 CTurnUICanvas * CTurnUICanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

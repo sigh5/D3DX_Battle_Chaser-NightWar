@@ -11,31 +11,24 @@ void CClient_Manager::Client_Manager_Update()
 
 }
 
-void CClient_Manager::distance_Limit_UP(CTransform * pTransform, _float4& vLimitFunction, OBJ_TYPE eType)
+void CClient_Manager::distance_Limit_UP(CTransform * pTransform, _float4& vLimitFunction, DIR eType)
 {
-	if (eType == OBJ_UI)
+	
+	if (eType == DIR_UP)
 	{
 		_float4 vPosition;
 		XMStoreFloat4(&vPosition, pTransform->Get_State(CTransform::STATE_TRANSLATION));
 
 		if (vPosition.y >= vLimitFunction.y)
 			return;
-		
-		vPosition.y +=  TimeDelta* 50.0;
 
-		if (vPosition.y >= 350.f)
-		{
-			vPosition.y = 50.f;
-			vLimitFunction = vPosition;
-		}
-		
+		vPosition.y += TimeDelta* 50.0;
 		pTransform->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPosition));
-
 	}
 	
-	else
+	else if(eType == DIR_RIGHT)
 	{
-
+		_bool b = false;
 	}
 	
 

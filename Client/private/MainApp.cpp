@@ -48,7 +48,7 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 
-	
+	srand((unsigned int)time(NULL));
 
 	return S_OK;
 }

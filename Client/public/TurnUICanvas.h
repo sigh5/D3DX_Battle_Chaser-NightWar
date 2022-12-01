@@ -14,6 +14,9 @@ BEGIN(Client)
 
 class CTurnUICanvas final : public CCanvas
 {
+public:
+	enum  TURN_UI_TYPE { TURN_UI_TOP, TURN_UI_BOTTOM, TURN_UI_END };
+
 private:
 	CTurnUICanvas(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CTurnUICanvas(const CTurnUICanvas& rhs);
@@ -28,6 +31,13 @@ public:
 	virtual HRESULT Render()override;
 
 
+public:
+	void	ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed); // Obsever
+	void	DeleteCharUI(const wstring& pNametag);											// Obsever
+
+
+	void	Move_Children(); /*logic*/
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -41,6 +51,8 @@ private:
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
+
+	
 
 public:
 	static CTurnUICanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

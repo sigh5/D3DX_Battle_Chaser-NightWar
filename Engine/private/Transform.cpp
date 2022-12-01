@@ -308,6 +308,6 @@ void CTransform::Free()
 {
 	__super::Free();
 
-	if (m_pParentTransfrom != nullptr)
-		Safe_Release(m_pParentTransfrom);
+	/*if (m_pParentTransfrom != nullptr)
+		Safe_Release(m_pParentTransfrom);*/
 }
