@@ -131,14 +131,13 @@ void CTurnCharcterUI::Top_Move()
 	{
 		vPos.y = 50.f;
 		m_vLimitPos.x = 0.f;
-		vPos.x = m_vLimitPos.x;
 		m_bMove = false;
 		m_bIsBottom = true;
 	}
 	else
 	{
 		m_bIsBottom = false;
-		vPos.x -= _float(CClient_Manager::TimeDelta * 200.f);
+		vPos.x -= _float(CClient_Manager::TimeDelta * 400.f);
 	}
 
 
@@ -166,7 +165,7 @@ void CTurnCharcterUI::Bottom_Move()
 	{ 
 		_float4		vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.x += _float(CClient_Manager::TimeDelta * +200.f);
+		vPos.x += _float(CClient_Manager::TimeDelta * 400.f);
 
 		if (vPos.x >= m_vLimitPos.x)
 		{
