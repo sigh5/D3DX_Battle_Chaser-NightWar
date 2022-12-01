@@ -73,7 +73,7 @@ HRESULT CNoneAnim_BG::Render()
 			return E_FAIL;
 	}
 
-	m_pVIBufferCom->Render();
+	//m_pVIBufferCom->Render();
 	return S_OK;
 }
 

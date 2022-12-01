@@ -136,6 +136,12 @@
     <Filter Include="01.Utility\02.GameObject\Static">
       <UniqueIdentifier>{5426fabc-c1f2-4945-bb32-e7192b521ab2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Bone">
+      <UniqueIdentifier>{25a943fb-a5ba-4c19-87f6-b4d9685a19bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Animation">
+      <UniqueIdentifier>{6f84e8b2-50d9-412d-804d-659344addc99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -318,6 +324,12 @@
     <ClInclude Include="..\Public\Environment_Object.h">
       <Filter>01.Utility\02.GameObject\Static</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Bone.h">
+      <Filter>01.Utility\03.Components\08.Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Animation.h">
+      <Filter>01.Utility\03.Components\08.Model\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -472,6 +484,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Environment_Object.cpp">
       <Filter>01.Utility\02.GameObject\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Bone.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Animation.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Animation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

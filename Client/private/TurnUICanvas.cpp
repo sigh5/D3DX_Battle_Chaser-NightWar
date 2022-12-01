@@ -242,7 +242,7 @@ void CTurnUICanvas::DeleteCharUI(const wstring&  pNametag)
 	if (nullptr != pUI)
 	{
 		Add_ChildUI(static_cast<CUI*>(pGameInstance->Clone_UI(LEVEL_GAMEPLAY, TEXT("Layer_UI"), (pUI))));
-		_uint iNumber =	m_ChildrenVec.size();
+		size_t iNumber =	m_ChildrenVec.size();
 		
 		dynamic_cast<CTurnCharcterUI*>(m_ChildrenVec[iNumber-1])->IsMove();
 	}

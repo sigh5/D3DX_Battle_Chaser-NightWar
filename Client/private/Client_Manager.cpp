@@ -22,7 +22,7 @@ void CClient_Manager::distance_Limit_UP(CTransform * pTransform, _float4& vLimit
 		if (vPosition.y >= vLimitFunction.y)
 			return;
 
-		vPosition.y += TimeDelta* 50.0;
+		vPosition.y += _float(TimeDelta* 50.f);
 		pTransform->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPosition));
 	}
 	

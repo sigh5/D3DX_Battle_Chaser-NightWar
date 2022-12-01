@@ -131,13 +131,14 @@ void CTurnCharcterUI::Top_Move()
 	{
 		vPos.y = 50.f;
 		m_vLimitPos.x = 0.f;
+		vPos.x = m_vLimitPos.x;
 		m_bMove = false;
 		m_bIsBottom = true;
 	}
 	else
 	{
 		m_bIsBottom = false;
-		vPos.x -= CClient_Manager::TimeDelta * 200.0;
+		vPos.x -= _float(CClient_Manager::TimeDelta * 200.f);
 	}
 
 
@@ -149,11 +150,13 @@ void CTurnCharcterUI::Normal_Move()
 {
 	_float4		vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-	vPos.y += CClient_Manager::TimeDelta * +100.0;
+	vPos.y += _float(CClient_Manager::TimeDelta * +100.f);
 
 	if (vPos.y >= m_vLimitPos.y)
+	{
+		vPos.y = m_vLimitPos.y;
 		m_bMove = false;
-
+	}
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 }
 
@@ -163,10 +166,11 @@ void CTurnCharcterUI::Bottom_Move()
 	{ 
 		_float4		vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.x += CClient_Manager::TimeDelta * +200.0;
+		vPos.x += _float(CClient_Manager::TimeDelta * +200.f);
 
 		if (vPos.x >= m_vLimitPos.x)
 		{
+			vPos.x = m_vLimitPos.x;
 			m_bIsBottom = false;
 		}
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
@@ -222,7 +226,6 @@ _bool CTurnCharcterUI::isUIBottom(OUT CUI *& pUI)
 
 _float CTurnCharcterUI::Get_PosY()
 {
-
 	_float4		vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
