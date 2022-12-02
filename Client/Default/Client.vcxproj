@@ -185,6 +185,7 @@
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\Public\Terrain.h" />
+    <ClInclude Include="..\Public\Tile.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
     <ClInclude Include="..\Public\TurnUICanvas.h" />
     <ClInclude Include="Client.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
+    <ClCompile Include="..\Private\Tile.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />
     <ClCompile Include="..\Private\TurnUICanvas.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -231,6 +233,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

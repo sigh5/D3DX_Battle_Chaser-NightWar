@@ -73,6 +73,9 @@
     <Filter Include="99.Defines\Client_Manager">
       <UniqueIdentifier>{7486ada0-0ad9-4648-89e8-64b54e013b01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Terrain\Tile">
+      <UniqueIdentifier>{e108db9c-fbbb-40da-bda9-c0775f6ef98d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -144,6 +147,9 @@
     <ClInclude Include="..\Public\Client_Manager.h">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tile.h">
+      <Filter>02.GameObjects\Terrain\Tile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -203,6 +209,9 @@
     <ClCompile Include="..\Private\Client_Manager.cpp">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Tile.cpp">
+      <Filter>02.GameObjects\Terrain\Tile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -234,6 +243,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

@@ -14,16 +14,10 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
-	virtual		void	Final_Update()override {}
+	virtual	void	Final_Update()override {}
 
 	const _float4*		Get_vPos() { return m_vPos; }
 	virtual _bool	PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 &vPosition)override;
-
-public:
-	
-
-
-
 
 public:
 	static CVIBuffer_Cube* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

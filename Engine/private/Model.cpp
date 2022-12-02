@@ -110,8 +110,8 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 	}
 	else
 	{
-		/*MSG_BOX("(nullptr == m_Materials[iMaterialIndex]");
-		return E_FAIL;*/
+		MSG_BOX("(nullptr == m_Materials[iMaterialIndex]");
+		return E_FAIL;
 	}
 
 	return S_OK;

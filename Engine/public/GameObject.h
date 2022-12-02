@@ -35,9 +35,9 @@ public:
 	virtual void Tick(_double TimeDelta);
 	virtual void Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
 public:
 	virtual		void	Final_Update() sealed;
+
 public: /* imgui */
 	// 이 오브젝트가 가지고 있는 component의 Imgui_RenderProtpery함수를 실행하는 함수.
 	void Imgui_RenderComponentProperties();

@@ -6,6 +6,9 @@
 namespace Client
 {																			
 	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY ,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1
+
+	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
+
 }
 
 extern HWND			g_hWnd;
