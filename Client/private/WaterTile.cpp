@@ -1,18 +1,18 @@
 #include "stdafx.h"
-#include "..\public\Tile.h"
+#include "..\public\WaterTile.h"
 #include "GameInstance.h"
 
-CTile::CTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject(pDevice, pContext)
+CWaterTile::CWaterTile(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+	: CEnvironment_Object(pDevice, pContext)
 {
 }
 
-CTile::CTile(const CTile & rhs)
-	: CGameObject(rhs)
+CWaterTile::CWaterTile(const CWaterTile & rhs)
+	: CEnvironment_Object(rhs)
 {
 }
 
-HRESULT CTile::Initialize_Prototype()
+HRESULT CWaterTile::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -20,40 +20,39 @@ HRESULT CTile::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CTile::Initialize(void * pArg)
+HRESULT CWaterTile::Initialize(void * pArg)
 {
-	m_ObjectName = TEXT("CTile");
-
-	if (FAILED(__super::Initialize(&pArg)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-
+	m_pTransformCom->Set_Scaled(_float3(1.f, 1.f, 1.f));
+	
 	return S_OK;
 }
 
-HRESULT CTile::Last_Initialize()
+HRESULT CWaterTile::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	m_ProtoName = TEXT("Prototype_GameObject_Tile");
 
 	m_bLast_Initlize = true;
 
 	return S_OK;
 }
 
-void CTile::Tick(_double TimeDelta)
+void CWaterTile::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
+	m_TimeDelta += TimeDelta;
 	__super::Tick(TimeDelta);
 }
 
-void CTile::Late_Tick(_double TimeDelta)
+void CWaterTile::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
@@ -61,7 +60,7 @@ void CTile::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }
 
-HRESULT CTile::Render()
+HRESULT CWaterTile::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -69,23 +68,32 @@ HRESULT CTile::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(0);
-	m_pVIBufferCom->Render();
+	_uint		iNumMeshes = m_pModelCom->Get_MeshNum();
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		if (FAILED(m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture")))
+			return E_FAIL;
+		
+		if (FAILED(m_pModelCom->Render(m_pShaderCom, i, m_EnviromentDesc.m_iShaderPass)))
+			return E_FAIL;
+	}
 
 	return S_OK;
+
 }
 
-_float4 CTile::Get_Position() const
+_float4 CWaterTile::Get_Position() const
 {
 	return _float4();
 }
 
-_bool CTile::Piciking_GameObject()
+_bool CWaterTile::Piciking_GameObject()
 {
 	return false;
 }
 
-HRESULT CTile::SetUp_Components()
+HRESULT CWaterTile::SetUp_Components()
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
@@ -96,30 +104,19 @@ HRESULT CTile::SetUp_Components()
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
-		(CComponent**)&m_pVIBufferCom)))
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
+		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
-
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Tile"), TEXT("Com_Texture"),
-		(CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pTextureTag, TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
-	/* For.Com_Brush*/
-	/*if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TileBrush"), TEXT("Com_Brush"),
-		(CComponent**)&m_pTextureCom[TYPE_BRUSH])))
-		return E_FAIL;*/
-
-	/* For.Com_Filter */
-	/*if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TileFilter"), TEXT("Com_Filter"),
-		(CComponent**)&m_pTextureCom[TYPE_FILTER])))
-		return E_FAIL;*/
 
 	return S_OK;
 }
 
-HRESULT CTile::SetUp_ShaderResources()
+HRESULT CWaterTile::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -138,6 +135,7 @@ HRESULT CTile::SetUp_ShaderResources()
 	const	LIGHTDESC*	pLightDesc = pGameInstance->Get_LightDesc(0);
 	if (nullptr == pLightDesc)
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
@@ -146,60 +144,59 @@ HRESULT CTile::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vCamPosition", &pGameInstance->Get_CamPositon(), sizeof(_float4))))
 		return E_FAIL;
 
+
 	RELEASE_INSTANCE(CGameInstance);
 
-	_uint	m_iDiffuseTextureIndex = 1;
+	if (FAILED(m_pShaderCom->Set_RawValue("g_TimeDelta", &m_TimeDelta, sizeof(_float))))
+		return E_FAIL;
+	_float	Speed = 2.f;
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_iDiffuseTextureIndex", &m_iDiffuseTextureIndex, sizeof(_uint))))
-		return E_FAIL;
-
-	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
-		return E_FAIL;
-	/*if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
-		return E_FAIL;*/
-	/*if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResource(m_pShaderCom, "g_FilterTexture", 0)))
-		return E_FAIL;
-	*/if (FAILED(m_pShaderCom->Set_RawValue("g_vBrushPos", &_float4(15.f, 0.f, 15.f, 1.f), sizeof(_float4))))
+	if (FAILED(m_pShaderCom->Set_RawValue("g_UVSpeed", &Speed, sizeof(_float))))
 		return E_FAIL;
 
+
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_HeightTexture",0)))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_UVTexture",1)))
+		return E_FAIL;
 	return S_OK;
 }
 
-CTile * CTile::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CWaterTile * CWaterTile::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CTile*		pInstance = new CTile(pDevice, pContext);
+	CWaterTile*		pInstance = new CWaterTile(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CTile");
+		MSG_BOX("Failed to Created : CWaterTile");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CTile::Clone(void * pArg)
+CGameObject * CWaterTile::Clone(void * pArg)
 {
-	CTile*		pInstance = new CTile(*this);
+	CWaterTile*		pInstance = new CWaterTile(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CTile");
+		MSG_BOX("Failed to Cloned : CWaterTile");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CTile::Free()
+void CWaterTile::Free()
 {
 	__super::Free();
 
-	for (auto& pTextureCom : m_pTextureCom)
-		Safe_Release(pTextureCom);
-
-	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pTextureCom);
+	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }

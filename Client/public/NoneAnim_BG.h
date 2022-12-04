@@ -28,6 +28,10 @@ public:
 	virtual HRESULT Render() override;
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
+	void	Change_Model(_uint iLevel, const wstring& NewComPonentTag);
+
+
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

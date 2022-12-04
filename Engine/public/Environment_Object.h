@@ -10,6 +10,8 @@ public:
 	typedef struct tagEnvironmentObject :public GAMEOBJECTDESC
 	{
 		_tchar*			m_pModelTag = TEXT("");
+		_tchar*			m_pTextureTag = TEXT("");
+		_uint			m_iShaderPass = 0;
 
 	}ENVIRONMENTDESC;
 
@@ -22,7 +24,11 @@ protected:
 public:
 	_tchar*				Get_ModelTag()const { return m_EnviromentDesc.m_pModelTag; }
 	void				Set_ModelTag(const _tchar* pModelTag) { lstrcpy(m_EnviromentDesc.m_pModelTag, pModelTag); };
+	_tchar*				Get_TextureTag()const { return m_EnviromentDesc.m_pTextureTag; }
+	void				Set_TextureTag(const _tchar* pModelTag) { lstrcpy(m_EnviromentDesc.m_pTextureTag, pModelTag); };
 
+	_uint				Get_ShaderPass() const { return m_EnviromentDesc.m_iShaderPass; }
+	void				Set_ShaderPass(_uint iShaderPass) { m_EnviromentDesc.m_iShaderPass = iShaderPass; }
 public:
 	virtual HRESULT		Initialize_Prototype()override;
 	virtual HRESULT		Initialize(void* pArg)override;

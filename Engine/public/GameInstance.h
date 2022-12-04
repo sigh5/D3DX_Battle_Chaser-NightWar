@@ -51,23 +51,27 @@ public: /* For.Input_Device */
 public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel);
 	HRESULT Render_Level();
+	_uint GetCurLevelIdx() const;
+
 
 public: /* For.Object_Manager */
 	HRESULT Add_Prototype(const wstring& pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
 	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
 	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag, class CGameObject* pGameObject);
-
-	
 	void	DeleteGameObject(_uint iLevelIndex, const wstring& ObjName);
 
+	map<const wstring, class CGameObject*>* 	Get_ProtoTypes();
+	map<const wstring, class CLayer*>*			Get_Layer();
+
+	class CGameObject* Get_SelectObject();
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
-
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);
+	void		Imgui_ComponentViewer(_uint iLevel, OUT wstring& TextureTag, COMPONENT_TYPE eType);
 
 public: // for imgui manager
 	void Render_ImGui();
@@ -75,6 +79,8 @@ public: // for imgui manager
 	void Add_ImguiTabObject(class CImguiObject* ImguiObject);
 	void Add_ImguiWindowObject(class CImguiObject* ImguiObject);
 	void Clear_ImguiObjects();
+
+	
 
 public: /* For.PipeLine */
 	_matrix Get_TransformMatrix(CPipeLine::TRANSFORMSTATE eState);
@@ -89,7 +95,6 @@ public:/* For.TimeManager */
 	void		Update_Timer(const _tchar* pTimerTag);
 
 public:/* For.Light_Manager */
-public:
 	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;
 	HRESULT				Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
 

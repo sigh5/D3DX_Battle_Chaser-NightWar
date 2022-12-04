@@ -51,7 +51,6 @@ HRESULT CUI::Render()
 	return S_OK;
 }
 
-
 void CUI::Set_parentName(const _tchar * pParentTag)
 {
 	CObject_Manager*pObjMgr = GET_INSTANCE(CObject_Manager);

@@ -17,6 +17,9 @@ public:
 	virtual void Imgui_RenderWindow() override;
 	static CImgui_PropertyEditor* Create(void* pArg = nullptr);
 
+	
+
+
 private:
 	class CGameObject* m_pSelectedObject = nullptr;
 };

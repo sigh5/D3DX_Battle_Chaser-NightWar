@@ -6,9 +6,10 @@
 #include "Camera_Dynamic.h"
 #include "LoadingImage.h"
 #include "Client_Manager.h"
-
+#include "ToolManager.h"
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
+	, m_pToolManager(CToolManager::GetInstance())
 
 {
 	Safe_AddRef(m_pGameInstance);
@@ -47,8 +48,10 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Start_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
+	//Ready_BufferLock_UnLock();
 
 	srand((unsigned int)time(NULL));
+
 
 	return S_OK;
 }
@@ -59,8 +62,12 @@ void CMainApp::Tick(_double TimeDelta)
 		return;
 
 	CClient_Manager::TimeDelta = TimeDelta;
+	
+	
 
 	m_pGameInstance->Tick_Engine(TimeDelta);
+	
+	m_pToolManager->Imgui_SelectParentViewer();
 
 	
 }
@@ -174,6 +181,7 @@ HRESULT CMainApp::Ready_Prototype_GameObject()
 	return S_OK;
 }
 
+
 HRESULT CMainApp::Ready_BufferLock_UnLock()
 {
 	ID3D11Texture2D*			pTexture2D = nullptr;
@@ -181,8 +189,8 @@ HRESULT CMainApp::Ready_BufferLock_UnLock()
 	D3D11_TEXTURE2D_DESC		TextureDesc;
 	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
-	TextureDesc.Width = 256;		// 2의 배수로 맞춰야됀다.
-	TextureDesc.Height = 256;		// 2의 배수로 맞춰야됀다.
+	TextureDesc.Width = 128;		// 2의 배수로 맞춰야됀다.
+	TextureDesc.Height = 128;		// 2의 배수로 맞춰야됀다.
 	TextureDesc.MipLevels = 1;
 	TextureDesc.ArraySize = 1;
 	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -205,10 +213,10 @@ HRESULT CMainApp::Ready_BufferLock_UnLock()
 		{
 			_uint iIndex = i*TextureDesc.Height + j;
 
-			if (j < 128)
-				pPixel[iIndex] = D3DCOLOR_ARGB(255, 0, 0,0);
-			else
-				pPixel[iIndex] = D3DCOLOR_ARGB(255, 255, 255, 255);
+			//if (j < 128)
+				pPixel[iIndex] = D3DCOLOR_ARGB(255, 255, 255,255);
+		/*	else
+				pPixel[iIndex] = D3DCOLOR_ARGB(255, 255, 255, 255);*/
 		}
 	}
 
@@ -223,7 +231,7 @@ HRESULT CMainApp::Ready_BufferLock_UnLock()
 
 	m_pContext->Unmap(pTexture2D, 0);
 
-	if (FAILED(DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures/Terrain/Filter.dds"))))
+	if (FAILED(DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures2D/Filter.dds"))))
 		return E_FAIL;
 
 	Safe_Delete_Array(pPixel);
@@ -254,5 +262,7 @@ void CMainApp::Free()
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
 
+
+	CToolManager::DestroyInstance();
 	CGameInstance::Release_Engine();
 }

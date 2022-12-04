@@ -226,6 +226,14 @@ HRESULT CGameInstance::Render_Level()
 	return m_pLevel_Manager->Render();
 }
 
+_uint CGameInstance::GetCurLevelIdx() const
+{
+	if (nullptr == m_pLevel_Manager)
+		return 0;
+
+	return m_pLevel_Manager->GetCurLevelIdx();
+}
+
 HRESULT CGameInstance::Add_Prototype(const wstring& pPrototypeTag, CGameObject * pPrototype)
 {
 	if (nullptr == m_pObject_Manager)
@@ -266,7 +274,29 @@ void CGameInstance::DeleteGameObject(_uint iLevelIndex, const wstring & ObjName)
 	return m_pObject_Manager->DeleteGameObject(iLevelIndex, ObjName);
 }
 
+map<const wstring, class CGameObject*>* CGameInstance::Get_ProtoTypes()
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+	return m_pObject_Manager->Get_ProtoTypes();
+}
 
+map<const wstring, class CLayer*>* CGameInstance::Get_Layer()
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Get_Layer();
+}
+
+
+
+CGameObject * CGameInstance::Get_SelectObject()
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+	return m_pObject_Manager->Get_SelectObject();
+}
 
 HRESULT CGameInstance::Loading_Objects()
 {
@@ -282,6 +312,8 @@ CGameObject * CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring & p
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, pLayerTag, pObjectNameTag);
 }
 
+
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)
@@ -296,6 +328,14 @@ CComponent * CGameInstance::Clone_Component(_uint iLevelIndex, const wstring& pP
 		return nullptr;
 
 	return m_pComponent_Manager->Clone_Component(iLevelIndex, pPrototypeTag, pArg);
+}
+
+void CGameInstance::Imgui_ComponentViewer(_uint iLevel, OUT wstring & TextureTag, COMPONENT_TYPE eType)
+{
+	if (nullptr == m_pComponent_Manager)
+		return;
+
+	m_pComponent_Manager->Imgui_ComponentViewer(iLevel, TextureTag, eType);
 }
 
 void CGameInstance::Render_ImGui()
@@ -331,6 +371,8 @@ void CGameInstance::Clear_ImguiObjects()
 	if (m_pImgui_Manager == nullptr) return;
 	m_pImgui_Manager->Clear_ImguiObjects();
 }
+
+
 
 
 _matrix CGameInstance::Get_TransformMatrix(CPipeLine::TRANSFORMSTATE eState)

@@ -22,6 +22,10 @@ public:
 	
 	virtual  _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom,_float4 &vPosition)override;
 	
+
+	_bool				PickingRetrunIndex(HWND hWnd, class CTransform * pCubeTransCom, _float3& fIndexs);
+			
+
 private:
 	_uint		m_iNumVerticesX = 0;
 	_uint		m_iNumVerticesZ = 0;

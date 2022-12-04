@@ -27,7 +27,7 @@ public:
 	virtual void Tick(_double TimeDelta) override;
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
 public: /*Observer Pattern*/
 	
 	void	IsMove();

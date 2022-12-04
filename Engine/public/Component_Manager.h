@@ -12,9 +12,14 @@
 /* 사본을 생성하여 리턴한다. */
 BEGIN(Engine)
 
+enum COMPONENT_TYPE { TYPE_TEXTURE, TYPE_MODEL, TYPE_END };
+
 class CComponent_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CComponent_Manager)
+
+public:
+
 private:
 	CComponent_Manager();
 	virtual ~CComponent_Manager() = default;
@@ -27,6 +32,11 @@ public:
 
 
 public: /*for_Imgui*/
+	void		Imgui_ComponentViewer(_uint iLevel, OUT wstring& TextureTag, COMPONENT_TYPE eType);
+
+
+
+private:
 	void		Imgui_TextureViewer(_uint iLevel,OUT wstring& TextureTag);
 	void		Imgui_ModelViewer(_uint iLevel, OUT wstring& Model_NoAnimTag);
 

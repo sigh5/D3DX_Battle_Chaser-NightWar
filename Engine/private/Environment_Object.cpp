@@ -20,7 +20,7 @@ HRESULT CEnvironment_Object::Initialize_Prototype()
 
 HRESULT CEnvironment_Object::Initialize(void * pArg)
 {
-	ZeroMemory(&m_EnviromentDesc, sizeof(m_EnviromentDesc));
+	ZeroMemory(&m_EnviromentDesc, sizeof(ENVIRONMENTDESC));
 
 	if (pArg != nullptr)
 		memcpy(&m_EnviromentDesc, pArg,sizeof(ENVIRONMENTDESC));

@@ -342,8 +342,6 @@ _bool CVIBuffer_Cube::PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom,
 		return true;
 	}
 
-
-
 	dwVtxIdx[0] = 7;
 	dwVtxIdx[1] = 5;
 	dwVtxIdx[2] = 4;

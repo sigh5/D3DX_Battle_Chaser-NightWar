@@ -2,6 +2,9 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 vector			g_vCamPosition;
 
+
+
+
 /* ºûÁ¤º¸ */
 vector			g_vLightDir;
 vector			g_vLightPos;		// For_PointLight

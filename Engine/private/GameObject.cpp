@@ -77,6 +77,8 @@ void CGameObject::Set_parent(CGameObject* pGameObject)
 	
 }
 
+
+
 CComponent * CGameObject::Get_Component(const wstring & ComponentTag)
 {
 	auto MyPair = find_if(m_Components.begin(), m_Components.end(), [&](auto Pair)->bool
@@ -143,6 +145,24 @@ CComponent * CGameObject::Find_Component(const wstring & pComponentTag)
 		return nullptr;
 
 	return iter->second;
+}
+
+HRESULT CGameObject::Remove_component(const wstring & pComponentTag)
+{
+	auto	iter = find_if(m_Components.begin(), m_Components.end(), [&](auto Pair)->bool
+	{
+		if (pComponentTag == Pair.first)
+			return true;
+		return false;
+	});
+	
+	if (iter == m_Components.end())
+		return S_OK;
+
+	Safe_Release(iter->second);
+	m_Components.erase(iter);
+
+	return S_OK;
 }
 
 void CGameObject::Free()

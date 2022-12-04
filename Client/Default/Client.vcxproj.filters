@@ -73,7 +73,7 @@
     <Filter Include="99.Defines\Client_Manager">
       <UniqueIdentifier>{7486ada0-0ad9-4648-89e8-64b54e013b01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Terrain\Tile">
+    <Filter Include="02.GameObjects\Terrain\Water">
       <UniqueIdentifier>{e108db9c-fbbb-40da-bda9-c0775f6ef98d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -147,8 +147,9 @@
     <ClInclude Include="..\Public\Client_Manager.h">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Tile.h">
-      <Filter>02.GameObjects\Terrain\Tile</Filter>
+    <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\public\WaterTile.h">
+      <Filter>02.GameObjects\Terrain\Water</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,8 +210,9 @@
     <ClCompile Include="..\Private\Client_Manager.cpp">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Tile.cpp">
-      <Filter>02.GameObjects\Terrain\Tile</Filter>
+    <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\private\WaterTile.cpp">
+      <Filter>02.GameObjects\Terrain\Water</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

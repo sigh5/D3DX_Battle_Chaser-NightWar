@@ -21,18 +21,23 @@ private:
 
 public:
 	_uint	Get_MeshNum()const { return m_iMeshNum; }
+	class CBone*	Get_BonePtr(char* pBoneName);
+
+public:
+	void	Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const char* pModelFilePath);
 	virtual HRESULT Initialize(void* pArg);
 
-public:
+
+public: /* for_Tool*/
 	_bool			PicikingModel(HWND hWnd, class CTransform* pTransform);
 
 public:
-	void Play_Animation(_double TimeDelta);
+	void	Play_Animation(_double TimeDelta);
 	HRESULT	Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
-	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0);
+	HRESULT Render(class CShader* pShader, _uint iMeshIndex, _uint iPassIndex = 0, const char* pBoneConstantName=nullptr);
 
 public:
 	const  aiScene*						m_pAIScene = nullptr;
@@ -51,15 +56,16 @@ public:
 	_uint								m_iNumBones = 0;
 	vector<class CBone*>				m_Bones;
 
-	_uint								m_iNumAnimations = 0;
+	_uint								m_iCurrentAnimIndex = 0; // 현재 애니메이션의 숫자
+	_uint								m_iNumAnimations = 0;	// 전체 애니메이션의 숫자
 	vector<class CAnimation*>			m_Animations;
 
 
 public:
-	HRESULT		Ready_Bonse(aiNode* pNode);		//Node를 뼈라고 한다.
+	HRESULT		Ready_Bones(aiNode* pNode);		//Node를 뼈라고 한다.
 	HRESULT		Ready_MeshContainers();
 	HRESULT		Ready_Materials(const char* pModelFilePath);
-
+	HRESULT		Ready_Animation();
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const char* pModelFilePath);

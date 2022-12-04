@@ -1,25 +1,26 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "GameObject.h"
+#include "Environment_Object.h"
 
 BEGIN(Engine)
 class CShader;
 class CRenderer;
-class CVI_Buffer_Terrain;
-class CVIBuffer_Rect;
 class CTexture;
+class CModel;
 END
 
 
 BEGIN(Client)
 
-class CTile final :public CGameObject
+class CWaterTile final :public CEnvironment_Object
 {
+	enum WATER_TYPE { WATER_NORMAL, WATER_DIFFUSE, WATER_HEIGHT, WATER_UV, WATER_END };
+
 private:
-	CTile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTile(const CTile& rhs);
-	virtual ~CTile() = default;
+	CWaterTile(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CWaterTile(const CWaterTile& rhs);
+	virtual ~CWaterTile() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,18 +36,19 @@ public:	/*For_Imgui*/
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
+	_float					m_TimeDelta = 0.f;
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
-	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
-	CTexture*				m_pTextureCom[TYPE_END] = { nullptr, };
-
+	CTexture*				m_pTextureCom = nullptr;
+	CModel*					m_pModelCom = nullptr;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 	_bool					m_bCreateCheck = false;
 public:
-	static CTile* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CWaterTile* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };

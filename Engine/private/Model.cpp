@@ -5,6 +5,8 @@
 #include "Shader.h"
 #include "Transform.h"
 #include "Bone.h"
+#include "Animation.h"
+
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -14,14 +16,15 @@ CModel::CModel(const CModel & rhs)
 	: CComponent(rhs)
 	, m_pAIScene(rhs.m_pAIScene)
 	, m_eType(rhs.m_eType)
-	, m_Meshs(rhs.m_Meshs)
 	, m_iMeshNum(rhs.m_iMeshNum)
-	, m_iNumMaterials(rhs.m_iNumMaterials)
+	, m_Meshs(rhs.m_Meshs)
 	, m_Materials(rhs.m_Materials)
-	, m_iNumBones(rhs.m_iNumBones)
+	, m_iNumMaterials(rhs.m_iNumMaterials)
 	, m_Bones(rhs.m_Bones)
-	, m_iNumAnimations(rhs.m_iNumAnimations)
+	, m_iNumBones(rhs.m_iNumBones)
 	, m_Animations(rhs.m_Animations)
+	, m_iNumAnimations(rhs.m_iNumAnimations)
+	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	
 {
 	for (auto & Material : m_Materials)
@@ -33,11 +36,22 @@ CModel::CModel(const CModel & rhs)
 	for (auto &pMesh : m_Meshs)
 		Safe_AddRef(pMesh);}
 
+CBone * CModel::Get_BonePtr(char * pBoneName)
+{
+	auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)->_bool
+	{
+		return !strcmp(pBoneName, pBone->Get_BoneName());
+	});
+
+	if (iter == m_Bones.end())
+		return nullptr;
+
+	return *iter;
+}
+
 HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath)
 {
 	_uint			iFlag = 0;
-
-	m_eType = eType;
 
 	if (TYPE_NONANIM == eType)
 		iFlag = aiProcess_PreTransformVertices | aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
@@ -47,27 +61,24 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath)
 		// aiProcess_PreTransformVertices 안쓰는 이유 == 내가 직접 조정할려고
 
 	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
-
-	/* 뼈. */
-	//m_pAIScene->mRootNode->mChildren->mChildren;
-
-	//m_pAIScene->mAnimations[0]->mChannels[0];
-
-	//m_pAIScene->mMeshes[0]->mBones[0] // 뼈를 가져올때 제일먼저
+	if (nullptr == m_pAIScene)
+		return E_FAIL;
 
 	/* 뼈를 로드한다.*/
 	// Anum Model 일때만 로드한다.
-	if (TYPE_ANIM == eType)
-	{
-		if (FAILED(Ready_Bonse(m_pAIScene->mRootNode)))	// 최상위 노드부터 넣어야지 CBone에 있는 parent가 빵꾸가 안남
-			return E_FAIL;
-	}
+
+	if (FAILED(Ready_Bones(m_pAIScene->mRootNode)))	// 최상위 노드부터 넣어야지 CBone에 있는 parent가 빵꾸가 안남
+		return E_FAIL;
+
 	if (FAILED(Ready_MeshContainers()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Materials(pModelFilePath)))
 		return E_FAIL;
 
+	if (FAILED(Ready_Animation()))
+		return E_FAIL;
+	
 
 	return S_OK;
 }
@@ -85,7 +96,7 @@ _bool CModel::PicikingModel(HWND hWnd, CTransform * pTransform)
 void CModel::Play_Animation(_double TimeDelta)
 {
 	/* 현재 애니메이션에 맞는 뼈들의 Transformatrix를 갱신한다. */
-	// m_Animations[m_iCurrentAnumIndex] ->Update_Bones(TimeDelta)
+	m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta);
 
 	for (auto& pBone : m_Bones)
 	{
@@ -109,25 +120,34 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 		m_Materials[iMaterialIndex].pTexture[eType]->Bind_ShaderResource(pShader, pConstantName);
 	}
 	else
-	{
-		MSG_BOX("(nullptr == m_Materials[iMaterialIndex]");
 		return E_FAIL;
-	}
 
 	return S_OK;
 }
 
-HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iPassIndex)
+HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iPassIndex,const char* pBoneConstantName)
 {
-	pShader->Begin(iPassIndex);
+	if (nullptr != m_Meshs[iMeshIndex])
+	{
+		if (nullptr != pBoneConstantName)
+		{
+			_float4x4		BoneMatrices[256];
 
-	if(nullptr != m_Meshs[iMeshIndex])
+			m_Meshs[iMeshIndex]->SetUp_BoneMatrices(BoneMatrices);
+
+			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 256);
+		}
+
+		pShader->Begin(iPassIndex);
+
 		m_Meshs[iMeshIndex]->Render();
+	}
 
-	return S_OK;	
+
+	return S_OK;
 }
 
-HRESULT CModel::Ready_Bonse(aiNode * pNode) // 재귀함수 뼈의 부모부터 시작해서
+HRESULT CModel::Ready_Bones(aiNode * pNode) // 재귀함수 뼈의 부모부터 시작해서
 {											// 뼈의 끝까지 간다.
 	
 	CBone*	pBone = CBone::Create(pNode); // 뼈를 로드해야되니까 뼈클래스가 필요하곘지?
@@ -144,7 +164,7 @@ HRESULT CModel::Ready_Bonse(aiNode * pNode) // 재귀함수 뼈의 부모부터 시작해서
 
 	for (_uint i = 0; i < pNode->mNumChildren; ++i)
 	{
-		Ready_Bonse(pNode->mChildren[i]);	//뼈의 끝까지간다.
+		Ready_Bones(pNode->mChildren[i]);	//뼈의 끝까지간다.
 				//이 구조는 지금 트리구조임 트리의 끝까지 찾아간다.
 	}
 
@@ -163,7 +183,7 @@ HRESULT CModel::Ready_MeshContainers()
 	{
 		aiMesh*		pAiMesh = m_pAIScene->mMeshes[i];
 		
-		CMesh*		pMesh = CMesh::Create(m_pDevice, m_pContext, m_eType,pAiMesh);
+		CMesh*		pMesh = CMesh::Create(m_pDevice, m_pContext, m_eType,pAiMesh,this);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -230,6 +250,25 @@ HRESULT CModel::Ready_Materials(const char * pModelFilePath)
 	return S_OK;
 }
 
+HRESULT CModel::Ready_Animation()
+{
+	m_iNumAnimations = m_pAIScene->mNumAnimations;
+
+	for (_uint i = 0; i < m_iNumAnimations; ++i)
+	{
+		aiAnimation*		pAIAnimation = m_pAIScene->mAnimations[i];
+
+		CAnimation*			pAnim = CAnimation::Create(pAIAnimation, this);
+		if (nullptr == pAnim)
+			return E_FAIL;
+
+		m_Animations.push_back(pAnim);
+	}
+
+
+	return S_OK;
+}
+
 
 CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, TYPE eType, const char * pModelFilePath)
 {
@@ -260,16 +299,22 @@ void CModel::Free()
 {
 	__super::Free();
 
-	for (auto &pMesh : m_Meshs)
-		Safe_Release(pMesh);
-	m_Meshs.clear();
+	if (!m_bClone)
+	{
+		for (auto& pBone : m_Bones)
+			Safe_Release(pBone);
+	}
 
-	for (auto &pMeterial : m_Materials)
+	for (auto& Material : m_Materials)
 	{
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
-			Safe_Release(pMeterial.pTexture[i]);
+			Safe_Release(Material.pTexture[i]);
 	}
 	m_Materials.clear();
 
-	m_Importer.FreeScene(); // 해제 코드
+	for (auto& pMesh : m_Meshs)
+		Safe_Release(pMesh);
+	m_Meshs.clear();
+
+	m_Importer.FreeScene();
 }

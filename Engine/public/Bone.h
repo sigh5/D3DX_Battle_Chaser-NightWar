@@ -16,15 +16,24 @@ public:
 	virtual ~CBone() = default;
 
 public:
-	const			char* Get_BoneName() const { return szBoneName; }
+	const			char* Get_BoneName() const { return m_szBoneName; }
 	void			Set_offSetMatrix(_float4x4 offSetMatrix) { m_OffsetMatrix = offSetMatrix; }
+	
+	void Set_TransformMatrix(_fmatrix TransformMatrix) {XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);}
+
+	_matrix Get_OffsetMatrix() {return XMLoadFloat4x4(&m_OffsetMatrix);}
+
+	_matrix Get_CombindMatrix() {return XMLoadFloat4x4(&m_CombindTransformMatrix);}
+
+
 
 public:
 	HRESULT			Initialize(aiNode* pAiNode);
 	void			Compute_CombindTransformationMatrix();
 
+
 private:
-	char			szBoneName[MAX_PATH];
+	char			m_szBoneName[MAX_PATH];
 	_float4x4		m_OffsetMatrix;		// 한번 읽어오면 수정 불가( 기초적인 로컬??)
 	_float4x4		m_TransformMatrix;	// 부모기준의 변환행렬
 	_float4x4		m_CombindTransformMatrix;	// 내 부모의 부모 .... 까지 곱해놓은것

@@ -17,7 +17,6 @@ namespace Engine
 		class CTexture*		pTexture[18]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
 	}MODELMATERIAL;
 
-
 	typedef struct tagLightDesc
 	{
 		enum TYPE {TYPE_DIRECTIONAL, TYPE_POINT, TYPE_END};
@@ -35,6 +34,16 @@ namespace Engine
 		XMFLOAT4	vAmbient;
 		XMFLOAT4	vSpecular;
 	}LIGHTDESC;
+
+
+	typedef struct tagKeyFrame
+	{
+		double		Time;		// 시간
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vPosition;
+
+	}KEYFRAME;
 
 
 
@@ -113,15 +122,7 @@ namespace Engine
 	}VTXANIMMODEL_DECLARATION;
 
 
-	typedef struct tag_UIData
-	{
-		_tchar* LayerTag = TEXT("");
-		_tchar* ProtoName = TEXT("");
-		_tchar* ParentName = TEXT("");
-		_tchar* TextureName = TEXT("");
-		_tchar* DelegaterName = TEXT("");
-
-	}UIDATA;
+	
 
 
 }

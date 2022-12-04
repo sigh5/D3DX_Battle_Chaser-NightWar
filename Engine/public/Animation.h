@@ -11,19 +11,25 @@ public:
 	virtual ~CAnimation() =default;
 
 public:
-	HRESULT	Initialize(aiAnimation* pAIAnimation);
-
+	HRESULT	Initialize(aiAnimation* pAIAnimation, class CModel* pModel);
+	void	Update_Bones(_double TimeDelta);
 private:
 	char					m_szAnimName[MAX_PATH];
-	_double					m_Duration = 0.0;				// 애니메이션 한개의 재생시간 이것을 늘리거나 줄여서 애니메이션을 빠르거나 느리게 만든다.
-	_double					m_TickPerSecond = 0.0;			// TickPerSecond * TimeDelta > duration  한애니메이션이 끝났다.
+
+	/* 애니메이션을 재생하는데 걸리는 전체시간 늘리거나줄여서 애니메이션의 길이편집*/
+	_double					m_Duration = 0.0;				
+
+	/* 초당 재생해야할 애니메이션의 속도이다. */
+	_double					m_TickPerSecond ;			
+
+	_double					m_PlayTime = 0.0;
 
 	/* 이 애니메이션을 재생하기위해 갱신해야하는 뼈들 */
-	_uint					m_iNumBones = 0;
-	vector<class CBone*>	m_Bones;
+	_uint					m_iNumChannels = 0;
+	vector<class CChannel*>	m_Channels;
 
 public:
-	static		CAnimation* Create(aiAnimation* pAIAnimation);
+	static		CAnimation* Create(aiAnimation* pAIAnimation,class CModel* pModel);
 	virtual		void		Free()override;
 
 

@@ -1,19 +1,18 @@
 #include "..\public\Bone.h"
 
 
+
 CBone::CBone()
 {
 }
 
-HRESULT CBone::Initialize(aiNode * pAiNode)
+HRESULT CBone::Initialize(aiNode * pAINode)
 {
-	strcpy_s(szBoneName, pAiNode->mName.data); // 꼭 data 써줘야한다.
+	strcpy_s(m_szBoneName, pAINode->mName.data);
 
 	XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixIdentity());
 
-	memcpy(&m_TransformMatrix, &pAiNode->mTransformation, sizeof(_float4x4));
-	// 어싱크는 콜바이행렬이다 .
-	// 우리가만든거는 로우바이 행렬이니까 전치해줘야한다.
+	memcpy(&m_TransformMatrix, &pAINode->mTransformation, sizeof(_float4x4));
 
 	XMStoreFloat4x4(&m_TransformMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformMatrix)));
 
@@ -26,15 +25,17 @@ void CBone::Compute_CombindTransformationMatrix()
 {
 	if (nullptr == m_pParent)
 		m_CombindTransformMatrix = m_TransformMatrix;
+
 	else
-		XMStoreFloat4x4(&m_CombindTransformMatrix, XMLoadFloat4x4(&m_TransformMatrix)*XMLoadFloat4x4(&m_pParent->m_CombindTransformMatrix));
+		XMStoreFloat4x4(&m_CombindTransformMatrix, XMLoadFloat4x4(&m_TransformMatrix) * XMLoadFloat4x4(&m_pParent->m_CombindTransformMatrix));
+
 }
 
-CBone * CBone::Create(aiNode * pAiNode)
+CBone * CBone::Create(aiNode * pAINode)
 {
 	CBone*		pInstance = new CBone();
 
-	if (FAILED(pInstance->Initialize(pAiNode)))
+	if (FAILED(pInstance->Initialize(pAINode)))
 	{
 		MSG_BOX("Failed to Created : CBone");
 		Safe_Release(pInstance);
@@ -44,4 +45,5 @@ CBone * CBone::Create(aiNode * pAiNode)
 
 void CBone::Free()
 {
+
 }

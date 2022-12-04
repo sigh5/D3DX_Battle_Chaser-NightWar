@@ -56,6 +56,9 @@ public: /* imgui */
 		return m_pParentObject;
 	}
 
+
+
+
 public:
 	CTransform*		Get_Transform() { return m_pTransformCom; }
 	class	CComponent	*Get_Component(const wstring& ComponentTag);
@@ -75,6 +78,7 @@ protected:
 protected:	
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 	class CComponent* Find_Component(const wstring& pComponentTag);
+	HRESULT Remove_component(const wstring& pComponentTag);
 
 protected:
 	const					_tchar*					m_ObjectName = TEXT("");

@@ -31,7 +31,7 @@ public:
 private:
 	CGameInstance*			m_pGameInstance = nullptr;
 	CRenderer*				m_pRenderer = nullptr;
-	
+	class CToolManager*			m_pToolManager = nullptr;
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;
@@ -41,9 +41,12 @@ private:
 	HRESULT Start_Level(LEVEL eLevelID);	
 	HRESULT Ready_Prototype_Component();
 	HRESULT Ready_Prototype_GameObject();
-	
+
 private:
 	HRESULT	Ready_BufferLock_UnLock();
+
+	_bool	m_bLastUpdate = false;
+
 
 
 public:

@@ -30,19 +30,23 @@ HRESULT CNoneAnim_BG::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_Scaled(_float3(1.f, 1.f, 1.f));
-
 	return S_OK;
 }
 
 HRESULT CNoneAnim_BG::Last_Initialize()
 {
+	if (m_bLast_Initlize)
+		return S_OK;
+
+
+
+	m_bLast_Initlize = true;
+
 	return S_OK;
 }
 
 void CNoneAnim_BG::Tick(_double TimeDelta)
 {
-	//Piciking_GameObject();
-
 	__super::Tick(TimeDelta);
 }
 
@@ -73,7 +77,7 @@ HRESULT CNoneAnim_BG::Render()
 			return E_FAIL;
 	}
 
-	//m_pVIBufferCom->Render();
+	m_pVIBufferCom->Render();
 	return S_OK;
 }
 
@@ -91,6 +95,19 @@ _bool CNoneAnim_BG::Piciking_GameObject()
 	}
 
 	return false;
+}
+
+void CNoneAnim_BG::Change_Model(_uint iLevel, const wstring & NewComPonentTag)
+{
+	Safe_Release(m_pModelCom);
+	Remove_component(TEXT("Com_Model"));
+
+	lstrcpy(m_EnviromentDesc.m_pModelTag, NewComPonentTag.c_str());
+
+	if (FAILED(__super::Add_Component(iLevel, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
+		(CComponent**)&m_pModelCom)))
+		assert("Error");
+
 }
 
 HRESULT CNoneAnim_BG::SetUp_Components()

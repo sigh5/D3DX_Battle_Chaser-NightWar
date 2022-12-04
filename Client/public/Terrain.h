@@ -12,6 +12,18 @@ END
 
 BEGIN(Client)
 
+typedef struct tag_Create_object
+{
+	wstring szLayerName = TEXT("");
+	wstring szProtoName = TEXT("");
+	wstring szTextureName = TEXT("");
+	wstring szObjectName = TEXT("");
+	wstring szModelName = TEXT("");
+	_uint	iShaderPass = 0;
+
+}Create_OBJECTDESC;
+
+
 class CTerrain final : public CGameObject
 {
 private:
@@ -28,10 +40,20 @@ public:
 	virtual HRESULT Render() override;
 	
 public:	/*For_Imgui*/
-	_float4		Get_Position()const ;
-
-public: /* Imgui */
+	_float4			Get_Position()const ;
+	void			Set_MapObject(Create_OBJECTDESC& pArg);
 	virtual _bool	Piciking_GameObject()override;
+	void			Create_Object();
+	
+
+
+private: /* for_ FilterMap*/
+	HRESULT	Ready_FilterBuffer();
+	HRESULT	Ready_BufferLock_UnLock();
+
+	_ulong*		m_pPixel= nullptr;
+	ID3D11Texture2D*			pTexture2D = nullptr;
+	D3D11_TEXTURE2D_DESC		TextureDesc;
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -39,12 +61,19 @@ private:
 	CVI_Buffer_Terrain*		m_pVIBufferCom = nullptr;
 	CTexture*				m_pTextureCom[TYPE_END] = { nullptr, };
 
+	_bool					m_bCreateObject = false;
+	_bool					m_bCreateCheck = false;
 
+
+	Create_OBJECTDESC		m_ObjData;
+	_uint					m_iObjNameNumber = 0;
+
+	vector<_tchar*>			m_NameVector;
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-	_bool					m_bCreateCheck = false;
+	
 public:
 	static CTerrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

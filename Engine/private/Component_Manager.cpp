@@ -48,6 +48,15 @@ CComponent * CComponent_Manager::Clone_Component(_uint iLevelIndex, const wstrin
 	return pComponent;	
 }
 
+void CComponent_Manager::Imgui_ComponentViewer(_uint iLevel, OUT wstring & TextureTag, COMPONENT_TYPE eType)
+{
+	if (TYPE_TEXTURE == eType)
+		Imgui_TextureViewer(iLevel, TextureTag);
+	else if(TYPE_MODEL == eType)
+		Imgui_ModelViewer(iLevel, TextureTag);
+
+}
+
 void CComponent_Manager::Imgui_TextureViewer(_uint iLevel  ,OUT wstring& TextureTag)
 {
 	const PROTOTYPES& ProtoType = m_pPrototypes[iLevel];

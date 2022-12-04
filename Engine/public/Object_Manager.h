@@ -28,6 +28,11 @@ public:
 	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject);
 
 
+
+public:
+	map<const wstring, class CGameObject*>*		Get_ProtoTypes() { return &m_Prototypes; }
+	map<const wstring, class CLayer*>*				Get_Layer() { return m_pLayers; }
+
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 	void					DeleteGameObject(_uint iLevelIndex, const wstring& ObjName);
 
@@ -48,17 +53,20 @@ public: /* imgui */
 	// 해당 Object가 없거나 사라지면 nullptr로 돌려준다.
 	void	Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
-	void	Imgui_SelectParentViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
-	void	Imgui_PicikingSelectObject(_uint iLevel, OUT CGameObject*& pSelectedObject);
-
+	void	Imgui_Picking(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
 	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
 	
+
+	void		Set_SelectedGameObject(class CGameObject* pGameObject){m_pSelectObject =  pGameObject;}
+	class CGameObject* Get_SelectObject() { return m_pSelectObject; }
+
+
 private:
-	void	Imgui_Select_LayerType();
-	void	Imgui_Select_ProtoType();
-	void	Imgui_Select_Texture();
-	void	Imgui_Select_Model();
+	//void	Imgui_Select_LayerType();
+	//void	Imgui_Select_ProtoType();
+	//void	Imgui_Select_Texture();
+	//void	Imgui_Select_Model();
 
 	void	Imgui_RemoveObject(_uint iLevel,OUT class CGameObject** ppGameObject);
 	void	Imgui_Save();
@@ -85,7 +93,8 @@ private:
 	wstring						TextureOrModelName = TEXT("");
 
 
-	class CGameObject*			m_pSelectTerrain = nullptr;
+	class CGameObject*			m_pSelectObject = nullptr;
+
 
 	vector<const _tchar*>		m_LayerName;
 

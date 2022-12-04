@@ -54,19 +54,9 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-	/*CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
-	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
-
-	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this,&CTurnCharcterUI::UI_Event);
-
-	RELEASE_INSTANCE(CGameInstance);*/
-
-
-
-
-
 	
+
+
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -109,6 +99,22 @@ HRESULT CTurnCharcterUI::Render()
 	CUI::End_UI();
 
 	return S_OK;
+}
+
+void CTurnCharcterUI::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
+{
+	Safe_Release(m_pTextureCom);
+	Remove_component(TEXT("Com_Texture"));
+
+	lstrcpy(m_UIDesc.m_pTextureTag, NewComPonentTag.c_str());
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
+		assert("CTurnCharcterUI Change_Texture");
+
+
+
 }
 
 

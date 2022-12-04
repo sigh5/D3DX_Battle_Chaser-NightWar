@@ -185,9 +185,10 @@
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\Public\Terrain.h" />
-    <ClInclude Include="..\Public\Tile.h" />
+    <ClInclude Include="..\public\ToolManager.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
     <ClInclude Include="..\Public\TurnUICanvas.h" />
+    <ClInclude Include="..\public\WaterTile.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -209,9 +210,10 @@
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
-    <ClCompile Include="..\Private\Tile.cpp" />
+    <ClCompile Include="..\Private\ToolManager.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />
     <ClCompile Include="..\Private\TurnUICanvas.cpp" />
+    <ClCompile Include="..\private\WaterTile.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
