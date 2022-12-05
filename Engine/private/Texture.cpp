@@ -49,7 +49,6 @@ HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_
 
 	}
 
-
 	if (eType == CTexture::TYPE_DIFFUSE)
 		m_szName = "Diffuse_Textures";
 
@@ -90,9 +89,6 @@ void CTexture::Imgui_RenderProperty()
 	ImGui::Begin("Terrain_Texture");
 	ImGui::NewLine();
 
-
-
-
 	if (ImGui::CollapsingHeader(m_szName, ImGuiTreeNodeFlags_DefaultOpen))
 	{
 	
@@ -100,7 +96,7 @@ void CTexture::Imgui_RenderProperty()
 		{
 			if (ImGui::ImageButton((void*)m_pTextures[i], ImVec2(32.f, 32.f)))
 			{
-				_bool f = false;
+				m_iSelectTextureIndex = i;
 			}
 			if (i == 0 || (i + 1) % 6)
 				ImGui::SameLine();

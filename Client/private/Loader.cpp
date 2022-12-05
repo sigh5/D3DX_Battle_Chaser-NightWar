@@ -9,10 +9,17 @@
 #include "Hero_Alumon.h"
 
 #include "BackGround.h"
-#include "TurnUICanvas.h"
-#include "TurnCharcterUI.h"
-#include "HpBar.h"
 #include "MainLogo.h"
+
+#include "ClientBaseCanvas.h"
+#include "TurnUICanvas.h"
+#include "TurnStateCanvas.h"
+
+
+#include "TurnCharcterUI.h"
+#include "TurnStateButton.h"
+#include "HpBar.h"
+
 
 #include "NoneAnim_BG.h"
 
@@ -124,58 +131,45 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Filter"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Filter.bmp"), CTexture::TYPE_FILTER, 1))))
 		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Test_Filter"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter.dds"), CTexture::TYPE_FILTER, 1))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Cubedds"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default0.dds"), CTexture::TYPE_END,1))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default0.dds"), CTexture::TYPE_END, 1))))
 		return E_FAIL;
+
+
+	/*나중에 지워야됌*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Base_Canvas"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/TestBaseCanvas.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_State_Canvas"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/UI_ChoiceBox.png"), CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_State_Button"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/StateButton/StateButton_%d.png"), CTexture::TYPE_DIFFUSE, 5))))
+		return E_FAIL;
+	
 	/* For.Prototype_Component_UI_Turn_canvas */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Turn_canvas"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Bar_BG.png"), CTexture::TYPE_END, 1))))
 		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun_GullyUI */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_GullyUI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Gully.png"), CTexture::TYPE_END, 1))))
-		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun_Garrison */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_Garrison"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Garrison.png"), CTexture::TYPE_END, 1))))
-		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun_WarGolem */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_WarGolem"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_WarGolem.png"), CTexture::TYPE_END, 1))))
-		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun_Ly_Armorless1 */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_Ly_Armorless1"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_Ly_Armorless1.png"), CTexture::TYPE_END, 1))))
-		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun_SlimeGreen */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun_SlimeGreen"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_SlimeGreen.png"), CTexture::TYPE_END, 1))))
-		return E_FAIL;
-	/* For.Prototype_Component_UI_Trun__BoneMageFire */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Trun__BoneMageFire"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Init_Rendered_BoneMageFire.png"), CTexture::TYPE_END, 1))))
+	/* For.Prototype_Component_Texture_UITrunCharUI */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UITrunCharUI"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/ComBatCharUI/ComBatCharUI_%d.png"), CTexture::TYPE_END, 6))))
 		return E_FAIL;
 
 	/*For.Water*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Water_large_shallow"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/FBX/vfx_water_large_shallow/water_large_shallow_%d.png"), CTexture::TYPE_END,2))))
-		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Water_WaterFall"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/FBX/WaterFall/WaterFall_%d.png"), CTexture::TYPE_END,2))))
 		return E_FAIL;
 
-	/*For.Water*/
-
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
-	///* For.Prototype_Component_VIBuffer_Terrain */
+	/* For.Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Ground/Ground9nmp.bmp")))))
 		return E_FAIL;
@@ -264,14 +258,27 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 		CHero_Gully::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	/* For.Prototype_GameObject_BaseCanvas */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BaseCanvas"),
+		CClientBaseCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	/* For.Prototype_GameObject_TurnCanvas_UI */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnCanvas_UI"),
 		CTurnUICanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_TurnStateCanvas */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnStateCanvas"),
+		CTurnStateCanvas::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	/* For.Prototype_GameObject_CharUI */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CharUI"),
 		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+	/* For.Prototype_GameObject_TurnStateButton */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnStateButton"),
+		CTurnStateButton::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/* For.Prototype_GameObject_NoneAnim */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
 		CNoneAnim_BG::Create(m_pDevice, m_pContext))))
@@ -279,6 +286,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WaterTile"),
 		CWaterTile::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
 	m_isFinished = true;

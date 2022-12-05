@@ -4,7 +4,7 @@
 
 #include "Hero_Gully.h"
 #include "TurnCharcterUI.h"
-#include <random>
+
 CTurnUICanvas::CTurnUICanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
 {
@@ -31,7 +31,6 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 
 	if (nullptr != pArg)
 		memcpy(&CanvasDesc, pArg, sizeof(CanvasDesc));
-
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
@@ -62,11 +61,13 @@ HRESULT CTurnUICanvas::Last_Initialize()
 		return S_OK;
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
 	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyTestShakingDelegater.bind(this, &CTurnUICanvas::ChildrenShakingCheck);
 
+	SetUp_ChildrenPosition();
+	SetUp_MatchingOption();
 	RELEASE_INSTANCE(CGameInstance);
 
 	m_bLast_Initlize = true;
@@ -79,11 +80,10 @@ void CTurnUICanvas::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-
 	// Test
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (pGameInstance->Key_Down(DIK_0))
+	if (pGameInstance->Key_Down(DIK_M))
 	{
 		DeleteCharUI(TEXT("UI_Trun_Garrison1"));
 	}
@@ -170,32 +170,59 @@ HRESULT CTurnUICanvas::SetUp_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CTurnUICanvas::SetUp_ChildrenPosition()
+{
+	CUI* pTopUI = nullptr;
+	CUI* pBottomUI = nullptr;
+	
+	_float fTopY = 0.f;
+	_float fBottomY = 0.f;
+
+	pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+	pBottomUI = CClient_Manager::Get_SmallValue_Pointer(m_ChildrenVec, fBottomY, COMPARE_UI_POS_Y);
+
+	if (pTopUI == nullptr || nullptr == pBottomUI)
+		assert("CTurnUICanvas::SetUp_ChildrenPosition");
+
+	Safe_AddRef(pTopUI);
+	Safe_AddRef(pBottomUI);
+
+	for (auto& pUI : m_ChildrenVec)
+	{
+		dynamic_cast<CTurnCharcterUI*>(pUI)->Set_Top_BottomYPos(fTopY, fBottomY);
+	}
+
+	Safe_Release(pTopUI);
+	Safe_Release(pBottomUI);
+
+	return S_OK;
+}
+
+HRESULT CTurnUICanvas::SetUp_MatchingOption()
+{
+	/* 나중에 삭제할때를 위해서 일단 UI들당 각자에 맞는 캐릭터들에 매칭시켜야됌*/
+	return S_OK;
+}
+
 void CTurnUICanvas::Move_Children()
 {
-	CUI*					m_pCharUI[TURN_UI_END] = { nullptr , nullptr };
-	_bool	bIsTop = false;
+	CUI*					pTopUI = nullptr;
+	_float					fTopY = 0.f;
 
-	for (auto &pUI : m_ChildrenVec)
-	{
-		if (pUI == nullptr)
-			continue;
+	pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+	
+	if (nullptr == pTopUI)
+		assert("Move_Children");
 
-		if (dynamic_cast<CTurnCharcterUI*>(pUI)->isUITop(m_pCharUI[TURN_UI_TOP]))
-		{
-			bIsTop = true;
-			break;
-		}
-	}
 
 	for (auto &iter : m_ChildrenVec)
 	{
 		if (iter == nullptr)
 			continue;
-
-		if (iter != m_pCharUI[TURN_UI_TOP])
-			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(1);
-		else
+		if (iter == pTopUI)
 			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(0);
+		else
+			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(1);
 	}
 
 }
@@ -203,6 +230,15 @@ void CTurnUICanvas::Move_Children()
 void CTurnUICanvas::ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed)
 {
 	Move_Children();
+}
+
+void CTurnUICanvas::ChildrenShakingCheck(_uint iShakingTime)
+{
+	for (auto &pUI : m_ChildrenVec)
+	{
+		dynamic_cast<CTurnCharcterUI*>(pUI)->ShakingControl(iShakingTime);
+	}
+
 }
  
 void CTurnUICanvas::DeleteCharUI(const wstring&  pNametag)
@@ -244,12 +280,10 @@ void CTurnUICanvas::DeleteCharUI(const wstring&  pNametag)
 		Add_ChildUI(static_cast<CUI*>(pGameInstance->Clone_UI(LEVEL_GAMEPLAY, TEXT("Layer_UI"), (pUI))));
 		size_t iNumber =	m_ChildrenVec.size();
 		
-		dynamic_cast<CTurnCharcterUI*>(m_ChildrenVec[iNumber-1])->IsMove();
+		dynamic_cast<CTurnCharcterUI*>(m_ChildrenVec[iNumber-1])->RightMove();
 	}
 
-	RELEASE_INSTANCE(CGameInstance);
-
-	
+	RELEASE_INSTANCE(CGameInstance);	
 
 }
 

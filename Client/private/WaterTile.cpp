@@ -48,7 +48,7 @@ void CWaterTile::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
-	m_TimeDelta += TimeDelta;
+	m_TimeDelta += (_float)TimeDelta;
 	__super::Tick(TimeDelta);
 }
 

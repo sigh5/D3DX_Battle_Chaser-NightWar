@@ -379,7 +379,7 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 	return false;
 }
 
-_bool CVI_Buffer_Terrain::PickingRetrunIndex(HWND hWnd, CTransform * pCubeTransCom, _float3& fIndexs)
+_bool CVI_Buffer_Terrain::PickingRetrunIndex(HWND hWnd, CTransform * pCubeTransCom, _float4& fIndexs)
 {
 
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
@@ -443,13 +443,12 @@ _bool CVI_Buffer_Terrain::PickingRetrunIndex(HWND hWnd, CTransform * pCubeTransC
 				fDist))
 			{
 				// 여기서 바꿔야함
-				dwIndex = i * (m_iNumVerticesX-1)+j;
-				
+				dwIndex  = i * (m_iNumVerticesX-1)+j;
 
-
-				fIndexs.x = dwIndex + m_iNumVerticesX - 1;
-				fIndexs.y = dwIndex + m_iNumVerticesX-1 + 1;
-				fIndexs.z = dwIndex+1;
+				fIndexs.x = _float(dwIndex + (m_iNumVerticesX-1));
+				fIndexs.y = _float(dwIndex + (m_iNumVerticesX-1)+1);
+				fIndexs.z = _float(dwIndex + 1);
+				fIndexs.w = _float(dwIndex);
 				return  true;
 			}
 
@@ -466,12 +465,11 @@ _bool CVI_Buffer_Terrain::PickingRetrunIndex(HWND hWnd, CTransform * pCubeTransC
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
 				fDist))
 			{
-
 				dwIndex = i * (m_iNumVerticesX - 1) + j;
-
-				fIndexs.x = dwIndex + m_iNumVerticesX - 1;
-				fIndexs.y = dwIndex ;
-				fIndexs.z = dwIndex + 1;
+				fIndexs.x = _float(dwIndex + (m_iNumVerticesX - 1));
+				fIndexs.y = _float(dwIndex + (m_iNumVerticesX - 1) + 1);
+				fIndexs.z = _float(dwIndex + 1);
+				fIndexs.w = _float(dwIndex);
 				return  true;
 			}
 		}

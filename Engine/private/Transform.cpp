@@ -43,23 +43,28 @@ void CTransform::Scaling(STATE eState, _float fScale)
 	Set_State(eState, Get_State(eState) * fScale);
 }
 
+
+
 void CTransform::Final_Update()
 {
-	if (nullptr != m_pParentTransfrom)
-	{
-		_matrix  matParent = XMMatrixIdentity();
-		_vector vRight = m_pParentTransfrom->Get_State(CTransform::STATE_RIGHT);
-		_vector vUp	   = m_pParentTransfrom->Get_State(CTransform::STATE_UP);
-		_vector vLook = m_pParentTransfrom->Get_State(CTransform::STATE_LOOK);
-		_vector vTranslate = m_pParentTransfrom->Get_State(CTransform::STATE_TRANSLATION);
+	if (nullptr == m_pParentTransfrom)
+		return;
 
-		memcpy(&matParent.r[0], &XMVector3Normalize(vRight), sizeof(_vector));
-		memcpy(&matParent.r[1], &XMVector3Normalize(vUp), sizeof(_vector));
-		memcpy(&matParent.r[2], &XMVector3Normalize(vLook), sizeof(_vector));
-		memcpy(&matParent.r[3], &vTranslate, sizeof(_vector));
+	_matrix  matParent = m_pParentTransfrom->Get_WorldMatrix();
+	_matrix  matScaleSet = XMMatrixIdentity();
+	_vector vRight, vUp, vLook, vTranslate;
 
-		XMStoreFloat4x4(&m_ParentAndChildWorldMatrix,  XMLoadFloat4x4(&m_WorldMatrix) * matParent );
-	}
+	memcpy(&vRight, &matParent.r[0], sizeof(_vector));
+	memcpy(&vUp, &matParent.r[1], sizeof(_vector));
+	memcpy(&vLook ,&matParent.r[2], sizeof(_vector));
+	memcpy(&vTranslate, &matParent.r[3], sizeof(_vector));
+
+	memcpy(&matScaleSet.r[0], &XMVector3Normalize(vRight), sizeof(_vector));
+	memcpy(&matScaleSet.r[1], &XMVector3Normalize(vUp), sizeof(_vector));
+	memcpy(&matScaleSet.r[2], &XMVector3Normalize(vLook), sizeof(_vector));
+	memcpy(&matScaleSet.r[3], &vTranslate, sizeof(_vector));
+
+	XMStoreFloat4x4(&m_ParentAndChildWorldMatrix, XMLoadFloat4x4(&m_WorldMatrix) * matScaleSet);
 
 }
 

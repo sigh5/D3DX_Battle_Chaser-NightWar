@@ -72,7 +72,7 @@ public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);
 	void		Imgui_ComponentViewer(_uint iLevel, OUT wstring& TextureTag, COMPONENT_TYPE eType);
-
+	void		Remove_ProtoComponent(_uint iLevel, const wstring& pComponentName);
 public: // for imgui manager
 	void Render_ImGui();
 	void Render_Update_ImGui();

@@ -141,6 +141,8 @@ void CToolManager::Imgui_CreateObject()
 		Imgui_Create_UI();
 		Imgui_Create_Object();
 
+		Imgui_Crate_FilterMap();
+
 	}
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -347,6 +349,12 @@ void CToolManager::Imgui_Change_Texture()
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CToolManager::Imgui_Crate_FilterMap()
+{
+	ImGui::RadioButton("NoUse_FilterMap", &m_iRadioButton, 0);
+	ImGui::RadioButton("Create_FilterMap", &m_iRadioButton, 1);
 }
 
 void CToolManager::Free()

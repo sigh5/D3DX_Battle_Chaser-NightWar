@@ -35,7 +35,7 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
 		CameraDesc.fMouse_sensitivity = 0.1f;
-		CameraDesc.TransformDesc.fSpeedPerSec = 5.f;
+		CameraDesc.TransformDesc.fSpeedPerSec = 20.f;
 		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	}
 
@@ -87,12 +87,12 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 
 			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_X))
 			{
-				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 5.f);
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 20.f);
 			}
 
 			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_Y))
 			{
-				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 5.f);
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 20.f);
 			}
 		}
 	}

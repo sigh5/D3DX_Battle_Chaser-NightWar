@@ -42,47 +42,36 @@ public:
 	
 		return  XMLoadFloat4x4(&m_ParentAndChildWorldMatrix);
 	}
-
 	_matrix	Get_LocalMatrix()
 	{
 		return  XMLoadFloat4x4(&m_WorldMatrix);
 	}
-
-
 	void	Set_WorldMatrix(_float4x4 WorldFlot4x4)
 	{
 		memcpy(&m_WorldMatrix, &WorldFlot4x4, sizeof(WorldFlot4x4));
 	}
-
-
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4x4(&m_WorldMatrix).r[eState];
 	}
-
 	_float3 Get_Scaled() const {
 		return _float3(XMVectorGetX(XMVector3Length(Get_State(STATE_RIGHT))),
 			XMVectorGetX(XMVector3Length(Get_State(STATE_UP))),
 			XMVectorGetX(XMVector3Length(Get_State(STATE_LOOK))));
 	}
-
 	void Set_State(STATE eState, _fvector vState) {
 		_float4		vTmp;
 		XMStoreFloat4(&vTmp, vState);
 		memcpy(&m_WorldMatrix.m[eState][0], &vTmp, sizeof vTmp);
 	}
-
 	void Set_Scaled(STATE eState, _float fScale); /* fScale값으로 길이를 변형한다. */
 	void Set_Scaled(_float3 vScale); /* fScale값으로 길이를 변형한다. */
 	void Scaling(STATE eState, _float fScale); /* fScale배수로 늘린다. */
+	void	Set_ParentTransform(CTransform* pTransform) {m_pParentTransfrom = pTransform;}
 
-
-	void	Set_ParentTransform(CTransform* pTransform) { 
-		m_pParentTransfrom = pTransform;
-		//Safe_AddRef(m_pParentTransfrom);
-	}
-
+	CTransform* Get_ParentTransform() { return m_pParentTransfrom; }
 
 	virtual		void	Final_Update()override;
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -104,6 +93,8 @@ public:
 
 	/* 추적한다 .*/
 	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+
+	
 
 public: /* for_UI*/
 	void Go_Up(_double TimeDelta);

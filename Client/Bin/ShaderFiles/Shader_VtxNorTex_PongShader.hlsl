@@ -128,9 +128,9 @@ PS_OUT PS_MAIN(PS_IN In)
 	
 	vector		vDestDiffuse = 2;
 	if (g_iDiffuseTextureIndex == 2)
-		vDestDiffuse = g_DiffuseTexture[1].Sample(LinearSampler, In.vTexUV * 30.f);
+		vDestDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
 	else
-		vDestDiffuse = g_DiffuseTexture[2].Sample(LinearSampler, In.vTexUV * 30.f);
+		vDestDiffuse = g_DiffuseTexture[0].Sample(LinearSampler, In.vTexUV * 30.f);
 	
 	vector		vFilter = g_FilterTexture.Sample(LinearSampler, In.vTexUV);
 

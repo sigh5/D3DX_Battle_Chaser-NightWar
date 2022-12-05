@@ -102,6 +102,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	//
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TurnStateCanvas"))))
+		return E_FAIL;*/
 	
 
 	RELEASE_INSTANCE(CGameInstance);

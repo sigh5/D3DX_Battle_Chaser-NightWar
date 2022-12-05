@@ -2,6 +2,7 @@
 #include "..\public\Terrain.h"
 #include "GameInstance.h"
 #include "Environment_Object.h"
+#include "ToolManager.h"
 
 CTerrain::CTerrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
@@ -114,22 +115,21 @@ HRESULT CTerrain::Ready_FilterBuffer()
 HRESULT CTerrain::Ready_BufferLock_UnLock()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	
-	_float3 iIndex = _float3(1.f, 1.f, 1.f);
+	CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
 
-	if (ImGui::IsMouseClicked(0))
+	HRESULT hr = 0;
+	_float4 iIndex = _float4(1.f, 1.f, 1.f,1.f);
+
+	if (ImGui::IsMouseDragging(0) && ptoolManager->Get_RadioButtonValue() == 1)
 	{
 		if (m_pVIBufferCom->PickingRetrunIndex(g_hWnd, m_pTransformCom, iIndex))
 		{
-			m_pPixel[ (_uint(iIndex.x)) ] = D3DCOLOR_ARGB(255, 0, 0, 0);
-			m_pPixel[(_uint(iIndex.y)) ] = D3DCOLOR_ARGB(255, 0, 0, 0);
-			m_pPixel[( _uint(iIndex.z)) ] = D3DCOLOR_ARGB(255, 0, 0, 0);
+			temp.insert(_ulong(iIndex.x));
+			temp.insert(_ulong(iIndex.y));
+			temp.insert(_ulong(iIndex.z));
+			temp.insert(_ulong(iIndex.w));
 		}
 
-		Safe_Release(pTexture2D);
-		pTexture2D = nullptr;
-		TextureDesc;
-		
 		ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
 		TextureDesc.Width = 128;		// 2의 배수로 맞춰야됀다.
@@ -148,50 +148,46 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 		if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pTexture2D)))
 			return E_FAIL;
 
-		_ulong*		pPixel = new _ulong[TextureDesc.Width * TextureDesc.Height];
-
-		
-		for (_uint i = 0; i < TextureDesc.Height; ++i)
+		for (auto iter = temp.begin(); iter != temp.end(); ++iter)
 		{
-			for (_uint j = 0; j < TextureDesc.Width; ++j)
-			{
-				_uint iIndex = i*TextureDesc.Height + j;
-				pPixel[iIndex] = m_pPixel[iIndex];
-			}
+			m_pPixel[(*iter)] = D3DCOLOR_ARGB(255, 0, 0, 0);
 		}
-
 
 		D3D11_MAPPED_SUBRESOURCE		SubResource;
 		ZeroMemory(&SubResource, sizeof SubResource);
 
-		// D3D11_MAP_WRITE_NO_OVERWRITE 툴작업할때는 이녀석으로 하는게 좋음
-
 		m_pContext->Map(pTexture2D, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);  //DX_9 Lock ==Map
 
-		memcpy(SubResource.pData, pPixel, sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height);
+		memcpy(SubResource.pData, m_pPixel, (sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height));
 
 		m_pContext->Unmap(pTexture2D, 0);
-
-		if (FAILED(DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures2D/Filter.dds"))))
-			return E_FAIL;
-
-		Safe_Delete_Array(pPixel);
-		Safe_Release(pTexture2D);
 
 
 		Safe_Release(m_pTextureCom[TYPE_FILTER]);
 		Remove_component(TEXT("Com_Filter"));
 
+		hr = DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures2D/Filter.dds"));
 
-		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Test_Filter"), TEXT("Com_Filter"),
-			(CComponent**)&m_pTextureCom[TYPE_FILTER])))
-			return E_FAIL;
+		Safe_Release(pTexture2D);
 
+		pGameInstance->Remove_ProtoComponent(pGameInstance->GetCurLevelIdx(), TEXT("Prototype_Component_Texture_Test_Filter"));
+
+		hr = (pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Test_Filter"),
+			CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter.dds"), CTexture::TYPE_FILTER)));
+
+		hr = __super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Test_Filter"), TEXT("Com_Filter"),
+			(CComponent**)&m_pTextureCom[TYPE_FILTER]);
 	}
 
 
-
+	RELEASE_INSTANCE(CToolManager);
 	RELEASE_INSTANCE(CGameInstance);
+
+	if (FAILED(hr))
+	{
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -329,9 +325,9 @@ HRESULT CTerrain::SetUp_ShaderResources()
 
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture", 0)))
+	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture")))
 		return E_FAIL;
-	if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResource(m_pShaderCom, "g_FilterTexture", 0)))
+	if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResource(m_pShaderCom, "g_FilterTexture")))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vBrushPos", &_float4(15.f, 0.f, 15.f, 1.f), sizeof(_float4))))
 		return E_FAIL;
@@ -368,7 +364,7 @@ void CTerrain::Free()
 	__super::Free();
 
 	Safe_Delete_Array(m_pPixel);
-
+	temp.clear();
 
 
 	for (auto& pName : m_NameVector)

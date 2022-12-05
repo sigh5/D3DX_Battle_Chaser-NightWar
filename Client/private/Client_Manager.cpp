@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "..\public\Client_Manager.h"
 #include "GameInstance.h"
-
+#include "GameObject.h"
 
 _double CClient_Manager::TimeDelta = 0;
+
+
+
 
 void CClient_Manager::Client_Manager_Update()
 {

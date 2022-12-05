@@ -48,8 +48,12 @@ public:
 	virtual void Free() override;
 
 public:
+
+	/*Test*/
 	BaseDelegater<_double, _uint> m_Hero_GullyHPDelegater;
 
+	/*Test*/
+	BaseDelegater<_uint> m_Hero_GullyTestShakingDelegater;
 
 };
 

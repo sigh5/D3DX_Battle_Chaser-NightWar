@@ -76,6 +76,18 @@
     <Filter Include="02.GameObjects\Terrain\Water">
       <UniqueIdentifier>{e108db9c-fbbb-40da-bda9-c0775f6ef98d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="100. ToolManager">
+      <UniqueIdentifier>{5ffc1636-987d-45cf-97ca-98cf0c8f304b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\ClientBaseCanvas">
+      <UniqueIdentifier>{84925460-d2b8-4148-9702-e2c67ef2fcb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateCanvas">
+      <UniqueIdentifier>{ca9c7644-b7d0-47c0-90af-ded52b2a84b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateButton">
+      <UniqueIdentifier>{f349b748-35d5-4dcf-b771-2274c779fe18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -147,9 +159,20 @@
     <ClInclude Include="..\Public\Client_Manager.h">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\ToolManager.h" />
     <ClInclude Include="..\public\WaterTile.h">
       <Filter>02.GameObjects\Terrain\Water</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ToolManager.h">
+      <Filter>100. ToolManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ClientBaseCanvas.h">
+      <Filter>02.GameObjects\UI\ClientBaseCanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TurnStateCanvas.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TurnStateButton.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -210,9 +233,20 @@
     <ClCompile Include="..\Private\Client_Manager.cpp">
       <Filter>99.Defines\Client_Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\ToolManager.cpp" />
     <ClCompile Include="..\private\WaterTile.cpp">
       <Filter>02.GameObjects\Terrain\Water</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ToolManager.cpp">
+      <Filter>100. ToolManager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ClientBaseCanvas.cpp">
+      <Filter>02.GameObjects\UI\ClientBaseCanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TurnStateCanvas.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TurnStateButton.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

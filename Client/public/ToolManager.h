@@ -20,6 +20,11 @@ private:
 	virtual ~CToolManager() = default;
 
 public:
+	int		Get_RadioButtonValue()const { return m_iRadioButton;}
+
+
+
+public:
 	void	Imgui_SelectParentViewer();
 
 private:
@@ -38,6 +43,8 @@ private:
 	void	Imgui_Change_model();
 	void	Imgui_Change_Texture();
 
+	void	Imgui_Crate_FilterMap();
+
 
 private:
 	char						m_szSaveDataname[MAX_PATH] = "";
@@ -47,7 +54,7 @@ private:
 	char						m_szTexturName[MAX_PATH] = "";
 	char						m_szModelName[MAX_PATH] = "";
 
-	int						m_iShaderPass = 0;
+	int							m_iShaderPass = 0;
 
 	vector<_tchar*>				m_vecNameArray;
 	vector<const _tchar*>		m_LayerName;
@@ -58,6 +65,8 @@ private:
 
 	CGameObject*				m_pSelectedObject = nullptr;
 	CGameObject*				m_pSelectTerrain = nullptr;
+	int							m_iRadioButton = 0;
+
 private:
 	void wc2c(const wchar_t* szWchar, char* szChar)
 	{

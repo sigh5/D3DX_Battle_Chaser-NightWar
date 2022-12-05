@@ -2,7 +2,7 @@
 
 #include "Client_Defines.h"
 #include "GameObject.h"
-
+#include <set>
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -54,6 +54,10 @@ private: /* for_ FilterMap*/
 	_ulong*		m_pPixel= nullptr;
 	ID3D11Texture2D*			pTexture2D = nullptr;
 	D3D11_TEXTURE2D_DESC		TextureDesc;
+
+	std::set<_ulong>   temp;
+
+	
 
 private:
 	CShader*				m_pShaderCom = nullptr;

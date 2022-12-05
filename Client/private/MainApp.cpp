@@ -48,7 +48,6 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Start_Level(LEVEL_LOGO)))
 		return E_FAIL;
 
-	//Ready_BufferLock_UnLock();
 
 	srand((unsigned int)time(NULL));
 

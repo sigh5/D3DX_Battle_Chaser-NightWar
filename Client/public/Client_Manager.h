@@ -7,11 +7,13 @@
 */
 BEGIN(Engine)
 class CTransform;
-
+class CGameObject;
 END
 
 
-enum DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
+enum  DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
+
+enum COMPARE_UI_POS {COMPARE_UI_POS_X, COMPARE_UI_POS_Y, COMPARE_UI_POS_END,};
 
 class CClient_Manager  
 {
@@ -28,11 +30,84 @@ public: /* For_UI */
 	void distance_Limit_UP(CTransform* pTransform, _float4& vTransformFunction, DIR eType);
 
 
+	// UI 위치비교
+	template<typename T>
+	static T*	Get_MaxValue_Pointer(vector<T*>& pVec, _float &fMAX , COMPARE_UI_POS eType);
+	template<typename T>
+	static T*	Get_SmallValue_Pointer(vector<T*>& pVec, _float &fSmall, COMPARE_UI_POS eType);
+	// ~UI 위치비교
+
 public:
 	static _double	 TimeDelta;
+
+
+
 
 	// 현재트랜스폼, 목표지점
 
 
 };
+
+template<typename T>
+static T * CClient_Manager::Get_MaxValue_Pointer(vector<T*>& pVec, _float & fMAX, COMPARE_UI_POS eType)
+{
+	_float4 vPos;
+	
+	_float fMax = -1000.f;
+	T* pMaxObject = nullptr;
+
+	for (auto pGameObject : pVec)
+	{
+		Safe_AddRef(pGameObject);
+		XMStoreFloat4(&vPos, pGameObject->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		if (eType == COMPARE_UI_POS_Y &&  vPos.y > fMax)
+		{
+			fMax = vPos.y;
+			pMaxObject = pGameObject;
+		}
+		else if (eType == COMPARE_UI_POS_X && vPos.x > fMax)
+		{
+			// X 위치일떄 
+			bool b = false;
+		}
+		Safe_Release(pGameObject);
+	}
+
+	if (nullptr == pMaxObject)
+		assert("CClient_Manager::Get_MaxValue_Pointer");
+
+	fMAX = fMax;
+	return pMaxObject;
+}
+
+template<typename T>
+inline T * CClient_Manager::Get_SmallValue_Pointer(vector<T*>& pVec, _float & fSmallY, COMPARE_UI_POS eType)
+{
+	_float4 vPos;
+	T* pMaxObject = nullptr;
+	_float fSmall = 1000.f;
+	for (auto pGameObject : pVec)
+	{
+		Safe_AddRef(pGameObject);
+		XMStoreFloat4(&vPos, pGameObject->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		if (eType == COMPARE_UI_POS_Y && vPos.y < fSmall)
+		{
+			fSmall = vPos.y;
+			pMaxObject = pGameObject;
+		}
+		else if(eType == COMPARE_UI_POS_X && vPos.x < fSmall)
+		{
+			// X 위치일떄 
+			bool b = false;
+		}
+		Safe_Release(pGameObject);
+	}
+
+	if (nullptr == pMaxObject)
+		assert("CClient_Manager::Get_MaxValue_Pointer");
+
+	fSmallY = fSmall;
+	return pMaxObject;
+}
+
 

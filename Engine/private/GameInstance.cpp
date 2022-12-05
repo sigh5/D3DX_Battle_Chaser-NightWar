@@ -338,6 +338,16 @@ void CGameInstance::Imgui_ComponentViewer(_uint iLevel, OUT wstring & TextureTag
 	m_pComponent_Manager->Imgui_ComponentViewer(iLevel, TextureTag, eType);
 }
 
+void CGameInstance::Remove_ProtoComponent(_uint iLevel, const wstring & pComponentName)
+{
+	if (nullptr == m_pComponent_Manager)
+		return;
+
+	m_pComponent_Manager->Remove_ProtoComponent(iLevel, pComponentName);
+}
+
+
+
 void CGameInstance::Render_ImGui()
 {
 	if (nullptr == m_pImgui_Manager)

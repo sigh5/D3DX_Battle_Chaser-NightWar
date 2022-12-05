@@ -320,7 +320,7 @@ void CObject_Manager::Imgui_Save()
 		_tchar *ModelName = new _tchar[MAX_PATH];
 		_tchar *ObjectName = new _tchar[MAX_PATH];
 		_uint	iShaderPass = 0;
-	
+		_uint	iTextureIndex = 0; // 일단 UI 한정
 		for (_uint i = 0; i < m_iNumLevels; ++i)
 		{
 			for (auto& Pair : m_pLayers[i])
@@ -362,6 +362,9 @@ void CObject_Manager::Imgui_Save()
 						lstrcpy(TextureName, dynamic_cast<CUI*>(pObject)->Get_TextureTag());
 						lstrcpy(ModelName, TEXT("Nullptr"));
 						iShaderPass = 0;
+						
+						CTexture* pTexture =dynamic_cast<CTexture*>(pObject->Get_Component(TEXT("Com_Texture")));
+						iTextureIndex = pTexture->Get_SelectTextureIndex();
 					}
 
 					WriteFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
@@ -372,6 +375,7 @@ void CObject_Manager::Imgui_Save()
 					WriteFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 					WriteFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 					WriteFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
+					WriteFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
 				}
 			}
 		}
@@ -437,7 +441,8 @@ void CObject_Manager::Imgui_Load()
 			_tchar *ObjectName = new _tchar[MAX_PATH];
 			_tchar *ModelName = new _tchar[MAX_PATH];
 			_uint	iShaderPass = 0;
-			
+			_uint	iTextureIndex = 0; // 일단 UI 한정
+
 			m_vecNameArray.push_back(ModelName);
 			m_vecNameArray.push_back(ObjectName);
 			m_vecNameArray.push_back(LayerTag);
@@ -454,7 +459,7 @@ void CObject_Manager::Imgui_Load()
 			ReadFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 			ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 			ReadFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
-			
+			ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
 			if (0 == dwByte)
 				break;
 
@@ -495,6 +500,9 @@ void CObject_Manager::Imgui_Load()
 				(pGameObject)->Set_ProtoName(ProtoName);
 				(pGameObject)->Set_ObjectName(ObjectName);
 				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+
+				CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
+				pTexture->Set_SelectTextureIndex(iTextureIndex);
 
 				if (lstrcmp(ParentName, TEXT("Nullptr")))
 					pGameObject->Set_parentName(ParentName);

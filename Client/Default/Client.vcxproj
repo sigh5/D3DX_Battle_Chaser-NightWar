@@ -171,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
+    <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\Hero_Alumon.h" />
@@ -187,6 +188,8 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
+    <ClInclude Include="..\Public\TurnStateButton.h" />
+    <ClInclude Include="..\Public\TurnStateCanvas.h" />
     <ClInclude Include="..\Public\TurnUICanvas.h" />
     <ClInclude Include="..\public\WaterTile.h" />
     <ClInclude Include="Client.h" />
@@ -197,6 +200,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
+    <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\Hero_Alumon.cpp" />
     <ClCompile Include="..\Private\Hero_Gully.cpp" />
@@ -212,6 +216,8 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />
+    <ClCompile Include="..\Private\TurnStateButton.cpp" />
+    <ClCompile Include="..\Private\TurnStateCanvas.cpp" />
     <ClCompile Include="..\Private\TurnUICanvas.cpp" />
     <ClCompile Include="..\private\WaterTile.cpp" />
     <ClCompile Include="Client.cpp" />

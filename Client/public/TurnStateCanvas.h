@@ -10,17 +10,13 @@ class CTexture;
 END
 
 BEGIN(Client)
-class CTurnUICanvas final : public CCanvas
-{
-public:
-	enum  TURN_UI_TYPE { TURN_UI_TOP, TURN_UI_BOTTOM, TURN_UI_END };
-	enum  TURN_UI_OPTION {OPTION_HERO1, OPTION_HERO2, OPTION_HERO3, 
-					OPTION_EMEMY1,OPTION_EMEMY2, OPTION_EMEMY3, TURN_UI_OPTION_END, };
 
+class CTurnStateCanvas final: public CCanvas
+{
 private:
-	CTurnUICanvas(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
-	CTurnUICanvas(const CTurnUICanvas& rhs);
-	virtual ~CTurnUICanvas() = default;
+	CTurnStateCanvas(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
+	CTurnStateCanvas(const CTurnStateCanvas& rhs);
+	virtual ~CTurnStateCanvas() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -30,13 +26,6 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 
-
-public:
-	void	ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed); // Obsever
-	void	ChildrenShakingCheck(_uint CoolTime);
-	void	DeleteCharUI(const wstring& pNametag);		// Obsever
-	void	Move_Children(); /*logic*/
-
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -45,18 +34,16 @@ private:
 
 private:
 	HRESULT SetUp_Components();
-	HRESULT SetUp_ShaderResources();	
+	HRESULT SetUp_ShaderResources();
 	HRESULT SetUp_ChildrenPosition();
-	HRESULT SetUp_MatchingOption();
-
 
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
 
 public:
-	static CTurnUICanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
-	virtual CGameObject* Clone(void* pArg = nullptr) ;
+	static CTurnStateCanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
+	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 
 

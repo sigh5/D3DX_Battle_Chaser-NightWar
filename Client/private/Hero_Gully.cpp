@@ -50,7 +50,13 @@ void CHero_Gully::Tick(_double TimeDelta)
 	{
 		_uint iMoveSpeed = 100;
 		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
-	
+		
+	}
+
+	if (pInstance->Key_Down(DIK_O))
+	{
+		_uint iShakingTime = 3;
+		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
 	}
 
 

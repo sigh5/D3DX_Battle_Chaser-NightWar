@@ -56,7 +56,6 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 		return S_OK;
 	
 
-
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -118,7 +117,7 @@ void CTurnCharcterUI::Change_Texture(_uint iLevel, const wstring & NewComPonentT
 }
 
 
-void CTurnCharcterUI::IsMove()
+void CTurnCharcterUI::RightMove()
 {
 	XMStoreFloat4(&m_vLimitPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
@@ -135,7 +134,7 @@ void CTurnCharcterUI::Top_Move()
 	
 	if (vPos.x <= m_vLimitPos.x)
 	{
-		vPos.y = 50.f;
+		vPos.y = m_fBottomY;
 		m_vLimitPos.x = 0.f;
 		m_bMove = false;
 		m_bIsBottom = true;
@@ -165,6 +164,28 @@ void CTurnCharcterUI::Normal_Move()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 }
 
+void CTurnCharcterUI::Shake_Move()
+{
+	_float4		vPos;
+
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	m_Timer += _float(CClient_Manager::TimeDelta * 1.f);
+
+	if (m_Timer >= m_fCoolTime)
+	{
+		m_Timer = 0.f;
+		m_bMove = false;
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
+	}
+	
+	vPos.y += _float((m_iSwitching)*  400.f * CClient_Manager::TimeDelta);
+	
+	m_iSwitching *= -1;
+
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+}
+
 void CTurnCharcterUI::Bottom_Move()
 {
 	if(m_bIsBottom)
@@ -188,17 +209,27 @@ void CTurnCharcterUI::MoveControl(_uint iOption)
 
 	XMStoreFloat4(&m_vLimitPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	
-	if (iOption == 0) // TOP
+	if (iOption == UI_POS_TOP) // TOP
 	{
 		m_vLimitPos.x -= 100;
 		m_Movefun = std::bind(&CTurnCharcterUI::Top_Move, this);
 	}
-	else if (iOption == 1) // Normal
+	else if (iOption == UI_POS_NORMAL) // Normal
 	{
 		m_vLimitPos.y += 50;
 		m_Movefun = std::bind(&CTurnCharcterUI::Normal_Move, this);
 	}
-	
+
+
+
+}
+
+void CTurnCharcterUI::ShakingControl(_uint iOption)
+{
+	m_fCoolTime = (_float)iOption;
+	m_bMove = true;
+	XMStoreFloat4(&m_vOriginPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	m_Movefun = std::bind(&CTurnCharcterUI::Shake_Move, this);
 }
 
 bool CTurnCharcterUI::isUITop(OUT CUI *& pUI)
@@ -220,7 +251,7 @@ _bool CTurnCharcterUI::isUIBottom(OUT CUI *& pUI)
 	_float4		vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
-	if (vPos.y <= 50.f  && vPos.x <= -50.f)
+	if (vPos.y <= -250.f)
 	{
 		pUI = this;
 		return true;
@@ -279,7 +310,7 @@ HRESULT CTurnCharcterUI::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture",m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

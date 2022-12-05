@@ -33,7 +33,7 @@ public:
 
 public: /*for_Imgui*/
 	void		Imgui_ComponentViewer(_uint iLevel, OUT wstring& TextureTag, COMPONENT_TYPE eType);
-
+	void		Remove_ProtoComponent(_uint iLevel, const wstring& pComponentName);
 
 
 private:
