@@ -9,19 +9,19 @@ CChannel::CChannel()
 /* 특정애니메이션ㄴ에서 사용되는 뼈. */
 HRESULT CChannel::Initialize(aiNodeAnim * pAIChannel, CModel* pModel)
 {
-	strcpy_s(m_szChannelName, pAIChannel->mNodeName.data);
+	strcpy_s(m_szName, pAIChannel->mNodeName.data);
 
-	m_pBone = pModel->Get_BonePtr(m_szChannelName);
+	m_pBone = pModel->Get_BonePtr(m_szName);
 	Safe_AddRef(m_pBone);
 
-	m_iNumKeyFrame = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
-	m_iNumKeyFrame = max(m_iNumKeyFrame, pAIChannel->mNumPositionKeys);
+	m_iNumKeyframes = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
+	m_iNumKeyframes = max(m_iNumKeyframes, pAIChannel->mNumPositionKeys);
 
 	XMFLOAT3		vScale;
 	XMFLOAT4		vRotation;
 	XMFLOAT3		vPosition;
 
-	for (_uint i = 0; i < m_iNumKeyFrame; ++i)
+	for (_uint i = 0; i < m_iNumKeyframes; ++i)
 	{
 		KEYFRAME			KeyFrame;
 		ZeroMemory(&KeyFrame, sizeof(KEYFRAME));
@@ -76,7 +76,7 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 	}
 	else
 	{
-		if (PlayTime >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
+		while (PlayTime >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
 		{
 			++m_iCurrentKeyFrameIndex;
 		}
@@ -96,9 +96,9 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 		vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
 		vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
 
-		vScale = XMVectorLerp(vSourScale, vDestScale, (_float)Ratio);
-		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)Ratio);
-		vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)Ratio);
+		vScale = XMVectorLerp(vSourScale, vDestScale, Ratio);
+		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, Ratio);
+		vPosition = XMVectorLerp(vSourPosition, vDestPosition, Ratio);
 		vPosition = XMVectorSetW(vPosition, 1.f);
 	}
 

@@ -3,12 +3,12 @@
 #include "GameInstance.h"
 
 CHero_Alumon::CHero_Alumon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CPlayer(pDevice,pContext)
+	:CGameObject(pDevice,pContext)
 {
 }
 
 CHero_Alumon::CHero_Alumon(const CHero_Alumon& rhs)
-	:CPlayer(rhs)
+	: CGameObject(rhs)
 {
 }
 
@@ -24,12 +24,21 @@ HRESULT CHero_Alumon::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Hero_Alumon");
 
-	if (FAILED(__super::Initialize(pArg)))
+
+	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
+	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
+
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
+	GameObjectDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
+
+	m_pModelCom->Set_AnimIndex(3);
 
 	return S_OK;
 }
@@ -43,8 +52,34 @@ void CHero_Alumon::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
+	if (GetKeyState(VK_DOWN) & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(TimeDelta);
+	}
+
+	if (GetKeyState(VK_LEFT) & 0x8000)
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * -1.f);
+	}
+
+	if (GetKeyState(VK_RIGHT) & 0x8000)
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta);
+	}
+
+	if (GetKeyState(VK_UP) & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(4);
+	}
+	else
+		m_pModelCom->Set_AnimIndex(3);
+
+
+
 	m_pModelCom->Play_Animation(TimeDelta);
 }
+
 
 void CHero_Alumon::Late_Tick(_double TimeDelta)
 {
@@ -63,7 +98,7 @@ HRESULT CHero_Alumon::Render()
 		return E_FAIL;
 
 
-	_uint iNumMeshes = m_pModelCom->Get_MeshNum();
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
@@ -78,9 +113,9 @@ HRESULT CHero_Alumon::Render()
 
 _bool CHero_Alumon::Piciking_GameObject()
 {
-	if (m_pModelCom->PicikingModel(g_hWnd, m_pTransformCom))
+	/*if (m_pModelCom->PicikingModel(g_hWnd, m_pTransformCom))
 		return true;
-
+*/
 	return false;
 }
 

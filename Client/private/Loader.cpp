@@ -179,10 +179,23 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* MapObject */
+
+	_matrix			PivotMatrix = XMMatrixIdentity();
+	PivotMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Metal_Panel"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_Metal_Panel/Dn_JT_Floor_Metal_Panel.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_Metal_Panel/Dn_JT_Floor_Metal_Panel.fbx", PivotMatrix))))
 		return E_FAIL;
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor_8m"),
+
+	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	PivotMatrix = XMMatrixIdentity();
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
+		return E_FAIL;
+
+
+
+
+	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor_8m"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_8m/Dn_JT_Floor_8m.fbx"))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor1"),
@@ -208,16 +221,16 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Tree_Pine_D"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_D/Dn_DW_Tree_Pine_D.fbx"))))
-		return E_FAIL;
+		return E_FAIL;*/
 	/* ~MapObject */
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_large_Hallow_Water"),
+	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_large_Hallow_Water"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/vfx_water_large_shallow/untitled.fbx"))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_large_WaterFall"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/WaterFall/untitled.fbx"))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_water_large_shallow"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/vfx_water_large_shallow/untitled.fbx"))))
@@ -225,9 +238,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 */
 
 	/* TEST*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Test"),
+	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Test"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Test/Test.fbx"))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNormalTex"),
@@ -258,6 +271,12 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 		CHero_Gully::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* For.Prototype_GameObject_Hero_Gully */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+		CHero_Alumon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	/* For.Prototype_GameObject_BaseCanvas */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BaseCanvas"),
 		CClientBaseCanvas::Create(m_pDevice, m_pContext))))

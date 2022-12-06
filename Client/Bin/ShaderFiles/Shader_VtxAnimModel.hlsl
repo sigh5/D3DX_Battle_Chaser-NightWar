@@ -2,7 +2,7 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 /* 1. 모델의 전체의 뼈를 받아온다. */
 /* 2. 모델 중, 현재 그릴려고 하는 메시에 뼈를 받아온다. */
-matrix			g_BoneMatrices[256];
+matrix			g_BoneMatrices[128];
 
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
@@ -88,6 +88,9 @@ PS_OUT PS_MAIN(PS_IN In)
 	PS_OUT			Out = (PS_OUT)0;
 
 	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+
+	if (0.1f > Out.vColor.a)
+		discard;
 
 	return Out;
 }

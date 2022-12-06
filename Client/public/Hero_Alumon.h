@@ -11,7 +11,7 @@ END
 
 BEGIN(Client)
 
-class CHero_Alumon final : public CPlayer
+class CHero_Alumon final : public CGameObject
 {
 private:
 	CHero_Alumon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

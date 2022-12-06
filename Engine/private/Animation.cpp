@@ -2,12 +2,13 @@
 #include "Channel.h"
 
 CAnimation::CAnimation()
+	: m_isLooping(true)
 {
 }
 
 HRESULT CAnimation::Initialize(aiAnimation * pAIAnimation, CModel* pModel)
 {
-	strcpy_s(m_szAnimName, pAIAnimation->mName.data);
+	strcpy_s(m_szName, pAIAnimation->mName.data);
 
 	m_Duration = pAIAnimation->mDuration;
 
@@ -32,12 +33,30 @@ HRESULT CAnimation::Initialize(aiAnimation * pAIAnimation, CModel* pModel)
 
 void CAnimation::Update_Bones(_double TimeDelta)
 {
+	if (true == m_isFinished &&
+		false == m_isLooping)
+	{
+		return;
+	}
+
 	m_PlayTime += m_TickPerSecond * TimeDelta;
+
+	if (m_PlayTime >= m_Duration)
+	{
+		m_PlayTime = 0.0;
+		m_isFinished = true;
+	}
 
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
+		if (true == m_isFinished)
+			m_Channels[i]->Reset_KeyFrameIndex();
+
 		m_Channels[i]->Update_TransformMatrix(m_PlayTime);
 	}
+
+	if (true == m_isFinished)
+		m_isFinished = false;
 
 }
 

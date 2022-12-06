@@ -14,7 +14,7 @@ namespace Engine
 
 	typedef struct tagModelMaterial
 	{
-		class CTexture*		pTexture[18]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
+		class CTexture*		pTexture[AI_TEXTURE_TYPE_MAX]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
 	}MODELMATERIAL;
 
 	typedef struct tagLightDesc
@@ -36,13 +36,12 @@ namespace Engine
 	}LIGHTDESC;
 
 
-	typedef struct tagKeyFrame
+	typedef struct tagKeyframe
 	{
-		double		Time;		// 시간
+		double		Time;
 		XMFLOAT3	vScale;
 		XMFLOAT4	vRotation;
 		XMFLOAT3	vPosition;
-
 	}KEYFRAME;
 
 
@@ -111,9 +110,10 @@ namespace Engine
 		XMFLOAT3		vNormal;
 		XMFLOAT2		vTexUV;
 		XMFLOAT3		vTangent;
-		XMUINT4			vBlendIndex; // 이 정점이 사용해야하는 뼈의 인덱스(전체뼈중의 순서(x) 이정점이 소속된 메시에 영향을 주는 뼈중의 순서(0))
+		XMUINT4			vBlendIndex; /* 이 정점이 사용해야하는 뼈의 인덱스(전체뼈 중의 순서(x), 이 정점이 소속된 메시에 영향을 주는 뼈중의 순서(o))  */
 		XMFLOAT4		vBlendWeight;
 	}VTXANIMMODEL;
+
 
 	typedef struct ENGINE_DLL tagVertexAnimModel_Declaration
 	{
