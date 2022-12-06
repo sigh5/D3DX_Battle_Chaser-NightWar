@@ -191,48 +191,40 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 	return S_OK;
 }
 
-
-
 void CTerrain::Create_Object()
 {
 	if (!m_bCreateObject)
 		return;
 
-	_float4 Temp;
-	if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, Temp))
+	_float4 vPos;
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Mouse_Down(CInput_Device::DIM_LB))
 	{
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-		if (pGameInstance->Mouse_Down(CInput_Device::MOUSEKEYSTATE::DIM_LB))
+		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, vPos))
 		{
 			CGameObject* pGameObject = nullptr;
 			CEnvironment_Object::ENVIRONMENTDESC Desc;
 			ZeroMemory(&Desc, sizeof(CEnvironment_Object::ENVIRONMENTDESC));
 
-			_tchar *Text = new _tchar[MAX_PATH];
-			m_NameVector.push_back(Text);
-			lstrcpy(Text, m_ObjData.szTextureName.c_str());
-			Desc.m_pModelTag = Text;
+			Desc.m_pModelTag = m_ObjData.szModelName;
 
-			pGameInstance->Clone_GameObject_UseImgui(LEVEL_GAMEPLAY, m_ObjData.szLayerName,m_ObjData.szProtoName, &pGameObject,&Desc);
+			pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), m_ObjData.szLayerName,m_ObjData.szProtoName, &pGameObject,&Desc);
 			if (pGameObject == nullptr)
 				MSG_BOX(" CTerrain::Piciking_GameObject");
 
-			wstring sour = to_wstring(m_iObjNameNumber++);
-			_tchar *NewName = new _tchar[MAX_PATH];
-			lstrcpy(NewName, (m_ObjData.szTextureName + sour).c_str());
-			m_NameVector.push_back(NewName);
-
-			pGameObject->Set_ObjectName(NewName);
-			pGameObject->Set_ProtoName(m_ObjData.szProtoName.c_str());
-			pGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&Temp));
-
+			_tchar	szIndex[MAX_PATH] = L"";
+			_itow_s(m_iObjNameNumber++, szIndex, 10);
+			lstrcat(m_ObjData.szObjectName, szIndex);
+			
+			pGameObject->Set_ObjectName(m_ObjData.szObjectName);
+			pGameObject->Set_ProtoName(m_ObjData.szProtoName);
+			pGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+			
+		
 		}
-
-		RELEASE_INSTANCE(CGameInstance);
 	}
 
-
+	RELEASE_INSTANCE(CGameInstance);
 
 	
 }
@@ -243,9 +235,12 @@ void CTerrain::Set_MapObject(Create_OBJECTDESC& pArg)
 	m_bCreateObject = true;
 	
 	m_ObjData.szLayerName = pArg.szLayerName;
-	m_ObjData.szObjectName = pArg.szObjectName;
 	m_ObjData.szProtoName = pArg.szProtoName;
 	m_ObjData.szTextureName = pArg.szTextureName;
+	m_ObjData.szModelName = pArg.szModelName;
+	m_ObjData.szObjectName = pArg.szObjectName;
+	m_ObjData.iShaderPass = pArg.iShaderPass;
+	
 	
 }
 

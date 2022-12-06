@@ -13,7 +13,7 @@ CInput_Device::CInput_Device()
 
 _bool CInput_Device::Mouse_Down(MOUSEKEYSTATE MouseButton)
 {
-	if (!m_bMouseState[MouseButton] && (m_MouseState.rgbButtons[MouseButton] & 0x80))
+	if (!m_bMouseState[MouseButton] && m_MouseState.rgbButtons[MouseButton] & 0x80)
 	{
 		m_bMouseState[MouseButton] = true;
 		return true;
@@ -60,16 +60,23 @@ _bool CInput_Device::Key_Up(_ubyte byKeyID)
 	return false;
 }
 
+_bool CInput_Device::Key_Pressing(_ubyte byKeyID)
+{
+	if (Get_DIKeyState(byKeyID) & 0x80)
+		return true;
+
+	return false;
+}
+
 void CInput_Device::Reset_EveryKey()
 {
 	/* Reset MouseState */
-	for (int i = 0; i < DIM_END; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
 		if (m_bMouseState[i] && !(m_MouseState.rgbButtons[i] & 0x80))
+		{
 			m_bMouseState[i] = false;
-
-		else if (!m_bMouseState[i] && (m_MouseState.rgbButtons[i] & 0x80))
-			m_bMouseState[i] = true;
+		}
 	}
 
 	/* Reset KeyState */
@@ -81,6 +88,9 @@ void CInput_Device::Reset_EveryKey()
 		else if (!m_bKeyState[i] && (Get_DIKeyState(i) & 0x80))
 			m_bKeyState[i] = true;
 	}
+
+
+
 }
 
 HRESULT CInput_Device::Ready_Input_Device(HINSTANCE hInst, HWND hWnd)

@@ -34,6 +34,8 @@ private:
 	void	Imgui_CreateObject();
 	void	Imgui_Create_UI();
 	void	Imgui_Create_Object();
+	void	Imgui_Show_Parent();
+
 
 	void	Imgui_Select_LayerType();
 	void	Imgui_Select_ProtoType();
@@ -66,6 +68,8 @@ private:
 	CGameObject*				m_pSelectedObject = nullptr;
 	CGameObject*				m_pSelectTerrain = nullptr;
 	int							m_iRadioButton = 0;
+
+	int							m_iTerrainPickingRadioButton = 0;
 
 private:
 	void wc2c(const wchar_t* szWchar, char* szChar)

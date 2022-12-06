@@ -88,6 +88,9 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateButton">
       <UniqueIdentifier>{f349b748-35d5-4dcf-b771-2274c779fe18}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Camera\StaticCamera">
+      <UniqueIdentifier>{b5b36561-8ed8-498d-a3c7-978b8da9f8a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -174,6 +177,9 @@
     <ClInclude Include="..\Public\TurnStateButton.h">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Camera_Static.h">
+      <Filter>02.GameObjects\Camera\StaticCamera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -247,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\TurnStateButton.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Static.cpp">
+      <Filter>02.GameObjects\Camera\StaticCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

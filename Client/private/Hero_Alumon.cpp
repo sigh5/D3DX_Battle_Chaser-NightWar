@@ -3,12 +3,12 @@
 #include "GameInstance.h"
 
 CHero_Alumon::CHero_Alumon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CGameObject(pDevice,pContext)
+	:CPlayer(pDevice,pContext)
 {
 }
 
 CHero_Alumon::CHero_Alumon(const CHero_Alumon& rhs)
-	: CGameObject(rhs)
+	: CPlayer(rhs)
 {
 }
 
@@ -38,7 +38,7 @@ HRESULT CHero_Alumon::Initialize(void * pArg)
 		return E_FAIL;
 
 
-	m_pModelCom->Set_AnimIndex(3);
+	m_pModelCom->Set_AnimIndex(0);
 
 	return S_OK;
 }
@@ -52,32 +52,63 @@ void CHero_Alumon::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	if (GetKeyState(VK_DOWN) & 0x8000)
-	{
-		m_pTransformCom->Go_Backward(TimeDelta);
-	}
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (GetKeyState(VK_LEFT) & 0x8000)
-	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * -1.f);
-	}
+	_float4 vTargetPos;
+	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	
+	ImGui::InputInt("Anim", &AnimIndex);
 
-	if (GetKeyState(VK_RIGHT) & 0x8000)
+	if (pGameInstance->Key_Pressing(DIK_DOWN))
 	{
-		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta);
-	}
+		vTargetPos.z -= 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+			vTargetPos.x += 1.f;
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+			vTargetPos.x -= 1.f;
 
-	if (GetKeyState(VK_UP) & 0x8000)
-	{
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
 		m_pTransformCom->Go_Straight(TimeDelta);
-		m_pModelCom->Set_AnimIndex(4);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+
+	else if (pGameInstance->Key_Pressing(DIK_UP))
+	{
+		vTargetPos.z += 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+			vTargetPos.x += 1.f;
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+			vTargetPos.x -= 1.f;
+	
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
+	{
+		vTargetPos.x += 1.f;
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+	else if (pGameInstance->Key_Pressing(DIK_LEFT))
+	{
+		vTargetPos.x -= 1.f;
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
 	}
 	else
-		m_pModelCom->Set_AnimIndex(3);
+		m_pModelCom->Set_AnimIndex(AnimIndex);
 
+	
 
 
 	m_pModelCom->Play_Animation(TimeDelta);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 
@@ -132,7 +163,7 @@ HRESULT CHero_Alumon::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"), TEXT("Com_Model"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
@@ -154,7 +185,6 @@ HRESULT CHero_Alumon::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-
 
 	/* For.Lights */
 	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);

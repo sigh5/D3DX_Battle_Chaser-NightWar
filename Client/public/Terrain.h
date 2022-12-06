@@ -14,11 +14,11 @@ BEGIN(Client)
 
 typedef struct tag_Create_object
 {
-	wstring szLayerName = TEXT("");
-	wstring szProtoName = TEXT("");
-	wstring szTextureName = TEXT("");
-	wstring szObjectName = TEXT("");
-	wstring szModelName = TEXT("");
+	_tchar* szLayerName = TEXT("");
+	_tchar* szProtoName = TEXT("");
+	_tchar* szTextureName = TEXT("");
+	_tchar* szObjectName = TEXT("");
+	_tchar* szModelName = TEXT("");
 	_uint	iShaderPass = 0;
 
 }Create_OBJECTDESC;
@@ -44,7 +44,7 @@ public:	/*For_Imgui*/
 	void			Set_MapObject(Create_OBJECTDESC& pArg);
 	virtual _bool	Piciking_GameObject()override;
 	void			Create_Object();
-	
+	void			Set_CreateObject(_bool bCreateObject) {m_bCreateObject = bCreateObject;}
 
 
 private: /* for_ FilterMap*/

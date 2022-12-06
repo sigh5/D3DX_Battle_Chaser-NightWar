@@ -11,7 +11,7 @@ END
 
 BEGIN(Client)
 
-class CHero_Alumon final : public CGameObject
+class CHero_Alumon final : public CPlayer	
 {
 private:
 	CHero_Alumon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -33,7 +33,7 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
-
+	int AnimIndex = 0;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

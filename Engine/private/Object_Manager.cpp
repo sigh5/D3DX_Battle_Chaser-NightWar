@@ -346,6 +346,8 @@ void CObject_Manager::Imgui_Save()
 					{
 						lstrcpy(ParentName, TEXT("Nullptr"));
 						lstrcpy(TextureName, dynamic_cast<CEnvironment_Object*>(pObject)->Get_TextureTag());
+						if (!lstrcmp(TextureName, TEXT("")))
+							lstrcpy(TextureName , TEXT("Nullptr"));
 						lstrcpy(ModelName, dynamic_cast<CEnvironment_Object*>(pObject)->Get_ModelTag());
 						iShaderPass = dynamic_cast<CEnvironment_Object*>(pObject)->Get_ShaderPass();
 					}

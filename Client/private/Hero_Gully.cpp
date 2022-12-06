@@ -2,7 +2,6 @@
 #include "..\public\Hero_Gully.h"
 
 #include "GameInstance.h"
-#include "Terrain.h"
 
 CHero_Gully::CHero_Gully(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
@@ -26,11 +25,19 @@ HRESULT CHero_Gully::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Hero_Gully");
 
-	if (FAILED(__super::Initialize(pArg)))
+	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
+	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
+
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
+	GameObjectDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
+
+	m_pModelCom[DUNGEON_PLAYER]->Set_AnimIndex(0);
 
 	return S_OK;
 }
@@ -83,8 +90,7 @@ HRESULT CHero_Gully::Render()
 		return E_FAIL;
 
 	m_pShaderCom->Begin(0);
-	m_pVIBufferCom->Render();
-
+	
 	return S_OK;
 }
 
@@ -103,15 +109,8 @@ HRESULT CHero_Gully::SetUp_Components()
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_VIBuffer */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"), TEXT("Com_VIBuffer"),
-		(CComponent**)&m_pVIBufferCom)))
-		return E_FAIL;
 
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Cubedds"), TEXT("Com_Texture"),
-		(CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -131,9 +130,7 @@ HRESULT CHero_Gully::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
-		return E_FAIL;
-
+	
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -170,6 +167,5 @@ void CHero_Gully::Free()
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pVIBufferCom);
+
 }

@@ -15,15 +15,13 @@
 #include "TurnUICanvas.h"
 #include "TurnStateCanvas.h"
 
-
 #include "TurnCharcterUI.h"
 #include "TurnStateButton.h"
 #include "HpBar.h"
 
-
 #include "NoneAnim_BG.h"
 
-
+#include "Camera_Static.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -185,43 +183,34 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Metal_Panel"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_Metal_Panel/Dn_JT_Floor_Metal_Panel.fbx", PivotMatrix))))
 		return E_FAIL;
-
-	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	PivotMatrix = XMMatrixIdentity();
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Fiona"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/Meshes/Fiona/Fiona.fbx", PivotMatrix))))
-		return E_FAIL;
-
-
-
-
-	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor_8m"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_8m/Dn_JT_Floor_8m.fbx"))))
+	PivotMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor_8m"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_JT_Floor_8m/Dn_JT_Floor_8m.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor1"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor1/Floor1.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor1/Floor1.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor2"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor2/Floor2.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor2/Floor2.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Floor3"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor3/Floor3.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Floor3/Floor3.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Straw_Thin"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_CV_Floor_Straw_Thin/Dn_CV_Floor_Straw_Thin.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Floor/Dn_CV_Floor_Straw_Thin/Dn_CV_Floor_Straw_Thin.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Tree_Pine_A"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_A/Dn_DW_Tree_Pine_A.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_A/Dn_DW_Tree_Pine_A.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Tree_Pine_B"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_B/Dn_DW_Tree_Pine_B.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_B/Dn_DW_Tree_Pine_B.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Tree_Pine_C"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_C/Dn_DW_Tree_Pine_C.fbx"))))
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_C/Dn_DW_Tree_Pine_C.fbx", PivotMatrix))))
 		return E_FAIL;
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Tree_Pine_D"),
-		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_D/Dn_DW_Tree_Pine_D.fbx"))))
-		return E_FAIL;*/
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/BackGround/Tree/Dn_DW_Tree_Pine_D/Dn_DW_Tree_Pine_D.fbx", PivotMatrix))))
+		return E_FAIL;
 	/* ~MapObject */
 
 	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_large_Hallow_Water"),
@@ -241,6 +230,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 	/*if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Test"),
 		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_NONANIM, "../Bin/Resources/FBX/Test/Test.fbx"))))
 		return E_FAIL;*/
+
+
+	/* Anim */
+	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully_Skin_01/Dungeon_Hero_Gully_Skin_01.fbx", PivotMatrix))))
+	//	return E_FAIL;
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNormalTex"),
@@ -267,15 +265,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Gully::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	//	CHero_Gully::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
-	/* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
-		CHero_Alumon::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
+	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 	/* For.Prototype_GameObject_BaseCanvas */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BaseCanvas"),
@@ -305,6 +303,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WaterTile"),
 		CWaterTile::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCamera_Static"),
+		CCamera_Static::Create(m_pDevice, m_pContext))))
+		return E_FAIL;*/
 
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));

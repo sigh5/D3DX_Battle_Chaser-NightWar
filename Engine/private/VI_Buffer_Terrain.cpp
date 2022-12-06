@@ -297,7 +297,6 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 	ViewPort.Width = 1280;
 	ViewPort.Height = 720;
 
-
 	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
 	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
 	vPoint.z = 1.f;
@@ -330,25 +329,24 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 	{
 		for (_ulong j = 0; j < m_iNumVerticesX - 1; ++j)
 		{
-			_ulong dwIndex = i * (m_iNumVerticesX)+j;
+			_ulong dwIndex = i * (m_iNumVerticesX) + j;
 
 			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
-			dwVtxIdx[1] = dwIndex + (m_iNumVerticesX)+1;
+			dwVtxIdx[1] = dwIndex + (m_iNumVerticesX) + 1;
 			dwVtxIdx[2] = dwIndex + 1;
-
-			_float4 Normal;
-			XMStoreFloat4(&Normal, XMLoadFloat4(&m_pVtx[dwIndex + (m_iNumVerticesX)+1]) + (XMLoadFloat4(&m_pVtx[dwIndex]) / 2));
-
 
 			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
 				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
-				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]) ,
 				fDist))
 			{
-				XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
-				vPosition = Normal;
+			
+				vPosition.x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x)/3.f;
+				vPosition.y = 0.f;
+				vPosition.z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
+				vPosition.w = 1.f;
 				return  true;
 			}
 
@@ -365,14 +363,14 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
 				fDist))
 			{
-
-				XMVector3TransformCoord(XMLoadFloat4(&Normal), matWorld);
-				vPosition = Normal;
+				vPosition.x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x) / 3.f;
+				vPosition.y = 0.f;
+				vPosition.z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
+				vPosition.w = 1.f;
 				return  true;
 			}
 		}
 	}
-
 
 
 

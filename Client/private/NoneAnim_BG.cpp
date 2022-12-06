@@ -29,7 +29,7 @@ HRESULT CNoneAnim_BG::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaled(_float3(1.f, 1.f, 1.f));
+	//m_pTransformCom->Set_Scaled(_float3(1.f, 1.f, 1.f));
 	return S_OK;
 }
 

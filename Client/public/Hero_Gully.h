@@ -6,9 +6,7 @@
 BEGIN(Engine)
 class CShader;
 class CRenderer;
-class CVIBuffer_Rect;
-class CTexture;
-class CVIBuffer_Cube;
+class CModel;
 END
 
 BEGIN(Client)
@@ -34,13 +32,12 @@ public: /* Imgui */
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
-	CVIBuffer_Cube*			m_pVIBufferCom = nullptr;
-	CTexture*				m_pTextureCom = nullptr;
+	CModel*					m_pModelCom[MAPTYPE_END] = { nullptr, };
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-
+	int AnimIndex = 0;
 
 public:
 	static CHero_Gully* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -33,7 +33,9 @@ public:
 	_bool		Mouse_DoubleClick(MOUSEKEYSTATE MouseButton);
 	_bool		Key_Down(_ubyte byKeyID);
 	_bool		Key_Up(_ubyte byKeyID);
+	_bool		Key_Pressing(_ubyte byKeyID);
 	void		Reset_EveryKey();
+
 public:
 	HRESULT	Ready_Input_Device(HINSTANCE hInst, HWND hWnd);
 	void		Invalidate_Input_Device(void);

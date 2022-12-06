@@ -112,6 +112,7 @@ void CToolManager::Imgui_Select_ParentTerrain()
 					if (ImGui::Selectable(szobjectTag))
 					{
 						m_pSelectTerrain = obj;
+						m_iTerrainPickingRadioButton = 1;
 					}
 				}
 				ImGui::EndListBox();
@@ -137,7 +138,7 @@ void CToolManager::Imgui_CreateObject()
 		ImGui::InputText("ObjectName ", m_szObjectName, MAX_PATH);
 
 		ImGui::InputInt("ShaderPassIndex ", &m_iShaderPass);
-
+		Imgui_Show_Parent();
 		Imgui_Create_UI();
 		Imgui_Create_Object();
 
@@ -212,6 +213,7 @@ void CToolManager::Imgui_Create_Object()
 			Temp.szObjectName = szObjectName;
 			Temp.iShaderPass = m_iShaderPass;
 			dynamic_cast<CTerrain*>(m_pSelectTerrain)->Set_MapObject(Temp);
+			
 		}	
 		else
 		{
@@ -238,6 +240,20 @@ void CToolManager::Imgui_Create_Object()
 
 	}
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CToolManager::Imgui_Show_Parent()
+{
+	ImGui::RadioButton("No_USE_TerrainPickingCreate", &m_iTerrainPickingRadioButton, 0);
+	ImGui::RadioButton("USE_TerrainPickingCreate", &m_iTerrainPickingRadioButton, 1);
+
+	if (0 == m_iTerrainPickingRadioButton)
+	{
+		if (m_pSelectTerrain == nullptr)
+			return;
+		dynamic_cast<CTerrain*>(m_pSelectTerrain)->Set_CreateObject(false);
+		m_pSelectTerrain = nullptr;
+	}
 }
 
 void CToolManager::Imgui_Select_LayerType()

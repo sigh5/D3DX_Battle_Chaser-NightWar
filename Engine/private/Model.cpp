@@ -111,7 +111,7 @@ HRESULT CModel::Initialize(void * pArg)
 
 void CModel::Play_Animation(_double TimeDelta)
 {
-	if (TYPE_NONANIM == m_eType)
+ 	if (TYPE_NONANIM == m_eType)
 		return;
 
 	/* 현재 애니메이션에 맞는 뼈들의 TranformMAtrix를 갱신하낟. */

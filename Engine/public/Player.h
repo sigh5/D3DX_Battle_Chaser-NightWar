@@ -7,6 +7,9 @@ BEGIN(Engine)
 class ENGINE_DLL CPlayer abstract: public CGameObject
 {
 public:
+	enum MAPTYPE { DUNGEON_PLAYER, COMBAT_PLAYER,  MAPTYPE_END };
+
+public:
 	typedef struct tag_PlayerDesc :GAMEOBJECTDESC
 	{
 
