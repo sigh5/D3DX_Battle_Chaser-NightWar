@@ -13,6 +13,8 @@ CTexture::CTexture(const CTexture & rhs)
 	, m_iNumTextures(rhs.m_iNumTextures)
 	, m_szName(rhs.m_szName)
 {
+	lstrcpy(m_szTexturePath, rhs.m_szTexturePath);
+
 	for (_uint i = 0; i < m_iNumTextures; ++i)
 		Safe_AddRef(m_pTextures[i]);
 
@@ -23,6 +25,7 @@ HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_
 	m_pTextures = new ID3D11ShaderResourceView*[iNumTextures];
 
 	m_iNumTextures = iNumTextures;
+	lstrcpy(m_szTexturePath, pTextureFilePath.c_str());
 
 	for (_uint i = 0; i < m_iNumTextures; ++i)
 	{
@@ -64,6 +67,7 @@ HRESULT CTexture::Initialize_Prototype(const wstring& pTextureFilePath, TEXTURE_
 
 HRESULT CTexture::Initialize(void * pArg)
 {
+
 	return S_OK;
 }
 
@@ -82,6 +86,14 @@ HRESULT CTexture::Bind_ShaderResource(CShader * pShaderCom, const char * pConsta
 		return E_FAIL;
 
 	return pShaderCom->Set_ShaderResourceView(pConstantName, m_pTextures[iTextureIndex]);
+}
+
+void CTexture::Save_Model_Texture(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+
+	WriteFile(hFile, m_szTexturePath, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+
 }
 
 void CTexture::Imgui_RenderProperty()

@@ -123,10 +123,13 @@ HRESULT CNoneAnim_BG::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Model */ //TEXT("Prototype_Component_ScrollingCloud")
+	CModel::MODELDESC Desc;
+	Desc.szProtoName = m_EnviromentDesc.m_pModelTag;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,m_EnviromentDesc.m_pModelTag , TEXT("Com_Model"),
-		(CComponent**)&m_pModelCom)))
+		(CComponent**)&m_pModelCom,&Desc)))
 		return E_FAIL;
-	/* For.Com_Model */
+
+	/* For.Com_Buffer */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"), TEXT("Com_Buffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;

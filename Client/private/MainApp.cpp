@@ -52,6 +52,9 @@ HRESULT CMainApp::Initialize()
 	srand((unsigned int)time(NULL));
 
 
+	m_pToolManager->InitToolManager(m_pDevice, m_pContext);
+
+
 	return S_OK;
 }
 

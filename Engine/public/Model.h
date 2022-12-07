@@ -8,6 +8,13 @@ class ENGINE_DLL CModel final : public CComponent
 {
 public:
 	enum TYPE { TYPE_NONANIM, TYPE_ANIM, TYPE_END };
+
+	typedef struct tag_ModelDesc
+	{
+		_tchar* szProtoName = TEXT("");
+	}MODELDESC;
+
+
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CModel(const CModel& rhs);
@@ -51,13 +58,28 @@ public:
 	_uint								m_iNumAnimations = 0;
 	vector<class CAnimation*>			m_Animations;
 
+
+	MODELDESC							m_ModelDesc;
+
 	_float4x4							m_PivotMatrix;
+	char								m_szModelPath[MAX_PATH] = "";
 
 public:
 	HRESULT Ready_Bones(aiNode* pNode, class CBone* pParent);
 	HRESULT Ready_MeshContainers();
 	HRESULT Ready_Materials(const char* pModelFilePath);
 	HRESULT Ready_Animation();
+
+
+public:
+	void	Save_Model(HANDLE hFile);
+	void	Load_Modle(HANDLE hFile);
+private:
+	void	Save_Bones(HANDLE hFile);
+	void	Save_MeshContainers(HANDLE hFile);
+	void	Save_Materials(HANDLE hFile);
+	void	Save_Animation(HANDLE hFile);
+
 
 public:
 	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eType, const char* pModelFilePath, _fmatrix PivotMatrix);

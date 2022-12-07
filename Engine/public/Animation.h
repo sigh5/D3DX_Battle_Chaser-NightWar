@@ -14,6 +14,9 @@ public:
 	HRESULT Initialize(aiAnimation* pAIAnimation, class CModel* pModel);
 	void Update_Bones(_double TimeDelta);
 
+public:
+	void Save_AnimationData(HANDLE hFile);
+
 private:
 	char								m_szName[MAX_PATH];
 	/* 애니메이션을 재생하는데 거리른ㄴ 전체 시간. */

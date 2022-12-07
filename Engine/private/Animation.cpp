@@ -60,6 +60,23 @@ void CAnimation::Update_Bones(_double TimeDelta)
 
 }
 
+void CAnimation::Save_AnimationData(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+
+	WriteFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
+	WriteFile(hFile,&m_Duration,sizeof(_double), &dwByte, nullptr);
+	WriteFile(hFile, &m_TickPerSecond, sizeof(_double), &dwByte, nullptr);
+	WriteFile(hFile, &m_isFinished, sizeof(_bool), &dwByte, nullptr);
+	WriteFile(hFile, &m_isLooping, sizeof(_bool), &dwByte, nullptr);
+	WriteFile(hFile, &m_iNumChannels, sizeof(_uint), &dwByte, nullptr);
+
+	for (auto &pChannel : m_Channels)
+	{
+		pChannel->Save_ChannelData(hFile);
+	}
+}
+
 CAnimation * CAnimation::Create(aiAnimation * pAIAnimation, CModel* pModel)
 {
 	CAnimation*		pInstance = new CAnimation();

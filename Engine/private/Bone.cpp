@@ -35,6 +35,24 @@ void CBone::Compute_CombindTransformationMatrix()
 
 }
 
+void CBone::Save_BoneData(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+	
+	WriteFile(hFile, &m_szName, MAX_PATH, &dwByte, nullptr);
+	WriteFile(hFile, &m_OffsetMatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+	WriteFile(hFile, &m_TransformMatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+	WriteFile(hFile, &m_CombindTransformMatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+	
+	if(m_pParent != nullptr)
+		WriteFile(hFile, m_pParent->m_szName, MAX_PATH, &dwByte, nullptr);
+	else
+	{
+		char  szNullParentName[MAX_PATH] = "nullptr";
+		WriteFile(hFile, szNullParentName, MAX_PATH, &dwByte, nullptr);
+	}
+}
+
 CBone * CBone::Create(aiNode * pAINode, CBone* pParent)
 {
 	CBone*		pInstance = new CBone();

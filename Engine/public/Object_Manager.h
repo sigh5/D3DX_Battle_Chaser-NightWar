@@ -61,6 +61,8 @@ public: /* imgui */
 	void		Set_SelectedGameObject(class CGameObject* pGameObject){m_pSelectObject =  pGameObject;}
 	class CGameObject* Get_SelectObject() { return m_pSelectObject; }
 
+	void	SaveLoad_ModelData(_uint iLevel);
+	
 
 private:
 	//void	Imgui_Select_LayerType();
@@ -87,6 +89,9 @@ private:
 	char						m_szProtoName[MAX_PATH] = "";
 	char						m_szLayerName[MAX_PATH] = "";
 	char						m_szObjectName[MAX_PATH] = "";
+
+	char						m_szDataModel[MAX_PATH] = "";
+
 
 	vector<_tchar*>				m_vecNameArray;
 	

@@ -17,6 +17,10 @@ public:
 		m_iCurrentKeyFrameIndex = 0;
 	}
 
+
+public:
+	void Save_ChannelData(HANDLE hFile);
+
 private:
 	char			m_szName[MAX_PATH] = "";
 	class CBone*	m_pBone = nullptr;

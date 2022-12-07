@@ -145,6 +145,24 @@
     <Filter Include="01.Utility\03.Components\08.Model\Animation\Channel">
       <UniqueIdentifier>{76af4c22-788b-49e2-be05-0cf16e57068d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load">
+      <UniqueIdentifier>{c2cc1fcb-36f0-4f92-aea0-f8fd638fe3fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load\LoadModel">
+      <UniqueIdentifier>{4eaa07f2-dbde-46da-83e9-17876d176d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load\LoadBone">
+      <UniqueIdentifier>{cd3f4899-8676-46ee-b13e-045308348c0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load\LoadMesh">
+      <UniqueIdentifier>{63f8cc0c-7eb2-4f4b-ba06-1722755f2d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load\LoadAnimation">
+      <UniqueIdentifier>{59c69780-902e-48cc-b899-dc6ffa8165a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Load\LoadAnimation\LoadChannel">
+      <UniqueIdentifier>{cefea550-aa74-4eca-ad21-13868aa87e03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -336,6 +354,21 @@
     <ClInclude Include="..\Public\Channel.h">
       <Filter>01.Utility\03.Components\08.Model\Animation\Channel</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LoadModel.h">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadBone.h">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadBone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoadMesh.h">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadAnimation.h">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadAnimation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoadChannel.h">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadAnimation\LoadChannel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -499,6 +532,21 @@
     </ClCompile>
     <ClCompile Include="..\private\Channel.cpp">
       <Filter>01.Utility\03.Components\08.Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadModel.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadBone.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadBone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadMesh.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadAnimation.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadAnimation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LoadChannel.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Load\LoadAnimation\LoadChannel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

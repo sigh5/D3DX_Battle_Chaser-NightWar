@@ -9,6 +9,8 @@
 #include "Camera.h"
 #include "Environment_Object.h"
 
+#include "Model.h"
+
 IMPLEMENT_SINGLETON(CObject_Manager)
 
 CObject_Manager::CObject_Manager()
@@ -518,6 +520,60 @@ void CObject_Manager::Imgui_Load()
 
 	}
 }
+
+void CObject_Manager::SaveLoad_ModelData(_uint iLevel)
+{
+	ImGui::InputText("ModelFile_Name :", m_szSaveDataname, MAX_PATH);
+
+	if (ImGui::Button("ModelSave"))
+	{
+		_tchar* szName = new _tchar[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
+		m_vecNameArray.push_back(szName);
+		_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+
+		HANDLE      hFile = CreateFile(szName,
+			GENERIC_WRITE,
+			NULL,
+			NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			return;
+		}
+
+		for (_uint i = 0; i < m_iNumLevels; ++i)
+		{
+			for (auto& Pair : m_pLayers[i])
+			{
+				for (auto& pObj : Pair.second->GetGameObjects())
+				{
+					CModel* pModel = dynamic_cast<CModel*>(pObj->Get_Component(TEXT("Com_Model")));
+					if (pModel != nullptr)
+					{
+						pModel->Save_Model(hFile);
+					}
+				}
+			}
+		}
+		CloseHandle(hFile);
+		MSG_BOX("Save Complate");
+		return;
+	}
+
+
+
+
+}
+
+
 
 void CObject_Manager::Imgui_ProtoViewer(const _tchar*& szSelectedProto)
 {

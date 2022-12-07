@@ -107,6 +107,35 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 	m_pBone->Set_TransformMatrix(TransformMatrix);
 }
 
+void CChannel::Save_ChannelData(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+
+	WriteFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
+	
+	char	pBoneName[MAX_PATH] = "";
+	strcpy_s(pBoneName, MAX_PATH, m_pBone->Get_Name());
+
+	WriteFile(hFile, pBoneName, MAX_PATH, &dwByte, nullptr);
+	WriteFile(hFile, &m_iNumKeyframes, sizeof(_uint), &dwByte, nullptr);
+	
+	for (auto &keyFrame : m_KeyFrames)
+	{
+		_double Time = keyFrame.Time;
+		XMFLOAT3 vScale = keyFrame.vScale;
+		XMFLOAT4 vRotation = keyFrame.vRotation;
+		XMFLOAT3 vPosition = keyFrame.vPosition;
+
+		WriteFile(hFile, &Time, sizeof(_double), &dwByte, nullptr);
+		WriteFile(hFile, &vScale, sizeof(XMFLOAT3), &dwByte, nullptr);
+		WriteFile(hFile, &vRotation, sizeof(XMFLOAT4), &dwByte, nullptr);
+		WriteFile(hFile, &vPosition, sizeof(XMFLOAT3), &dwByte, nullptr);
+	}
+
+
+	WriteFile(hFile, &m_iCurrentKeyFrameIndex, sizeof(_uint), &dwByte, nullptr);
+}
+
 CChannel * CChannel::Create(aiNodeAnim * pAIChannel, CModel* pModel)
 {
 	CChannel*		pInstance = new CChannel();

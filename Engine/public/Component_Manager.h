@@ -8,6 +8,7 @@
 #include "Texture.h"
 #include "VIBuffer_Cube.h"
 #include "Model.h"
+#include "LoadModel.h"
 /* 다양한 컴포넌트(원형)들을 담고 있는다. -> 사본컴포넌트들은 사용해야할 객체들이 보유한다. */
 /* 사본을 생성하여 리턴한다. */
 BEGIN(Engine)
@@ -34,11 +35,11 @@ public:
 public: /*for_Imgui*/
 	void		Imgui_ComponentViewer(_uint iLevel, OUT wstring& TextureTag, COMPONENT_TYPE eType);
 	void		Remove_ProtoComponent(_uint iLevel, const wstring& pComponentName);
-
-
 private:
 	void		Imgui_TextureViewer(_uint iLevel,OUT wstring& TextureTag);
 	void		Imgui_ModelViewer(_uint iLevel, OUT wstring& Model_NoAnimTag);
+
+	wstring		Get_ComponentName() {}
 
 
 private:
@@ -47,6 +48,7 @@ private:
 	/* 레벨별로 원형 컴포넌트(텍스쳐, 메시모델 etc )들을 보관하겠다. */
 	map<const wstring, class CComponent*>*			m_pPrototypes = nullptr;
 	typedef map<const wstring, class CComponent*>	PROTOTYPES;
+
 
 private:
 	CComponent* Find_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag);

@@ -27,6 +27,7 @@ public:
 	// 현재 사용중인 imgui object를 모두 삭제한다.
 	void Clear_ImguiObjects();
 
+
 private:
 	void RenderTab();
 	void RenderWindow();

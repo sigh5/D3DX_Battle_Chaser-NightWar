@@ -13,6 +13,8 @@ CMesh::CMesh(const CMesh & rhs)
 	, m_eType(rhs.m_eType)
 	, m_iMaterialIndex(rhs.m_iMaterialIndex)
 	, m_iNumBones(rhs.m_iNumBones)
+	, m_pVertices(rhs.m_pVertices)
+	, m_pAnimVertices(rhs.m_pAnimVertices)
 {
 
 }
@@ -22,7 +24,7 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eType, aiMesh * pAIMesh, CModel
 	m_pAIMesh = pAIMesh;
 
 	m_eType = eType;
-
+	// 여기 다시저장해야함
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
@@ -66,14 +68,22 @@ HRESULT CMesh::Initialize_Prototype(CModel::TYPE eType, aiMesh * pAIMesh, CModel
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 
-	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
+	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive]; 
 	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
+	/* 여기서 추가해야함 저장*/
+	m_pIndices	   = new FACEINDICES32[m_iNumPrimitive];
+	ZeroMemory(m_pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
 
 	for (_uint i = 0; i < m_iNumPrimitive; ++i)
 	{
 		pIndices[i]._0 = pAIMesh->mFaces[i].mIndices[0];
 		pIndices[i]._1 = pAIMesh->mFaces[i].mIndices[1];
 		pIndices[i]._2 = pAIMesh->mFaces[i].mIndices[2];
+
+		m_pIndices[i]._0 = pIndices[i]._0;
+		m_pIndices[i]._1 = pIndices[i]._1;
+		m_pIndices[i]._2 = pIndices[i]._2;
+
 	}
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
@@ -153,6 +163,57 @@ void CMesh::SetUp_BoneMatrices(_float4x4 * pBoneMatrices, _fmatrix PivotMatrix)
 	}
 }
 
+void CMesh::Save_MeshData(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+
+	_int	iType = _int(m_eType);
+	WriteFile(hFile, &iType, sizeof(_int), &dwByte, nullptr);
+	WriteFile(hFile, &m_iMaterialIndex, sizeof(_uint), &dwByte, nullptr);
+	WriteFile(hFile, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);
+	WriteFile(hFile, &m_iNumVertices, sizeof(_uint), &dwByte, nullptr);
+
+	if (CModel::TYPE_NONANIM == m_eType)
+	{
+		for (_uint i = 0; i < m_iNumVertices; ++i)
+		{
+			WriteFile(hFile, &m_pVertices[i].vPosition, sizeof(XMFLOAT3), &dwByte, nullptr);
+			WriteFile(hFile, &m_pVertices[i].vNormal, sizeof(XMFLOAT3), &dwByte, nullptr);
+			WriteFile(hFile, &m_pVertices[i].vTexUV, sizeof(XMFLOAT2), &dwByte, nullptr);
+			WriteFile(hFile, &m_pVertices[i].vTangent, sizeof(XMFLOAT3), &dwByte, nullptr);
+		}
+	}
+	else
+	{
+		for (_uint i = 0; i < m_iNumVertices; ++i)
+		{
+			WriteFile(hFile, &m_pAnimVertices[i].vPosition, sizeof(XMFLOAT3), &dwByte, nullptr);
+			WriteFile(hFile, &m_pAnimVertices[i].vNormal, sizeof(XMFLOAT3), &dwByte, nullptr);
+			WriteFile(hFile, &m_pAnimVertices[i].vTexUV, sizeof(XMFLOAT2), &dwByte, nullptr);
+			WriteFile(hFile, &m_pAnimVertices[i].vTangent, sizeof(XMFLOAT3), &dwByte, nullptr);
+			WriteFile(hFile, &m_pAnimVertices[i].vBlendIndex, sizeof(XMUINT4), &dwByte, nullptr);
+			WriteFile(hFile, &m_pAnimVertices[i].vBlendWeight, sizeof(XMFLOAT4), &dwByte, nullptr);
+		}
+	}
+	
+	WriteFile(hFile, &m_iNumPrimitive, sizeof(_uint), &dwByte, nullptr);
+
+	for (_uint i = 0; i < m_iNumPrimitive; ++i)
+	{
+		WriteFile(hFile, &m_pIndices[i]._0, sizeof(unsigned long), &dwByte, nullptr);
+		WriteFile(hFile, &m_pIndices[i]._1, sizeof(unsigned long), &dwByte, nullptr);
+		WriteFile(hFile, &m_pIndices[i]._2, sizeof(unsigned long), &dwByte, nullptr);
+	}
+	
+	
+	for (auto &pBone : m_Bones)
+	{
+		char szName[MAX_PATH] = "";
+		strcpy_s(szName, MAX_PATH,pBone->Get_Name());
+		WriteFile(hFile, szName, MAX_PATH, &dwByte, nullptr);
+	}
+}
+
 HRESULT CMesh::Ready_VertexBuffer_NonAnimModel(aiMesh * pAIMesh, CModel* pModel)
 {
 	m_iStride = sizeof(VTXMODEL);
@@ -168,18 +229,27 @@ HRESULT CMesh::Ready_VertexBuffer_NonAnimModel(aiMesh * pAIMesh, CModel* pModel)
 	VTXMODEL*			pVertices = new VTXMODEL[m_iNumVertices];
 	ZeroMemory(pVertices, sizeof(VTXMODEL) * m_iNumVertices);
 
+	m_pVertices = new VTXMODEL[m_iNumVertices];
+	ZeroMemory(m_pVertices, sizeof(VTXMODEL) * m_iNumVertices); //저장을 위해서
+
 	_matrix			PivotMatrix = pModel->Get_PivotMatrix();
 
 	for (_uint i = 0; i < m_iNumVertices; ++i)
 	{
 		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
 		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PivotMatrix));
+		memcpy(&m_pVertices[i].vPosition, &pVertices[i].vPosition, sizeof(_float3)); // for_save
 
 		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PivotMatrix));
-
+		memcpy(&m_pVertices[i].vNormal, &pVertices[i].vNormal, sizeof(_float3)); // for_save
+		
 		memcpy(&pVertices[i].vTexUV, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+		memcpy(&m_pVertices[i].vTexUV, &pVertices[i].vTexUV, sizeof(_float2)); // for_save
+		
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+		memcpy(&m_pVertices[i].vTangent, &pVertices[i].vTangent, sizeof(_float3)); // for_save
+
 	}
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
@@ -206,7 +276,10 @@ HRESULT CMesh::Ready_VertexBuffer_AnimModel(aiMesh * pAIMesh, CModel* pModel)
 	m_BufferDesc.MiscFlags = 0;
 
 	VTXANIMMODEL*			pVertices = new VTXANIMMODEL[m_iNumVertices];
+	m_pAnimVertices = new VTXANIMMODEL[m_iNumVertices];	// for_Save
+	
 	ZeroMemory(pVertices, sizeof(VTXANIMMODEL) * m_iNumVertices);
+	ZeroMemory(m_pAnimVertices, sizeof(VTXANIMMODEL) * m_iNumVertices);	// for_Save
 
 	for (_uint i = 0; i < m_iNumVertices; ++i)
 	{
@@ -214,6 +287,12 @@ HRESULT CMesh::Ready_VertexBuffer_AnimModel(aiMesh * pAIMesh, CModel* pModel)
 		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexUV, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+
+		memcpy(&m_pAnimVertices[i].vPosition, &pVertices[i].vPosition, sizeof(_float3));
+		memcpy(&m_pAnimVertices[i].vNormal, &pVertices[i].vNormal, sizeof(_float3));
+		memcpy(&m_pAnimVertices[i].vTexUV, &pVertices[i].vTexUV, sizeof(_float2));
+		memcpy(&m_pAnimVertices[i].vTangent, &pVertices[i].vTangent, sizeof(_float3));
+
 	}
 
 	/* 메시에 영향ㅇ르 준다.ㅏ */
@@ -234,22 +313,34 @@ HRESULT CMesh::Ready_VertexBuffer_AnimModel(aiMesh * pAIMesh, CModel* pModel)
 			{
 				pVertices[iVertexIndex].vBlendIndex.x = i;
 				pVertices[iVertexIndex].vBlendWeight.x = pAIBone->mWeights[j].mWeight;
+
+				m_pAnimVertices[iVertexIndex].vBlendIndex.x = i;
+				m_pAnimVertices[iVertexIndex].vBlendWeight.x = pAIBone->mWeights[j].mWeight;
 			}
 
 			else if (0.0f == pVertices[iVertexIndex].vBlendWeight.y)
 			{
 				pVertices[iVertexIndex].vBlendIndex.y = i;
 				pVertices[iVertexIndex].vBlendWeight.y = pAIBone->mWeights[j].mWeight;
+
+				m_pAnimVertices[iVertexIndex].vBlendIndex.y = i;
+				m_pAnimVertices[iVertexIndex].vBlendWeight.y = pAIBone->mWeights[j].mWeight;
 			}
 
 			else if (0.0f == pVertices[iVertexIndex].vBlendWeight.z)
 			{
 				pVertices[iVertexIndex].vBlendIndex.z = i;
 				pVertices[iVertexIndex].vBlendWeight.z = pAIBone->mWeights[j].mWeight;
+
+				pVertices[iVertexIndex].vBlendIndex.z = i;
+				pVertices[iVertexIndex].vBlendWeight.z = pAIBone->mWeights[j].mWeight;
 			}
 
 			else if (0.0f == pVertices[iVertexIndex].vBlendWeight.w)
 			{
+				pVertices[iVertexIndex].vBlendIndex.w = i;
+				pVertices[iVertexIndex].vBlendWeight.w = pAIBone->mWeights[j].mWeight;
+
 				pVertices[iVertexIndex].vBlendIndex.w = i;
 				pVertices[iVertexIndex].vBlendWeight.w = pAIBone->mWeights[j].mWeight;
 			}
@@ -301,6 +392,14 @@ void CMesh::Free()
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);
+
+	if (!m_bClone)
+	{
+		Safe_Delete_Array(m_pIndices);
+		Safe_Delete_Array(m_pVertices);
+		Safe_Delete_Array(m_pAnimVertices);
+	}
+
 
 	m_Bones.clear();
 }

@@ -83,7 +83,7 @@ protected:
 protected:
 	const					_tchar*					m_ObjectName = TEXT("");
 	const					_tchar*					m_ProtoName = TEXT("");
-
+	
 	_bool											m_bLast_Initlize = false;
 
 public:	

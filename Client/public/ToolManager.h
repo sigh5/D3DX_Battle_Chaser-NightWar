@@ -20,6 +20,9 @@ private:
 	virtual ~CToolManager() = default;
 
 public:
+	void	InitToolManager(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContextOut);
+
+public:
 	int		Get_RadioButtonValue()const { return m_iRadioButton;}
 
 
@@ -48,6 +51,7 @@ private:
 	void	Imgui_Crate_FilterMap();
 	void	Imgui_Camera_Type();
 
+	void	Imgui_Model_Save_Load();
 
 private:
 	char						m_szSaveDataname[MAX_PATH] = "";
@@ -57,6 +61,7 @@ private:
 	char						m_szTexturName[MAX_PATH] = "";
 	char						m_szModelName[MAX_PATH] = "";
 
+	char						m_szModelDataName[MAX_PATH] = "";
 	int							m_iShaderPass = 0;
 
 	vector<_tchar*>				m_vecNameArray;
@@ -72,6 +77,15 @@ private:
 
 	int							m_iTerrainPickingRadioButton = 0;
 	int							m_iCameraRadioButton = 0;
+
+
+
+private:
+	ID3D11Device*			m_pDevice = nullptr;
+	ID3D11DeviceContext*	m_pDeviceContext = nullptr;
+
+
+
 private:
 	void wc2c(const wchar_t* szWchar, char* szChar)
 	{

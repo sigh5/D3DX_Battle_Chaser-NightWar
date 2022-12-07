@@ -7,6 +7,7 @@ BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CModel;
+class CLoadModel;
 END
 
 BEGIN(Client)
@@ -39,7 +40,8 @@ private:
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
-	CModel*					m_pModelCom =  nullptr;
+	//CModel*					m_pModelCom = nullptr;
+	CLoadModel*				m_pModelCom =  nullptr;
 
 private:
 	HRESULT SetUp_Components();

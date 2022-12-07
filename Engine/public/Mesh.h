@@ -29,6 +29,10 @@ public:
 	void SetUp_MeshBones(class CModel* pModel);
 	void SetUp_BoneMatrices(_float4x4* pBoneMatrices, _fmatrix PivotMatrix);
 
+public:
+	void	Save_MeshData(HANDLE hFile);
+
+
 private:
 	aiMesh*				m_pAIMesh = nullptr;
 	CModel::TYPE		m_eType;
@@ -38,7 +42,10 @@ private:
 	/* 이 메시의 정점들에게 영향을 주는 뼈의 갯수. */
 	_uint					m_iNumBones = 0;
 	vector<class CBone*>	m_Bones;
-
+	
+	VTXMODEL*				m_pVertices		= nullptr;
+	VTXANIMMODEL*			m_pAnimVertices = nullptr;
+	FACEINDICES32*			m_pIndices = nullptr;
 private:
 	HRESULT Ready_VertexBuffer_NonAnimModel(aiMesh* pAIMesh, class CModel* pModel);
 	HRESULT Ready_VertexBuffer_AnimModel(aiMesh* pAIMesh, class CModel* pModel);

@@ -35,6 +35,10 @@ public:
 	HRESULT Initialize(aiNode* pAINode, CBone* pParent);
 	void Compute_CombindTransformationMatrix();
 
+public:
+	void				Save_BoneData(HANDLE hFile);
+
+
 private:
 	char				m_szName[MAX_PATH];
 	_float4x4			m_OffsetMatrix;

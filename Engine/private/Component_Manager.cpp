@@ -74,6 +74,8 @@ void CComponent_Manager::Remove_ProtoComponent(_uint iLevel, const wstring & pCo
 
 }
 
+
+
 void CComponent_Manager::Imgui_TextureViewer(_uint iLevel  ,OUT wstring& TextureTag)
 {
 	const PROTOTYPES& ProtoType = m_pPrototypes[iLevel];
@@ -114,23 +116,22 @@ void CComponent_Manager::Imgui_ModelViewer(_uint iLevel, OUT wstring & Model_NoA
 	{
 		for (auto& Pair : ProtoType)
 		{
-			if (dynamic_cast<CModel*>(Pair.second) == nullptr)
-				continue;
-
-			if (ImGui::BeginListBox("##"))
-			{
-				char szobjectTag[MAX_PATH];
-
-				if (Pair.second != nullptr)
-					CGameUtils::wc2c(Pair.first.c_str(), szobjectTag);
-
-				if (ImGui::Selectable(szobjectTag))
+			if (dynamic_cast<CModel*>(Pair.second) != nullptr || dynamic_cast<CLoadModel*>(Pair.second) != nullptr)
+			{ 
+				if (ImGui::BeginListBox("##"))
 				{
-					Model_NoAnimTag = Pair.first;
+					char szobjectTag[MAX_PATH];
+
+					if (Pair.second != nullptr)
+						CGameUtils::wc2c(Pair.first.c_str(), szobjectTag);
+
+					if (ImGui::Selectable(szobjectTag))
+					{
+						Model_NoAnimTag = Pair.first;
+					}
+					ImGui::EndListBox();
 				}
-				ImGui::EndListBox();
 			}
-			
 		}
 		ImGui::TreePop();
 	}

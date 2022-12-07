@@ -21,7 +21,11 @@ CModel::CModel(const CModel & rhs)
 	, m_iNumAnimations(rhs.m_iNumAnimations)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
+
+	
 {
+	strcpy_s(m_szModelPath,MAX_PATH, rhs.m_szModelPath);
+
 	for (auto& Material : m_Materials)
 	{
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
@@ -30,6 +34,7 @@ CModel::CModel(const CModel & rhs)
 
 	for (auto& pMesh : rhs.m_Meshes)
 		m_Meshes.push_back((CMesh*)pMesh->Clone());
+
 }
 
 CBone * CModel::Get_BonePtr(const char * pBoneName)
@@ -51,6 +56,7 @@ CBone * CModel::Get_BonePtr(const char * pBoneName)
 HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix)
 {
 	_uint			iFlag = 0;
+	strcpy_s(m_szModelPath, MAX_PATH, pModelFilePath);
 
 	if (TYPE_NONANIM == eType)
 		iFlag = aiProcess_PreTransformVertices | aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
@@ -76,12 +82,16 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath, _f
 		return E_FAIL;
 
 
-
 	return S_OK;
 }
 
 HRESULT CModel::Initialize(void * pArg)
 {
+	ZeroMemory(&m_ModelDesc, sizeof(m_ModelDesc));
+
+	if (nullptr != pArg)
+		memcpy(&m_ModelDesc, pArg,sizeof(m_ModelDesc));
+
 	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, nullptr)))
 		return E_FAIL;
 
@@ -155,6 +165,95 @@ HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , 
 
 
 	return S_OK;
+}
+
+void CModel::Save_Model(HANDLE hFile)
+{
+
+	Save_Bones(hFile);
+	Save_MeshContainers(hFile);
+	Save_Materials(hFile);
+	Save_Animation(hFile);
+}
+
+void CModel::Load_Modle(HANDLE hFile)
+{
+}
+
+void CModel::Save_Bones(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+	WriteFile(hFile, m_ModelDesc.szProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+	WriteFile(hFile, m_szModelPath, MAX_PATH, &dwByte, nullptr);
+	WriteFile(hFile, &m_PivotMatrix, sizeof(_float4x4), &dwByte, nullptr);
+	_uint	iType = _uint(m_eType);
+	WriteFile(hFile, &iType, sizeof(_uint), &dwByte, nullptr);
+
+	_uint	iBoneNum = m_Bones.size();
+	WriteFile(hFile, &iBoneNum, sizeof(_uint), &dwByte, nullptr);
+
+	for (auto &pBone : m_Bones)
+	{
+		pBone->Save_BoneData(hFile);
+		
+	}
+
+	
+}
+
+void CModel::Save_MeshContainers(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+	WriteFile(hFile, &m_iNumMeshes, sizeof(_uint), &dwByte, nullptr);
+
+	for (auto &pMesh : m_Meshes)
+	{
+		pMesh->Save_MeshData(hFile);
+	}
+
+}
+
+void CModel::Save_Materials(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+	WriteFile(hFile, &m_iNumMaterials, sizeof(_uint), &dwByte, nullptr);
+	
+
+	for (_uint i = 0; i < m_iNumMaterials; ++i)
+	{
+		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; ++j)
+		{
+			//값이 없으면 AI_TEXTURE_TYPE_MAX 저장하고 끝,
+			//값이 있다면 인덱스와 문자열, 길이 저장(Texture 생성하기 위해)
+			if (m_Materials[i].pTexture[j] == nullptr)
+			{
+				_uint tmp = AI_TEXTURE_TYPE_MAX;
+				WriteFile(hFile, &tmp, sizeof(_uint), &dwByte, nullptr);
+			}
+			else
+			{
+				WriteFile(hFile, &j, sizeof(_uint), &dwByte, nullptr);
+
+				//문자열 길이와 문자열 저장
+				m_Materials[i].pTexture[j]->Save_Model_Texture(hFile);
+			}
+		}
+	}
+}
+
+	
+
+
+void CModel::Save_Animation(HANDLE hFile)
+{
+	DWORD   dwByte = 0;
+	WriteFile(hFile, &m_iNumAnimations, sizeof(_uint), &dwByte, nullptr);
+
+	for (auto &pAnimation : m_Animations)
+	{
+		pAnimation->Save_AnimationData(hFile);
+	}
+
 }
 
 HRESULT CModel::Ready_Bones(aiNode * pAINode, CBone* pParent)
@@ -236,9 +335,8 @@ HRESULT CModel::Ready_Materials(const char* pModelFilePath)
 			_tchar			szFullPath[MAX_PATH] = TEXT("");
 
 			MultiByteToWideChar(CP_ACP, 0, szTexturePath, size_t(strlen(szTexturePath)), szFullPath, MAX_PATH);
-
 			ModelMaterial.pTexture[j] = CTexture::Create(m_pDevice, m_pContext, szFullPath);
-
+			
 			if (nullptr == ModelMaterial.pTexture[j])
 				return E_FAIL;
 		}

@@ -213,6 +213,11 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Level_Manager.h" />
     <ClInclude Include="..\Public\Light.h" />
     <ClInclude Include="..\Public\Light_Manager.h" />
+    <ClInclude Include="..\public\LoadAnimation.h" />
+    <ClInclude Include="..\public\LoadBone.h" />
+    <ClInclude Include="..\Public\LoadChannel.h" />
+    <ClInclude Include="..\Public\LoadMesh.h" />
+    <ClInclude Include="..\Public\LoadModel.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\Model.h" />
     <ClInclude Include="..\public\Object_Manager.h" />
@@ -255,6 +260,11 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Level_Manager.cpp" />
     <ClCompile Include="..\Private\Light.cpp" />
     <ClCompile Include="..\Private\Light_Manager.cpp" />
+    <ClCompile Include="..\Private\LoadAnimation.cpp" />
+    <ClCompile Include="..\Private\LoadBone.cpp" />
+    <ClCompile Include="..\Private\LoadChannel.cpp" />
+    <ClCompile Include="..\Private\LoadMesh.cpp" />
+    <ClCompile Include="..\Private\LoadModel.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\Object_Manager.cpp" />

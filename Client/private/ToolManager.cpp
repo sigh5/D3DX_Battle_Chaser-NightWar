@@ -11,6 +11,9 @@
 
 #include "Camera_Static.h"
 #include "Camera_Dynamic.h"
+#include "LoadModel.h"
+
+#include "Hero_Gully.h"
 
 IMPLEMENT_SINGLETON(CToolManager)
 
@@ -21,6 +24,15 @@ CToolManager::CToolManager()
 	m_LayerName.push_back(LAYER_PLAYER);
 	m_LayerName.push_back(LAYER_Monster);
 	m_LayerName.push_back(LAYER_UI);
+}
+
+void CToolManager::InitToolManager(ID3D11Device * pDevice, ID3D11DeviceContext * pDeviceContextOut)
+{
+	m_pDevice = pDevice;
+	m_pDeviceContext = pDeviceContextOut;
+	Safe_AddRef(m_pDevice);
+	Safe_AddRef(m_pDeviceContext);
+
 }
 
 void CToolManager::Imgui_SelectParentViewer()
@@ -44,6 +56,8 @@ void CToolManager::Imgui_SelectParentViewer()
 	Imgui_Change_model();
 	Imgui_Change_Texture();
 	Imgui_Camera_Type();
+
+	Imgui_Model_Save_Load();
 	ImGui::End();
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -407,11 +421,130 @@ void CToolManager::Imgui_Camera_Type()
 
 }
 
+void CToolManager::Imgui_Model_Save_Load()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	ImGui::InputText("ModelFile_Name :", m_szModelDataName, MAX_PATH);
+
+	if (ImGui::Button("ModelSave"))
+	{
+		_tchar* szName = new _tchar[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szModelDataName, sizeof(char[256]), szName, sizeof(_tchar[256]));
+		m_vecNameArray.push_back(szName);
+		_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+
+		HANDLE      hFile = CreateFile(szName,
+			GENERIC_WRITE,
+			NULL,
+			NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			return;
+		}
+		for (_uint i = 0; i < LEVEL_END+1; ++i)
+		{
+			for (auto& Pair : pGameInstance->Get_Layer()[i])
+			{
+				for (auto& pObj : Pair.second->GetGameObjects())
+				{
+					CModel* pModel = dynamic_cast<CModel*>(pObj->Get_Component(TEXT("Com_Model")));
+					if (pModel != nullptr)
+					{
+						pModel->Save_Model(hFile);
+					}
+				}
+			}
+		}
+		CloseHandle(hFile);
+		MSG_BOX("Save Complate");
+	}
+
+
+	if (ImGui::Button("Load_Scene"))
+	{
+		_tchar* szName = new _tchar[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szModelDataName, sizeof(char[256]), szName, sizeof(_tchar[256]));
+		m_vecNameArray.push_back(szName);
+		_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+
+		HANDLE      hFile = CreateFile(szName,
+			GENERIC_READ,
+			NULL,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			return;
+		}
+
+
+		_tchar ProtoName[MAX_PATH] = TEXT("");
+		char	szModelPath[MAX_PATH] = "";
+		_float4x4	PivotMatrix;
+		XMStoreFloat4x4(&PivotMatrix, XMMatrixIdentity());
+		_uint	iAnimType = 0;
+		while (true)
+		{
+			DWORD   dwByte = 0;
+			ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+			ReadFile(hFile, szModelPath, MAX_PATH, &dwByte, nullptr);
+			ReadFile(hFile, &PivotMatrix, sizeof(_float4x4), &dwByte, nullptr);
+			ReadFile(hFile, &iAnimType, sizeof(_uint), &dwByte, nullptr);
+
+			if (0 == dwByte)
+				break;
+
+			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, ProtoName,
+				CLoadModel::Create(m_pDevice, m_pDeviceContext, CLoadModel::LOAD_TYPE(iAnimType), szModelPath,XMLoadFloat4x4(&PivotMatrix),hFile))))
+				return ;
+		}
+
+		MSG_BOX("Load Sucess");
+		CloseHandle(hFile);
+	}
+	ImGui::NewLine();
+	if (ImGui::Button("Copy"))
+	{
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+			CHero_Gully::Create(m_pDevice, m_pDeviceContext))))
+			return ;
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Create_Obj"))
+	{
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Hero_Gully"))))
+		return ;
+	}
+
+	
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+
+
 void CToolManager::Free()
 {
+	Safe_Release(m_pDevice);
+	Safe_Release(m_pDeviceContext);
+
 	for (auto& iter : m_vecNameArray)
 		Safe_Delete_Array(iter);
-
 }
 
 

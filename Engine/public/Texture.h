@@ -31,6 +31,10 @@ public:
 	HRESULT Bind_ShaderResource(class CShader* pShaderCom, const char* pConstantName, _uint iTextureIndex = 0);
 	
 public:
+	void	Save_Model_Texture(HANDLE hFile);
+
+
+public:
 	virtual void Imgui_RenderProperty();
 
 	
@@ -39,6 +43,7 @@ private:
 	ID3D11ShaderResourceView**					m_pTextures =nullptr;
 	char*										m_szName = "";
 	typedef vector<ID3D11ShaderResourceView*>	TEXTURES;
+	_tchar					m_szTexturePath[MAX_PATH] = TEXT("");
 
 private: /* Imgui*/
 	_uint										m_iSelectTextureIndex = 0;
