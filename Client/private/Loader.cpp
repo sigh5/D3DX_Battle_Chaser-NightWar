@@ -233,11 +233,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 
 	/* Anim */
-	//PivotMatrix = XMMatrixRotationY(XMConvertToRadians(180.0f));
-	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"),
-	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully_Skin_01/Dungeon_Hero_Gully_Skin_01.fbx", PivotMatrix))))
-	//	return E_FAIL;
+	PivotMatrix = XMMatrixIdentity();//			XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"),
+		CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully_Skin_01/Dungeon_Hero_Gully_Skin_01.fbx", PivotMatrix))))
+		return E_FAIL;
 
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyCombat"),
+	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/FBX/Hero_Gully_Skin_01/Hero_Gully_Skin_01.fbx", PivotMatrix))))
+	//	return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
@@ -265,12 +268,12 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	///* For.Prototype_GameObject_Hero_Gully */
-	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-	//	CHero_Gully::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	/* For.Prototype_GameObject_Hero_Gully */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+		CHero_Gully::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
-	///* For.Prototype_GameObject_Hero_Gully */
+	/* For.Prototype_GameObject_Hero_Alumon */
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Alumon"),
 	//	CHero_Alumon::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;
@@ -304,9 +307,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CWaterTile::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCamera_Static"),
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCamera_Static"),
 		CCamera_Static::Create(m_pDevice, m_pContext))))
-		return E_FAIL;*/
+		return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));

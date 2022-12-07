@@ -18,6 +18,8 @@ public:
 	_uint Get_MaterialIndex() const {
 		return m_iMaterialIndex;
 	}
+	const char* Get_MeshName()const {
+		return m_pAIMesh->mName.data;}
 
 public:
 	virtual HRESULT Initialize_Prototype(CModel::TYPE eType, aiMesh* pAIMesh, class CModel* pModel);

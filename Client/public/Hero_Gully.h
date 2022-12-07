@@ -26,18 +26,30 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
+public:
+	virtual void KeyInput(_double TimeDelta)override;
+
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
+
+
+private:
+	void			ObserverTest();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
-	CModel*					m_pModelCom[MAPTYPE_END] = { nullptr, };
+	CModel*					m_pModelCom =  nullptr;
 
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-	int AnimIndex = 0;
+	int			AnimIndex = 0;
+	int			m_iPlayerType = 0;
+
+	_double		m_fWalkTime = 0.f;
+	_float		m_fMoveSpeedRatio = 0.f;
+	_bool		m_bKeyInput = false;
 
 public:
 	static CHero_Gully* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

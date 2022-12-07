@@ -24,7 +24,6 @@ HRESULT CHero_Alumon::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Hero_Alumon");
 
-
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
 
@@ -52,63 +51,13 @@ void CHero_Alumon::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	_float4 vTargetPos;
-	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	
-	ImGui::InputInt("Anim", &AnimIndex);
-
-	if (pGameInstance->Key_Pressing(DIK_DOWN))
-	{
-		vTargetPos.z -= 1.f;
-		if (pGameInstance->Key_Pressing(DIK_RIGHT))
-			vTargetPos.x += 1.f;
-		else if (pGameInstance->Key_Pressing(DIK_LEFT))
-			vTargetPos.x -= 1.f;
-
-		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
-		m_pTransformCom->Go_Straight(TimeDelta);
-		m_pModelCom->Set_AnimIndex(2);
-	}
-
-	else if (pGameInstance->Key_Pressing(DIK_UP))
-	{
-		vTargetPos.z += 1.f;
-		if (pGameInstance->Key_Pressing(DIK_RIGHT))
-			vTargetPos.x += 1.f;
-		else if (pGameInstance->Key_Pressing(DIK_LEFT))
-			vTargetPos.x -= 1.f;
+	KeyInput(TimeDelta);
 	
-		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
-		m_pTransformCom->Go_Straight(TimeDelta);
-		m_pModelCom->Set_AnimIndex(2);
-	}
-	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
-	{
-		vTargetPos.x += 1.f;
-		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
-
-		m_pTransformCom->Go_Straight(TimeDelta);
-		m_pModelCom->Set_AnimIndex(2);
-	}
-	else if (pGameInstance->Key_Pressing(DIK_LEFT))
-	{
-		vTargetPos.x -= 1.f;
-		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
-
-		m_pTransformCom->Go_Straight(TimeDelta);
-		m_pModelCom->Set_AnimIndex(2);
-	}
-	else
-		m_pModelCom->Set_AnimIndex(AnimIndex);
-
-	
-
 
 	m_pModelCom->Play_Animation(TimeDelta);
 
-	RELEASE_INSTANCE(CGameInstance);
+	
 }
 
 
@@ -140,6 +89,63 @@ HRESULT CHero_Alumon::Render()
 	}
 
 	return S_OK;
+}
+
+void CHero_Alumon::KeyInput(_double TimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_float4 vTargetPos;
+	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	ImGui::InputInt("Anim", &AnimIndex);
+
+	if (pGameInstance->Key_Pressing(DIK_DOWN))
+	{
+		vTargetPos.z -= 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+			vTargetPos.x += 1.f;
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+			vTargetPos.x -= 1.f;
+
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+
+	else if (pGameInstance->Key_Pressing(DIK_UP))
+	{
+		vTargetPos.z += 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+			vTargetPos.x += 1.f;
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+			vTargetPos.x -= 1.f;
+
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
+	{
+		vTargetPos.x += 1.f;
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+	else if (pGameInstance->Key_Pressing(DIK_LEFT))
+	{
+		vTargetPos.x -= 1.f;
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+
+		m_pTransformCom->Go_Straight(TimeDelta);
+		m_pModelCom->Set_AnimIndex(2);
+	}
+	else
+		m_pModelCom->Set_AnimIndex(AnimIndex);
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 _bool CHero_Alumon::Piciking_GameObject()

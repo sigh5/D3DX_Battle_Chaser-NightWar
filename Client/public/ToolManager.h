@@ -46,6 +46,7 @@ private:
 	void	Imgui_Change_Texture();
 
 	void	Imgui_Crate_FilterMap();
+	void	Imgui_Camera_Type();
 
 
 private:
@@ -70,7 +71,7 @@ private:
 	int							m_iRadioButton = 0;
 
 	int							m_iTerrainPickingRadioButton = 0;
-
+	int							m_iCameraRadioButton = 0;
 private:
 	void wc2c(const wchar_t* szWchar, char* szChar)
 	{

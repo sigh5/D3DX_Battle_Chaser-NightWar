@@ -26,6 +26,9 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	virtual void KeyInput(_double TimeDelta)override;
+
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 

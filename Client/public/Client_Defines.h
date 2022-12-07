@@ -3,6 +3,8 @@
 #include <Process.h>
 #include <random>
 #include <time.h>
+#include <queue>
+#include <set>
 namespace Client
 {																			
 	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY ,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1

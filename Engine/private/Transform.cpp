@@ -159,13 +159,13 @@ void CTransform::Imgui_RenderProperty()
 		nullptr, useSnap ? &snap[0] : nullptr);
 }
 
-void CTransform::Go_Straight(_double TimeDelta)
+void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio)
 {
 	_vector	vPosition = Get_State(CTransform::STATE_TRANSLATION);
 	_vector	vLook = Get_State(CTransform::STATE_LOOK);
 
 	/* 이렇게 얻어온 VlOOK은 Z축 스케일을 포함하낟. */
-	vPosition += XMVector3Normalize(vLook) * m_TransformDesc.fSpeedPerSec * (_float)TimeDelta;
+	vPosition += XMVector3Normalize(vLook) * (m_TransformDesc.fSpeedPerSec * fSpeedRatio) * (_float)TimeDelta;
 
 	Set_State(CTransform::STATE_TRANSLATION, vPosition);
 }

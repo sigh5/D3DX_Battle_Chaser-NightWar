@@ -21,12 +21,18 @@ protected:
 	virtual ~CCamera() = default;
 
 public:
+	virtual void	Set_CameraActive(_bool bCameraActive) {m_bCameraActive = bCameraActive;}
+	//const	_bool Get_CameraActive()const { return m_bCameraActive; }
+
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Last_Initialize()override;
 	virtual void Tick(_double TimeDelta);
 	virtual void Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
+	
 
 	/* 행렬을 바인딩하여 알아서(고정기능렌더링파이프라인) 정점의 변환에 사용되도록 처리. dx11:x*/
 	/* 필요하면 얻어오는 기능까지도. */
@@ -37,7 +43,7 @@ public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
 protected:
 	CAMERADESC					m_CameraDesc;
-
+	_bool						m_bCameraActive = false;
 private:
 	class CPipeLine*			m_pPipeLine = nullptr;
 	

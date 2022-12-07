@@ -15,22 +15,13 @@ CModel::CModel(const CModel & rhs)
 	, m_pAIScene(rhs.m_pAIScene)
 	, m_eType(rhs.m_eType)
 	, m_iNumMeshes(rhs.m_iNumMeshes)
-	/*, m_Meshes(rhs.m_Meshes)*/
 	, m_Materials(rhs.m_Materials)
 	, m_iNumMaterials(rhs.m_iNumMaterials)
-	/*, m_Bones(rhs.m_Bones)*/
 	, m_iNumBones(rhs.m_iNumBones)
-	/*, m_Animations(rhs.m_Animations)*/
 	, m_iNumAnimations(rhs.m_iNumAnimations)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
 {
-	/*for (auto& pBone : m_Bones)
-	Safe_AddRef(pBone);*/
-
-	//for (auto& pAnimation : m_Animations)
-	//	Safe_AddRef(pAnimation);
-
 	for (auto& Material : m_Materials)
 	{
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
@@ -38,11 +29,7 @@ CModel::CModel(const CModel & rhs)
 	}
 
 	for (auto& pMesh : rhs.m_Meshes)
-	{
 		m_Meshes.push_back((CMesh*)pMesh->Clone());
-	}
-
-
 }
 
 CBone * CModel::Get_BonePtr(const char * pBoneName)
@@ -134,7 +121,7 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 
 	if (iMaterialIndex >= m_iNumMaterials)
 		return E_FAIL;
-
+	
 	if (nullptr != m_Materials[iMaterialIndex].pTexture[eType])
 	{
 		m_Materials[iMaterialIndex].pTexture[eType]->Bind_ShaderResource(pShader, pConstantName);
@@ -147,6 +134,8 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 
 HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , const char* pBoneConstantName)
 {
+	if (!strcmp(m_Meshes[iMeshIndex]->Get_MeshName(), "FishingRod"))
+		return S_OK;
 
 	if (nullptr != m_Meshes[iMeshIndex])
 	{
@@ -246,7 +235,7 @@ HRESULT CModel::Ready_Materials(const char* pModelFilePath)
 
 			_tchar			szFullPath[MAX_PATH] = TEXT("");
 
-			MultiByteToWideChar(CP_ACP, 0, szTexturePath, strlen(szTexturePath), szFullPath, MAX_PATH);
+			MultiByteToWideChar(CP_ACP, 0, szTexturePath, size_t(strlen(szTexturePath)), szFullPath, MAX_PATH);
 
 			ModelMaterial.pTexture[j] = CTexture::Create(m_pDevice, m_pContext, szFullPath);
 

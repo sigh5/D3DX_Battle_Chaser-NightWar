@@ -9,6 +9,9 @@
 #include "Terrain.h"
 #include "NoneAnim_BG.h"
 
+#include "Camera_Static.h"
+#include "Camera_Dynamic.h"
+
 IMPLEMENT_SINGLETON(CToolManager)
 
 CToolManager::CToolManager()
@@ -40,7 +43,7 @@ void CToolManager::Imgui_SelectParentViewer()
 	
 	Imgui_Change_model();
 	Imgui_Change_Texture();
-
+	Imgui_Camera_Type();
 	ImGui::End();
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -371,6 +374,37 @@ void CToolManager::Imgui_Crate_FilterMap()
 {
 	ImGui::RadioButton("NoUse_FilterMap", &m_iRadioButton, 0);
 	ImGui::RadioButton("Create_FilterMap", &m_iRadioButton, 1);
+}
+
+void CToolManager::Imgui_Camera_Type()
+{
+
+	_int iTemp = m_iCameraRadioButton;
+
+	ImGui::RadioButton("Dynamic_camera", &m_iCameraRadioButton, 0);
+	ImGui::RadioButton("Static_Camera", &m_iCameraRadioButton, 1);
+
+	if (iTemp == m_iCameraRadioButton)
+		return;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pDynamic_camera = pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), TEXT("Layer_Camera"), TEXT("dynamic_Camera"));
+	CGameObject* pStatic_camera = pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), TEXT("Layer_Camera"), TEXT("Static_Camera"));
+
+	if (0 == m_iCameraRadioButton)
+	{
+		static_cast<CCamera*>(pDynamic_camera)->Set_CameraActive(true);
+		static_cast<CCamera*>(pStatic_camera)->Set_CameraActive(false);
+	}
+	else if (1 == m_iCameraRadioButton)
+	{
+		static_cast<CCamera*>(pDynamic_camera)->Set_CameraActive(false);
+		static_cast<CCamera*>(pStatic_camera)->Set_CameraActive(true);
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 void CToolManager::Free()

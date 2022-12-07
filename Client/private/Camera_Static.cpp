@@ -3,6 +3,7 @@
 
 #include "Player.h"
 #include "GameInstance.h"
+#include "Layer.h"
 
 CCamera_Static::CCamera_Static(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CCamera(pDevice, pContext)
@@ -55,6 +56,9 @@ void CCamera_Static::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
+	if (!m_bCameraActive)
+		return;
+	
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	Update_CameraLookPos();
@@ -66,6 +70,9 @@ void CCamera_Static::Tick(_double TimeDelta)
 
 void CCamera_Static::Late_Tick(_double TimeDelta)
 {
+	if (!m_bCameraActive)
+		return;
+
 	__super::Late_Tick(TimeDelta);
 }
 
@@ -73,24 +80,25 @@ HRESULT CCamera_Static::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-	//Test
-	m_bLast_Initlize = true;
-	return S_OK;
-	//~ 
+
 	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);
 
-
-	CGameObject* pPlayer = pGameInstace->Get_GameObject(pGameInstace->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
-
-	if (nullptr == pPlayer)
+	for (auto& Pair : pGameInstace->Get_Layer()[pGameInstace->GetCurLevelIdx()])
 	{
-		return E_FAIL;
+		for (auto& obj : Pair.second->GetGameObjects())
+		{
+			if (nullptr != dynamic_cast<CPlayer*>(obj))
+			{
+				m_TargetList.push_back({ obj->Get_ObjectName(),obj });
+				Safe_AddRef(m_TargetList.back().second);
+			}
+		}
+		
 	}
 
-	m_CameraLookPos_vec.push_back(pPlayer);
-	XMStoreFloat4(&m_CameraDesc.vAt, pPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
-	
-	
+	//Test 
+	m_ChaseTargetTag = TEXT("Hero_Gully");
+
 	m_bLast_Initlize = true;
 	
 	RELEASE_INSTANCE(CGameInstance);
@@ -105,31 +113,45 @@ HRESULT CCamera_Static::Render()
 	return S_OK;
 }
 
+void CCamera_Static::Set_CameraActive(_bool bCameraActive)
+{
+	__super::Set_CameraActive(bCameraActive);
+
+	auto iter = find_if(m_TargetList.begin(), m_TargetList.end(), [&](auto MyPair)->bool
+	{
+		if (MyPair.first == m_ChaseTargetTag.c_str())
+			return true;
+		return false;
+	});
+
+	if (iter == m_TargetList.end())
+		return;
+
+	m_pCurrentTarget = iter->second;
+}
+
 HRESULT CCamera_Static::SetUp_Components()
 {
 	
-
-
 	return S_OK;
 }
 
 HRESULT CCamera_Static::Update_CameraLookPos()
 {
-	if (m_CameraLookPos_vec[0] == nullptr)
+	if (m_pCurrentTarget == nullptr)
 		return S_OK;
-	 
-	_vector vPlayerPos = m_CameraLookPos_vec[0]->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-
+	
+	_vector vPlayerPos = m_pCurrentTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
-	
+
 	_vector vLook = vPlayerPos - CameraPos;
-	
+
 	_float4 PlayerVecotr;
 	XMStoreFloat4(&PlayerVecotr, vPlayerPos);
 
 	PlayerVecotr.y += m_CameraDistanceY;
 	PlayerVecotr.z -= m_CameraDistanceZ;
-	
+
 
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
@@ -165,6 +187,9 @@ CGameObject * CCamera_Static::Clone(void * pArg)
 void CCamera_Static::Free()
 {
 	__super::Free();
+
+	for (auto &MyPair : m_TargetList)
+		Safe_Release(MyPair.second);
 
 
 }

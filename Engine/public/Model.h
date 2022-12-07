@@ -14,20 +14,12 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	_uint Get_NumMeshes() const {
-		return m_iNumMeshes;
-	}
-
-	_matrix Get_PivotMatrix() const {
-		return XMLoadFloat4x4(&m_PivotMatrix);
-	}
-
+	_uint Get_NumMeshes() const {return m_iNumMeshes;}
+	_matrix Get_PivotMatrix() const {return XMLoadFloat4x4(&m_PivotMatrix);}
 	class CBone* Get_BonePtr(const char* pBoneName);
 
 public:
-	void Set_AnimIndex(_uint iAnimIndex) {
-		m_iCurrentAnimIndex = iAnimIndex;
-	}
+	void Set_AnimIndex(_uint iAnimIndex) {m_iCurrentAnimIndex = iAnimIndex;}
 
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType, const char* pModelFilePath, _fmatrix PivotMatrix);

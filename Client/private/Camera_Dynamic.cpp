@@ -39,6 +39,7 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	}
 
+	m_bCameraActive = true;
 	if (FAILED(__super::Initialize(&CameraDesc)))
 		return E_FAIL;
 
@@ -50,6 +51,9 @@ HRESULT CCamera_Dynamic::Initialize(void * pArg)
 
 void CCamera_Dynamic::Tick(_double TimeDelta)
 {
+	if (!m_bCameraActive)
+		return;
+
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 
@@ -119,6 +123,9 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 
 void CCamera_Dynamic::Late_Tick(_double TimeDelta)
 {
+	if (!m_bCameraActive)
+		return;
+
 	__super::Late_Tick(TimeDelta);
 
 

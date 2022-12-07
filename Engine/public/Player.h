@@ -27,14 +27,15 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-
+public:
+	virtual void KeyInput(_double TimeDelta) = 0;
 
 public: /* imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
 
 protected:
 	PLAYERDESC				m_PlayerDesc;
-
+	MAPTYPE					m_ePlayerType = DUNGEON_PLAYER;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

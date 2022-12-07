@@ -37,7 +37,8 @@ HRESULT CHero_Gully::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	m_pModelCom[DUNGEON_PLAYER]->Set_AnimIndex(0);
+
+	m_pModelCom->Set_AnimIndex(0);
 
 	return S_OK;
 }
@@ -49,25 +50,17 @@ HRESULT CHero_Gully::Last_Initialize()
 
 void CHero_Gully::Tick(_double TimeDelta)
 {
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	//ImGui::InputInt("AnimIndex", &AnimIndex);
+	//ImGui::InputInt("AnimType", &m_iPlayerType);	// 0 or 1
+
+	//if (AnimIndex >= m_pModelCom->m_iNumAnimations)
+	//	AnimIndex = 0;
 
 	__super::Tick(TimeDelta);
 
-	if (pInstance->Key_Down(DIK_SPACE))
-	{
-		_uint iMoveSpeed = 100;
-		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
-		
-	}
+	KeyInput(TimeDelta);
 
-	if (pInstance->Key_Down(DIK_O))
-	{
-		_uint iShakingTime = 3;
-		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	}
-
-
-	RELEASE_INSTANCE(CGameInstance);
+	m_pModelCom->Play_Animation(TimeDelta);
 
 }
 
@@ -76,8 +69,7 @@ void CHero_Gully::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
-
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 
 }
 
@@ -89,14 +81,122 @@ HRESULT CHero_Gully::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(0);
-	
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		/* 이 모델을 그리기위한 셰이더에 머테리얼 텍스쳐를 전달하낟. */
+		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+
+		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices");
+	}
+
 	return S_OK;
+	
+}
+
+void CHero_Gully::KeyInput(_double TimeDelta)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_float4 vTargetPos;
+	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+
+	if (pGameInstance->Key_Pressing(DIK_DOWN))
+	{
+		vTargetPos.z -= 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+		{
+			vTargetPos.z += 0.5f;
+			vTargetPos.x += 0.5f;
+		}
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+		{
+			vTargetPos.z += 0.5f;
+			vTargetPos.x -= 0.5f;
+		}
+		m_bKeyInput = true;
+		
+	}
+	else if (pGameInstance->Key_Pressing(DIK_UP))
+	{
+		vTargetPos.z += 1.f;
+		if (pGameInstance->Key_Pressing(DIK_RIGHT))
+		{
+			vTargetPos.z -= 0.5f;
+			vTargetPos.x += 0.5f;
+		}
+		else if (pGameInstance->Key_Pressing(DIK_LEFT))
+		{
+			vTargetPos.z -= 0.5f;
+			vTargetPos.x -= 1.f;
+		}
+		m_bKeyInput = true;
+		
+	}
+	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
+	{
+		m_bKeyInput = true;
+		vTargetPos.x += 1.f;
+	}
+	else if (pGameInstance->Key_Pressing(DIK_LEFT))
+	{
+		m_bKeyInput = true;
+		vTargetPos.x -= 1.f;
+	}
+	else
+		m_bKeyInput = false;
+
+	if (m_bKeyInput)
+	{
+		m_fWalkTime += TimeDelta* 1.0;
+		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
+		
+		if (m_fWalkTime >= 1.f)
+		{
+			m_pModelCom->Set_AnimIndex(2);
+			m_fMoveSpeedRatio = 1.f;
+		}
+		else
+		{
+			m_pModelCom->Set_AnimIndex(1);
+			m_fMoveSpeedRatio = 0.5f;
+		}
+		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio);
+	}
+	else
+	{
+		m_pModelCom->Set_AnimIndex(0);
+		m_fWalkTime = 0.0;
+	}
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 _bool CHero_Gully::Piciking_GameObject()
 {
 	return _bool();
+}
+
+void CHero_Gully::ObserverTest()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	/*if (pInstance->Key_Down(DIK_SPACE))
+	{
+	_uint iMoveSpeed = 100;
+	m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
+
+	}
+
+	if (pInstance->Key_Down(DIK_O))
+	{
+	_uint iShakingTime = 3;
+	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
+	}*/
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CHero_Gully::SetUp_Components()
@@ -105,11 +205,18 @@ HRESULT CHero_Gully::SetUp_Components()
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxCubeTex"), TEXT("Com_Shader"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
+	/* For.Com_Model */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"), TEXT("Com_Model"),
+		(CComponent**)&m_pModelCom)))
+		return E_FAIL;
 
-
+	///* For.Com_Model */
+	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyCombat"), TEXT("Com_Model2"),
+	//	(CComponent**)&m_pModelCom[COMBAT_PLAYER])))
+	//	return E_FAIL;
 
 
 	return S_OK;
@@ -130,8 +237,12 @@ HRESULT CHero_Gully::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	
+	/* For.Lights */
+	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);
+	if (nullptr == pLightDesc)
+		return E_FAIL;
 
+	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -164,6 +275,8 @@ void CHero_Gully::Free()
 {
 	__super::Free();
 
+	//for (auto& pModel : m_pModelCom)
+		Safe_Release(m_pModelCom);
 
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
