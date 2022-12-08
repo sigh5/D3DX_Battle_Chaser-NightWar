@@ -15,6 +15,7 @@ CMesh::CMesh(const CMesh & rhs)
 	, m_iNumBones(rhs.m_iNumBones)
 	, m_pVertices(rhs.m_pVertices)
 	, m_pAnimVertices(rhs.m_pAnimVertices)
+	, m_pIndices(rhs.m_pIndices)
 {
 
 }
@@ -168,10 +169,11 @@ void CMesh::Save_MeshData(HANDLE hFile)
 	DWORD   dwByte = 0;
 
 	_int	iType = _int(m_eType);
-	WriteFile(hFile, &iType, sizeof(_int), &dwByte, nullptr);
+	WriteFile(hFile, &iType, sizeof(_uint), &dwByte, nullptr);
 	WriteFile(hFile, &m_iMaterialIndex, sizeof(_uint), &dwByte, nullptr);
 	WriteFile(hFile, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);
 	WriteFile(hFile, &m_iNumVertices, sizeof(_uint), &dwByte, nullptr);
+	WriteFile(hFile, &m_iNumPrimitive, sizeof(_uint), &dwByte, nullptr);
 
 	if (CModel::TYPE_NONANIM == m_eType)
 	{
@@ -196,7 +198,7 @@ void CMesh::Save_MeshData(HANDLE hFile)
 		}
 	}
 	
-	WriteFile(hFile, &m_iNumPrimitive, sizeof(_uint), &dwByte, nullptr);
+
 
 	for (_uint i = 0; i < m_iNumPrimitive; ++i)
 	{
@@ -205,7 +207,7 @@ void CMesh::Save_MeshData(HANDLE hFile)
 		WriteFile(hFile, &m_pIndices[i]._2, sizeof(unsigned long), &dwByte, nullptr);
 	}
 	
-	
+	// numbone 이문제임
 	for (auto &pBone : m_Bones)
 	{
 		char szName[MAX_PATH] = "";

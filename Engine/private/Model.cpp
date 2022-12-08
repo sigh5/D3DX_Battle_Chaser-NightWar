@@ -169,7 +169,6 @@ HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , 
 
 void CModel::Save_Model(HANDLE hFile)
 {
-
 	Save_Bones(hFile);
 	Save_MeshContainers(hFile);
 	Save_Materials(hFile);

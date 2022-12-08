@@ -468,7 +468,7 @@ void CToolManager::Imgui_Model_Save_Load()
 	}
 
 
-	if (ImGui::Button("Load_Scene"))
+	if (ImGui::Button("Load_Model"))
 	{
 		_tchar* szName = new _tchar[MAX_PATH];
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szModelDataName, sizeof(char[256]), szName, sizeof(_tchar[256]));
@@ -510,11 +510,11 @@ void CToolManager::Imgui_Model_Save_Load()
 				break;
 
 			if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, ProtoName,
-				CLoadModel::Create(m_pDevice, m_pDeviceContext, CLoadModel::LOAD_TYPE(iAnimType), szModelPath,XMLoadFloat4x4(&PivotMatrix),hFile))))
-				return ;
+				CLoadModel::Create(m_pDevice, m_pDeviceContext, CLoadModel::LOAD_TYPE(iAnimType), szModelPath, XMLoadFloat4x4(&PivotMatrix), hFile))))
+				assert("issue");
 		}
 
-		MSG_BOX("Load Sucess");
+		MSG_BOX("Load_Model Sucess");
 		CloseHandle(hFile);
 	}
 	ImGui::NewLine();
@@ -522,14 +522,14 @@ void CToolManager::Imgui_Model_Save_Load()
 	{
 		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 			CHero_Gully::Create(m_pDevice, m_pDeviceContext))))
-			return ;
+			assert("Copy issue");
 	}
 
 	ImGui::SameLine();
 	if (ImGui::Button("Create_Obj"))
 	{
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Prototype_GameObject_Hero_Gully"))))
-		return ;
+			assert("Create_Obj_issue");
 	}
 
 	

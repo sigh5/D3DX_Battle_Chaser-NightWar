@@ -232,7 +232,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;*/
 
 
-	/* Anim */
+	///* Anim */
 	//PivotMatrix = XMMatrixIdentity();//			XMMatrixRotationY(XMConvertToRadians(180.0f));
 	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"),
 	//	CModel::Create(m_pDevice, m_pContext, CModel::TYPE_ANIM, "../Bin/Resources/FBX/Dungeon_Hero_Gully_Skin_01/Dungeon_Hero_Gully_Skin_01.fbx", PivotMatrix))))
@@ -268,7 +268,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	////* For.Prototype_GameObject_Hero_Gully */
+	/////* For.Prototype_GameObject_Hero_Gully */
 	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 	//	CHero_Gully::Create(m_pDevice, m_pContext))))
 	//	return E_FAIL;

@@ -212,13 +212,13 @@ HRESULT CHero_Gully::SetUp_Components()
 	/*CModel::MODELDESC Desc;
 	Desc.szProtoName = TEXT("Prototype_Component_Model_GullyDungeon");
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"), TEXT("Com_Model"),
-		(CComponent**)&m_pModelCom,&Desc)))
+		(CComponent**)&m_pModelCom, &Desc)))
 		return E_FAIL;*/
 
 	//Desc.szProtoName = TEXT("Prototype_Component_Model_GullyDungeon");
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyDungeon"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
-		return E_FAIL; 
+		return E_FAIL;
 
 	///* For.Com_Model */
 	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyCombat"), TEXT("Com_Model2"),

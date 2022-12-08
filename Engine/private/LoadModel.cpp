@@ -24,6 +24,17 @@ CLoadModel::CLoadModel(const CLoadModel & rhs)
 	, m_Bones(rhs.m_Bones)
 	, m_Animations(rhs.m_Animations)
 {
+	//Test ¾èÀºº¹»ç
+	for (auto& m_Bones : m_Bones)
+	{
+			Safe_AddRef(m_Bones);
+	}
+
+	for (auto& pAnimations : m_Animations)
+	{
+		Safe_AddRef(pAnimations);
+	}
+
 	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
 	
 	for (auto& Material : m_Materials)
@@ -32,25 +43,14 @@ CLoadModel::CLoadModel(const CLoadModel & rhs)
 			Safe_AddRef(Material.pTexture[i]);
 	}
 	for (auto& pMesh : rhs.m_Meshes)
-		m_Meshes.push_back((CLoadMesh*)pMesh->Clone());
-
-
-	/*for (auto &pOldBone : rhs.m_Bones)
 	{
-		CLoadBone* pNewBone = CLoadBone::CreateCopy(this,pOldBone);
-		if (nullptr == pNewBone)
-			assert("CLoadModel & rhs Issue");
-		m_Bones.push_back(pNewBone);
-	}*/
+		m_Meshes.push_back((CLoadMesh*)pMesh->Clone(this));
 
-	//for (auto &pOldAnim : rhs.m_Animations)
-	//{
-	//	CLoadAnimation* pNewAnim = CLoadAnimation::CreateCopy(this, pOldAnim);
-	//	if (nullptr == pNewAnim)
-	//		assert("CLoadModel & rhs Issue");
+	}
 
-	//	m_Animations.push_back(pNewAnim);
-	//}
+
+
+
 }
 
 CLoadBone * CLoadModel::Get_BonePtr(const char * pBoneName)
@@ -98,7 +98,6 @@ HRESULT CLoadModel::Initialize(void * pArg)
 
 	if (nullptr != pArg)
 		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
-
 
 
 	return S_OK;
@@ -286,6 +285,10 @@ CComponent * CLoadModel::Clone(void * pArg)
 void CLoadModel::Free()
 {
 	__super::Free();
+	
+	for (auto& pBone : m_Bones)
+		Safe_Release(pBone);
+	m_Bones.clear();
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);
@@ -303,10 +306,6 @@ void CLoadModel::Free()
 	m_Meshes.clear();
 
 	
-
-	for (auto& pBone : m_Bones)
-		Safe_Release(pBone);
-	m_Bones.clear();
 
 
 

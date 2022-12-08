@@ -21,6 +21,7 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(class CLoadModel* pModel, HANDLE hFile);
 	virtual HRESULT Initialize(void* pArg) override;
+	
 
 public:
 	void SetUp_BoneMatrices(_float4x4* pBoneMatrices, _fmatrix PivotMatrix);

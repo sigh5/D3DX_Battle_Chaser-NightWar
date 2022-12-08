@@ -6,6 +6,16 @@ CLoadBone::CLoadBone()
 {
 }
 
+CLoadBone::CLoadBone(const CLoadBone & rhs)
+	: m_CombindTransformMatrix(rhs.m_CombindTransformMatrix)
+	, m_OffsetMatrix(rhs.m_OffsetMatrix)
+	, m_TransformMatrix(rhs.m_TransformMatrix)
+	
+{
+	strcpy_s(m_szName,MAX_PATH,rhs.m_szName);
+	strcpy_s(m_szParentName, MAX_PATH, rhs.m_szParentName);
+}
+
 HRESULT CLoadBone::Initialize(CLoadModel* pModel,HANDLE hFile)
 {
 	DWORD   dwByte = 0;
@@ -21,33 +31,27 @@ HRESULT CLoadBone::Initialize(CLoadModel* pModel,HANDLE hFile)
 	if (!strcmp(szParentName, ("nullptr")))
 	{
 		m_pParent = nullptr;
+		strcpy_s(m_szParentName, MAX_PATH, ("nullptr"));
 	}
 	else
 	{
 		m_pParent = pModel->Get_BonePtr(szParentName);
+		if (m_pParent) assert("CLoadBone::Initialize");
+		Safe_AddRef(m_pParent);
+		strcpy_s(m_szParentName, MAX_PATH, szParentName);
+
 	}
 
 	return S_OK;
 }
 
-HRESULT CLoadBone::Initialize_DeepCopy(class CLoadModel* pModel,CLoadBone * pOriginBone)
+HRESULT CLoadBone::Initialize_DeepCopy(void *pArg)
 {
-	strcpy_s(m_szName,MAX_PATH, pOriginBone->m_szName);
-	m_OffsetMatrix = pOriginBone->m_OffsetMatrix;
-	m_TransformMatrix = pOriginBone->m_TransformMatrix;
-	m_CombindTransformMatrix = pOriginBone->m_CombindTransformMatrix;
-
-	if (nullptr == pOriginBone->m_pParent)
-		m_pParent = nullptr;
-	else
-	{
-		char szParentName[MAX_PATH] = "";
-		strcpy_s(szParentName, MAX_PATH, pOriginBone->m_pParent->m_szName);
-		m_pParent = pModel->Get_BonePtr(szParentName);
-
-		if (nullptr == m_pParent)
-			assert("CLoadBone::Initialize_DeepCopy");
-	}
+	CLoadModel* pModel = reinterpret_cast<CLoadModel*>(pArg);
+	m_pParent = pModel->Get_BonePtr(m_szParentName);
+	
+	if (nullptr != m_pParent)
+		Safe_AddRef(m_pParent);
 
 	return S_OK;
 }
@@ -73,16 +77,17 @@ CLoadBone * CLoadBone::Create(CLoadModel* pModel,HANDLE hFile)
 	return pInstance;
 }
 
-CLoadBone * CLoadBone::CreateCopy(class CLoadModel* pModel,CLoadBone * pOriginBone)
+CLoadBone * CLoadBone::CreateClone(void *pArg )
 {
-	CLoadBone*		pInstance = new CLoadBone();
+	CLoadBone*		pInstance = new CLoadBone(*this);
 
-	if (FAILED(pInstance->Initialize_DeepCopy(pModel,pOriginBone)))
+	if (FAILED(pInstance->Initialize_DeepCopy(pArg)))
 	{
-		MSG_BOX("Failed to Created : CLoadBone_CreateCopy");
+		MSG_BOX("Failed to Cloned : CLoadBone");
 		Safe_Release(pInstance);
 	}
-	return nullptr;
+
+	return pInstance;
 }
 
 void CLoadBone::Free()

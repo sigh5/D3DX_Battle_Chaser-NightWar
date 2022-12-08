@@ -7,6 +7,7 @@ class CLoadBone : public CBase
 {
 private:
 	CLoadBone();
+	CLoadBone(const CLoadBone& rhs);
 	virtual ~CLoadBone() = default;
 
 public:
@@ -23,19 +24,20 @@ public:
 
 public:
 	HRESULT Initialize(class CLoadModel* pModel,HANDLE hFile);
-	HRESULT Initialize_DeepCopy(class CLoadModel* pModel,CLoadBone* pOriginBone);
+	HRESULT Initialize_DeepCopy(void *pArg =nullptr);
 	void Compute_CombindTransformationMatrix();
 
 private:
 	char							m_szName[MAX_PATH];
+	char							m_szParentName[MAX_PATH];
 	_float4x4						m_OffsetMatrix;
 	_float4x4						m_TransformMatrix;
 	_float4x4						m_CombindTransformMatrix;
 	class CLoadBone*				m_pParent = nullptr;
-
+	
 public:
 	static CLoadBone* Create(class CLoadModel* pModel , HANDLE hFile);
-	static CLoadBone* CreateCopy(class CLoadModel* pModel,CLoadBone* pOriginBone);
+	CLoadBone* CreateClone(void* pArg = nullptr);
 	virtual void Free() override;
 
 };
