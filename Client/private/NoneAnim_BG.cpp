@@ -99,9 +99,11 @@ _bool CNoneAnim_BG::Piciking_GameObject()
 
 void CNoneAnim_BG::Change_Model(_uint iLevel, const wstring & NewComPonentTag)
 {
-	Safe_Release(m_pModelCom);
-	Remove_component(TEXT("Com_Model"));
-
+	if (nullptr == m_pModelCom)
+	{
+		Safe_Release(m_pModelCom);
+		Remove_component(TEXT("Com_Model"));
+	}
 	lstrcpy(m_EnviromentDesc.m_pModelTag, NewComPonentTag.c_str());
 
 	if (FAILED(__super::Add_Component(iLevel, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
@@ -122,11 +124,12 @@ HRESULT CNoneAnim_BG::SetUp_Components()
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
-	/* For.Com_Model */ //TEXT("Prototype_Component_ScrollingCloud")
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,m_EnviromentDesc.m_pModelTag , TEXT("Com_Model"),
+	/* For.Com_Model */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
-	/* For.Com_Model */
+	
+	/* For.Com_Buffer */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"), TEXT("Com_Buffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;

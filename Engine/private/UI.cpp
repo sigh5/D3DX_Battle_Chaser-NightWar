@@ -25,6 +25,14 @@ HRESULT CUI::Initialize_Prototype()
 
 HRESULT CUI::Initialize(void * pArg)
 {
+	ZeroMemory(&m_UIDesc, sizeof(m_UIDesc));
+
+	if (nullptr != pArg)
+	{
+		memcpy(&m_UIDesc, pArg, sizeof(m_UIDesc));
+	}
+
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 

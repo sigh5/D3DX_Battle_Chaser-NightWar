@@ -29,6 +29,8 @@ public:
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
 
+	virtual const _tchar*		Get_TextureTag()const { return m_CanvasDesc.m_pTextureTag; }
+	virtual void							Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_CanvasDesc.m_pTextureTag, pTextureTag); };
 public:
 	virtual HRESULT	Add_ChildUI(CUI* pUI)sealed;
 

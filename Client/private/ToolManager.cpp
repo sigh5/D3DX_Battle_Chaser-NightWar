@@ -166,7 +166,8 @@ void CToolManager::Imgui_Create_UI()
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szProtoName, sizeof(char[256]), szProtoName, sizeof(_tchar[256]));
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szTexturName, sizeof(char[256]), szTextureName, sizeof(_tchar[256]));
 		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szObjectName, sizeof(char[256]), szObjectName, sizeof(_tchar[256]));
-		m_Desc.m_pTextureTag = szTextureName;
+		
+		lstrcpy(m_Desc.m_pTextureTag, szTextureName);
 
 		CGameObject* pGameObject = nullptr;
 		pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &m_Desc);
@@ -223,8 +224,7 @@ void CToolManager::Imgui_Create_Object()
 			CGameObject* pGameObject = nullptr;
 			CEnvironment_Object::ENVIRONMENTDESC Desc;
 			ZeroMemory(&Desc, sizeof(CEnvironment_Object::ENVIRONMENTDESC));
-			Desc.m_pModelTag = szModelName;
-			Desc.m_pTextureTag = szTextureName;
+			lstrcpy(Desc.m_pModelTag, szModelName);
 			Desc.m_iShaderPass = m_iShaderPass;
 
 			pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &Desc);

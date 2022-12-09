@@ -62,6 +62,9 @@ void CCamera_Static::Tick(_double TimeDelta)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	Update_CameraLookPos();
+
+	Set_CaptinPlayer();
+
 	RELEASE_INSTANCE(CGameInstance);
 
 
@@ -83,6 +86,8 @@ HRESULT CCamera_Static::Last_Initialize()
 
 	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);
 
+	CGameObject *pTarget = nullptr;
+	_int iIndex = 0;
 	for (auto& Pair : pGameInstace->Get_Layer()[pGameInstace->GetCurLevelIdx()])
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
@@ -91,14 +96,18 @@ HRESULT CCamera_Static::Last_Initialize()
 			{
 				m_TargetList.push_back({ obj->Get_ObjectName(),obj });
 				Safe_AddRef(m_TargetList.back().second);
+
+				if(iIndex !=0)
+					dynamic_cast<CPlayer*>(obj)->Set_FollowTarget(pTarget);
+				
+				pTarget = obj;
+				++iIndex;
 			}
 		}
 		
 	}
 
-	//Test 
-	m_ChaseTargetTag = TEXT("Hero_Gully");
-
+	m_ChaseTargetTag = TEXT("Hero_Gully");	// 첫대장은 무조건 굴리
 	m_bLast_Initlize = true;
 	
 	RELEASE_INSTANCE(CGameInstance);
@@ -127,7 +136,45 @@ void CCamera_Static::Set_CameraActive(_bool bCameraActive)
 	if (iter == m_TargetList.end())
 		return;
 
-	m_pCurrentTarget = iter->second;
+
+	m_pCaptinPlayer = iter->second;
+}
+
+void CCamera_Static::Set_CaptinPlayer()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	
+
+	if (pGameInstance->Key_Down(DIK_TAB))
+	{		
+		CGameObject* pPlayer = m_pCaptinPlayer;
+
+		for (auto iter = m_TargetList.begin(); iter != m_TargetList.end();)
+		{
+			if (iter->first == m_pCaptinPlayer->Get_ObjectName())
+			{
+				static_cast<CPlayer*>(iter->second)->Set_ControlInput(false);
+				iter = m_TargetList.erase(iter);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+		m_pCaptinPlayer = m_TargetList.front().second;
+		dynamic_cast<CPlayer*>(m_pCaptinPlayer)->Set_ControlInput(true);
+		m_TargetList.push_back({pPlayer->Get_ObjectName() ,pPlayer });
+	}
+
+
+
+
+
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CCamera_Static::SetUp_Components()
@@ -138,10 +185,10 @@ HRESULT CCamera_Static::SetUp_Components()
 
 HRESULT CCamera_Static::Update_CameraLookPos()
 {
-	if (m_pCurrentTarget == nullptr)
+	if (m_pCaptinPlayer == nullptr)
 		return S_OK;
 	
-	_vector vPlayerPos = m_pCurrentTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vPlayerPos = m_pCaptinPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
 	_vector vLook = vPlayerPos - CameraPos;
@@ -191,5 +238,6 @@ void CCamera_Static::Free()
 	for (auto &MyPair : m_TargetList)
 		Safe_Release(MyPair.second);
 
+	
 
 }

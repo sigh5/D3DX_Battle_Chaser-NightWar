@@ -23,7 +23,7 @@ public:
 
 public:
 	const	 _tchar*				Get_ProtoName() const { return m_ProtoName; }
-	void							Set_ProtoName(const _tchar* pNametag) { m_ProtoName = pNametag; }
+	void							Set_ProtoName(const _tchar* pNametag) { m_ProtoName= pNametag; }
 
 	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
 	void							Set_ObjectName(const _tchar* pNametag) { m_ObjectName = pNametag; }

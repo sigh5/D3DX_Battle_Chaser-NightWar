@@ -9,8 +9,8 @@ class ENGINE_DLL CUI abstract : public CGameObject
 public:
 	typedef struct tag_UIDesc :public GAMEOBJECTDESC
 	{
-	 _tchar*			pBroadCasterTag =  TEXT("");
-	 _tchar*			m_pTextureTag = TEXT("");
+	 _tchar			pBroadCasterTag[MAX_PATH] =  TEXT("");
+	 _tchar			m_pTextureTag[MAX_PATH] = TEXT("");
 
 	}UIDESC;
 
@@ -20,11 +20,11 @@ protected:
 	virtual ~CUI() = default;
 
 public:
-	 _tchar*						Get_BroadCasterTag()const  { return m_UIDesc.pBroadCasterTag; }
+	 const _tchar*						Get_BroadCasterTag()const  { return m_UIDesc.pBroadCasterTag; }
 	 void							Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
 	
-	 _tchar*						Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
-	 void							Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
+	  virtual const _tchar*						Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
+	  virtual void							Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
 
 	 
 

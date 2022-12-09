@@ -3,8 +3,6 @@
 #include "VIBuffer.h"
 #include "Model.h"
 
-/* 모델의 교체가능한 한 파츠. */
-/* 이 메시를 그려내기위한 정점, 인덱스 버퍼를 보유한다. */
 BEGIN(Engine)
 
 class CMesh final : public CVIBuffer
@@ -18,35 +16,35 @@ public:
 	_uint Get_MaterialIndex() const {
 		return m_iMaterialIndex;
 	}
-	const char* Get_MeshName()const {
-		return m_pAIMesh->mName.data;}
+	const char* Get_MeshName() const { return m_szName; }
 
 public:
-	virtual HRESULT Initialize_Prototype(CModel::TYPE eType, aiMesh* pAIMesh, class CModel* pModel);
+	virtual HRESULT Initialize_Prototype(class CModel* pModel, HANDLE hFile, CModel::LOAD_TYPE eType);
 	virtual HRESULT Initialize(void* pArg) override;
 
+
+	void	LoadFile(HANDLE hFile,CModel* pModel);
+
 public:
-	void SetUp_MeshBones(class CModel* pModel);
 	void SetUp_BoneMatrices(_float4x4* pBoneMatrices, _fmatrix PivotMatrix);
 
-private:
-	aiMesh*				m_pAIMesh = nullptr;
-	CModel::TYPE		m_eType;
-	/* 이 메시는 m_iMaterialIndex번째 머테리얼을 사용한다. */
-	_uint				m_iMaterialIndex = 0;
+public:
+	CModel::LOAD_TYPE			m_eType;
+	char						m_szName[MAX_PATH] = "";
+	_uint						m_iMaterialIndex = 0;
+	_uint						m_iNumBones = 0;
+	vector<class CBone*>		m_Bones;
 
-	/* 이 메시의 정점들에게 영향을 주는 뼈의 갯수. */
-	_uint					m_iNumBones = 0;
-	vector<class CBone*>	m_Bones;
 
 private:
-	HRESULT Ready_VertexBuffer_NonAnimModel(aiMesh* pAIMesh, class CModel* pModel);
-	HRESULT Ready_VertexBuffer_AnimModel(aiMesh* pAIMesh, class CModel* pModel);
+	HRESULT Ready_VertexBuffer_NonAnimModel(HANDLE hFile, class CModel* pModel);
+	HRESULT Ready_VertexBuffer_AnimModel(HANDLE hFile, class CModel* pModel);
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CModel::TYPE eType, aiMesh* pAIMesh, class CModel* pModel);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, class CModel* pModel, HANDLE hFile, CModel::LOAD_TYPE eType);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free();
+
 };
 
 END

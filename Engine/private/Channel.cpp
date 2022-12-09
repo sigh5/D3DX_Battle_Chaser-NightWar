@@ -1,62 +1,36 @@
 #include "..\public\Channel.h"
-#include "Model.h"
+
 #include "Bone.h"
+#include "Model.h"
 
 CChannel::CChannel()
 {
 }
 
-/* 특정애니메이션ㄴ에서 사용되는 뼈. */
-HRESULT CChannel::Initialize(aiNodeAnim * pAIChannel, CModel* pModel)
+HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 {
-	strcpy_s(m_szName, pAIChannel->mNodeName.data);
+	DWORD   dwByte = 0;
 
-	m_pBone = pModel->Get_BonePtr(m_szName);
-	Safe_AddRef(m_pBone);
+	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
+	ReadFile(hFile, &m_iNumKeyframes, sizeof(_uint), &dwByte, nullptr);
 
-	m_iNumKeyframes = max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys);
-	m_iNumKeyframes = max(m_iNumKeyframes, pAIChannel->mNumPositionKeys);
+	m_pBone =		pModel->Get_BonePtr(m_szName);
+	if (m_pBone != nullptr)
+		Safe_AddRef(m_pBone);
 
-	XMFLOAT3		vScale;
-	XMFLOAT4		vRotation;
-	XMFLOAT3		vPosition;
+	KEYFRAME keyFrame;
+	ZeroMemory(&keyFrame, sizeof(KEYFRAME));
 
 	for (_uint i = 0; i < m_iNumKeyframes; ++i)
 	{
-		KEYFRAME			KeyFrame;
-		ZeroMemory(&KeyFrame, sizeof(KEYFRAME));
-
-		if (i < pAIChannel->mNumScalingKeys)
-		{
-			memcpy(&vScale, &pAIChannel->mScalingKeys[i].mValue, sizeof(XMFLOAT3));
-			KeyFrame.Time = pAIChannel->mScalingKeys[i].mTime;
-		}
-
-		if (i < pAIChannel->mNumRotationKeys)
-		{
-			/*memcpy(&vScale, &pAIChannel->mRotationKeys[i].mValue, sizeof(XMFLOAT3));*/
-			vRotation.x = pAIChannel->mRotationKeys[i].mValue.x;
-			vRotation.y = pAIChannel->mRotationKeys[i].mValue.y;
-			vRotation.z = pAIChannel->mRotationKeys[i].mValue.z;
-			vRotation.w = pAIChannel->mRotationKeys[i].mValue.w;
-			KeyFrame.Time = pAIChannel->mRotationKeys[i].mTime;
-		}
-
-		if (i < pAIChannel->mNumPositionKeys)
-		{
-			memcpy(&vPosition, &pAIChannel->mPositionKeys[i].mValue, sizeof(XMFLOAT3));
-			KeyFrame.Time = pAIChannel->mPositionKeys[i].mTime;
-		}
-
-		KeyFrame.vScale = vScale;
-		KeyFrame.vRotation = vRotation;
-		KeyFrame.vPosition = vPosition;
-
-		m_KeyFrames.push_back(KeyFrame);
+		ReadFile(hFile, &keyFrame, sizeof(KEYFRAME), &dwByte, nullptr);
+		m_KeyFrames.push_back(keyFrame);
 	}
 
 	return S_OK;
 }
+
+
 
 void CChannel::Update_TransformMatrix(_double PlayTime)
 {
@@ -107,11 +81,12 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 	m_pBone->Set_TransformMatrix(TransformMatrix);
 }
 
-CChannel * CChannel::Create(aiNodeAnim * pAIChannel, CModel* pModel)
+
+CChannel * CChannel::Create(HANDLE hFile, CModel * pModel)
 {
 	CChannel*		pInstance = new CChannel();
 
-	if (FAILED(pInstance->Initialize(pAIChannel, pModel)))
+	if (FAILED(pInstance->Initialize(hFile, pModel)))
 	{
 		MSG_BOX("Failed to Created : CChannel");
 		Safe_Release(pInstance);
@@ -125,3 +100,4 @@ void CChannel::Free()
 
 	m_KeyFrames.clear();
 }
+

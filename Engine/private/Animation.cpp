@@ -1,33 +1,32 @@
 #include "..\public\Animation.h"
 #include "Channel.h"
 
+
 CAnimation::CAnimation()
 	: m_isLooping(true)
 {
 }
 
-HRESULT CAnimation::Initialize(aiAnimation * pAIAnimation, CModel* pModel)
+
+HRESULT CAnimation::Initialize(HANDLE hFile, CModel * pModel)
 {
-	strcpy_s(m_szName, pAIAnimation->mName.data);
+	DWORD   dwByte = 0;
 
-	m_Duration = pAIAnimation->mDuration;
-
-	m_TickPerSecond = pAIAnimation->mTicksPerSecond;
-
-	/* 이 애니메이션 구동하는데 필요한 뼈대의 갯수다.  */
-	m_iNumChannels = pAIAnimation->mNumChannels;
+	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
+	ReadFile(hFile, &m_Duration, sizeof(_double), &dwByte, nullptr);
+	ReadFile(hFile, &m_TickPerSecond, sizeof(_double), &dwByte, nullptr);
+	ReadFile(hFile, &m_isLooping, sizeof(_bool), &dwByte, nullptr);
+	ReadFile(hFile, &m_iNumChannels, sizeof(_uint), &dwByte, nullptr);
+	
 
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
-		aiNodeAnim*		pAINodeAnim = pAIAnimation->mChannels[i];
-
-		CChannel*		pChannel = CChannel::Create(pAINodeAnim, pModel);
+		CChannel* pChannel = CChannel::Create(hFile, pModel);
 		if (nullptr == pChannel)
-			return E_FAIL;
+			assert("CAnimation::Initialize");
 
 		m_Channels.push_back(pChannel);
 	}
-
 	return S_OK;
 }
 
@@ -60,11 +59,11 @@ void CAnimation::Update_Bones(_double TimeDelta)
 
 }
 
-CAnimation * CAnimation::Create(aiAnimation * pAIAnimation, CModel* pModel)
+CAnimation * CAnimation::Create(HANDLE hFile, CModel * pModel)
 {
 	CAnimation*		pInstance = new CAnimation();
 
-	if (FAILED(pInstance->Initialize(pAIAnimation, pModel)))
+	if (FAILED(pInstance->Initialize(hFile, pModel)))
 	{
 		MSG_BOX("Failed to Created : CAnimation");
 		Safe_Release(pInstance);
@@ -79,4 +78,3 @@ void CAnimation::Free()
 
 	m_Channels.clear();
 }
-

@@ -206,8 +206,7 @@ void CTerrain::Create_Object()
 			CEnvironment_Object::ENVIRONMENTDESC Desc;
 			ZeroMemory(&Desc, sizeof(CEnvironment_Object::ENVIRONMENTDESC));
 
-			Desc.m_pModelTag = m_ObjData.szModelName;
-
+			lstrcpy(Desc.m_pModelTag, m_ObjData.szModelName);
 			pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), m_ObjData.szLayerName,m_ObjData.szProtoName, &pGameObject,&Desc);
 			if (pGameObject == nullptr)
 				MSG_BOX(" CTerrain::Piciking_GameObject");

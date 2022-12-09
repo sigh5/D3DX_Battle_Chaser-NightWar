@@ -45,20 +45,29 @@ HRESULT CHero_Gully::Initialize(void * pArg)
 
 HRESULT CHero_Gully::Last_Initialize()
 {
+	if (m_bLast_Initlize)
+		return S_OK;
+
+	m_bControlKeyInput = true;
+
+	m_pModelCom->Set_NoRenderMeshName("Gully_Gloves_Stone");
+
+	m_pModelCom->m_iNoRenderIndex = 12;
+	m_bLast_Initlize = true;
+
 	return S_OK;
 }
 
 void CHero_Gully::Tick(_double TimeDelta)
 {
-	//ImGui::InputInt("AnimIndex", &AnimIndex);
-	//ImGui::InputInt("AnimType", &m_iPlayerType);	// 0 or 1
-
-	//if (AnimIndex >= m_pModelCom->m_iNumAnimations)
-	//	AnimIndex = 0;
-
+	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	KeyInput(TimeDelta);
+	CPlayer::KeyInput(TimeDelta, m_pModelCom);
+
+	ObserverTest(TimeDelta);
+
+	ImGui::InputInt("Mesh", &m_iMeshIndex);
 
 	m_pModelCom->Play_Animation(TimeDelta);
 
@@ -88,114 +97,35 @@ HRESULT CHero_Gully::Render()
 		/* 이 모델을 그리기위한 셰이더에 머테리얼 텍스쳐를 전달하낟. */
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 
-		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices");
+		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "FishingRod");
 	}
 
 	return S_OK;
 	
 }
 
-void CHero_Gully::KeyInput(_double TimeDelta)
-{
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	_float4 vTargetPos;
-	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
-
-	if (pGameInstance->Key_Pressing(DIK_DOWN))
-	{
-		vTargetPos.z -= 1.f;
-		if (pGameInstance->Key_Pressing(DIK_RIGHT))
-		{
-			vTargetPos.z += 0.5f;
-			vTargetPos.x += 0.5f;
-		}
-		else if (pGameInstance->Key_Pressing(DIK_LEFT))
-		{
-			vTargetPos.z += 0.5f;
-			vTargetPos.x -= 0.5f;
-		}
-		m_bKeyInput = true;
-		
-	}
-	else if (pGameInstance->Key_Pressing(DIK_UP))
-	{
-		vTargetPos.z += 1.f;
-		if (pGameInstance->Key_Pressing(DIK_RIGHT))
-		{
-			vTargetPos.z -= 0.5f;
-			vTargetPos.x += 0.5f;
-		}
-		else if (pGameInstance->Key_Pressing(DIK_LEFT))
-		{
-			vTargetPos.z -= 0.5f;
-			vTargetPos.x -= 1.f;
-		}
-		m_bKeyInput = true;
-		
-	}
-	else if (pGameInstance->Key_Pressing(DIK_RIGHT))
-	{
-		m_bKeyInput = true;
-		vTargetPos.x += 1.f;
-	}
-	else if (pGameInstance->Key_Pressing(DIK_LEFT))
-	{
-		m_bKeyInput = true;
-		vTargetPos.x -= 1.f;
-	}
-	else
-		m_bKeyInput = false;
-
-	if (m_bKeyInput)
-	{
-		m_fWalkTime += TimeDelta* 1.0;
-		m_pTransformCom->LookAt(XMLoadFloat4(&vTargetPos));
-		
-		if (m_fWalkTime >= 1.f)
-		{
-			m_pModelCom->Set_AnimIndex(2);
-			m_fMoveSpeedRatio = 1.f;
-		}
-		else
-		{
-			m_pModelCom->Set_AnimIndex(1);
-			m_fMoveSpeedRatio = 0.5f;
-		}
-		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio);
-	}
-	else
-	{
-		m_pModelCom->Set_AnimIndex(0);
-		m_fWalkTime = 0.0;
-	}
-
-
-
-	RELEASE_INSTANCE(CGameInstance);
-}
 
 _bool CHero_Gully::Piciking_GameObject()
 {
 	return _bool();
 }
 
-void CHero_Gully::ObserverTest()
+void CHero_Gully::ObserverTest(_double TimeDelta)
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	/*if (pInstance->Key_Down(DIK_SPACE))
+	if (pInstance->Key_Down(DIK_SPACE))
 	{
-	_uint iMoveSpeed = 100;
-	m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
+		_uint iMoveSpeed = 100;
+		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
 
 	}
 
 	if (pInstance->Key_Down(DIK_O))
 	{
-	_uint iShakingTime = 3;
-	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	}*/
+		_uint iShakingTime = 3;
+		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
+	}
 	RELEASE_INSTANCE(CGameInstance);
 }
 

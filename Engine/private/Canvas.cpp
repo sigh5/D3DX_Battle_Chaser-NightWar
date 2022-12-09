@@ -26,7 +26,7 @@ HRESULT CCanvas::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_CanvasDesc, pArg, sizeof(m_CanvasDesc));
 
-	if (FAILED(__super::Initialize(&m_CanvasDesc)))
+	if (FAILED(__super::Initialize(&m_CanvasDesc.m_pTextureTag)))
 		return E_FAIL;
 
 	return S_OK;

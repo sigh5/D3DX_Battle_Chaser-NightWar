@@ -1,8 +1,10 @@
 #include "..\public\Model.h"
-#include "Mesh.h"
+
 #include "Texture.h"
 #include "Shader.h"
+
 #include "Bone.h"
+#include "Mesh.h"
 #include "Animation.h"
 
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -12,7 +14,6 @@ CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CModel::CModel(const CModel & rhs)
 	: CComponent(rhs)
-	, m_pAIScene(rhs.m_pAIScene)
 	, m_eType(rhs.m_eType)
 	, m_iNumMeshes(rhs.m_iNumMeshes)
 	, m_Materials(rhs.m_Materials)
@@ -21,15 +22,36 @@ CModel::CModel(const CModel & rhs)
 	, m_iNumAnimations(rhs.m_iNumAnimations)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
+	, m_Bones(rhs.m_Bones)
+	, m_Animations(rhs.m_Animations)
 {
+	//Test 얕은복사
+	for (auto& m_Bones : m_Bones)
+	{
+		Safe_AddRef(m_Bones);
+	}
+
+	for (auto& pAnimations : m_Animations)
+	{
+		Safe_AddRef(pAnimations);
+	}
+
+	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
+
 	for (auto& Material : m_Materials)
 	{
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
 			Safe_AddRef(Material.pTexture[i]);
 	}
-
 	for (auto& pMesh : rhs.m_Meshes)
-		m_Meshes.push_back((CMesh*)pMesh->Clone());
+	{
+		m_Meshes.push_back((CMesh*)pMesh->Clone(this));
+
+	}
+
+
+
+
 }
 
 CBone * CModel::Get_BonePtr(const char * pBoneName)
@@ -44,36 +66,35 @@ CBone * CModel::Get_BonePtr(const char * pBoneName)
 
 	return *iter;
 
-
-	return nullptr;
 }
 
-HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix)
+HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile)
 {
 	_uint			iFlag = 0;
-
-	if (TYPE_NONANIM == eType)
-		iFlag = aiProcess_PreTransformVertices | aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
-	else
-		iFlag = aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast;
-
+	strcpy_s(m_szModelPath, MAX_PATH, pModelFilePath);
 	m_eType = eType;
-
-	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
-	if (nullptr == m_pAIScene)
-		return E_FAIL;
-
 	XMStoreFloat4x4(&m_PivotMatrix, PivotMatrix);
 
-	/* 뼈를 로드한다. / */
-	/*if (FAILED(Ready_Bones(m_pAIScene->mRootNode, nullptr)))
-	return E_FAIL;*/
 
-	if (FAILED(Ready_MeshContainers()))
+	if (FAILED(Ready_MeshContainers(hFile, eType)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(pModelFilePath)))
+	if (FAILED(Ready_Materials(hFile, pModelFilePath, eType)))
 		return E_FAIL;
+
+	if (FAILED(Ready_Bones(hFile, nullptr)))	// 깊은복사 필요
+		return E_FAIL;
+
+	for (auto& pMesh : m_Meshes)
+	{
+		pMesh->LoadFile(hFile,this);
+	}
+
+
+	
+	if (FAILED(Ready_Animation(hFile)))		// 깊은 복사 필요
+		return E_FAIL;
+
 
 
 
@@ -82,23 +103,18 @@ HRESULT CModel::Initialize_Prototype(TYPE eType, const char * pModelFilePath, _f
 
 HRESULT CModel::Initialize(void * pArg)
 {
-	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, nullptr)))
-		return E_FAIL;
+	ZeroMemory(&m_ModelDesc, sizeof(m_ModelDesc));
 
-	for (auto& pMesh : m_Meshes)
-	{
-		pMesh->SetUp_MeshBones(this);
-	}
+	if (nullptr != pArg)
+		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
 
-	if (FAILED(Ready_Animation()))
-		return E_FAIL;
 
 	return S_OK;
 }
 
 void CModel::Play_Animation(_double TimeDelta)
 {
- 	if (TYPE_NONANIM == m_eType)
+	if (TYPE_NONANIM == m_eType)
 		return;
 
 	/* 현재 애니메이션에 맞는 뼈들의 TranformMAtrix를 갱신하낟. */
@@ -109,7 +125,6 @@ void CModel::Play_Animation(_double TimeDelta)
 		if (nullptr != pBone)
 			pBone->Compute_CombindTransformationMatrix();
 	}
-	int a = 10;
 }
 
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)
@@ -121,7 +136,7 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 
 	if (iMaterialIndex >= m_iNumMaterials)
 		return E_FAIL;
-	
+
 	if (nullptr != m_Materials[iMaterialIndex].pTexture[eType])
 	{
 		m_Materials[iMaterialIndex].pTexture[eType]->Bind_ShaderResource(pShader, pConstantName);
@@ -132,9 +147,15 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 	return S_OK;
 }
 
-HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , const char* pBoneConstantName)
+HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, const char * pBoneConstantName,const char* pNoRenderName)
 {
-	if (!strcmp(m_Meshes[iMeshIndex]->Get_MeshName(), "FishingRod"))
+	if (pNoRenderName != nullptr && !strcmp(m_Meshes[iMeshIndex]->Get_MeshName(), pNoRenderName))
+		return S_OK;
+
+	if (!strcmp(m_szNoRenderMeshName, m_Meshes[iMeshIndex]->Get_MeshName()))
+		return S_OK;
+	
+	if (m_iNoRenderIndex == iMeshIndex)
 		return S_OK;
 
 	if (nullptr != m_Meshes[iMeshIndex])
@@ -148,7 +169,7 @@ HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , 
 			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 128);
 		}
 
-		pShader->Begin(0);
+		pShader->Begin(iShaderIndex);
 
 		m_Meshes[iMeshIndex]->Render();
 	}
@@ -157,88 +178,86 @@ HRESULT CModel::Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex , 
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Bones(aiNode * pAINode, CBone* pParent)
+_float4x4 CModel::GetModelCameraBone()
 {
-	/* 생성하고자해ㅑㅆ떤 뼈의 정보. */
-	CBone*		pBone = CBone::Create(pAINode, pParent);
-	if (nullptr == pBone)
-		return E_FAIL;
+	return _float4x4();
+}
 
+
+
+
+HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
+{
+	DWORD   dwByte = 0;
+
+
+	CBone* pBone = CBone::Create(this, hFile);
+	if (nullptr == pBone)
+		assert("CLoadModel_Ready_Bones");
+	if(pParent!=nullptr)
+		pBone->Set_Parent(pParent);
 	m_Bones.push_back(pBone);
 
-	/* 이뼈의 자식뼈를 만든다.  */
-	for (_uint i = 0; i < pAINode->mNumChildren; ++i)
+	_uint NumChildren = 0;
+	ReadFile(hFile, &NumChildren, sizeof(_uint), &dwByte, nullptr);
+	for (_uint i = 0; i < NumChildren; ++i)
 	{
-		Ready_Bones(pAINode->mChildren[i], pBone);
-	}
+		Ready_Bones(hFile, pBone);
 
+	}
+		
+
+	
 	return S_OK;
 }
 
-HRESULT CModel::Ready_MeshContainers()
+HRESULT CModel::Ready_MeshContainers(HANDLE hFile, LOAD_TYPE eType)
 {
-	if (nullptr == m_pAIScene)
-		return E_FAIL;
-
-	m_iNumMeshes = m_pAIScene->mNumMeshes;
+	DWORD   dwByte = 0;
+	ReadFile(hFile, &m_iNumMeshes, sizeof(_uint), &dwByte, nullptr);
 
 	for (_uint i = 0; i < m_iNumMeshes; ++i)
 	{
-		aiMesh*		pAIMesh = m_pAIScene->mMeshes[i];
+		CMesh *pMesh = CMesh::Create(m_pDevice, m_pContext, this, hFile,eType);
 
-		CMesh*		pMesh = CMesh::Create(m_pDevice, m_pContext, m_eType, pAIMesh, this);
 		if (nullptr == pMesh)
-			return E_FAIL;
+			assert("CLoadModel::Ready_MeshContainers");
 
 		m_Meshes.push_back(pMesh);
 	}
 
+
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Materials(const char* pModelFilePath)
+HRESULT CModel::Ready_Materials(HANDLE hFile, const char * pModelFilePath, LOAD_TYPE eType)
 {
-	char		szDirectory[MAX_PATH] = "";
-
-	_splitpath_s(pModelFilePath, nullptr, 0, szDirectory, MAX_PATH, nullptr, 0, nullptr, 0);
-
-	/* 텍스쳐에 기록되어있는 픽셀단위 재질 정보를 로드한다. */
-	m_iNumMaterials = m_pAIScene->mNumMaterials;
+	DWORD   dwByte = 0;
+	ReadFile(hFile, &m_iNumMaterials, sizeof(_uint), &dwByte, nullptr);
 
 	for (_uint i = 0; i < m_iNumMaterials; ++i)
 	{
-		char		szTextureFileName[MAX_PATH] = "";
-		char		szExt[MAX_PATH] = "";
-		char		szTexturePath[MAX_PATH] = "";
-
-		MODELMATERIAL			ModelMaterial;
+		MODELMATERIAL ModelMaterial;
 		ZeroMemory(&ModelMaterial, sizeof(ModelMaterial));
-
-		aiMaterial*		pAIMaterial = m_pAIScene->mMaterials[i];
 
 		for (_uint j = 0; j < AI_TEXTURE_TYPE_MAX; ++j)
 		{
-			/*j == 0 = > aiTextureType_NONE;
-			j == 1 = > aiTextureType_DIFFUSE;
-			j == 2 = > aiTextureType_SPECULAR;*/
-
-			aiString			strTexturePath;
-
-			if (FAILED(pAIMaterial->GetTexture(aiTextureType(j), 0, &strTexturePath)))
+			_uint iTextureIndex = 0;
+			ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
+			if (AI_TEXTURE_TYPE_MAX == iTextureIndex)
+			{
 				continue;
+			}
 
-			_splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szTextureFileName, MAX_PATH, szExt, MAX_PATH);
+			_tchar szFilePath[MAX_PATH] = TEXT("");
+			_uint TextureFilePathLen = 0;
+			ReadFile(hFile, &TextureFilePathLen, sizeof(_uint), &dwByte, nullptr);
+			ReadFile(hFile, szFilePath,sizeof(_tchar)* TextureFilePathLen, &dwByte, nullptr);
 
-			strcpy_s(szTexturePath, szDirectory);
-			strcat_s(szTexturePath, szTextureFileName);
-			strcat_s(szTexturePath, szExt);
+			if (!lstrcmp(szFilePath, TEXT("")))
+				assert("CLoadModel: Ready_Materials issue");
 
-			_tchar			szFullPath[MAX_PATH] = TEXT("");
-
-			MultiByteToWideChar(CP_ACP, 0, szTexturePath, size_t(strlen(szTexturePath)), szFullPath, MAX_PATH);
-
-			ModelMaterial.pTexture[j] = CTexture::Create(m_pDevice, m_pContext, szFullPath);
-
+			ModelMaterial.pTexture[iTextureIndex] = CTexture::Create(m_pDevice, m_pContext ,szFilePath);
 			if (nullptr == ModelMaterial.pTexture[j])
 				return E_FAIL;
 		}
@@ -249,31 +268,33 @@ HRESULT CModel::Ready_Materials(const char* pModelFilePath)
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Animation()
+HRESULT CModel::Ready_Animation(HANDLE hFile)
 {
-	m_iNumAnimations = m_pAIScene->mNumAnimations;
+	DWORD   dwByte = 0;
+	ReadFile(hFile, &m_iNumAnimations, sizeof(_uint), &dwByte, nullptr);
 
 	for (_uint i = 0; i < m_iNumAnimations; ++i)
 	{
-		aiAnimation*		pAIAnimation = m_pAIScene->mAnimations[i];
+		CAnimation* pAnimation = CAnimation::Create(hFile, this);
 
-		CAnimation*			pAnim = CAnimation::Create(pAIAnimation, this);
-		if (nullptr == pAnim)
-			return E_FAIL;
+		if (nullptr == pAnimation)
+			assert("CLoadModel::Ready_Animation");
 
-		m_Animations.push_back(pAnim);
+		m_Animations.push_back(pAnimation);
 	}
+
+
 
 	return S_OK;
 }
 
-CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix)
+CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, LOAD_TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile)
 {
 	CModel*		pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eType, pModelFilePath, PivotMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype(eType, pModelFilePath, PivotMatrix, hFile)))
 	{
-		MSG_BOX("Failed to Created : CModel");
+		MSG_BOX("Failed to Created : CLoadModel");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
@@ -298,10 +319,11 @@ void CModel::Free()
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);
+	m_Bones.clear();
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);
-
+	m_Animations.clear();
 
 	for (auto& Material : m_Materials)
 	{
@@ -313,8 +335,4 @@ void CModel::Free()
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 	m_Meshes.clear();
-
-	m_Importer.FreeScene();
 }
-
-

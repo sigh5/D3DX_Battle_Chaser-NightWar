@@ -26,15 +26,14 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-public:
-	virtual void KeyInput(_double TimeDelta)override;
+	
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
 
 private:
-	void			ObserverTest();
+	void			ObserverTest(_double TimeDelta);
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -51,6 +50,7 @@ private:
 	_float		m_fMoveSpeedRatio = 0.f;
 	_bool		m_bKeyInput = false;
 
+	int			m_iMeshIndex = 0;
 public:
 	static CHero_Gully* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

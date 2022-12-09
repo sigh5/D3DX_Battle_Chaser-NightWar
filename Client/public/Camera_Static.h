@@ -29,6 +29,11 @@ public:
 	virtual HRESULT Render() override;
 
 	virtual void	Set_CameraActive(_bool bCameraActive)override;
+	
+private:
+	void	Set_CaptinPlayer();
+
+
 
 private:
 	HRESULT SetUp_Components();
@@ -36,11 +41,13 @@ private:
 private:
 	list<pair<const wstring ,CGameObject*>>	m_TargetList;
 
+
+
 private:
 	_float					m_CameraDistanceY = 5.f;
 	_float					m_CameraDistanceZ = 5.f;
 	wstring					m_ChaseTargetTag = TEXT("");
-	CGameObject*			m_pCurrentTarget = nullptr;
+	CGameObject*			m_pCaptinPlayer = nullptr;
 public:
 	static CCamera_Static* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

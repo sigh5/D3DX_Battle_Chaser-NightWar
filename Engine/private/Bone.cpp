@@ -1,27 +1,30 @@
 #include "..\public\Bone.h"
 
-
+#include "Model.h"
 
 CBone::CBone()
 {
 }
 
-HRESULT CBone::Initialize(aiNode * pAINode, CBone* pParent)
+CBone::CBone(const CBone & rhs)
+	: m_CombindTransformMatrix(rhs.m_CombindTransformMatrix)
+	, m_OffsetMatrix(rhs.m_OffsetMatrix)
+	, m_TransformMatrix(rhs.m_TransformMatrix)
+	, m_pParent(rhs.m_pParent)
+
 {
-	strcpy_s(m_szName, pAINode->mName.data);
+	strcpy_s(m_szName, MAX_PATH, rhs.m_szName);
+	strcpy_s(m_szParentName, MAX_PATH, rhs.m_szParentName);
+}
 
-	XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixIdentity());
+HRESULT CBone::Initialize(CModel* pModel, HANDLE hFile)
+{
+	DWORD   dwByte = 0;
 
-	memcpy(&m_TransformMatrix, &pAINode->mTransformation, sizeof(_float4x4));
+	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
+	ReadFile(hFile, &m_TransformMatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
 
-	XMStoreFloat4x4(&m_TransformMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformMatrix)));
-
-	XMStoreFloat4x4(&m_CombindTransformMatrix, XMMatrixIdentity());
-
-	m_pParent = pParent;
-
-	Safe_AddRef(m_pParent);
-
+	
 	return S_OK;
 }
 
@@ -32,14 +35,13 @@ void CBone::Compute_CombindTransformationMatrix()
 
 	else
 		XMStoreFloat4x4(&m_CombindTransformMatrix, XMLoadFloat4x4(&m_TransformMatrix) * XMLoadFloat4x4(&m_pParent->m_CombindTransformMatrix));
-
 }
 
-CBone * CBone::Create(aiNode * pAINode, CBone* pParent)
+CBone * CBone::Create(CModel* pModel, HANDLE hFile)
 {
 	CBone*		pInstance = new CBone();
 
-	if (FAILED(pInstance->Initialize(pAINode, pParent)))
+	if (FAILED(pInstance->Initialize(pModel, hFile)))
 	{
 		MSG_BOX("Failed to Created : CBone");
 		Safe_Release(pInstance);
@@ -47,8 +49,10 @@ CBone * CBone::Create(aiNode * pAINode, CBone* pParent)
 	return pInstance;
 }
 
+
 void CBone::Free()
 {
 	Safe_Release(m_pParent);
-
 }
+
+

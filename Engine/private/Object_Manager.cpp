@@ -108,7 +108,8 @@ CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag , 
 
 	CUI::UIDESC m_UIdesc;
 	ZeroMemory(&m_UIdesc, sizeof(m_UIdesc));
-	m_UIdesc.m_pTextureTag = dynamic_cast<CUI*>(pGameObject)->Get_TextureTag();
+	
+	lstrcpy(m_UIdesc.m_pTextureTag, dynamic_cast<CUI*>(pGameObject)->Get_TextureTag());
 
 	CGameObject*		pCloneGameObject = pPrototype->Clone(&m_UIdesc);
 	if (pCloneGameObject == nullptr)
@@ -481,9 +482,9 @@ void CObject_Manager::Imgui_Load()
 			{
 				CEnvironment_Object::ENVIRONMENTDESC Desc;
 				ZeroMemory(&Desc, sizeof(Desc));
-				Desc.m_pModelTag = ModelName;
+				lstrcpy(Desc.m_pModelTag, ModelName);
 				Desc.m_iShaderPass = iShaderPass;
-				Desc.m_pTextureTag = TextureName;
+				lstrcpy(Desc.m_pTextureTag, TextureName);
 				CGameObject* pGameObject = nullptr;
 				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject,&Desc);
 				(pGameObject)->Set_ProtoName(ProtoName);
@@ -496,7 +497,8 @@ void CObject_Manager::Imgui_Load()
 			{
 				CUI::UIDESC UIDesc;
 				ZeroMemory(&UIDesc, sizeof(UIDesc));
-				UIDesc.m_pTextureTag = TextureName;
+				 lstrcpy(UIDesc.m_pTextureTag, TextureName);
+				
 				CGameObject* pGameObject = nullptr;
 				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject, &UIDesc);
 				(pGameObject)->Set_ProtoName(ProtoName);

@@ -85,11 +85,17 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateCanvas">
       <UniqueIdentifier>{ca9c7644-b7d0-47c0-90af-ded52b2a84b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateButton">
-      <UniqueIdentifier>{f349b748-35d5-4dcf-b771-2274c779fe18}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Camera\StaticCamera">
       <UniqueIdentifier>{b5b36561-8ed8-498d-a3c7-978b8da9f8a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\DungeonUI">
+      <UniqueIdentifier>{b826be8e-e9ab-43ef-99e8-e97ee90e98be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\DungeonUI\Canvas">
+      <UniqueIdentifier>{1c39d727-b428-4689-8b4b-ff8036ab76cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\Button">
+      <UniqueIdentifier>{0ea519bc-3118-43d3-8103-53b8a1488d2e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -147,9 +153,6 @@
     <ClInclude Include="..\Public\LoadingImage.h">
       <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Hero_Alumon.h">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\NoneAnim_BG.h">
       <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
     </ClInclude>
@@ -174,11 +177,20 @@
     <ClInclude Include="..\Public\TurnStateCanvas.h">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TurnStateButton.h">
-      <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Camera_Static.h">
       <Filter>02.GameObjects\Camera\StaticCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Hero_Garrison.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Hero_Calibretto.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Dungeon_Canvas.h">
+      <Filter>02.GameObjects\UI\DungeonUI\Canvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UIButton.h">
+      <Filter>02.GameObjects\UI\Button</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -224,9 +236,6 @@
     <ClCompile Include="..\Private\LoadingImage.cpp">
       <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Hero_Alumon.cpp">
-      <Filter>02.GameObjects\Player</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\NoneAnim_BG.cpp">
       <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
     </ClCompile>
@@ -251,11 +260,20 @@
     <ClCompile Include="..\Private\TurnStateCanvas.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TurnStateButton.cpp">
-      <Filter>02.GameObjects\UI\TrunBattle\TurnStateButton</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Camera_Static.cpp">
       <Filter>02.GameObjects\Camera\StaticCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Hero_Garrison.cpp">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Hero_Calibretto.cpp">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Dungeon_Canvas.cpp">
+      <Filter>02.GameObjects\UI\DungeonUI\Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UIButton.cpp">
+      <Filter>02.GameObjects\UI\Button</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
