@@ -63,11 +63,12 @@ void CHero_Gully::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	CPlayer::KeyInput(TimeDelta, m_pModelCom);
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+		m_iAnimIndex = 0;
 
+	AnimMove();
+	
 	ObserverTest(TimeDelta);
-
-	ImGui::InputInt("Mesh", &m_iMeshIndex);
 
 	m_pModelCom->Play_Animation(TimeDelta);
 
@@ -104,12 +105,55 @@ HRESULT CHero_Gully::Render()
 	
 }
 
+_vector CHero_Gully::Get_CameraBoneVector()
+{
+	return m_pModelCom->GetModelCameraBone();
+}
+
 
 
 _bool CHero_Gully::Piciking_GameObject()
 {
 	return _bool();
 }
+
+_uint CHero_Gully::Get_AnimationIndex()
+{
+	return m_pModelCom->Get_AnimIndex();
+}
+
+void CHero_Gully::AnimMove()
+{
+	m_pModelCom->Set_AnimIndex(m_iAnimIndex);
+}
+
+void CHero_Gully::HighLightChar()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 134.f;;
+	Desc.yPos = 5.f;
+	Desc.iTextureIndex = 8;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton3"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
+}
+
+void CHero_Gully::NormalLightCharUI()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 123.f;
+	Desc.yPos = 0.f;
+	Desc.iTextureIndex = 5;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton3"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
+
+}
+
 
 void CHero_Gully::ObserverTest(_double TimeDelta)
 {

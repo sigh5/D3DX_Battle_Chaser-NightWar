@@ -148,7 +148,16 @@ namespace Engine
 
 
 	
-	
+	typedef struct Tag_HighLightUIDesc
+	{
+		float		 iNumSizeX;
+		float		 iNumSizeY;
+		float		 yPos;
+		unsigned int iTextureIndex;
+		wchar_t		 szObjectName[MAX_PATH];
+
+	}HIGHLIGHT_UIDESC;
+
 
 
 

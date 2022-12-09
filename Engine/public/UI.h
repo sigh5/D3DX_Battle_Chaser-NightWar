@@ -41,7 +41,7 @@ public:
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
 	virtual void	Set_parentName(const _tchar* pParentTag);
-
+	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc) {};
 protected:
 	virtual HRESULT SetUp_UI()sealed;
 
@@ -58,7 +58,6 @@ protected:
 	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
 	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
 	UINT                        m_StencilRef = 0;
-
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

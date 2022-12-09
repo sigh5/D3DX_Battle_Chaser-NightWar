@@ -41,9 +41,12 @@ public:
 	static _double	 TimeDelta;
 
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
+	static  void    UI_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName, _uint iLevel);
 
 
 	// 현재트랜스폼, 목표지점
+	
+	
 
 
 };

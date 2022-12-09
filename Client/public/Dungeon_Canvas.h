@@ -2,6 +2,8 @@
 #include "Client_Defines.h"
 #include "Canvas.h"
 
+
+
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -35,6 +37,14 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
+
+public:
+	void					Change_UITexture(HIGHLIGHT_UIDESC Desc);
+
+
+
+
+
 
 
 private:

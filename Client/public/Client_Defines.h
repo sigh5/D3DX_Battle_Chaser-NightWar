@@ -12,6 +12,9 @@ namespace Client
 	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
 
 
+	
+
+
 }
 
 extern HWND			g_hWnd;

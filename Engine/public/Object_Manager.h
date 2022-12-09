@@ -28,9 +28,11 @@ public:
 	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject);
 
 
+	void	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);
+
 
 public:
-	map<const wstring, class CGameObject*>*		Get_ProtoTypes() { return &m_Prototypes; }
+	map<const wstring, class CGameObject*>*			Get_ProtoTypes() { return &m_Prototypes; }
 	map<const wstring, class CLayer*>*				Get_Layer() { return m_pLayers; }
 
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);

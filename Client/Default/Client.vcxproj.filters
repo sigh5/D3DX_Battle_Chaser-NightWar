@@ -85,9 +85,6 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TurnStateCanvas">
       <UniqueIdentifier>{ca9c7644-b7d0-47c0-90af-ded52b2a84b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Camera\StaticCamera">
-      <UniqueIdentifier>{b5b36561-8ed8-498d-a3c7-978b8da9f8a4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\UI\DungeonUI">
       <UniqueIdentifier>{b826be8e-e9ab-43ef-99e8-e97ee90e98be}</UniqueIdentifier>
     </Filter>
@@ -96,6 +93,9 @@
     </Filter>
     <Filter Include="02.GameObjects\UI\Button">
       <UniqueIdentifier>{0ea519bc-3118-43d3-8103-53b8a1488d2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\PlayerController">
+      <UniqueIdentifier>{f9a70e32-f236-4874-bbd5-02c8f5394ed2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -177,9 +177,6 @@
     <ClInclude Include="..\Public\TurnStateCanvas.h">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Camera_Static.h">
-      <Filter>02.GameObjects\Camera\StaticCamera</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Hero_Garrison.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
@@ -191,6 +188,12 @@
     </ClInclude>
     <ClInclude Include="..\public\UIButton.h">
       <Filter>02.GameObjects\UI\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerController.h">
+      <Filter>02.GameObjects\Player\PlayerController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Static.h">
+      <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -260,9 +263,6 @@
     <ClCompile Include="..\Private\TurnStateCanvas.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TurnStateCanvas</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Camera_Static.cpp">
-      <Filter>02.GameObjects\Camera\StaticCamera</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Hero_Garrison.cpp">
       <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
@@ -274,6 +274,12 @@
     </ClCompile>
     <ClCompile Include="..\private\UIButton.cpp">
       <Filter>02.GameObjects\UI\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerController.cpp">
+      <Filter>02.GameObjects\Player\PlayerController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Static.cpp">
+      <Filter>02.GameObjects\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -51,12 +51,16 @@ void CHero_Garrison::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	CPlayer::KeyInput(TimeDelta, m_pModelCom);
-			
-
-	m_pModelCom->Play_Animation(TimeDelta);
-
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+		m_iAnimIndex = 0;
 	
+	if (ImGui::Button("!!"))
+	{
+		LookAtTarget();
+	}
+
+	AnimMove();
+	m_pModelCom->Play_Animation(TimeDelta);
 }
 
 
@@ -90,6 +94,11 @@ HRESULT CHero_Garrison::Render()
 	return S_OK;
 }
 
+_vector CHero_Garrison::Get_CameraBoneVector()
+{
+	return m_pModelCom->GetModelCameraBone();
+}
+
 
 
 _bool CHero_Garrison::Piciking_GameObject()
@@ -98,6 +107,42 @@ _bool CHero_Garrison::Piciking_GameObject()
 		return true;
 */
 	return false;
+}
+
+_uint CHero_Garrison::Get_AnimationIndex()
+{
+	return m_pModelCom->Get_AnimIndex();
+}
+
+void CHero_Garrison::AnimMove()
+{
+	m_pModelCom->Set_AnimIndex(m_iAnimIndex);
+}
+
+void CHero_Garrison::HighLightChar()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 134.f;
+	Desc.yPos = 5.f;
+	Desc.iTextureIndex = 8;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton2"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
+}
+
+void CHero_Garrison::NormalLightCharUI()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 123.f;
+	Desc.yPos = 0.f;
+	Desc.iTextureIndex = 5;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton2"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
 }
 
 HRESULT CHero_Garrison::SetUp_Components()

@@ -6,6 +6,7 @@
 #include "Bone.h"
 #include "Mesh.h"
 #include "Animation.h"
+#include "GameUtils.h"
 
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -24,6 +25,7 @@ CModel::CModel(const CModel & rhs)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
 	, m_Bones(rhs.m_Bones)
 	, m_Animations(rhs.m_Animations)
+	, m_pCameraBone(rhs.m_pCameraBone)
 {
 	//Test ¾èÀºº¹»ç
 	for (auto& m_Bones : m_Bones)
@@ -95,6 +97,9 @@ HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePat
 	if (FAILED(Ready_Animation(hFile)))		// ±íÀº º¹»ç ÇÊ¿ä
 		return E_FAIL;
 
+
+	if (FAILED(Ready_CameraBone()))
+		return E_FAIL;
 
 
 
@@ -178,13 +183,50 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 	return S_OK;
 }
 
-_float4x4 CModel::GetModelCameraBone()
+void CModel::Imgui_RenderProperty()
 {
-	return _float4x4();
+	ImGui::Begin("BoneName");
+
+	if (ImGui::TreeNode("NameViewer"))
+	{
+		char szBoneTag[MAX_PATH];
+		
+		if (ImGui::BeginListBox("##"))
+		{
+			for (auto& bone : m_Bones)
+			{
+				if (bone != nullptr)
+				{
+
+					strcpy_s(szBoneTag, MAX_PATH,bone->Get_Name());
+					ImGui::Text(szBoneTag);
+				}
+			}
+			ImGui::EndListBox();
+		}
+
+		ImGui::TreePop();
+	}
+
+
+	ImGui::End();
+
 }
 
+_vector CModel::GetModelCameraBone()
+{
+	if (nullptr == m_pCameraBone)
+		return	_vector();
 
+	_float4x4 m_CameraCOmbindMatrix;
 
+	XMStoreFloat4x4(&m_CameraCOmbindMatrix, m_pCameraBone->Get_CombindMatrix());
+
+	_vector vPos;
+	memcpy(&vPos, &m_CameraCOmbindMatrix._41, sizeof(_vector));
+
+	return  vPos;
+}
 
 HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 {
@@ -288,6 +330,15 @@ HRESULT CModel::Ready_Animation(HANDLE hFile)
 	return S_OK;
 }
 
+HRESULT CModel::Ready_CameraBone()
+{
+	m_pCameraBone = Get_BonePtr("Node_Camera");
+	
+	if (nullptr != m_pCameraBone)
+		Safe_AddRef(m_pCameraBone);
+	return S_OK;
+}
+
 CModel * CModel::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, LOAD_TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile)
 {
 	CModel*		pInstance = new CModel(pDevice, pContext);
@@ -316,6 +367,8 @@ CComponent * CModel::Clone(void * pArg)
 void CModel::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pCameraBone);
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);

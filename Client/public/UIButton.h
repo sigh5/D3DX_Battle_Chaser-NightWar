@@ -11,9 +11,15 @@ class CVIBuffer_Rect;
 class CTexture;
 END
 
+
+
+
 BEGIN(Client)
 class CUIButton final :public CUI
 {
+public:
+	enum DungeonUIType { UITYPE_HIGHLIGHT, UITYPE_NORMAL,UITYPE_END };
+
 private:
 	CUIButton(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CUIButton(const CUIButton& rhs);
@@ -27,6 +33,8 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
+	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc)override;
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -37,6 +45,8 @@ private:
 private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+
+
 
 private:
 	HRESULT SetUp_Components();

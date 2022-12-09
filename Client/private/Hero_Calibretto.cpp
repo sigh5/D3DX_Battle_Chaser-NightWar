@@ -52,7 +52,10 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	CPlayer::KeyInput(TimeDelta, m_pModelCom);
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+		m_iAnimIndex = 0;
+	
+	AnimMove();
 
 	m_pModelCom->Play_Animation(TimeDelta);
 }
@@ -87,10 +90,53 @@ HRESULT CHero_Calibretto::Render()
 }
 
 
+_vector CHero_Calibretto::Get_CameraBoneVector()
+{
+	return m_pModelCom->GetModelCameraBone();
+}
+
 _bool CHero_Calibretto::Piciking_GameObject()
 {
 	return false;
 }
+
+_uint CHero_Calibretto::Get_AnimationIndex()
+{
+	return m_pModelCom->Get_AnimIndex();
+}
+
+void CHero_Calibretto::AnimMove()
+{
+	m_pModelCom->Set_AnimIndex(m_iAnimIndex);
+}
+
+void CHero_Calibretto::HighLightChar()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 134.f;;
+	Desc.yPos = 5.f;
+	Desc.iTextureIndex = 8;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton4"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
+
+}
+
+void CHero_Calibretto::NormalLightCharUI()
+{
+	HIGHLIGHT_UIDESC Desc;
+	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
+
+	Desc.iNumSizeX = 133.f;
+	Desc.iNumSizeY = 123.f;
+	Desc.yPos = 0.f;
+	Desc.iTextureIndex = 5;
+	lstrcpy(Desc.szObjectName, TEXT("UIButton4"));
+	m_Hero_DungeonUIDelegeter.broadcast(Desc);
+}
+
 
 void CHero_Calibretto::ObserverTest()
 {

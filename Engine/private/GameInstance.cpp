@@ -320,6 +320,13 @@ CGameObject * CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring & p
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, pLayerTag, pObjectNameTag);
 }
 
+void CGameInstance::Load_Object(const _tchar * pDataFileNam, _uint iCurLevel )
+{
+	if (nullptr == m_pObject_Manager)
+		return ;
+	return m_pObject_Manager->Load_Object(pDataFileNam, iCurLevel);
+}
+
 
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)

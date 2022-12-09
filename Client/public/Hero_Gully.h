@@ -11,6 +11,9 @@ END
 
 BEGIN(Client)
 
+
+
+
 class CHero_Gully final :public CPlayer
 {
 protected:
@@ -26,12 +29,16 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-	
+	virtual _vector	Get_CameraBoneVector()override;
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
-
+public: /*For.Dungeon*/
+	virtual _uint	Get_AnimationIndex() override;
+	virtual void	AnimMove()override;
+	virtual	  void		HighLightChar()override;
+	virtual	  void		NormalLightCharUI()override;
 private:
 	void			ObserverTest(_double TimeDelta);
 
@@ -57,6 +64,9 @@ public:
 	virtual void Free() override;
 
 public:
+	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
+
+
 
 	/*Test*/
 	BaseDelegater<_double, _uint> m_Hero_GullyHPDelegater;

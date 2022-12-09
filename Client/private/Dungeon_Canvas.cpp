@@ -2,7 +2,9 @@
 #include "..\public\Dungeon_Canvas.h"
 
 #include "GameInstance.h"
-
+#include "Hero_Gully.h"
+#include "Hero_Calibretto.h"
+#include "Hero_Garrison.h"
 
 CDungeon_Canvas::CDungeon_Canvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
@@ -61,8 +63,16 @@ HRESULT CDungeon_Canvas::Last_Initialize()
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
-	m_bLast_Initlize = true;
+	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
 
+	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
+
+	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
+
+	m_bLast_Initlize = true;
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
@@ -169,6 +179,24 @@ HRESULT CDungeon_Canvas::SetUp_ShaderResources()
 
 	return S_OK;
 }
+
+void CDungeon_Canvas::Change_UITexture(HIGHLIGHT_UIDESC Desc)
+{
+	for (auto& pChildUI : m_ChildrenVec)
+	{
+		if (!lstrcmp(pChildUI->Get_ObjectName(), Desc.szObjectName))
+		{
+			pChildUI->Set_HighRightUIDesc(Desc);
+			break;
+		}
+
+
+	}
+}
+
+
+
+
 
 CDungeon_Canvas * CDungeon_Canvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

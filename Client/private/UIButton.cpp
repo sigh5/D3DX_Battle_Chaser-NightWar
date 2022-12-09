@@ -45,6 +45,8 @@ HRESULT CUIButton::Initialize(void * pArg)
 	if (FAILED(CUI::SetUp_UI()))
 		return E_FAIL;
 
+
+
 	return S_OK;
 }
 
@@ -101,6 +103,18 @@ void CUIButton::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		assert("CUIButton Change_Texture");
+}
+
+void CUIButton::Set_HighRightUIDesc(HIGHLIGHT_UIDESC & HighLightDesc)
+{
+	_float4	 vPos;
+
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y = HighLightDesc.yPos;
+	
+	m_pTransformCom->Set_Scaled(_float3(HighLightDesc.iNumSizeX, HighLightDesc.iNumSizeY,0.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+	m_pTextureCom->Set_SelectTextureIndex(HighLightDesc.iTextureIndex);
 }
 
 HRESULT CUIButton::SetUp_Components()

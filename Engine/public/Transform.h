@@ -93,6 +93,7 @@ public:
 
 	/* 추적한다 .*/
 	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+	_bool JudgeChaseState(_fvector vTargetPos, _float fLimit = 0.1f);
 
 	
 

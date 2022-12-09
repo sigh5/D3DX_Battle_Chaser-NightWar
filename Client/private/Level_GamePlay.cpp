@@ -2,7 +2,7 @@
 #include "..\public\Level_GamePlay.h"
 #include "GameInstance.h"
 #include "UI.h"
-
+#include "Client_Manager.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -20,7 +20,7 @@ HRESULT CLevel_GamePlay::Initialize()
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
@@ -30,6 +30,9 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
+	///*UI*/
+	//CClient_Manager::UI_Load(m_pDevice, m_pContext, TEXT("Test"), LEVEL_GAMEPLAY);
+	///*~UI*/
 
 	return S_OK;
 
@@ -112,6 +115,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_TurnStateCanvas"))))
 		return E_FAIL;*/
 	
+
+	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 
 	RELEASE_INSTANCE(CGameInstance);
 

@@ -31,12 +31,27 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 	
-public:
-	void	Set_FollowTarget(CGameObject* pPlayer);
+public: /*For.PlayerController*/
+	virtual  _vector	Get_CameraBoneVector() { return _vector(); }
+	void	  Set_FollowTarget(CGameObject* pPlayer);
+	
 
+
+public: /*For.Dungeon*/
+	virtual _uint	Get_AnimationIndex() { return 0; }
+	void	SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
+	void	LookAtTarget();
+	_bool	Get_IsSwap()const { return m_bIsSwap; }
+	void	Set_IsSwap(_bool bIsSwap) { m_bIsSwap = bIsSwap; }
+
+protected: /*For.Dungeon*/
+	_bool				IsCaptin();
+	virtual   void		AnimMove() {}
+	virtual	  void		HighLightChar() {}
+	virtual	  void		NormalLightCharUI() {}
 
 protected:
-	void KeyInput(_double TimeDelta,class CModel* pModel);
+	_bool		KeyInput(_double TimeDelta);
 	
 public: /* imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
@@ -50,12 +65,16 @@ protected:
 	
 protected:
 	_bool					m_bControlKeyInput = false;
+	_uint					m_iAnimIndex = 0;
 
 private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;
 	_bool					m_bKeyInput = false;
-	CGameObject*				m_pTargetPlayer = nullptr;
+	CGameObject*			m_pTargetPlayer = nullptr;
+	_bool					m_bIsSwap = false;
+	_bool					m_isStop = false;
+
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

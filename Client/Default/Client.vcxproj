@@ -188,6 +188,7 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
+    <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
+    <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />

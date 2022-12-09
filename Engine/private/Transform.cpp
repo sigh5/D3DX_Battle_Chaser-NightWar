@@ -242,8 +242,9 @@ void CTransform::LookAt(_fvector vTargetPos)
 	Set_State(CTransform::STATE_LOOK, vLook);
 }
 
-void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit)
+void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit )
 {
+
 	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
 	_vector		vDir = vTargetPos - vPosition;
 
@@ -254,6 +255,20 @@ void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit)
 		vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
 		Set_State(CTransform::STATE_TRANSLATION, vPosition);
 	}
+}
+
+_bool CTransform::JudgeChaseState(_fvector vTargetPos, _float fLimit)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vDir = vTargetPos - vPosition;
+
+	_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
+
+	if (fDistance < fLimit)
+	{
+		return true;
+	}
+	return false;
 }
 
 void CTransform::Go_Up(_double TimeDelta)

@@ -28,11 +28,16 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
-
+	virtual _vector	Get_CameraBoneVector()override;
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
+public: /*For.Dungeon*/
+	virtual _uint	Get_AnimationIndex() override;
+	virtual void	AnimMove()override;
+	virtual	  void		HighLightChar()override;
+	virtual	  void		NormalLightCharUI()override;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -48,7 +53,7 @@ public:
 	virtual void Free() override;
 
 public:
-	BaseDelegater<int, int> m_Hero_GullyHPDelegater;
+	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
 
 };
 

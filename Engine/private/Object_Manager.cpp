@@ -139,13 +139,14 @@ CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag , 
 	return pCloneGameObject;
 }
 
+
 CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
 
 	for (auto& iter : pLayer->GetGameObjects())
 	{
-		if (iter != nullptr && !lstrcmpW(iter->Get_ObjectName(), pObjectNameTag.c_str()))
+		if (iter != nullptr && !lstrcmp(iter->Get_ObjectName(), pObjectNameTag.c_str()))
 			return iter;
 	}
 
@@ -402,122 +403,143 @@ void CObject_Manager::Imgui_Save()
 
 }
 
+void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
+{
+
+	CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
+	_tchar* szName = new _tchar[256];
+	m_vecNameArray.push_back(szName);
+	_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+
+	if (0 == iCurLevel)
+		iCurLevel = pLevelManager->GetCurLevelIdx();
+
+	if(pDataFileName ==nullptr)
+	{ 
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+	}
+	else
+	{
+		lstrcat(szPath, pDataFileName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+	}
+	
+	HANDLE      hFile = CreateFile(szName,
+		GENERIC_READ,
+		NULL,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		return;
+	}
+
+	DWORD   dwByte = 0;
+
+	_uint iObjectNumber = 0;
+
+
+	while (true)
+	{
+		_float4x4 Worldmatrix = _float4x4();
+		_tchar* LayerTag = new _tchar[MAX_PATH];
+		_tchar* ProtoName = new _tchar[MAX_PATH];
+		_tchar* ParentName = new _tchar[MAX_PATH];
+		_tchar* TextureName = new _tchar[MAX_PATH];
+		_tchar *ObjectName = new _tchar[MAX_PATH];
+		_tchar *ModelName = new _tchar[MAX_PATH];
+		_uint	iShaderPass = 0;
+		_uint	iTextureIndex = 0; // 일단 UI 한정
+
+		m_vecNameArray.push_back(ModelName);
+		m_vecNameArray.push_back(ObjectName);
+		m_vecNameArray.push_back(LayerTag);
+		m_vecNameArray.push_back(ProtoName);
+		m_vecNameArray.push_back(ParentName);
+		m_vecNameArray.push_back(TextureName);
+
+
+		ReadFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+		ReadFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
+		if (0 == dwByte)
+			break;
+
+		if (!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+			continue;
+
+		/*if (!lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+		{
+		CGameObject* pGameObject = nullptr;
+		Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject);
+		(pGameObject)->Set_ProtoName(ProtoName);
+		(pGameObject)->Set_ObjectName(ObjectName);
+		(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+		}
+		*/
+		if (!lstrcmp(LayerTag, TEXT("Layer_Environment")))
+		{
+			CEnvironment_Object::ENVIRONMENTDESC Desc;
+			ZeroMemory(&Desc, sizeof(Desc));
+			lstrcpy(Desc.m_pModelTag, ModelName);
+			Desc.m_iShaderPass = iShaderPass;
+			lstrcpy(Desc.m_pTextureTag, TextureName);
+			CGameObject* pGameObject = nullptr;
+			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &Desc);
+			(pGameObject)->Set_ProtoName(ProtoName);
+			(pGameObject)->Set_ObjectName(ObjectName);
+			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+		}
+
+
+		if (!lstrcmp(LayerTag, TEXT("Layer_UI")))
+		{
+			CUI::UIDESC UIDesc;
+			ZeroMemory(&UIDesc, sizeof(UIDesc));
+			lstrcpy(UIDesc.m_pTextureTag, TextureName);
+
+			CGameObject* pGameObject = nullptr;
+			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &UIDesc);
+			(pGameObject)->Set_ProtoName(ProtoName);
+			(pGameObject)->Set_ObjectName(ObjectName);
+			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+
+			CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
+			pTexture->Set_SelectTextureIndex(iTextureIndex);
+
+			if (lstrcmp(ParentName, TEXT("Nullptr")))
+				pGameObject->Set_parentName(ParentName);
+		}
+
+	}
+
+	CloseHandle(hFile);
+
+	RELEASE_INSTANCE(CLevel_Manager);
+
+}
+
+
+
+
 void CObject_Manager::Imgui_Load()
 {
 	if (ImGui::Button("Load_Scene"))
 	{
-		CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
-		_tchar* szName = new _tchar[256];
-		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
-		m_vecNameArray.push_back(szName);
-
-		_tchar szPath[MAX_PATH] = TEXT("../../Data/");
-		lstrcat(szPath, szName);
-		lstrcpy(szName, szPath);
-		lstrcat(szName, TEXT(".dat"));
-
-		HANDLE      hFile = CreateFile(szName,
-			GENERIC_READ,
-			NULL,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-
-		if (INVALID_HANDLE_VALUE == hFile)
-		{
-			return;
-		}
-
-		DWORD   dwByte = 0;
-
-		_uint iObjectNumber = 0;
-
-
-		while (true)
-		{
-			_float4x4 Worldmatrix = _float4x4();
-			_tchar* LayerTag = new _tchar[MAX_PATH];
-			_tchar* ProtoName = new _tchar[MAX_PATH];
-			_tchar* ParentName = new _tchar[MAX_PATH];
-			_tchar* TextureName = new _tchar[MAX_PATH];
-			_tchar *ObjectName = new _tchar[MAX_PATH];
-			_tchar *ModelName = new _tchar[MAX_PATH];
-			_uint	iShaderPass = 0;
-			_uint	iTextureIndex = 0; // 일단 UI 한정
-
-			m_vecNameArray.push_back(ModelName);
-			m_vecNameArray.push_back(ObjectName);
-			m_vecNameArray.push_back(LayerTag);
-			m_vecNameArray.push_back(ProtoName);
-			m_vecNameArray.push_back(ParentName);
-			m_vecNameArray.push_back(TextureName);
-
-
-			ReadFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
-			ReadFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-			ReadFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
-			ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
-			if (0 == dwByte)
-				break;
-
-			if(!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
-				continue;
-
-			/*if (!lstrcmp(LayerTag, TEXT("Layer_BackGround")))
-			{
-				CGameObject* pGameObject = nullptr;
-				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject);
-				(pGameObject)->Set_ProtoName(ProtoName);
-				(pGameObject)->Set_ObjectName(ObjectName);
-				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-			}
-			*/
-			if (!lstrcmp(LayerTag, TEXT("Layer_Environment")))
-			{
-				CEnvironment_Object::ENVIRONMENTDESC Desc;
-				ZeroMemory(&Desc, sizeof(Desc));
-				lstrcpy(Desc.m_pModelTag, ModelName);
-				Desc.m_iShaderPass = iShaderPass;
-				lstrcpy(Desc.m_pTextureTag, TextureName);
-				CGameObject* pGameObject = nullptr;
-				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject,&Desc);
-				(pGameObject)->Set_ProtoName(ProtoName);
-				(pGameObject)->Set_ObjectName(ObjectName);
-				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-			}
-
-
-			if (!lstrcmp(LayerTag, TEXT("Layer_UI")))
-			{
-				CUI::UIDESC UIDesc;
-				ZeroMemory(&UIDesc, sizeof(UIDesc));
-				 lstrcpy(UIDesc.m_pTextureTag, TextureName);
-				
-				CGameObject* pGameObject = nullptr;
-				Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject, &UIDesc);
-				(pGameObject)->Set_ProtoName(ProtoName);
-				(pGameObject)->Set_ObjectName(ObjectName);
-				(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-
-				CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
-				pTexture->Set_SelectTextureIndex(iTextureIndex);
-
-				if (lstrcmp(ParentName, TEXT("Nullptr")))
-					pGameObject->Set_parentName(ParentName);
-			}
-			
-		}
-		
-		CloseHandle(hFile);
-		MSG_BOX("Load");
-		RELEASE_INSTANCE(CLevel_Manager);
-
+		Load_Object();
 	}
 }
 

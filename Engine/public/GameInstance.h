@@ -67,7 +67,7 @@ public: /* For.Object_Manager */
 	class CGameObject* Get_SelectObject();
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
-
+	void	Load_Object(const _tchar *pDataFileName = nullptr,_uint iCurLevel=0);
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);

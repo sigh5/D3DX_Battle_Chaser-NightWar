@@ -26,11 +26,17 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-
-
+public:
+	virtual _vector	Get_CameraBoneVector()override;
+	
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
+public: /*For.Dungeon*/
+	virtual _uint	Get_AnimationIndex() override;
+	virtual void	AnimMove()override;
+	virtual	  void		HighLightChar()override;
+	virtual	  void		NormalLightCharUI()override;
 private:
 	void			ObserverTest();
 
@@ -53,7 +59,7 @@ public:
 	virtual void Free() override;
 
 public:
-	BaseDelegater<_double, _uint> m_Hero_Caliberotto_Delegater;
+	BaseDelegater<HIGHLIGHT_UIDESC> m_Hero_DungeonUIDelegeter;
 };
 
 END

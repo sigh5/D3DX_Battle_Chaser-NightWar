@@ -7,9 +7,12 @@
 #include "LoadingImage.h"
 #include "Client_Manager.h"
 #include "ToolManager.h"
+#include "PlayerController.h"
+
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 	, m_pToolManager(CToolManager::GetInstance())
+	, m_pPlayerController(CPlayerController::GetInstance())
 
 {
 	Safe_AddRef(m_pGameInstance);
@@ -55,6 +58,22 @@ HRESULT CMainApp::Initialize()
 	return S_OK;
 }
 
+HRESULT CMainApp::LastInitalize()
+{
+	/* 이곳에서 싱클톤 관련 Initialize 진행합니다*/
+	if (m_bLastUpdate)
+		return S_OK;
+
+	
+
+
+	m_bLastUpdate = true;
+
+	return S_OK;
+}
+
+
+
 void CMainApp::Tick(_double TimeDelta)
 {
 	if (nullptr == m_pGameInstance)
@@ -66,6 +85,9 @@ void CMainApp::Tick(_double TimeDelta)
 
 	m_pGameInstance->Tick_Engine(TimeDelta);
 	
+
+
+
 	m_pToolManager->Imgui_SelectParentViewer();
 
 	
@@ -262,6 +284,7 @@ void CMainApp::Free()
 	Safe_Release(m_pDevice);
 
 
+	CPlayerController::DestroyInstance();
 	CToolManager::DestroyInstance();
 	CGameInstance::Release_Engine();
 }
