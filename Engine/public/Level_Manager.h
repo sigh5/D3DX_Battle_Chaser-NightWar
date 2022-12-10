@@ -15,7 +15,7 @@ private:
 	virtual ~CLevel_Manager() = default;
 
 public:
-	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel);
+	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel, _bool bCopy = false);
 	
 	void Tick(_double TimeDelta);
 	void Late_Tick(_double TimeDelta);

@@ -99,7 +99,6 @@ void CGameInstance::Tick_Engine(_double TimeDelta)
 
 	m_pInput_Device->Reset_EveryKey();
 
-
 	m_pObject_Manager->Final_Update();
 }
 
@@ -110,6 +109,14 @@ void CGameInstance::Clear_Level(_uint iLevelIndex)
 
 	m_pObject_Manager->Clear(iLevelIndex);
 
+}
+
+void CGameInstance::Copy_Data(_uint iLevelIndex)
+{
+	if (nullptr == m_pObject_Manager)
+		return;
+
+	m_pObject_Manager->Copy_Data(iLevelIndex);
 }
 
 HRESULT CGameInstance::Clear_Graphic_Device(const _float4 * pColor)
@@ -214,16 +221,12 @@ _bool CGameInstance::Key_Pressing(_ubyte byKeyID)
 	return m_pInput_Device->Key_Pressing(byKeyID);
 }
 
-
-
-
-
-HRESULT CGameInstance::Open_Level(_uint iLevelIndex, CLevel * pNewLevel)
+HRESULT CGameInstance::Open_Level(_uint iLevelIndex, CLevel * pNewLevel, _bool bCopy )
 {
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	return m_pLevel_Manager->Open_Level(iLevelIndex, pNewLevel);
+	return m_pLevel_Manager->Open_Level(iLevelIndex, pNewLevel, bCopy);
 }
 
 HRESULT CGameInstance::Render_Level()
@@ -327,7 +330,14 @@ void CGameInstance::Load_Object(const _tchar * pDataFileNam, _uint iCurLevel )
 	return m_pObject_Manager->Load_Object(pDataFileNam, iCurLevel);
 }
 
+void CGameInstance::Change_Level(_uint iLevleIdx)
+{
+	if (nullptr == m_pObject_Manager)
+		return;
 
+	m_pObject_Manager->Change_Level(iLevleIdx);
+
+}
 
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)
 {

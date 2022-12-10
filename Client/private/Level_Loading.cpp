@@ -6,6 +6,7 @@
 #include "Level_Logo.h"
 #include "Level_GamePlay.h"
 #include "LoadingImage.h"
+#include "Level_Combat.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -67,6 +68,11 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 			case LEVEL_GAMEPLAY:
 				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 				break;
+
+			case LEVEL_COMBAT:
+				pLevel = CLevel_Combat::Create(m_pDevice, m_pContext);
+				break;
+
 			}
 
 			if (nullptr == pLevel)
@@ -99,7 +105,7 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround(const wstring & pLayerTag)
 	Safe_AddRef(pGameInstance);
 
 
-	if (FAILED(pGameInstance->Clone_GameObject(pGameInstance->Get_StaticLevelIndex() - 1, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
 		return E_FAIL;
 
 	Safe_Release(pGameInstance);

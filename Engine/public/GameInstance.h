@@ -31,6 +31,7 @@ public: /* For.GameInstance */
 	HRESULT Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, const GRAPHIC_DESC& GraphicDesc, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppContextOut);
 	void Tick_Engine(_double TimeDelta);
 	void Clear_Level(_uint iLevelIndex);
+	void Copy_Data(_uint iLevelIndex);
 
 public: /* For.Graphic_Device */
 	HRESULT Clear_Graphic_Device(const _float4* pColor);
@@ -49,7 +50,7 @@ public: /* For.Input_Device */
 	_bool		Key_Pressing(_ubyte byKeyID);
 
 public: /* For.Level_Manager */
-	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel);
+	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel,_bool bCopy=false);
 	HRESULT Render_Level();
 	_uint GetCurLevelIdx() const;
 
@@ -68,6 +69,11 @@ public: /* For.Object_Manager */
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 	void	Load_Object(const _tchar *pDataFileName = nullptr,_uint iCurLevel=0);
+	void	Change_Level(_uint iLevleIdx);
+
+
+
+
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
 	class CComponent* Clone_Component(_uint iLevelIndex, const wstring& pPrototypeTag, void* pArg = nullptr);

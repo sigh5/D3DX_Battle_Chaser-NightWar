@@ -2,7 +2,7 @@
 #include "..\public\TurnUICanvas.h"
 #include "GameInstance.h"
 
-#include "Hero_Gully.h"
+#include "Hero_Knolan.h"
 #include "TurnCharcterUI.h"
 
 CTurnUICanvas::CTurnUICanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -60,13 +60,12 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
 	
-	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
-	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_GullyTestShakingDelegater.bind(this, &CTurnUICanvas::ChildrenShakingCheck);
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyTestShakingDelegater.bind(this, &CTurnUICanvas::ChildrenShakingCheck);
 
 	SetUp_ChildrenPosition();
 	SetUp_MatchingOption();

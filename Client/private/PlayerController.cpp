@@ -103,6 +103,33 @@ void CPlayerController::SyncAninmation()
 
 }
 
+void CPlayerController::Change_Scene(_uint	iLevelIndex)
+{
+	m_iCurrentScene = iLevelIndex;
+
+	if (iLevelIndex == LEVEL_COMBAT)
+	{
+		m_pCaptinPlayer = nullptr;
+		for (auto& pPlayer : m_pPlayerVec)
+		{
+			pPlayer->Set_FollowTarget(nullptr);
+		}
+	}
+	else if(iLevelIndex == LEVEL_GAMEPLAY)
+	{
+		Initialize();
+	}
+}
+
+_bool CPlayerController::CombatScene()
+{
+	if (m_iCurrentScene == LEVEL_COMBAT)
+		return true;
+
+	return false;
+}
+
+
 
 
 void CPlayerController::Free()

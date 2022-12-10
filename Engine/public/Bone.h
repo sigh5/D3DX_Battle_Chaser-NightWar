@@ -29,7 +29,6 @@ public:
 
 private:
 	char							m_szName[MAX_PATH];
-	char							m_szParentName[MAX_PATH];
 	_float4x4						m_OffsetMatrix;
 	_float4x4						m_TransformMatrix;
 	_float4x4						m_CombindTransformMatrix;

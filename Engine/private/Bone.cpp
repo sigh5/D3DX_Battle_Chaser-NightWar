@@ -10,19 +10,20 @@ CBone::CBone(const CBone & rhs)
 	: m_CombindTransformMatrix(rhs.m_CombindTransformMatrix)
 	, m_OffsetMatrix(rhs.m_OffsetMatrix)
 	, m_TransformMatrix(rhs.m_TransformMatrix)
-	, m_pParent(rhs.m_pParent)
 
 {
 	strcpy_s(m_szName, MAX_PATH, rhs.m_szName);
-	strcpy_s(m_szParentName, MAX_PATH, rhs.m_szParentName);
+	
 }
 
 HRESULT CBone::Initialize(CModel* pModel, HANDLE hFile)
 {
 	DWORD   dwByte = 0;
+	XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_CombindTransformMatrix, XMMatrixIdentity());
 
 	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
-	ReadFile(hFile, &m_TransformMatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+	ReadFile(hFile, &m_TransformMatrix, sizeof(_float4x4), &dwByte, nullptr);
 
 	
 	return S_OK;

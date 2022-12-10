@@ -32,6 +32,9 @@ public:
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 
+public: /*For.SceneChange*/
+	virtual void		Change_Level_Data(_uint iLevleIdx)override;
+
 public: /*For.Dungeon*/
 	virtual _uint	Get_AnimationIndex() override;
 	virtual void	AnimMove()override;
@@ -49,10 +52,8 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-	int			AnimIndex = 0;
-	int			m_iPlayerType = 0;
-
-
+	
+	_bool		m_bIsCombatScene = false;
 public:
 	static CHero_Calibretto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

@@ -33,7 +33,11 @@ HRESULT CMesh::Initialize_Prototype(CModel * pModel, HANDLE hFile, CModel::LOAD_
 	ReadFile(hFile, &m_iNumPrimitive, sizeof(_uint), &dwByte, nullptr);
 	ReadFile(hFile, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);
 
+
+	m_iMaterialIndex = m_iMaterialIndex;
 	m_iNumVertexBuffers = 1;
+	m_iNumVertices = m_iNumVertices;
+	m_iNumPrimitive = m_iNumPrimitive;
 	m_eTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_iIndicesSizePerPrimitive = sizeof(FACEINDICES32);
@@ -89,7 +93,7 @@ void CMesh::LoadFile(HANDLE hFile,CModel* pModel)
 {
 	DWORD dwByte = 0;
 	
-	ReadFile(hFile, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);
+	//ReadFile(hFile, &m_iNumBones, sizeof(_uint), &dwByte, nullptr);
 
 	for (size_t i = 0; i < m_iNumBones; ++i)
 	{
@@ -100,6 +104,8 @@ void CMesh::LoadFile(HANDLE hFile,CModel* pModel)
 		if (nullptr == pBone)
 			assert("CMesh::LoadFile");
 		
+		
+
 		_float4x4 OffSetMatrix;
 		ReadFile(hFile, &OffSetMatrix, sizeof(_float4x4), &dwByte, nullptr);
 		pBone->Set_OffsetMatrix(OffSetMatrix);
@@ -169,7 +175,7 @@ HRESULT CMesh::Ready_VertexBuffer_AnimModel(HANDLE hFile, CModel * pModel)
 
 	m_iStride = sizeof(VTXANIMMODEL);
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-
+	
 	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
 	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

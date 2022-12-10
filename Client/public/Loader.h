@@ -35,7 +35,7 @@ public:
 
 	HRESULT Loading_ForLogo();
 	HRESULT Loading_ForGamePlay();
-
+	HRESULT Loading_Combat();
 	
 
 

@@ -48,6 +48,26 @@ void CLayer::Delete_GameObject(CGameObject *& pObject)
 	}
 }
 
+void CLayer::CopyData(list<class CGameObject*>& Temp)
+{
+	for (auto iter= Temp.begin(); iter != Temp.end();)
+	{
+		m_GameObjects.push_back(*iter);
+		iter = Temp.erase(iter);
+	}
+	Temp.clear();
+}
+
+void CLayer::Change_Level(_uint iLevleIdx)
+{
+	for (auto& pGameObject : m_GameObjects)
+	{
+		if (nullptr != pGameObject)
+			pGameObject->Change_Level_Data(iLevleIdx);
+	}
+
+}
+
 HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 {
 	if (nullptr == pGameObject)

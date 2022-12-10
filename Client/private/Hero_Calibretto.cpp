@@ -51,11 +51,13 @@ HRESULT CHero_Calibretto::Last_Initialize()
 void CHero_Calibretto::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
-
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
-		m_iAnimIndex = 0;
+	if (m_bIsCombatScene == false)
+	{
+		if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+			m_iAnimIndex = 0;
+		AnimMove();
+	}
 	
-	AnimMove();
 
 	m_pModelCom->Play_Animation(TimeDelta);
 }
@@ -100,6 +102,35 @@ _bool CHero_Calibretto::Piciking_GameObject()
 	return false;
 }
 
+void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
+{
+	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
+
+	Safe_Release(m_pModelCom);
+	Remove_component(TEXT("Com_Model"));
+	if (LEVEL_GAMEPLAY == iLevleIdx)
+	{
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_CalibrettoDungeon"), TEXT("Com_Model"),
+			(CComponent**)&m_pModelCom)))
+			assert("CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
+
+		m_bIsCombatScene = false;
+
+	}
+	else if (LEVEL_COMBAT == iLevleIdx)
+	{
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_CalibrettoCombat"), TEXT("Com_Model"),
+			(CComponent**)&m_pModelCom)))
+			assert("CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
+		m_bIsCombatScene = true;
+		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
+	}
+	// maybe ´Ù¸¥¾À?
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 _uint CHero_Calibretto::Get_AnimationIndex()
 {
 	return m_pModelCom->Get_AnimIndex();
@@ -112,6 +143,7 @@ void CHero_Calibretto::AnimMove()
 
 void CHero_Calibretto::HighLightChar()
 {
+
 	HIGHLIGHT_UIDESC Desc;
 	ZeroMemory(&Desc, sizeof HIGHLIGHT_UIDESC);
 
@@ -186,8 +218,11 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	
+
 
 	/* For.Lights */
 	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);

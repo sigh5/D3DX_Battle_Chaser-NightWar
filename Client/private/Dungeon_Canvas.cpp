@@ -2,7 +2,7 @@
 #include "..\public\Dungeon_Canvas.h"
 
 #include "GameInstance.h"
-#include "Hero_Gully.h"
+#include "Hero_Knolan.h"
 #include "Hero_Calibretto.h"
 #include "Hero_Garrison.h"
 
@@ -64,7 +64,7 @@ HRESULT CDungeon_Canvas::Last_Initialize()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
-	dynamic_cast<CHero_Gully*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
 
 	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Alumon"));
 	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);

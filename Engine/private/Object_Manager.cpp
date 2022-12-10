@@ -8,7 +8,7 @@
 #include "Component_Manager.h"
 #include "Camera.h"
 #include "Environment_Object.h"
-
+#include <utility>
 IMPLEMENT_SINGLETON(CObject_Manager)
 
 CObject_Manager::CObject_Manager()
@@ -48,16 +48,45 @@ HRESULT CObject_Manager::Clear(_uint iLevelIndex)
 	return S_OK;
 }
 
+HRESULT CObject_Manager::Copy_Data(_uint iLevelIndex)
+{
+	if (iLevelIndex >= m_iNumLevels)
+		return E_FAIL;
+
+	for (auto& Pair : m_pLayers[iLevelIndex])
+	{
+		if (Pair.first == LAYER_PLAYER || Pair.first == TEXT("Layer_Camera"))
+		{
+			CLayer * pLayer = CLayer::Create();
+			pLayer->CopyData(Pair.second->GetGameObjects());
+			m_pLayers[iLevelIndex + 1].emplace( Pair.first,pLayer);
+		}
+		
+
+
+	}
+
+
+
+	for (auto& Pair : m_pLayers[iLevelIndex])
+		Safe_Release(Pair.second);
+
+	m_pLayers[iLevelIndex].clear();
+
+
+	return S_OK;
+}
+
 HRESULT CObject_Manager::Loading_Objects()
 {
 	// 로딩 레벨 삭제
 	CGameInstance* pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
-	for (auto &Pair : m_pLayers[pGameInstance->Get_StaticLevelIndex() - 1])
+	for (auto &Pair : m_pLayers[0])
 	{
 		Safe_Release(Pair.second);
 	}
-	m_pLayers[pGameInstance->Get_StaticLevelIndex() - 1].clear();
+	m_pLayers[0].clear();
 	Safe_Release(pGameInstance);
 
 
@@ -172,6 +201,18 @@ void CObject_Manager::DeleteGameObject(_uint iLevelIndex ,const wstring& ObjName
 				}
 			}
 
+	}
+}
+
+void CObject_Manager::Change_Level(_uint iLevleIdx)
+{
+	for (_uint i = 0; i < m_iNumLevels; ++i)
+	{
+		for (auto& Pair : m_pLayers[i])
+		{
+			if (nullptr != Pair.second)
+				Pair.second->Change_Level(iLevleIdx);
+		}
 	}
 }
 
@@ -521,7 +562,7 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 			pTexture->Set_SelectTextureIndex(iTextureIndex);
 
 			if (lstrcmp(ParentName, TEXT("Nullptr")))
-				pGameObject->Set_parentName(ParentName);
+				pGameObject->Set_parentName(iCurLevel,ParentName);
 		}
 
 	}

@@ -38,10 +38,13 @@ public: /* For.Dungeon*/
 	void		Set_CaptinPlayer();
 	void		SyncAninmation();
 	
-
+	void		Change_Scene(_uint	iLevelIndex);
 	//template<typename T> 
 	//void	Matching_UIToPlayer(T* pUI);		// UI 와 플레이어를 이어주는함수
 
+
+public:
+	_bool			CombatScene();
 
 public:
 	vector<CPlayer*>& Get_Players() {return m_pPlayerVec;}
@@ -49,6 +52,8 @@ public:
 private:
 	vector<CPlayer*> m_pPlayerVec;
 	CPlayer*		m_pCaptinPlayer = nullptr;
+
+	_uint			m_iCurrentScene = 0;
 
 public:
 	virtual void Free()override;

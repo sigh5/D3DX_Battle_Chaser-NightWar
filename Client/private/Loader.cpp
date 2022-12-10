@@ -6,7 +6,7 @@
 #include "Terrain.h"
 #include "WaterTile.h"
 
-#include "Hero_Gully.h"
+#include "Hero_Knolan.h"
 #include "Hero_Garrison.h"
 #include "Hero_Calibretto.h"
 
@@ -48,6 +48,9 @@ _uint APIENTRY LoadingThread(void* pArg)
 		break;
 	case LEVEL_GAMEPLAY:
 		pLoader->Loading_ForGamePlay();
+		break;
+	case LEVEL_COMBAT:
+		pLoader->Loading_Combat();
 		break;
 	}
 	
@@ -191,7 +194,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 	
 	
 	/* Model */
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("AllModels"), LEVEL_GAMEPLAY);
+	
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("AllModels"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
 	
@@ -222,7 +227,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 	/* For.Prototype_GameObject_Hero_Gully */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Gully::Create(m_pDevice, m_pContext))))
+		CHero_Knolan::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	/* For.Prototype_GameObject_Hero_Alumon */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
@@ -280,6 +285,35 @@ HRESULT CLoader::Loading_ForGamePlay()
 	m_isFinished = true;
 
 	
+
+	Safe_Release(pGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_Combat()
+{
+	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+	Safe_AddRef(pGameInstance);
+
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
+
+
+	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
+
+
+	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
+
+
+	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
+
+
+	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
+
+
+	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
+
+	m_isFinished = true;
 
 	Safe_Release(pGameInstance);
 

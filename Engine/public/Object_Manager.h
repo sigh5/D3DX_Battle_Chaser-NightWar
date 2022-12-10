@@ -18,7 +18,7 @@ private:
 public:
 	HRESULT Reserve_Manager(_uint iNumLevels);
 	HRESULT Clear(_uint iLevelIndex);
-
+	HRESULT Copy_Data(_uint iLevelIndex);			// 씬전환시 데이터들을 카피한다.
 	HRESULT Loading_Objects();
 
 
@@ -37,7 +37,7 @@ public:
 
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 	void					DeleteGameObject(_uint iLevelIndex, const wstring& ObjName);
-
+	void					Change_Level(_uint iLevleIdx);
 
 
 	void Tick(_double TimeDelta);

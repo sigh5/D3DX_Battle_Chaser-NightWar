@@ -3,7 +3,7 @@
 #include "Object_Manager.h"
 #include "Canvas.h"
 #include "Level_Manager.h"
-
+#include "GameInstance.h"
 CUI::CUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CGameObject(pDevice, pContext)
 {
@@ -59,14 +59,15 @@ HRESULT CUI::Render()
 	return S_OK;
 }
 
-void CUI::Set_parentName(const _tchar * pParentTag)
+void CUI::Set_parentName(_uint iCulLevel, const _tchar * pParentTag)
 {
 	CObject_Manager*pObjMgr = GET_INSTANCE(CObject_Manager);
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject* pCanvas = pObjMgr->Get_GameObject(2, TEXT("Layer_UI"), pParentTag);
+	CGameObject* pCanvas = pObjMgr->Get_GameObject(iCulLevel, TEXT("Layer_UI"), pParentTag);
 	dynamic_cast<CCanvas*>(pCanvas)->Add_ChildUI(this);
 
-
+	RELEASE_INSTANCE(CGameInstance);
 	RELEASE_INSTANCE(CObject_Manager);
 }
 

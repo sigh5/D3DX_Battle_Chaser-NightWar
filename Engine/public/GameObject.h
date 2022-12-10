@@ -19,7 +19,7 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
-	static	const wstring		m_pTransformComTag;
+	static	const wstring			m_pTransformComTag;
 
 public:
 	const	 _tchar*				Get_ProtoName() const { return m_ProtoName; }
@@ -27,6 +27,10 @@ public:
 
 	const    _tchar*				Get_ObjectName()const { return m_ObjectName; }
 	void							Set_ObjectName(const _tchar* pNametag) { m_ObjectName = pNametag; }
+
+public:
+	virtual void					Change_Level_Data(_uint iLevleIdx) {}
+
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -47,7 +51,7 @@ public: /* imgui */
 	virtual _bool Piciking_GameObject() = 0;
 
 	void					Set_parent(CGameObject* pGameObject);
-	virtual void			Set_parentName(const _tchar* pParentTag) {};
+	virtual void			Set_parentName(_uint iCulLevel, const _tchar* pParentTag) {};
 
 
 	CGameObject*			Get_parentName() { 

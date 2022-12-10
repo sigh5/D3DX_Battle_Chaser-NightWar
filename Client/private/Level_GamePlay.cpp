@@ -3,7 +3,7 @@
 #include "GameInstance.h"
 #include "UI.h"
 #include "Client_Manager.h"
-
+#include "Level_Loading.h"
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 {
@@ -47,6 +47,18 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	if (GetKeyState(VK_SPACE) & 0x8000)
+	{
+		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+		Safe_AddRef(pGameInstance);
+
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT),true)))
+			return;
+
+		Safe_Release(pGameInstance);
+	}
+
 }
 
 HRESULT CLevel_GamePlay::Render()

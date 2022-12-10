@@ -40,7 +40,7 @@ public:
 
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
-	virtual void	Set_parentName(const _tchar* pParentTag);
+	virtual void	Set_parentName(_uint iCulLevel, const _tchar* pParentTag);
 	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc) {};
 protected:
 	virtual HRESULT SetUp_UI()sealed;

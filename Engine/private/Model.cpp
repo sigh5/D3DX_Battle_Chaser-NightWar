@@ -7,7 +7,7 @@
 #include "Mesh.h"
 #include "Animation.h"
 #include "GameUtils.h"
-
+#include <string>
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -17,14 +17,15 @@ CModel::CModel(const CModel & rhs)
 	: CComponent(rhs)
 	, m_eType(rhs.m_eType)
 	, m_iNumMeshes(rhs.m_iNumMeshes)
+	, m_Meshes(rhs.m_Meshes)
 	, m_Materials(rhs.m_Materials)
 	, m_iNumMaterials(rhs.m_iNumMaterials)
+	, m_Bones(rhs.m_Bones)
 	, m_iNumBones(rhs.m_iNumBones)
+	, m_Animations(rhs.m_Animations)
 	, m_iNumAnimations(rhs.m_iNumAnimations)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
-	, m_Bones(rhs.m_Bones)
-	, m_Animations(rhs.m_Animations)
 	, m_pCameraBone(rhs.m_pCameraBone)
 {
 	//Test 얕은복사
@@ -45,14 +46,9 @@ CModel::CModel(const CModel & rhs)
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
 			Safe_AddRef(Material.pTexture[i]);
 	}
+
 	for (auto& pMesh : rhs.m_Meshes)
-	{
-		m_Meshes.push_back((CMesh*)pMesh->Clone(this));
-
-	}
-
-
-
+		Safe_AddRef(pMesh);
 
 }
 
@@ -117,12 +113,32 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CModel::Play_Animation(_double TimeDelta)
+void CModel::Play_Animation(_double TimeDelta, _bool m_IsSequnce )
 {
 	if (TYPE_NONANIM == m_eType)
 		return;
 
-	/* 현재 애니메이션에 맞는 뼈들의 TranformMAtrix를 갱신하낟. */
+	if (m_IsSequnce)
+	{
+		if (!m_AnimIndexQueue.empty()&&m_Animations[m_iNameArrayCurIndex]->Get_Finished())
+		{
+			m_Animations[m_iCurrentAnimIndex]->Set_Finished(false);
+			m_iNameArrayCurIndex = m_AnimIndexQueue.front();
+			m_AnimIndexQueue.pop();
+			m_iCurrentAnimIndex = m_iNameArrayCurIndex;
+			m_Animations[m_iCurrentAnimIndex]->Set_Looping(false);
+		}
+		else
+		{
+			m_Animations[m_iCurrentAnimIndex]->Set_Looping(true);
+		}
+		
+	}
+	else
+	{
+		m_Animations[m_iCurrentAnimIndex]->Set_Looping(true);
+	}
+
 	m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta);
 
 	for (auto& pBone : m_Bones)
@@ -131,6 +147,8 @@ void CModel::Play_Animation(_double TimeDelta)
 			pBone->Compute_CombindTransformationMatrix();
 	}
 }
+
+
 
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)
 {
@@ -163,15 +181,18 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 	if (m_iNoRenderIndex == iMeshIndex)
 		return S_OK;
 
+	if (m_iMeshIndex == iMeshIndex)
+		return S_OK;
+
 	if (nullptr != m_Meshes[iMeshIndex])
 	{
 		if (nullptr != pBoneConstantName)
 		{
-			_float4x4		BoneMatrices[128];
+			_float4x4		BoneMatrices[256];
 
 			m_Meshes[iMeshIndex]->SetUp_BoneMatrices(BoneMatrices, XMLoadFloat4x4(&m_PivotMatrix));
 
-			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 128);
+			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 256);
 		}
 
 		pShader->Begin(iShaderIndex);
@@ -187,7 +208,7 @@ void CModel::Imgui_RenderProperty()
 {
 	ImGui::Begin("BoneName");
 
-	if (ImGui::TreeNode("NameViewer"))
+	if (ImGui::TreeNode("BoneNameViewer"))
 	{
 		char szBoneTag[MAX_PATH];
 		
@@ -207,6 +228,73 @@ void CModel::Imgui_RenderProperty()
 
 		ImGui::TreePop();
 	}
+
+	_uint iIndex = 0;
+	if (ImGui::TreeNode("Animation"))
+	{
+		char szAnimTag[MAX_PATH];
+
+		if (ImGui::BeginListBox("##"))
+		{
+			for (auto& pAnim : m_Animations)
+			{
+				if (pAnim != nullptr)
+				{
+					strcpy_s(szAnimTag, MAX_PATH, pAnim->Get_Name());
+					
+					if (ImGui::Selectable(szAnimTag))
+					{
+						m_iCurrentAnimIndex = iIndex;
+					}
+					++iIndex;
+				}
+			}
+			ImGui::EndListBox();
+		}
+
+		ImGui::TreePop();
+	}
+
+	_uint iMeshNoRenderIndex = 0;
+	if (ImGui::TreeNode("MeshName"))
+	{
+		char szMeshName[MAX_PATH];
+
+		if (ImGui::BeginListBox("##"))
+		{
+			for (auto& pMesh : m_Meshes)
+			{
+				if (pMesh != nullptr)
+				{
+					strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
+
+					if (ImGui::Selectable(szMeshName))
+					{
+						m_iMeshIndex = iMeshNoRenderIndex;
+					}
+					++iMeshNoRenderIndex;
+				}
+			}
+			ImGui::EndListBox();
+		}
+
+		ImGui::TreePop();
+	}
+
+	_double iTickPerSecond =	m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+
+	char szTickPerSecond[MAX_PATH];
+	//to_string(iTickPerSecond);
+	strcpy_s(szTickPerSecond,MAX_PATH, to_string(iTickPerSecond).c_str());
+
+	ImGui::Text(szTickPerSecond);
+
+	ImGui::InputFloat("TickPerSecone", &m_iTickPerSecond);
+	
+	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
+
+
+	//ImGui::InputInt("MeshIndex", &m_iMeshIndex);
 
 
 	ImGui::End();
@@ -228,6 +316,36 @@ _vector CModel::GetModelCameraBone()
 	return  vPos;
 }
 
+void CModel::Set_AnimName(char * pAnimName )
+{
+	_uint iIndex = 0;
+
+	for (auto& pAnim : m_Animations)
+	{
+		if (!strcmp(pAnim->Get_Name(), pAnimName))
+		{
+			Set_AnimIndex(iIndex);
+			return;
+		}
+		++iIndex;
+	}
+	
+}
+
+void CModel::Set_SeaunceAnim(queue<_uint> iIndexs)
+{
+	while (!iIndexs.empty())
+	{
+		_uint iTemp = iIndexs.front();
+		m_AnimIndexQueue.push(iTemp);
+		iIndexs.pop();
+	}
+
+	m_iCurrentAnimIndex = m_AnimIndexQueue.front();
+	m_AnimIndexQueue.pop();
+	m_iNameArrayCurIndex = m_iCurrentAnimIndex;
+}
+
 HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 {
 	DWORD   dwByte = 0;
@@ -236,6 +354,7 @@ HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 	CBone* pBone = CBone::Create(this, hFile);
 	if (nullptr == pBone)
 		assert("CLoadModel_Ready_Bones");
+	
 	if(pParent!=nullptr)
 		pBone->Set_Parent(pParent);
 	m_Bones.push_back(pBone);

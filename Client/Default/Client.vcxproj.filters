@@ -97,6 +97,9 @@
     <Filter Include="02.GameObjects\Player\PlayerController">
       <UniqueIdentifier>{f9a70e32-f236-4874-bbd5-02c8f5394ed2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Levels\03.CombatLevel">
+      <UniqueIdentifier>{dae64ca7-40c5-470d-80bf-c722c116657d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -143,9 +146,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\HpBar.h">
       <Filter>02.GameObjects\UI\HPBar</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Hero_Gully.h">
-      <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MainLogo.h">
       <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
@@ -195,6 +195,12 @@
     <ClInclude Include="..\Public\Camera_Static.h">
       <Filter>02.GameObjects\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Level_Combat.h">
+      <Filter>01.Levels\03.CombatLevel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Hero_Knolan.h">
+      <Filter>02.GameObjects\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -229,9 +235,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\HpBar.cpp">
       <Filter>02.GameObjects\UI\HPBar</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Hero_Gully.cpp">
-      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MainLogo.cpp">
       <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
@@ -280,6 +283,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Static.cpp">
       <Filter>02.GameObjects\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Combat.cpp">
+      <Filter>01.Levels\03.CombatLevel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Hero_Knolan.cpp">
+      <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -58,11 +58,12 @@ void CCamera_Static::Tick(_double TimeDelta)
 	if (!m_bCameraActive)
 		return;
 
-	m_pPlayerController->Set_CaptinPlayer();
-
-	Update_CameraLookPos();
-
-	m_pPlayerController->SyncAninmation();
+	if (!m_pPlayerController->CombatScene())
+	{
+		m_pPlayerController->Set_CaptinPlayer();
+		Update_CameraLookPos();
+		m_pPlayerController->SyncAninmation();
+	}
 
 	__super::Tick(TimeDelta);
 }
@@ -101,7 +102,6 @@ void CCamera_Static::Set_CameraActive(_bool bCameraActive)
 	__super::Set_CameraActive(bCameraActive);
 	
 }
-
 
 HRESULT CCamera_Static::SetUp_Components()
 {

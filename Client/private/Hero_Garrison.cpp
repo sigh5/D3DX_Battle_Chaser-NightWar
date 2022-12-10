@@ -51,16 +51,29 @@ void CHero_Garrison::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
-		m_iAnimIndex = 0;
-	
-	if (ImGui::Button("!!"))
+	if (m_bIsCombatScene == false)
 	{
-		LookAtTarget();
+		if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+			m_iAnimIndex = 0;
+		AnimMove();
 	}
 
-	AnimMove();
-	m_pModelCom->Play_Animation(TimeDelta);
+	if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
+	{
+		queue<_uint> q;
+		q.push(15);
+		q.push(2);
+		q.push(1);
+
+		m_pModelCom->Set_SeaunceAnim(q);
+	}
+
+	if(!m_bIsCombatScene)
+		m_pModelCom->Play_Animation(TimeDelta);
+	else
+	{
+		m_pModelCom->Play_Animation(TimeDelta,true);
+	}
 }
 
 
@@ -107,6 +120,38 @@ _bool CHero_Garrison::Piciking_GameObject()
 		return true;
 */
 	return false;
+}
+
+void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
+{
+	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
+
+	Safe_Release(m_pModelCom);
+	Remove_component(TEXT("Com_Model"));
+	if (LEVEL_GAMEPLAY == iLevleIdx)
+	{
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
+			(CComponent**)&m_pModelCom)))
+			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
+
+		m_bIsCombatScene = false;
+
+	}
+	else if (LEVEL_COMBAT == iLevleIdx)
+	{
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonCombat"), TEXT("Com_Model"),
+			(CComponent**)&m_pModelCom)))
+			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
+
+		m_bIsCombatScene = true;
+		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
+
+		
+	}
+	// maybe ´Ù¸¥¾À?
+
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 _uint CHero_Garrison::Get_AnimationIndex()

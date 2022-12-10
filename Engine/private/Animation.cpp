@@ -16,6 +16,7 @@ HRESULT CAnimation::Initialize(HANDLE hFile, CModel * pModel)
 	ReadFile(hFile, &m_Duration, sizeof(_double), &dwByte, nullptr);
 	ReadFile(hFile, &m_TickPerSecond, sizeof(_double), &dwByte, nullptr);
 	ReadFile(hFile, &m_isLooping, sizeof(_bool), &dwByte, nullptr);
+	
 	ReadFile(hFile, &m_iNumChannels, sizeof(_uint), &dwByte, nullptr);
 	
 
@@ -53,10 +54,6 @@ void CAnimation::Update_Bones(_double TimeDelta)
 
 		m_Channels[i]->Update_TransformMatrix(m_PlayTime);
 	}
-
-	if (true == m_isFinished)
-		m_isFinished = false;
-
 }
 
 CAnimation * CAnimation::Create(HANDLE hFile, CModel * pModel)

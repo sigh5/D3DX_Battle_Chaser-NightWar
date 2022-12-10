@@ -2,7 +2,7 @@
 #include "..\public\HpBar.h"
 
 #include "GameInstance.h"
-#include "Hero_Gully.h"
+#include "Hero_Knolan.h"
 #include "Level_Manager.h"
 CHpBar::CHpBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
@@ -40,7 +40,7 @@ HRESULT CHpBar::Last_Initialize()
 
 	//CGameObject* pObserver = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
-	//dynamic_cast<CHero_Gully*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
+	//dynamic_cast<CHero_Knolan*>(pObserver)->m_Hero_GullyHPDelegater.bind(this, &CHpBar::UI_Event);
 
 	m_bLast_Initlize = true;
 

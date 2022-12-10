@@ -27,6 +27,8 @@ using namespace DirectX;
 #include <unordered_map>
 #include <algorithm>
 #include <functional>
+#include <set>
+#include <queue>
 using namespace std;
 
 #include "imgui.h"

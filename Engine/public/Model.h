@@ -26,27 +26,28 @@ public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_matrix Get_PivotMatrix() const { return XMLoadFloat4x4(&m_PivotMatrix); }
 	class CBone* Get_BonePtr(const char* pBoneName);
-	void Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
-	_uint	Get_AnimIndex() const {return m_iCurrentAnimIndex;}
+	
 public:
 	virtual HRESULT Initialize_Prototype(LOAD_TYPE eType, const char* pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile);
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void Play_Animation(_double TimeDelta);
+	void Play_Animation(_double TimeDelta,_bool m_IsSequnce=false);
+
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 	
 public: /*For.Imgui*/
 	virtual void Imgui_RenderProperty() override;
-
-
-
-
 public:
 	_vector			GetModelCameraBone();
 
+public: /*For.Animation*/
+	void	 Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
+	_uint	Get_AnimIndex() const { return m_iCurrentAnimIndex; }
 
+	void	Set_AnimName(char* pAnimName);
+	void	Set_SeaunceAnim(queue<_uint> iIndexs);
 private:
 	LOAD_TYPE							m_eType = TYPE_END;
 	_uint								m_iNumMeshes = 0;
@@ -56,14 +57,24 @@ private:
 	vector<MODELMATERIAL>				m_Materials;
 
 	_uint								m_iNumBones = 0;
-	vector<class CBone*>			m_Bones;
+	vector<class CBone*>				m_Bones;
 
 	_uint								m_iCurrentAnimIndex = 0;
 	_uint								m_iNumAnimations = 0;
-	vector<class CAnimation*>		m_Animations;
+	vector<class CAnimation*>			m_Animations;
 
 	LOAD_MODELDESC						m_ModelDesc;
 	_float4x4							m_PivotMatrix;
+
+	/*For.Animation*/
+	queue<_uint>						m_AnimIndexQueue;
+	_uint								m_iNameArraySize = 0;
+	_uint								m_iNameArrayCurIndex = 0;
+
+private: /*For.Imgui*/
+	_bool								m_bAnimcontrol = false;
+	int									m_iMeshIndex = -1;
+	float								m_iTickPerSecond = 0;
 
 private:
 	char								m_szModelPath[MAX_PATH] = "";
