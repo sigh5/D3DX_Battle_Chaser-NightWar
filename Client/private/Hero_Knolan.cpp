@@ -106,13 +106,6 @@ HRESULT CHero_Knolan::Render()
 	
 }
 
-_vector CHero_Knolan::Get_CameraBoneVector()
-{
-	return m_pModelCom->GetModelCameraBone();
-}
-
-
-
 _bool CHero_Knolan::Piciking_GameObject()
 {
 	return _bool();

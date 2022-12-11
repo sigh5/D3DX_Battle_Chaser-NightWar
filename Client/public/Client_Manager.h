@@ -8,8 +8,12 @@
 BEGIN(Engine)
 class CTransform;
 class CGameObject;
+class CModel;
 END
 
+
+enum AnimType {
+	ANIM_CHAR1, ANIM_CHAR2, ANIM_CHAR3, ANIM_CHAR4, ANIM_CHAR5, ANIM_CHAR6, ANIM_CHAR_END};
 
 enum  DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
 
@@ -41,13 +45,11 @@ public:
 	static _double	 TimeDelta;
 
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
-	static  void    UI_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName, _uint iLevel);
-
-
-	// 현재트랜스폼, 목표지점
 	
-	
+public:/*For.Imgui_AnimTool*/
+	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
 
+	
 
 };
 

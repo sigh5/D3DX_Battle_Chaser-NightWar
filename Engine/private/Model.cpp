@@ -88,8 +88,6 @@ HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePat
 		pMesh->LoadFile(hFile,this);
 	}
 
-
-	
 	if (FAILED(Ready_Animation(hFile)))		// 깊은 복사 필요
 		return E_FAIL;
 
@@ -113,31 +111,10 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CModel::Play_Animation(_double TimeDelta, _bool m_IsSequnce )
+void CModel::Play_Animation(_double TimeDelta)
 {
 	if (TYPE_NONANIM == m_eType)
 		return;
-
-	if (m_IsSequnce)
-	{
-		if (!m_AnimIndexQueue.empty()&&m_Animations[m_iNameArrayCurIndex]->Get_Finished())
-		{
-			m_Animations[m_iCurrentAnimIndex]->Set_Finished(false);
-			m_iNameArrayCurIndex = m_AnimIndexQueue.front();
-			m_AnimIndexQueue.pop();
-			m_iCurrentAnimIndex = m_iNameArrayCurIndex;
-			m_Animations[m_iCurrentAnimIndex]->Set_Looping(false);
-		}
-		else
-		{
-			m_Animations[m_iCurrentAnimIndex]->Set_Looping(true);
-		}
-		
-	}
-	else
-	{
-		m_Animations[m_iCurrentAnimIndex]->Set_Looping(true);
-	}
 
 	m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta);
 
@@ -204,6 +181,27 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 	return S_OK;
 }
 
+_bool CModel::Get_Finished(_uint iAnimIndex)
+{
+	return m_Animations[iAnimIndex]->Get_Finished();
+}
+
+void CModel::Set_Finished(_uint iAnimIndex, _bool bFinish)
+{
+	m_Animations[iAnimIndex]->Set_Finished(bFinish);
+}
+
+void CModel::Set_PlayTime(_uint iAnimIndex)
+{
+	m_Animations[iAnimIndex]->Set_Looping(true);
+	m_Animations[iAnimIndex]->Set_PlayTime();
+}
+
+void CModel::InitChannel()
+{
+	m_Animations[m_iCurrentAnimIndex]->InitChannel();
+}
+
 void CModel::Imgui_RenderProperty()
 {
 	ImGui::Begin("BoneName");
@@ -254,6 +252,10 @@ void CModel::Imgui_RenderProperty()
 
 		ImGui::TreePop();
 	}
+	string str = "Current Anim Index :" +  to_string(m_iCurrentAnimIndex);
+	
+	ImGui::Text(str.c_str());
+
 
 	_uint iMeshNoRenderIndex = 0;
 	if (ImGui::TreeNode("MeshName"))
@@ -296,25 +298,15 @@ void CModel::Imgui_RenderProperty()
 
 	//ImGui::InputInt("MeshIndex", &m_iMeshIndex);
 
+	
+	
+
+
 
 	ImGui::End();
 
 }
 
-_vector CModel::GetModelCameraBone()
-{
-	if (nullptr == m_pCameraBone)
-		return	_vector();
-
-	_float4x4 m_CameraCOmbindMatrix;
-
-	XMStoreFloat4x4(&m_CameraCOmbindMatrix, m_pCameraBone->Get_CombindMatrix());
-
-	_vector vPos;
-	memcpy(&vPos, &m_CameraCOmbindMatrix._41, sizeof(_vector));
-
-	return  vPos;
-}
 
 void CModel::Set_AnimName(char * pAnimName )
 {
@@ -332,19 +324,6 @@ void CModel::Set_AnimName(char * pAnimName )
 	
 }
 
-void CModel::Set_SeaunceAnim(queue<_uint> iIndexs)
-{
-	while (!iIndexs.empty())
-	{
-		_uint iTemp = iIndexs.front();
-		m_AnimIndexQueue.push(iTemp);
-		iIndexs.pop();
-	}
-
-	m_iCurrentAnimIndex = m_AnimIndexQueue.front();
-	m_AnimIndexQueue.pop();
-	m_iNameArrayCurIndex = m_iCurrentAnimIndex;
-}
 
 HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 {

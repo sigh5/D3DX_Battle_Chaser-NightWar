@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.h"
-
+#include "Channel.h"
 BEGIN(Engine)
 
 
@@ -18,13 +18,21 @@ public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void    Update_Bones(_double TimeDelta);
 
+	
 	void		Set_TickPerSecond(_double TickPerSecond) {m_TickPerSecond = TickPerSecond;}
 	_double		Get_TickPerSecond()const { return m_TickPerSecond; }
 
 	_bool		Get_Finished()const { return m_isFinished; }
 	_bool		Get_IsLooping()const { return m_isLooping; }
-	void		Set_Looping(_bool bLoopIng) { m_isLooping = bLoopIng; }
-	void		Set_Finished(_bool bFinish) {m_isFinished = bFinish;}
+	
+	void		InitChannel();
+	void		Set_Looping(_bool bLoopIng);
+	void		Set_Finished(_bool bFinish);
+	void		Set_PlayTime() { m_PlayTime = 0.0; }
+	
+
+
+
 private:
 	char								m_szName[MAX_PATH];
 	_double								m_Duration = 0.f;
@@ -34,7 +42,11 @@ private:
 	_bool								m_isFinished = false;
 	_bool								m_isLooping = false;
 	_uint								m_iNumChannels = 0;
+	
 	vector<class CChannel*>				m_Channels;
+	_uint								m_iJumpIndexNum = 0;
+	vector<pair<const char*, KEYFRAME>> SmothFrame;
+
 
 public:
 	static CAnimation* Create(HANDLE hFile, class CModel* pModel);

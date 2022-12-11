@@ -26,7 +26,6 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-	virtual _vector	Get_CameraBoneVector()override;
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;

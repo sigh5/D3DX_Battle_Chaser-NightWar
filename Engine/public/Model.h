@@ -32,22 +32,26 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void Play_Animation(_double TimeDelta,_bool m_IsSequnce=false);
+	void Play_Animation(_double TimeDelta);
 
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 	
+
+	_bool	 Get_Finished(_uint iAnimIndex);
+	void	Set_Finished(_uint iAnimIndex,_bool bFinish);
+	
+	void	Set_PlayTime(_uint iAnimIndex);
+	void	InitChannel();
 public: /*For.Imgui*/
 	virtual void Imgui_RenderProperty() override;
-public:
-	_vector			GetModelCameraBone();
+
 
 public: /*For.Animation*/
 	void	 Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
 	_uint	Get_AnimIndex() const { return m_iCurrentAnimIndex; }
 
 	void	Set_AnimName(char* pAnimName);
-	void	Set_SeaunceAnim(queue<_uint> iIndexs);
 private:
 	LOAD_TYPE							m_eType = TYPE_END;
 	_uint								m_iNumMeshes = 0;
@@ -66,10 +70,6 @@ private:
 	LOAD_MODELDESC						m_ModelDesc;
 	_float4x4							m_PivotMatrix;
 
-	/*For.Animation*/
-	queue<_uint>						m_AnimIndexQueue;
-	_uint								m_iNameArraySize = 0;
-	_uint								m_iNameArrayCurIndex = 0;
 
 private: /*For.Imgui*/
 	_bool								m_bAnimcontrol = false;

@@ -12,7 +12,10 @@ public:
 public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void Update_TransformMatrix(_double PlayTime);
+	
+	void Set_CurrentFrameIndex(_uint iStartIndex) {m_iCurrentKeyFrameIndex = iStartIndex;}
 	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0; }
+
 
 private:
 	char			m_szName[MAX_PATH] = "";
@@ -22,6 +25,10 @@ private:
 	vector<KEYFRAME>	m_KeyFrames;
 
 	_uint				m_iCurrentKeyFrameIndex = 0;
+
+	KEYFRAME			m_OldFrame;
+	
+	
 
 public:
 	static CChannel* Create(HANDLE hFile, class CModel* pModel);

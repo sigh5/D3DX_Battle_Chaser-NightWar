@@ -21,14 +21,9 @@ protected:
 
 public:
 	 const _tchar*						Get_BroadCasterTag()const  { return m_UIDesc.pBroadCasterTag; }
-	 void							Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
-	
-	  virtual const _tchar*						Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
-	  virtual void							Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
-
-	 
-
-
+	 void								Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
+	  virtual const _tchar*				Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
+	  virtual void						Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;

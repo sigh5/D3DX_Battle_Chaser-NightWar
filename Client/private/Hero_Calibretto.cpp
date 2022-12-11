@@ -92,10 +92,6 @@ HRESULT CHero_Calibretto::Render()
 }
 
 
-_vector CHero_Calibretto::Get_CameraBoneVector()
-{
-	return m_pModelCom->GetModelCameraBone();
-}
 
 _bool CHero_Calibretto::Piciking_GameObject()
 {

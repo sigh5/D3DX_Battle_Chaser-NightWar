@@ -32,7 +32,6 @@ public:
 	virtual HRESULT Render()override;
 	
 public: /*For.PlayerController*/
-	virtual  _vector	Get_CameraBoneVector() { return _vector(); }
 	void	  Set_FollowTarget(CGameObject* pPlayer);
 	
 

@@ -34,52 +34,59 @@ HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 
 void CChannel::Update_TransformMatrix(_double PlayTime)
 {
+
+
 	_vector			vScale;
 	_vector			vRotation;
 	_vector			vPosition;
 
 	_matrix			TransformMatrix;
 
+	
 	/* 현재 재생된 시간이 마지막 키프레임시간보다 커지며.ㄴ */
-	if (PlayTime >= m_KeyFrames.back().Time)
-	{
-		vScale = XMLoadFloat3(&m_KeyFrames.back().vScale);
-		vRotation = XMLoadFloat4(&m_KeyFrames.back().vRotation);
-		vPosition = XMLoadFloat3(&m_KeyFrames.back().vPosition);
-		vPosition = XMVectorSetW(vPosition, 1.f);
-	}
-	else
-	{
-		while (PlayTime >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
+		if (PlayTime >= m_KeyFrames.back().Time)
 		{
-			++m_iCurrentKeyFrameIndex;
+			vScale = XMLoadFloat3(&m_KeyFrames.back().vScale);
+			vRotation = XMLoadFloat4(&m_KeyFrames.back().vRotation);
+			vPosition = XMLoadFloat3(&m_KeyFrames.back().vPosition);
+			vPosition = XMVectorSetW(vPosition, 1.f);
 		}
+		else
+		{
+			while (PlayTime >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
+			{
+				++m_iCurrentKeyFrameIndex;
+			}
 
-		_double			Ratio = (PlayTime - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
-			(m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time - m_KeyFrames[m_iCurrentKeyFrameIndex].Time);
+			_double			Ratio = (PlayTime - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
+				(m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time - m_KeyFrames[m_iCurrentKeyFrameIndex].Time);
 
-		_vector			vSourScale, vDestScale;
-		_vector			vSourRotation, vDestRotation;
-		_vector			vSourPosition, vDestPosition;
+			_vector			vSourScale, vDestScale;
+			_vector			vSourRotation, vDestRotation;
+			_vector			vSourPosition, vDestPosition;
 
-		vSourScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex].vScale);
-		vSourRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex].vRotation);
-		vSourPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex].vPosition);
+			vSourScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex].vScale);
+			vSourRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex].vRotation);
+			vSourPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex].vPosition);
 
-		vDestScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vScale);
-		vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
-		vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
+			vDestScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vScale);
+			vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
+			vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
 
-		vScale = XMVectorLerp(vSourScale, vDestScale, (_float)Ratio);
-		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)Ratio);
-		vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)Ratio);
-		vPosition = XMVectorSetW(vPosition, 1.f);
-	}
+			vScale = XMVectorLerp(vSourScale, vDestScale, (_float)Ratio);
+			vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)Ratio);
+			vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)Ratio);
+			vPosition = XMVectorSetW(vPosition, 1.f);
+		}
+	
 
+	
 	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
 	m_pBone->Set_TransformMatrix(TransformMatrix);
+	
 }
+
 
 
 CChannel * CChannel::Create(HANDLE hFile, CModel * pModel)

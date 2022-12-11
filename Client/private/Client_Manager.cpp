@@ -6,6 +6,7 @@
 #include "Model.h"
 #include "Environment_Object.h"
 #include "UI.h"
+#include <string>
 _double CClient_Manager::TimeDelta = 0;
 
 
@@ -95,111 +96,59 @@ void CClient_Manager::Model_Load(ID3D11Device*	m_pDevice, ID3D11DeviceContext*	m
 
 }
 
-void CClient_Manager::UI_Load(ID3D11Device * m_pDevice, ID3D11DeviceContext * m_pDeviceContext, _tchar * pDataFileName, _uint iLevel)
+void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType)
 {
-	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	ImGui::Begin("Animation QueueMaker");
+	ImGui::Text("");
 
-	//_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+	static int		iAnimIndex = 0;
+	static double	dAnimTickForSecond = 0.0;
+	static queue<pair<_uint, _double>>	m_AnimQueue[ANIM_CHAR_END];
 
-	//lstrcat(szPath, pDataFileName);
-	//lstrcat(szPath, TEXT(".dat"));
+	ImGui::InputInt("AnimIndex", &iAnimIndex);
+	ImGui::InputDouble("TickForSecond", &dAnimTickForSecond);
+	
+	if (ImGui::Button("Add_Index"))
+	{
+		m_AnimQueue[eType].push({ iAnimIndex ,dAnimTickForSecond });
 
-	//HANDLE      hFile = CreateFile(szPath,
-	//	GENERIC_READ,
-	//	NULL,
-	//	NULL,
-	//	OPEN_EXISTING,
-	//	FILE_ATTRIBUTE_NORMAL,
-	//	NULL);
+	}
+	if (ImGui::Button("Delte_Index"))
+	{
+		queue<pair<_uint, _double>> TempQueue;
 
-	//if (INVALID_HANDLE_VALUE == hFile)
-	//{
-	//	return;
-	//}
+		while (!m_AnimQueue[eType].empty())
+		{
+			_uint iDeletNum = m_AnimQueue[eType].front().first;
+			_double Time = m_AnimQueue[eType].front().second;
+			m_AnimQueue[eType].pop();
+			
+			if(iDeletNum == iAnimIndex)
+				continue;
+			TempQueue.push({ iDeletNum, Time });
+			
+		}
 
-	//DWORD   dwByte = 0;
+		m_AnimQueue[eType] = TempQueue;
+	}
 
-	//while (true)
-	//{
-	//	_float4x4 Worldmatrix = _float4x4();
-	//	_tchar	LayerTag[MAX_PATH] = TEXT("");
-	//	_tchar	ProtoName[MAX_PATH] = TEXT("");
-	//	_tchar	ParentName[MAX_PATH] = TEXT("");
-	//	_tchar	TextureName[MAX_PATH] = TEXT("");
-	//	_tchar	ObjectName[MAX_PATH] = TEXT("");
-	//	_tchar	ModelName[MAX_PATH] = TEXT("");
-	//	_uint	iShaderPass = 0;
-	//	_uint	iTextureIndex = 0; // 일단 UI 한정
+	AnimQueue = m_AnimQueue[eType];
 
+	queue<pair<_uint, _double>> TempQueue;
+	TempQueue = AnimQueue;
 
-	//	ReadFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
-	//	ReadFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
-	//	ReadFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
-	//	ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
-	//	if (0 == dwByte)
-	//		break;
+	while (!TempQueue.empty())
+	{
+		string str = to_string(TempQueue.front().first);
+		
+		ImGui::Text(str.c_str());
 
-	//	if (!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
-	//			continue;
+		TempQueue.pop();
+	}
 
-	//	/*if (!lstrcmp(LayerTag, TEXT("Layer_BackGround")))
-	//	{
-	//	CGameObject* pGameObject = nullptr;
-	//	Clone_GameObject_UseImgui(pLevelManager->GetCurLevelIdx(), LayerTag, ProtoName, &pGameObject);
-	//	(pGameObject)->Set_ProtoName(ProtoName);
-	//	(pGameObject)->Set_ObjectName(ObjectName);
-	//	(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-	//	}
-	//	*/
-	//	if (!lstrcmp(LayerTag, TEXT("Layer_Environment")))
-	//	{
-	//		CEnvironment_Object::ENVIRONMENTDESC Desc;
-	//		ZeroMemory(&Desc, sizeof(Desc));
-	//		lstrcpy(Desc.m_pModelTag, ModelName);
-	//		Desc.m_iShaderPass = iShaderPass;
-	//		lstrcpy(Desc.m_pTextureTag, TextureName);
-	//		CGameObject* pGameObject = nullptr;
-	//		pGameInstance->Clone_GameObject_UseImgui(iLevel, LayerTag, ProtoName, &pGameObject, &Desc);
-	//		(pGameObject)->Set_ProtoName(ProtoName);
-	//		(pGameObject)->Set_ObjectName(ObjectName);
-	//		(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-	//	}
-
-
-	//	if (!lstrcmp(LayerTag, TEXT("Layer_UI")))
-	//	{
-	//		CUI::UIDESC UIDesc;
-	//		ZeroMemory(&UIDesc, sizeof(UIDesc));
-	//		lstrcpy(UIDesc.m_pTextureTag, TextureName);
-
-	//		CGameObject* pGameObject = nullptr;
-	//		pGameInstance->Clone_GameObject_UseImgui(iLevel, LayerTag, ProtoName, &pGameObject, &UIDesc);
-	//		(pGameObject)->Set_ProtoName(ProtoName);
-	//		(pGameObject)->Set_ObjectName(ObjectName);
-	//		(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
-
-	//		CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
-	//		pTexture->Set_SelectTextureIndex(iTextureIndex);
-
-	//		if (lstrcmp(ParentName, TEXT("Nullptr")))
-	//			pGameObject->Set_parentName(ParentName);
-	//	}
-
-	//}
-
-	//CloseHandle(hFile);
-	//MSG_BOX("Load");
-	//RELEASE_INSTANCE(CGameInstance);
+	ImGui::End();
 
 }
-	
-
-
 
 
 

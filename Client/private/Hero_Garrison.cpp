@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\public\Hero_Garrison.h"
 #include "GameInstance.h"
-
+#include "Client_Manager.h"
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
 {
@@ -58,28 +58,71 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		AnimMove();
 	}
 
-	if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
-	{
-		queue<_uint> q;
-		q.push(15);
-		q.push(2);
-		q.push(1);
+	//if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
+	//{
+	//	/* 해야할거 툴 애니메이션 큐만들어서 해보기*/
+	//	queue<pair<_uint,_double>> q;
+	//	q.push({ 15,0.4 });
+	//	q.push({ 2,0.3 });
+	//	q.push({ 1,0.5 });
 
-		m_pModelCom->Set_SeaunceAnim(q);
+	//	m_pModelCom->Set_SeaunceAnim(q);
+	//}
+
+
+	
+	
+	if (!m_Animqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	{
+		m_bIsTest = false;
+		m_iOldAnim = m_pModelCom->Get_AnimIndex();
+		_uint i = m_Animqeue.front().first;
+		m_pModelCom->Set_AnimIndex(i);
+		m_Animqeue.pop();
+		m_bFinishOption = ANIM_CONTROL_NEXT;
+
+		if (m_Animqeue.empty())
+		{
+			//m_pModelCom->Set_PlayTime(i);
+			m_bIsTest = true;
+		}
 	}
 
-	if(!m_bIsCombatScene)
-		m_pModelCom->Play_Animation(TimeDelta);
-	else
-	{
-		m_pModelCom->Play_Animation(TimeDelta,true);
-	}
+
+	m_pModelCom->Play_Animation(TimeDelta);
 }
 
 
 void CHero_Garrison::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	if (m_bFinishOption == ANIM_CONTROL_NEXT)
+	{
+		m_pModelCom->Set_Finished(m_iOldAnim, false);
+		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
+
+	}
+
+	if (m_bIsTest && m_Animqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	{
+		m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
+	}
+
+	if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
+	{
+		//CClient_Manager::Make_Anim_Queue(m_Animqeue, ANIM_CHAR1);
+		m_Animqeue.push({ 21,0.3f });
+		m_Animqeue.push({ 1,0.3f });
+		m_Animqeue.push({ 2,0.3f });
+
+		m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
+		m_pModelCom->InitChannel();
+		m_pModelCom->Set_AnimIndex(m_Animqeue.front().first);
+		m_Animqeue.pop();
+	}
+
+
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -107,18 +150,11 @@ HRESULT CHero_Garrison::Render()
 	return S_OK;
 }
 
-_vector CHero_Garrison::Get_CameraBoneVector()
-{
-	return m_pModelCom->GetModelCameraBone();
-}
 
 
 
 _bool CHero_Garrison::Piciking_GameObject()
 {
-	/*if (m_pModelCom->PicikingModel(g_hWnd, m_pTransformCom))
-		return true;
-*/
 	return false;
 }
 

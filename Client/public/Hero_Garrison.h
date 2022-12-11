@@ -28,7 +28,6 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
-	virtual _vector	Get_CameraBoneVector()override;
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
@@ -52,6 +51,9 @@ private:
 
 
 	_bool		m_bIsCombatScene = false;
+	_uint		m_iOldAnim = 0;
+	_uint		m_bFinishOption = 0;
+	_bool		m_bIsTest = false;
 public:
 	static CHero_Garrison* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
@@ -59,6 +61,10 @@ public:
 
 public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
+	
+private:
+	queue<pair<_uint, _double>>	m_Animqeue;
+
 
 };
 
