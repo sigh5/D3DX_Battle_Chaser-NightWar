@@ -9,6 +9,7 @@ CChannel::CChannel()
 
 HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 {
+
 	DWORD   dwByte = 0;
 
 	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
@@ -26,6 +27,8 @@ HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 		ReadFile(hFile, &keyFrame, sizeof(KEYFRAME), &dwByte, nullptr);
 		m_KeyFrames.push_back(keyFrame);
 	}
+
+	m_OldFrame = m_KeyFrames[0];
 
 	return S_OK;
 }
@@ -87,7 +90,39 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 	
 }
 
+void CChannel::BlendingFrame(CChannel * pPrevChannel)
+{
+	_vector			vScale;
+	_vector			vRotation;
+	_vector			vPosition;
 
+	_matrix			TransformMatrix;
+
+	_vector			vSourScale, vDestScale;
+	_vector			vSourRotation, vDestRotation;
+	_vector			vSourPosition, vDestPosition;
+
+	m_OldFrame = m_KeyFrames[0];
+
+	vSourScale = XMLoadFloat3(&m_KeyFrames[0].vScale);
+	vSourRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
+	vSourPosition = XMLoadFloat3(&m_KeyFrames[0].vPosition);
+
+	vDestScale = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vScale);
+	vDestRotation = XMLoadFloat4(&pPrevChannel->m_KeyFrames.back().vRotation);
+	vDestPosition = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vPosition);
+
+	vScale = XMVectorLerp(vSourScale, vDestScale, 0.5f);
+	vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, 0.5f);
+	vPosition = XMVectorLerp(vSourPosition, vDestPosition, 0.5f);
+	vPosition = XMVectorSetW(vPosition, 1.f);
+
+	XMStoreFloat3(&m_KeyFrames[0].vScale, vScale);
+	XMStoreFloat4(&m_KeyFrames[0].vRotation, vRotation);
+	XMStoreFloat3(&m_KeyFrames[0].vPosition, vPosition);
+
+
+}
 
 CChannel * CChannel::Create(HANDLE hFile, CModel * pModel)
 {

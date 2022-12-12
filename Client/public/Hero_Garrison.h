@@ -7,6 +7,7 @@ BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CModel;
+class CFSMComponent;
 END
 
 BEGIN(Client)
@@ -44,7 +45,7 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
-	
+	CFSMComponent*			m_pFsmCom = nullptr;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
@@ -54,6 +55,7 @@ private:
 	_uint		m_iOldAnim = 0;
 	_uint		m_bFinishOption = 0;
 	_bool		m_bIsTest = false;
+	int		m_bTestImguiButton = 0;
 public:
 	static CHero_Garrison* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
@@ -63,7 +65,7 @@ public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
 	
 private:
-	queue<pair<_uint, _double>>	m_Animqeue;
+	queue<pair<_uint, _double>>	m_CurAnimqeue;
 
 
 };

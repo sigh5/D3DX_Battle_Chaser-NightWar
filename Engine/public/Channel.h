@@ -10,12 +10,17 @@ public:
 	virtual ~CChannel() = default;
 
 public:
+	const char*		GetName()const { return m_szName; }
+
+public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void Update_TransformMatrix(_double PlayTime);
 	
 	void Set_CurrentFrameIndex(_uint iStartIndex) {m_iCurrentKeyFrameIndex = iStartIndex;}
-	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0; }
+	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0;
+	m_KeyFrames[0] = m_OldFrame;}
 
+	void BlendingFrame(CChannel* pPrevChannel);
 
 private:
 	char			m_szName[MAX_PATH] = "";

@@ -111,12 +111,12 @@ HRESULT CModel::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CModel::Play_Animation(_double TimeDelta)
+void CModel::Play_Animation(_double TimeDelta,_bool IsCombat)
 {
 	if (TYPE_NONANIM == m_eType)
 		return;
 
-	m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta);
+	m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta, IsCombat);
 
 	for (auto& pBone : m_Bones)
 	{
@@ -179,6 +179,11 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 
 
 	return S_OK;
+}
+
+void CModel::Set_Lerp(_uint iprevIndex, _uint iNextIndex)
+{
+	m_Animations[iNextIndex]->InitLerp(m_Animations[iprevIndex]->Get_Channles());
 }
 
 _bool CModel::Get_Finished(_uint iAnimIndex)

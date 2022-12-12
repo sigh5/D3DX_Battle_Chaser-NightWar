@@ -57,39 +57,28 @@ void CHero_Garrison::Tick(_double TimeDelta)
 			m_iAnimIndex = 0;
 		AnimMove();
 	}
-
-	//if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
-	//{
-	//	/* 해야할거 툴 애니메이션 큐만들어서 해보기*/
-	//	queue<pair<_uint,_double>> q;
-	//	q.push({ 15,0.4 });
-	//	q.push({ 2,0.3 });
-	//	q.push({ 1,0.5 });
-
-	//	m_pModelCom->Set_SeaunceAnim(q);
-	//}
-
-
-	
-	
-	if (!m_Animqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	if (m_bTestImguiButton == 1)
 	{
-		m_bIsTest = false;
-		m_iOldAnim = m_pModelCom->Get_AnimIndex();
-		_uint i = m_Animqeue.front().first;
-		m_pModelCom->Set_AnimIndex(i);
-		m_Animqeue.pop();
-		m_bFinishOption = ANIM_CONTROL_NEXT;
-
-		if (m_Animqeue.empty())
+		if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
 		{
-			//m_pModelCom->Set_PlayTime(i);
-			m_bIsTest = true;
+			m_bIsTest = false;
+			m_iOldAnim = m_pModelCom->Get_AnimIndex();
+			_uint i = m_CurAnimqeue.front().first;
+			m_pModelCom->Set_AnimIndex(i);
+			m_CurAnimqeue.pop();
+			m_bFinishOption = ANIM_CONTROL_NEXT;
+
+			if (m_CurAnimqeue.empty())
+			{
+				m_bIsTest = true;
+			}
+		
+			if (18 == i)
+				m_pModelCom->Set_Lerp(i, m_CurAnimqeue.front().first);
+			
 		}
 	}
-
-
-	m_pModelCom->Play_Animation(TimeDelta);
+	m_pModelCom->Play_Animation(TimeDelta,m_bIsCombatScene);
 }
 
 
@@ -103,24 +92,33 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
 
 	}
-
-	if (m_bIsTest && m_Animqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	if (m_bTestImguiButton == 1)
 	{
-		m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
+		if (m_bIsTest && m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+		{
+			m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
+		}
 	}
 
-	if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
-	{
-		//CClient_Manager::Make_Anim_Queue(m_Animqeue, ANIM_CHAR1);
-		m_Animqeue.push({ 21,0.3f });
-		m_Animqeue.push({ 1,0.3f });
-		m_Animqeue.push({ 2,0.3f });
+	ImGui::RadioButton("QeueeNoneUse", &m_bTestImguiButton, 0);
+	ImGui::RadioButton("QeueeUes", &m_bTestImguiButton, 1);
+	
+	queue<pair<_uint, _double>> Temp;
+	CClient_Manager::Make_Anim_Queue(Temp, ANIM_CHAR1);
 
-		m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
-		m_pModelCom->InitChannel();
-		m_pModelCom->Set_AnimIndex(m_Animqeue.front().first);
-		m_Animqeue.pop();
+	if (m_bTestImguiButton == 1)
+	{
+		if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
+		{
+			m_CurAnimqeue = Temp;
+
+			m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
+			m_pModelCom->InitChannel();
+			m_pModelCom->Set_AnimIndex(m_CurAnimqeue.front().first);
+			m_CurAnimqeue.pop();
+		}
 	}
+	
 
 
 

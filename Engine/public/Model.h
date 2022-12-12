@@ -32,26 +32,29 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void Play_Animation(_double TimeDelta);
+	void Play_Animation(_double TimeDelta,_bool IsCombat=false);
 
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 	
-
 	_bool	 Get_Finished(_uint iAnimIndex);
 	void	Set_Finished(_uint iAnimIndex,_bool bFinish);
 	
-	void	Set_PlayTime(_uint iAnimIndex);
-	void	InitChannel();
+	
 public: /*For.Imgui*/
 	virtual void Imgui_RenderProperty() override;
 
 
 public: /*For.Animation*/
-	void	 Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
+	void	Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
 	_uint	Get_AnimIndex() const { return m_iCurrentAnimIndex; }
-
 	void	Set_AnimName(char* pAnimName);
+	
+	void	Set_PlayTime(_uint iAnimIndex);
+	void	InitChannel();
+public:
+	void	Set_Lerp(_uint iprevIndex, _uint iNextIndex);
+
 private:
 	LOAD_TYPE							m_eType = TYPE_END;
 	_uint								m_iNumMeshes = 0;
