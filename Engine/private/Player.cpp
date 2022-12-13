@@ -37,12 +37,14 @@ HRESULT CPlayer::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(&m_PlayerDesc)))
 		return E_FAIL;
 
+
+
 	return S_OK;
 }
 
 HRESULT CPlayer::Last_Initialize()
 {
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 void CPlayer::Tick(_double TimeDelta)
@@ -102,6 +104,8 @@ void CPlayer::ChaseTarget(_double TimeDelta)
 	
 }
 
+
+
 void CPlayer::LookAtTarget()
 {
 	if (m_pTargetPlayer == nullptr )
@@ -133,6 +137,49 @@ _bool CPlayer::IsCaptin()
 
 	return false;
 }
+
+void CPlayer::CurAnimQueue_Play_Tick(_double Time,CModel* pModel)
+{
+	if (!m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
+	{
+		m_bIsCombatAndAnimSequnce = false;
+		m_iOldAnim = pModel->Get_AnimIndex();
+		_uint i = m_CurAnimqeue.front().first;
+		pModel->Set_AnimIndex(i);
+		m_CurAnimqeue.pop();
+		m_bFinishOption = ANIM_CONTROL_NEXT;
+
+		if (m_CurAnimqeue.empty())
+		{
+			m_bIsCombatAndAnimSequnce = true;
+		}
+	}
+
+}
+
+void CPlayer::CurAnimQueue_Play_LateTick(CModel* pModel)
+{
+	if (m_bFinishOption == ANIM_CONTROL_NEXT)
+	{
+		pModel->Set_Finished(m_iOldAnim, false);
+		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
+	}
+	if (m_bIsCombatAndAnimSequnce && m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
+	{
+		pModel->Set_PlayTime(pModel->Get_AnimIndex());
+	}
+
+}
+
+void CPlayer::Set_CombatAnim_Index(CModel * pModel)
+{
+	pModel->Set_PlayTime(pModel->Get_AnimIndex());
+	pModel->InitChannel();
+	pModel->Set_AnimIndex(m_CurAnimqeue.front().first, (_double)m_CurAnimqeue.front().second);
+
+	m_CurAnimqeue.pop();
+}
+
 
 _bool CPlayer::KeyInput(_double TimeDelta)
 {

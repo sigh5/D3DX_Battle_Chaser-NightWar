@@ -199,7 +199,22 @@ HRESULT CLoader::Loading_ForGamePlay()
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("AllModels"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
-	
+
+	lstrcpy(m_szLoadingText, TEXT("콜라이더를 로딩중입니다. "));
+	/* For.Prototype_Component_Collider_AABB*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		return E_FAIL;
+	/* For.Prototype_Component_Collider_OBB*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		return E_FAIL;
+	/* For.Prototype_Component_Collider_SPHERE*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		return E_FAIL;
+
+
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNormalTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))

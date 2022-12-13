@@ -55,6 +55,10 @@ HRESULT CUIButton::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	if (!lstrcmp(m_ObjectName, TEXT("UIButton3")))
+		FirstDungeonUIInit();
+	
+
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -115,6 +119,18 @@ void CUIButton::Set_HighRightUIDesc(HIGHLIGHT_UIDESC & HighLightDesc)
 	m_pTransformCom->Set_Scaled(_float3(HighLightDesc.iNumSizeX, HighLightDesc.iNumSizeY,0.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 	m_pTextureCom->Set_SelectTextureIndex(HighLightDesc.iTextureIndex);
+}
+
+void CUIButton::FirstDungeonUIInit()
+{
+	_float4	 vPos;
+
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y = 5.f;
+
+	m_pTransformCom->Set_Scaled(_float3(133.f, 134.f, 0.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+	m_pTextureCom->Set_SelectTextureIndex(8);
 }
 
 HRESULT CUIButton::SetUp_Components()

@@ -245,6 +245,14 @@ _uint CGameInstance::GetCurLevelIdx() const
 	return m_pLevel_Manager->GetCurLevelIdx();
 }
 
+CComponent * CGameInstance::Get_ComponentPtr(_uint iLevelIndex, const _tchar * pLayerTag, const _tchar * pComponentTag, _uint iIndex)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Get_ComponentPtr(iLevelIndex, pLayerTag, pComponentTag, iIndex);
+}
+
 HRESULT CGameInstance::Add_Prototype(const wstring& pPrototypeTag, CGameObject * pPrototype)
 {
 	if (nullptr == m_pObject_Manager)

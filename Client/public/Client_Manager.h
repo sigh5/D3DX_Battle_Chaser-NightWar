@@ -9,6 +9,7 @@ BEGIN(Engine)
 class CTransform;
 class CGameObject;
 class CModel;
+class CCollider;
 END
 
 
@@ -32,8 +33,6 @@ public:
 
 public: /* For_UI */
 	void distance_Limit_UP(CTransform* pTransform, _float4& vTransformFunction, DIR eType);
-
-
 	// UI 위치비교
 	template<typename T>
 	static T*	Get_MaxValue_Pointer(vector<T*>& pVec, _float &fMAX , COMPARE_UI_POS eType);
@@ -43,11 +42,21 @@ public: /* For_UI */
 
 public:
 	static _double	 TimeDelta;
-
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
 	
 public:/*For.Imgui_AnimTool*/
 	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
+
+public: /* For_Player */
+	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
+	static bool		Test() { return true; }
+
+
+#ifdef _DEBUG
+
+	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider);
+
+#endif // _DEBUG
 
 	
 

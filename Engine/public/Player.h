@@ -4,10 +4,22 @@
 
 BEGIN(Engine)
 
+class CFSMComponent;
+
+
 class ENGINE_DLL CPlayer abstract: public CGameObject
 {
 public:
 	enum MAPTYPE { DUNGEON_PLAYER, COMBAT_PLAYER,  MAPTYPE_END };
+	enum  CurrentState {
+		STATE_INTRO, STATE_NORMAL_ATTACK,
+		STATE_SKILL_ATTACK1, STATE_SKILL_ATTACK2,STATE_UlTIMATE, STATE_BUFF, STATE_WIDEAREA_BUFF,
+		STATE_USE_ITEM, STATE_DEFENCE, STATE_LIGHT_HIT,
+		STATE_HEAVY_HIT, STATE_FLEE, STATE_DIE, STATE_VITORY,
+		STATE_END
+	};
+
+	enum e_ANIM_CONTROL { ANIM_CONTROL_SEQUNCE, ANIM_CONTROL_NEXT, ANIM_CONTROL_END };
 
 public:
 	typedef struct tag_PlayerDesc :GAMEOBJECTDESC
@@ -30,42 +42,55 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-	
+
 public: /*For.PlayerController*/
-	void	  Set_FollowTarget(CGameObject* pPlayer);
-	
+	void				 Set_FollowTarget(CGameObject* pPlayer);
+	_bool				Get_IsSwap()const { return m_bIsSwap; }
+	void				Set_IsSwap(_bool bIsSwap) { m_bIsSwap = bIsSwap; }
+	virtual _uint		Get_AnimationIndex() { return 0; }
+	void				SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
+	_bool				IsCaptin();
+	virtual				 _bool	  Is_PlayerDead() { return false; }
+	virtual	   void		Set_Current_AnimQueue(CurrentState eType, _bool IsEvent) {};
+protected:
+	_bool				KeyInput(_double TimeDelta);
+	virtual void		Change_Level_Data(_uint iLevleIdx) {}
 
-
-public: /*For.Dungeon*/
-	virtual _uint	Get_AnimationIndex() { return 0; }
-	void	SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
-	void	LookAtTarget();
-	_bool	Get_IsSwap()const { return m_bIsSwap; }
-	void	Set_IsSwap(_bool bIsSwap) { m_bIsSwap = bIsSwap; }
+protected: /*For.Tick*/
+	virtual void				Dungeon_Tick(_double TimeDelta) {};
+	virtual void				Combat_Tick(_double TimeDelta) {};
 
 protected: /*For.Dungeon*/
-	_bool				IsCaptin();
 	virtual   void		AnimMove() {}
 	virtual	  void		HighLightChar() {}
 	virtual	  void		NormalLightCharUI() {}
-
-protected:
-	_bool		KeyInput(_double TimeDelta);
 	
-public: /* imgui */
-	virtual _bool Piciking_GameObject()override { return false; }
+protected: /*For.Animamtion*/
+	void	  CurAnimQueue_Play_Tick(_double Time, class CModel* pModel);
+	void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
+	void	  Set_CombatAnim_Index(class CModel* pModel);
+	
+public: /*For.Imgui*/
+	virtual _bool Piciking_GameObject() { return false; }
 
 private:
 	void	ChaseTarget(_double TimeDelta);
+	void	LookAtTarget();
 
 protected:
 	PLAYERDESC				m_PlayerDesc;
 	MAPTYPE					m_ePlayerType = DUNGEON_PLAYER;
+	_bool					m_bControlKeyInput = false;
 	
 protected:
-	_bool					m_bControlKeyInput = false;
-	_uint					m_iAnimIndex = 0;
-
+	_uint							m_bFinishOption = 0;
+	_uint							m_iOldAnim = 0;
+	_uint							m_iAnimIndex = 0;
+	_bool							m_bIsCombatScene = false;
+	_bool							m_bIsCombatLastInit = false;
+	_bool							m_bIsCombatAndAnimSequnce = false;
+	queue<pair<_uint, _double>>		m_CurAnimqeue;
+	CurrentState					m_eType = STATE_END;
 private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;

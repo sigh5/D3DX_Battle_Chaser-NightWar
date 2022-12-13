@@ -7,10 +7,13 @@ BEGIN(Engine)
 class ENGINE_DLL CGameObject abstract : public CBase
 {
 public:
+	enum COLLIDERTYPE { COLLTYPE_AABB, COLLTYPE_OBB, COLLTYPE_SPHERE, COLLTYPE_END };
+public:
 	typedef struct tagGameObjectDesc
 	{
 		CTransform::TRANSFORMDESC  TransformDesc;
 	}GAMEOBJECTDESC;
+
 
 
 protected:
@@ -22,6 +25,7 @@ public:
 	static	const wstring			m_pTransformComTag;
 
 public:
+	class CComponent* Find_Component(const wstring& pComponentTag);
 	const	 _tchar*				Get_ProtoName() const { return m_ProtoName; }
 	void							Set_ProtoName(const _tchar* pNametag) { m_ProtoName= pNametag; }
 
@@ -81,7 +85,7 @@ protected:
 	CTransform*				m_pTransformCom = nullptr;
 protected:	
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
-	class CComponent* Find_Component(const wstring& pComponentTag);
+
 	HRESULT Remove_component(const wstring& pComponentTag);
 
 protected:

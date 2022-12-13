@@ -68,6 +68,22 @@ void CLayer::Change_Level(_uint iLevleIdx)
 
 }
 
+CComponent * CLayer::Get_ComponentPtr(const _tchar * pComponentTag, _uint iIndex)
+{
+	if (iIndex >= m_GameObjects.size())
+		return nullptr;
+
+	auto	iter = m_GameObjects.begin();
+
+	for (_uint i = 0; i < iIndex; ++i)
+		++iter;
+
+	if (iter == m_GameObjects.end())
+		return nullptr;
+
+	return (*iter)->Find_Component(pComponentTag);
+}
+
 HRESULT CLayer::Add_GameObject(CGameObject * pGameObject)
 {
 	if (nullptr == pGameObject)

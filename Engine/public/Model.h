@@ -46,7 +46,7 @@ public: /*For.Imgui*/
 
 
 public: /*For.Animation*/
-	void	Set_AnimIndex(_uint iAnimIndex) { m_iCurrentAnimIndex = iAnimIndex; }
+	void	Set_AnimIndex(_uint iAnimIndex, _float TickTime = 0.f);
 	_uint	Get_AnimIndex() const { return m_iCurrentAnimIndex; }
 	void	Set_AnimName(char* pAnimName);
 	
@@ -77,7 +77,7 @@ private:
 private: /*For.Imgui*/
 	_bool								m_bAnimcontrol = false;
 	int									m_iMeshIndex = -1;
-	float								m_iTickPerSecond = 0;
+	float								m_iTickPerSecond = 0.3f;
 
 private:
 	char								m_szModelPath[MAX_PATH] = "";

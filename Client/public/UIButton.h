@@ -35,6 +35,8 @@ public:
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
 	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc)override;
 
+private:
+	void			FirstDungeonUIInit();
 
 private:
 	CShader*				m_pShaderCom = nullptr;

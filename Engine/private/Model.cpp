@@ -300,18 +300,16 @@ void CModel::Imgui_RenderProperty()
 	
 	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
 
-
-	//ImGui::InputInt("MeshIndex", &m_iMeshIndex);
-
-	
-	
-
-
-
 	ImGui::End();
 
 }
 
+
+void CModel::Set_AnimIndex(_uint iAnimIndex, _float TickTime)
+{
+	m_iCurrentAnimIndex = iAnimIndex;
+	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(TickTime);
+}
 
 void CModel::Set_AnimName(char * pAnimName )
 {

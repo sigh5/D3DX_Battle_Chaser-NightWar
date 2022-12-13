@@ -9,6 +9,12 @@
 #include <DirectXTK/WICTextureLoader.h>
 #include <DirectXTK/ScreenGrab.h>
 
+#include <DirectXTK/PrimitiveBatch.h>
+#include <DirectXTK/VertexTypes.h>
+#include <DirectXTK/Effects.h>
+
+#include <DirectXTK/SpriteBatch.h>
+#include <DirectXTK/SpriteFont.h>
 
 #include <d3dcompiler.h>
 #include <TypeInfo.h>

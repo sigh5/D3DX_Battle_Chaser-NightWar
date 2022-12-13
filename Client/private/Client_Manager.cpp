@@ -7,6 +7,8 @@
 #include "Environment_Object.h"
 #include "UI.h"
 #include <string>
+#include "PlayerController.h"
+
 _double CClient_Manager::TimeDelta = 0;
 
 
@@ -15,10 +17,6 @@ _double CClient_Manager::TimeDelta = 0;
 void CClient_Manager::Client_Manager_Update()
 {
 	
-
-
-
-
 }
 
 void CClient_Manager::distance_Limit_UP(CTransform * pTransform, _float4& vLimitFunction, DIR eType)
@@ -134,13 +132,14 @@ void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, An
 
 	AnimQueue = m_AnimQueue[eType];
 
+
 	queue<pair<_uint, _double>> TempQueue;
-	TempQueue = AnimQueue;
+	TempQueue = m_AnimQueue[eType];
 
 	while (!TempQueue.empty())
 	{
 		string str = to_string(TempQueue.front().first);
-		
+
 		ImGui::Text(str.c_str());
 
 		TempQueue.pop();
@@ -150,6 +149,42 @@ void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, An
 
 }
 
+void CClient_Manager::CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform)
+{
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+
+	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
+	{
+		pColider->Update(pTransform->Get_WorldMatrix());
+	}
+
+
+	RELEASE_INSTANCE(CPlayerController);
+}
+
+#ifdef _DEBUG
+void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pColider)
+{
+	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
+	
+	if (pGameInstance->GetCurLevelIdx() == LEVEL_COMBAT)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+
+
+	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
+	{
+		pColider->Render();
+	}
+
+	RELEASE_INSTANCE(CPlayerController);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+#endif
 
 
 

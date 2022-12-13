@@ -23,14 +23,7 @@ typedef struct ENGINE_DLL tagFSM_Transition
 
 	// 멤버함수 바인드용 생성자
 	template<typename T>
-	tagFSM_Transition(const _tchar* pTransitionName, T* obj, bool (T::*memFunc)(), _uint iPriority = 0)
-		: pTransitionName(pTransitionName), iPriority(iPriority)
-	{ 
-		Predicator = [obj, memFunc]()
-		{
-			return (obj->*memFunc)();
-		};
-	}
+	tagFSM_Transition(const _tchar* pTransitionName, T* obj, bool (T::*memFunc)(), _uint iPriority = 0);
 
 	// 복사 및 이동 생성자
 	tagFSM_Transition(const tagFSM_Transition& other);
@@ -82,6 +75,8 @@ protected:
 	virtual ~CFSMComponent() override = default;
 
 public:
+	void FirstNodeStrat(); // 첫 fsm 시작할때 
+
 	void Tick(_double TimeDelta);
 
 	// CFSMComponentBuilder을 통해 FMS을 만들고 이를 pArg로 전해준다.
@@ -155,7 +150,7 @@ public:
 		const auto itr = find_if(m_mapStates.begin(), m_mapStates.end(), CTag_Finder(m_pBuildStateName));
 		assert(itr != m_mapStates.end());
 
-		auto NextNodeItr = find_if(itr->second.mapTransition.begin(), itr->second.mapTransition.begin(), CTag_Finder(szNextNodeNmae));
+		auto NextNodeItr = find_if(itr->second.mapTransition.begin(), itr->second.mapTransition.end(), CTag_Finder(szNextNodeNmae));
 		if (NextNodeItr == itr->second.mapTransition.end())
 		{
 			itr->second.mapTransition.insert({szNextNodeNmae, vector<FSM_TRANSITION>{tTransition}});

@@ -16,6 +16,9 @@ private:
 	virtual ~CObject_Manager() = default;
 
 public:
+	class CComponent* Get_ComponentPtr(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex);
+
+public:
 	HRESULT Reserve_Manager(_uint iNumLevels);
 	HRESULT Clear(_uint iLevelIndex);
 	HRESULT Copy_Data(_uint iLevelIndex);			// 씬전환시 데이터들을 카피한다.

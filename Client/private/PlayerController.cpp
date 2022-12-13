@@ -5,9 +5,16 @@
 #include "GameInstance.h"
 #include "Layer.h"
 
+// 디버그용
+static string str[14] = { {"STATE_INTRO"},{ "STATE_NORMAL_ATTACK" },{ "STATE_SKILL_ATTACK1" },
+						{ "STATE_SKILL_ATTACK2" },{ "STATE_UlTIMATE" },{ "STATE_BUFF" },
+						  {"STATE_WIDEAREA_BUFF"},{ "STATE_USE_ITEM" },{ "STATE_DEFENCE" },
+							{"STATE_LIGHT_HIT"},{ "STATE_HEAVY_HIT" },{ "STATE_FLEE" },
+							{"STATE_DIE"},{ "STATE_VITORY" } };
+			
+
+
 IMPLEMENT_SINGLETON(CPlayerController);
-
-
 
 HRESULT CPlayerController::Initialize()
 {
@@ -33,12 +40,9 @@ HRESULT CPlayerController::Initialize()
 			}
 		}
 	}
-
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
-
-
 
 void CPlayerController::Set_CaptinPlayer()
 {
@@ -76,12 +80,8 @@ void CPlayerController::Set_CaptinPlayer()
 			}
 			iter->Set_FollowTarget(pPlayer);
 			pPlayer = iter;
-
 		}
-
 	}
-
-
 	RELEASE_INSTANCE(CGameInstance);
 
 }
@@ -99,8 +99,6 @@ void CPlayerController::SyncAninmation()
 		}
 		pPlayer->SyncAnimation(iCaptinAnimIndex);
 	}
-
-
 }
 
 void CPlayerController::Change_Scene(_uint	iLevelIndex)
@@ -113,6 +111,13 @@ void CPlayerController::Change_Scene(_uint	iLevelIndex)
 		for (auto& pPlayer : m_pPlayerVec)
 		{
 			pPlayer->Set_FollowTarget(nullptr);
+			
+			/*Test*/
+			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
+			{
+				pCurentActor = pPlayer;
+			}
+			/*Test*/
 		}
 	}
 	else if(iLevelIndex == LEVEL_GAMEPLAY)
@@ -129,8 +134,65 @@ _bool CPlayerController::CombatScene()
 	return false;
 }
 
+void CPlayerController::CurrentTurn_AnimControl()
+{
+	static int CharIndex = 0;
+	static int Type_Num = 0;
+
+	ImGui::RadioButton("Garrison", &CharIndex, 0);
+	ImGui::RadioButton("Knolan", &CharIndex, 1);
+	ImGui::RadioButton("Calibreotto", &CharIndex, 2);
+	if (CharIndex == 0)
+	{
+		for (auto& pPlayer : m_pPlayerVec)
+		{
+			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
+			{
+				pCurentActor = pPlayer;
+			}
+		}
+	}
+	else if (CharIndex == 1)
+	{
+		for (auto& pPlayer : m_pPlayerVec)
+		{
+			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
+			{
+				pCurentActor = pPlayer;
+			}
+		}
+	}
+	else if (CharIndex == 2)
+	{
+		for (auto& pPlayer : m_pPlayerVec)
+		{
+			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
+			{
+				pCurentActor = pPlayer;
+			}
+		}
+	}
 
 
+
+
+	ImGui::InputInt("Anim Type MAX=10", &Type_Num);
+
+	if (Type_Num >= 14)
+		Type_Num = 0;
+	ImGui::Text(str[Type_Num].c_str());
+
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Key_Down(DIK_P))
+	{
+		static_cast<CPlayer*>(pCurentActor)->Set_Current_AnimQueue(CPlayer::CurrentState(Type_Num), true);
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+	
+}
 
 void CPlayerController::Free()
 {

@@ -145,6 +145,9 @@
     <Filter Include="01.Utility\03.Components\08.Model\Animation\Channel">
       <UniqueIdentifier>{76af4c22-788b-49e2-be05-0cf16e57068d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\07.Colider">
+      <UniqueIdentifier>{4a656bf6-d15c-4484-a9cd-1e4ced795def}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -306,9 +309,6 @@
     <ClInclude Include="..\Public\Light_Manager.h">
       <Filter>01.Utility\06.Light\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\FSMComponent.h">
-      <Filter>01.Utility\03.Components\06.FSM</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\VIBuffer_Cube.h">
       <Filter>01.Utility\03.Components\02.VIBuffer\Cube</Filter>
     </ClInclude>
@@ -335,6 +335,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Channel.h">
       <Filter>01.Utility\03.Components\08.Model\Animation\Channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>01.Utility\03.Components\07.Colider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Collider.h">
+      <Filter>01.Utility\03.Components\07.Colider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -470,9 +476,6 @@
     <ClCompile Include="..\Private\Light_Manager.cpp">
       <Filter>01.Utility\06.Light\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\FSMComponent.cpp">
-      <Filter>01.Utility\03.Components\06.FSM</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Cube.cpp">
       <Filter>01.Utility\03.Components\02.VIBuffer\Cube</Filter>
     </ClCompile>
@@ -499,6 +502,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Channel.cpp">
       <Filter>01.Utility\03.Components\08.Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>01.Utility\03.Components\07.Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider.cpp">
+      <Filter>01.Utility\03.Components\07.Colider</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

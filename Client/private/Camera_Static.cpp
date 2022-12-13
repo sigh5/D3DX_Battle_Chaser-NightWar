@@ -55,6 +55,10 @@ void CCamera_Static::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
+	/*나중에 삭제바람*/
+	if(m_pPlayerController->CombatScene())
+		m_pPlayerController->CurrentTurn_AnimControl();
+	
 	if (!m_bCameraActive)
 		return;
 
@@ -63,6 +67,10 @@ void CCamera_Static::Tick(_double TimeDelta)
 		m_pPlayerController->Set_CaptinPlayer();
 		Update_CameraLookPos();
 		m_pPlayerController->SyncAninmation();
+	}
+	else
+	{
+		m_pPlayerController->CurrentTurn_AnimControl();
 	}
 
 	__super::Tick(TimeDelta);

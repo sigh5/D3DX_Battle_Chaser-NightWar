@@ -2,6 +2,9 @@
 #include "..\public\Hero_Garrison.h"
 #include "GameInstance.h"
 #include "Client_Manager.h"
+
+#include "PlayerController.h"
+
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
 {
@@ -23,7 +26,6 @@ HRESULT CHero_Garrison::Initialize_Prototype()
 HRESULT CHero_Garrison::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Hero_Alumon");
-
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
 
@@ -32,51 +34,35 @@ HRESULT CHero_Garrison::Initialize(void * pArg)
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
-
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-
 	m_pModelCom->Set_AnimIndex(0);
-
 	return S_OK;
 }
 
-HRESULT CHero_Garrison::Last_Initialize()
+HRESULT CHero_Garrison::Last_Initialize() 
 {
+	if (m_bLast_Initlize)
+		return S_OK;
+	
+
+	
+	m_bLast_Initlize = true;
 	return S_OK;
 }
 
 void CHero_Garrison::Tick(_double TimeDelta)
 {
+	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	if (m_bIsCombatScene == false)
-	{
-		if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
-			m_iAnimIndex = 0;
-		AnimMove();
-	}
-	if (m_bTestImguiButton == 1)
-	{
-		if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
-		{
-			m_bIsTest = false;
-			m_iOldAnim = m_pModelCom->Get_AnimIndex();
-			_uint i = m_CurAnimqeue.front().first;
-			m_pModelCom->Set_AnimIndex(i);
-			m_CurAnimqeue.pop();
-			m_bFinishOption = ANIM_CONTROL_NEXT;
 
-			if (m_CurAnimqeue.empty())
-			{
-				m_bIsTest = true;
-			}
-		
-			if (18 == i)
-				m_pModelCom->Set_Lerp(i, m_CurAnimqeue.front().first);
-			
-		}
+	if (m_bIsCombatScene == false)
+		Dungeon_Tick(TimeDelta);
+	else
+	{
+		Combat_Tick(TimeDelta);
 	}
 	m_pModelCom->Play_Animation(TimeDelta,m_bIsCombatScene);
 }
@@ -86,42 +72,8 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	if (m_bFinishOption == ANIM_CONTROL_NEXT)
-	{
-		m_pModelCom->Set_Finished(m_iOldAnim, false);
-		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
-
-	}
-	if (m_bTestImguiButton == 1)
-	{
-		if (m_bIsTest && m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
-		{
-			m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
-		}
-	}
-
-	ImGui::RadioButton("QeueeNoneUse", &m_bTestImguiButton, 0);
-	ImGui::RadioButton("QeueeUes", &m_bTestImguiButton, 1);
+	CurAnimQueue_Play_LateTick(m_pModelCom);
 	
-	queue<pair<_uint, _double>> Temp;
-	CClient_Manager::Make_Anim_Queue(Temp, ANIM_CHAR1);
-
-	if (m_bTestImguiButton == 1)
-	{
-		if (CGameInstance::GetInstance()->Key_Down(DIK_Y))
-		{
-			m_CurAnimqeue = Temp;
-
-			m_pModelCom->Set_PlayTime(m_pModelCom->Get_AnimIndex());
-			m_pModelCom->InitChannel();
-			m_pModelCom->Set_AnimIndex(m_CurAnimqeue.front().first);
-			m_CurAnimqeue.pop();
-		}
-	}
-	
-
-
-
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -130,30 +82,19 @@ HRESULT CHero_Garrison::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
-
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
-		/* 이 모델을 그리기위한 셰이더에 머테리얼 텍스쳐를 전달하낟. */
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-
 		m_pModelCom->Render(m_pShaderCom, i, 0,"g_BoneMatrices","DN_FR_FishingRod");
 	}
-
+#ifdef _DEBUG
+	CClient_Manager::Collider_Render(this, m_pColliderCom);
+#endif
 	return S_OK;
-}
-
-
-
-
-_bool CHero_Garrison::Piciking_GameObject()
-{
-	return false;
 }
 
 void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
@@ -224,6 +165,20 @@ void CHero_Garrison::NormalLightCharUI()
 	m_Hero_DungeonUIDelegeter.broadcast(Desc);
 }
 
+void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
+{
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+		m_iAnimIndex = 0;
+	AnimMove();
+	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+}
+
+void CHero_Garrison::Combat_Tick(_double TimeDelta)
+{
+	CPlayer::CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
+}
+
 HRESULT CHero_Garrison::SetUp_Components()
 {
 	/* For.Com_Renderer */
@@ -240,6 +195,19 @@ HRESULT CHero_Garrison::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+	CCollider::COLLIDERDESC			ColliderDesc;
+
+	/* For.Com_OBB */
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+	ColliderDesc.vSize = _float3(1.0f, 2.0f, 0.8f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), TEXT("Com_OBB"),
+		(CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -320,10 +288,124 @@ void CHero_Garrison::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 
 }
 
+void CHero_Garrison::Set_Current_AnimQueue(CurrentState eType, _bool IsEvent)
+{
+	if (!IsEvent)
+		return;
+	
+	_uint iHitRand = rand() % 4 + 13; 
+	m_eType = eType;
+	
+	switch (eType)
+	{
+	case STATE_INTRO:
+		m_CurAnimqeue.push({ 21, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+	case STATE_NORMAL_ATTACK:
+		m_CurAnimqeue.push({ 4,  1.f });
+		m_CurAnimqeue.push({ 3,  1.f });
+		m_CurAnimqeue.push({ 11, 1.f });
+		m_CurAnimqeue.push({ 12, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+	case STATE_SKILL_ATTACK1:
+		m_CurAnimqeue.push({ 4,  1.f });
+		m_CurAnimqeue.push({ 10, 1.f });
+		m_CurAnimqeue.push({ 11, 1.f });
+		m_CurAnimqeue.push({ 12, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
 
+	case STATE_SKILL_ATTACK2:
+		m_CurAnimqeue.push({ 17, 1.f });
+		m_CurAnimqeue.push({ 18, 1.f });
+		m_CurAnimqeue.push({ 19, 1.f });
+		m_CurAnimqeue.push({ 11, 1.f });
+		m_CurAnimqeue.push({ 12, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+
+	case STATE_UlTIMATE:
+		m_CurAnimqeue.push({ 30,  1.f });
+		m_CurAnimqeue.push({ 11,  1.f });
+		m_CurAnimqeue.push({ 12,  1.f });
+		m_CurAnimqeue.push({ 1,   1.f });
+		m_CurAnimqeue.push({ 2,   1.f });
+		break;
+
+	case STATE_BUFF:
+		m_CurAnimqeue.push({ 8,  1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+
+	case STATE_WIDEAREA_BUFF:
+		m_CurAnimqeue.push({ 2,  1.f });		//없음
+		break;
+		
+
+	case STATE_USE_ITEM:
+		m_CurAnimqeue.push({ 23,  1.f });
+		m_CurAnimqeue.push({ 1,   1.f });
+		m_CurAnimqeue.push({ 2,   1.f });
+		break;
+	case STATE_DEFENCE:
+		m_CurAnimqeue.push({ 32,   1.f });
+		m_CurAnimqeue.push({ 1,    1.f });
+		m_CurAnimqeue.push({ 2,    1.f });
+		break;
+	case STATE_LIGHT_HIT:
+		m_CurAnimqeue.push({ 26, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+	case STATE_HEAVY_HIT:
+		m_CurAnimqeue.push({ iHitRand ,  1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 2,  1.f });
+		break;
+	case STATE_FLEE:
+		m_CurAnimqeue.push({ 48,  1.f });
+		m_CurAnimqeue.push({ 47,  1.f });
+		break;
+	case STATE_DIE:
+		m_CurAnimqeue.push({ 7,  1.f });
+		m_CurAnimqeue.push({ 33,  1.f });
+		break;
+	case STATE_VITORY:
+		Is_PlayerDead();
+		break;
+	case STATE_END:
+		break;
+	default:
+		break;
+	}
+	Set_CombatAnim_Index(m_pModelCom);
+
+}
+
+_bool CHero_Garrison::Is_PlayerDead()
+{
+	if (m_eType == STATE_VITORY)
+	{
+		//ToDo .. 다른 애님 추가
+		/* if 플레이어 죽음 아니면 살음*/
+		m_CurAnimqeue.push({ 22 ,0.1f });
+		m_CurAnimqeue.push({ 43,0.1f });
+	}
+
+
+	return true;
+}

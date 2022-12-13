@@ -98,6 +98,12 @@ CFSMComponent::CFSMComponent(const CFSMComponent& rhs): CComponent(rhs)
 {
 }
 
+void CFSMComponent::FirstNodeStrat()	// FSM 첫시작할때만 실행
+{
+	const auto firstNode = find_if(m_mapState.begin(), m_mapState.end(), CTag_Finder(m_pCurStateName));
+	firstNode->second.OnStart();
+}
+
 void CFSMComponent::Tick(_double TimeDelta)
 {
 	int iLoopCnt = 5000;
