@@ -11,16 +11,7 @@ class ENGINE_DLL CPlayer abstract: public CGameObject
 {
 public:
 	enum MAPTYPE { DUNGEON_PLAYER, COMBAT_PLAYER,  MAPTYPE_END };
-	enum  CurrentState {
-		STATE_INTRO, STATE_NORMAL_ATTACK,
-		STATE_SKILL_ATTACK1, STATE_SKILL_ATTACK2,STATE_UlTIMATE, STATE_BUFF, STATE_WIDEAREA_BUFF,
-		STATE_USE_ITEM, STATE_DEFENCE, STATE_LIGHT_HIT,
-		STATE_HEAVY_HIT, STATE_FLEE, STATE_DIE, STATE_VITORY,
-		STATE_END
-	};
-
-	enum e_ANIM_CONTROL { ANIM_CONTROL_SEQUNCE, ANIM_CONTROL_NEXT, ANIM_CONTROL_END };
-
+	
 public:
 	typedef struct tag_PlayerDesc :GAMEOBJECTDESC
 	{
@@ -34,7 +25,7 @@ protected:
 
 public:
 	void	Set_ControlInput(_bool bControl) { m_bControlKeyInput = bControl; }
-
+	const _bool	Get_IsIdle()const { return m_bIsIdle; }
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -51,7 +42,6 @@ public: /*For.PlayerController*/
 	void				SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
 	_bool				IsCaptin();
 	virtual				 _bool	  Is_PlayerDead() { return false; }
-	virtual	   void		Set_Current_AnimQueue(CurrentState eType, _bool IsEvent) {};
 protected:
 	_bool				KeyInput(_double TimeDelta);
 	virtual void		Change_Level_Data(_uint iLevleIdx) {}
@@ -65,7 +55,7 @@ protected: /*For.Dungeon*/
 	virtual	  void		HighLightChar() {}
 	virtual	  void		NormalLightCharUI() {}
 	
-protected: /*For.Animamtion*/
+public: /*For.Animamtion*/
 	void	  CurAnimQueue_Play_Tick(_double Time, class CModel* pModel);
 	void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
 	void	  Set_CombatAnim_Index(class CModel* pModel);
@@ -78,9 +68,9 @@ private:
 	void	LookAtTarget();
 
 protected:
-	PLAYERDESC				m_PlayerDesc;
-	MAPTYPE					m_ePlayerType = DUNGEON_PLAYER;
-	_bool					m_bControlKeyInput = false;
+	PLAYERDESC						m_PlayerDesc;
+	MAPTYPE							m_ePlayerType = DUNGEON_PLAYER;
+	_bool							m_bControlKeyInput = false;
 	
 protected:
 	_uint							m_bFinishOption = 0;
@@ -90,7 +80,7 @@ protected:
 	_bool							m_bIsCombatLastInit = false;
 	_bool							m_bIsCombatAndAnimSequnce = false;
 	queue<pair<_uint, _double>>		m_CurAnimqeue;
-	CurrentState					m_eType = STATE_END;
+	_bool							m_bIsIdle = false;;
 private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;

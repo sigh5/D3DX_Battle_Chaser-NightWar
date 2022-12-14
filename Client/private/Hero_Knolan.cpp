@@ -4,6 +4,9 @@
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
+#include "PlayerController.h"
+#include "AnimFsm.h"
+
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
 {
@@ -61,9 +64,14 @@ void CHero_Knolan::Tick(_double TimeDelta)
 	if (m_bIsCombatScene == false)
 		Dungeon_Tick(TimeDelta);
 	else
-		Combat_Tick(TimeDelta);
-	
-
+	{
+		Combat_Initialize();
+		
+		if(CPlayerController::GetInstance()->Get_CurActor() == this)
+			m_pFsmCom->Tick(TimeDelta);
+		//Combat_Tick(TimeDelta);
+	}
+		
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -168,6 +176,17 @@ void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
+HRESULT CHero_Knolan::Combat_Initialize()
+{
+	if (m_bCombat_LastInit)
+		return S_OK;
+
+	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR1);
+	m_bCombat_LastInit = true;
+	
+	return S_OK;
+}
+
 void CHero_Knolan::Combat_Tick(_double TimeDelta)
 {
 	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
@@ -180,25 +199,13 @@ void CHero_Knolan::ObserverTest(_double TimeDelta)
 	{
 		_uint iMoveSpeed = 100;
 		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
-
 	}
-
 	if (pInstance->Key_Down(DIK_O))
 	{
 		_uint iShakingTime = 3;
 		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
 	}
 
-	//if (pInstance->Key_Down(DIK_O))
-	//{
-	//	m_CurAnimqeue.push({ 6,0.1f });
-	//	m_CurAnimqeue.push({ 1,0.1f });
-	//	m_CurAnimqeue.push({ 2,0.1f });
-
-	//	Set_CombatAnim_Index(m_pModelCom);
-	//	/*_uint iShakingTime = 3;
-	//	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);*/
-	//}
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -216,6 +223,10 @@ HRESULT CHero_Knolan::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanDungeon"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+		/*if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Spider_Mana_Baby"), TEXT("Com_Model"),
+			(CComponent**)&m_pModelCom)))
+			return E_FAIL;*/
 
 	///* For.Com_Model */
 	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyCombat"), TEXT("Com_Model2"),
@@ -261,6 +272,110 @@ HRESULT CHero_Knolan::SetUp_ShaderResources()
 	return S_OK;
 }
 
+void CHero_Knolan::Anim_Idle()
+{
+	m_CurAnimqeue.push({ 2,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Intro()
+{
+	m_CurAnimqeue.push({ 12, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::AnimNormalAttack()
+{
+	//_uint iHitRand = rand() % 4 + 13;
+	m_CurAnimqeue.push({ 7, 1.f }); //7 21(제자리),24(골프샷),25(뒤로점프샷)
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Skill1_Attack()
+{
+	m_CurAnimqeue.push({ 15, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Skill2_Attack()
+{
+	m_CurAnimqeue.push({ 19, 1.f }); // fireStorm
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Uitimate()
+{
+	m_CurAnimqeue.push({ 28, 1.f }); // 28 전체공격력 업
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Buff()
+{
+	m_CurAnimqeue.push({ 26, 1.f });	// 자 버프 
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_WideAreaBuff()
+{
+	m_CurAnimqeue.push({ 27, 1.f });	// 마나 채워주기
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Use_Item()
+{
+	m_CurAnimqeue.push({ 14, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Defence()
+{
+	m_CurAnimqeue.push({ 6,  1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Light_Hit()
+{
+	m_CurAnimqeue.push({ 4,  1.f });	// 3 or 4
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+		
+void CHero_Knolan::Anim_Heavy_Hit()
+{
+	m_CurAnimqeue.push({ 8,  1.f });	// 8,9,10
+	m_CurAnimqeue.push({ 1,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Flee()
+{
+	m_CurAnimqeue.push({ 32, 1.f });
+	m_CurAnimqeue.push({ 31, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Die()
+{
+	m_CurAnimqeue.push({ 5,  1.f });
+	m_CurAnimqeue.push({ 23, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Knolan::Anim_Viroty()
+{
+	Is_PlayerDead();
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
 CHero_Knolan * CHero_Knolan::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CHero_Knolan*		pInstance = new CHero_Knolan(pDevice, pContext);
@@ -289,6 +404,7 @@ void CHero_Knolan::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 
@@ -296,106 +412,12 @@ void CHero_Knolan::Free()
 	Safe_Release(m_pRendererCom);
 }
 
-void CHero_Knolan::Set_Current_AnimQueue(CurrentState eType, _bool IsEvent)
-{
-	if (!IsEvent)
-		return;
-
-	_uint iHitRand = rand() % 4 + 13;
-	m_eType = eType;
-
-	switch (eType)
-	{	
-	case Engine::CPlayer::STATE_INTRO:
-		m_CurAnimqeue.push({ 12, 1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_NORMAL_ATTACK:
-		m_CurAnimqeue.push({ 7, 1.f }); //7 21(제자리),24(골프샷),25(뒤로점프샷)
-		m_CurAnimqeue.push({ 1, 1.f });
-		m_CurAnimqeue.push({ 2, 1.f });
-		break;
-	
-	case Engine::CPlayer::STATE_SKILL_ATTACK1:
-		m_CurAnimqeue.push({ 16, 1.f }); //(BattleBrust)수정필요
-		m_CurAnimqeue.push({ 15, 1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	
-	case Engine::CPlayer::STATE_SKILL_ATTACK2:
-		m_CurAnimqeue.push({ 19, 1.f }); // fireStorm
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-
-	case Engine::CPlayer::STATE_UlTIMATE:
-		m_CurAnimqeue.push({ 28, 1.f }); // 28 전체공격력 업
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-
-	case Engine::CPlayer::STATE_BUFF:
-		m_CurAnimqeue.push({ 26, 1.f });	// 자 버프 
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-
-	case Engine::CPlayer::STATE_WIDEAREA_BUFF:
-		m_CurAnimqeue.push({ 27, 1.f });	// 마나 채워주기
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-
-
-	case Engine::CPlayer::STATE_USE_ITEM:
-		m_CurAnimqeue.push({ 14, 1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_DEFENCE:
-		m_CurAnimqeue.push({ 6,  1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	
-	case Engine::CPlayer::STATE_LIGHT_HIT:
-		m_CurAnimqeue.push({ 4,  1.f });	// 3 or 4
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_HEAVY_HIT:
-		m_CurAnimqeue.push({ 8,  1.f });	// 8,9,10
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_FLEE:
-		m_CurAnimqeue.push({ 32, 1.f });
-		m_CurAnimqeue.push({ 31, 1.f });
-		break;
-	case Engine::CPlayer::STATE_DIE:
-		m_CurAnimqeue.push({ 5,  1.f });
-		m_CurAnimqeue.push({ 23, 1.f });
-		break;
-	case Engine::CPlayer::STATE_VITORY:
-		Is_PlayerDead();
-		break;
-	case Engine::CPlayer::STATE_END:
-		break;
-	default:
-		break;
-	}
-
-	Set_CombatAnim_Index(m_pModelCom);
-}
-
 _bool CHero_Knolan::Is_PlayerDead()
 {
 	/* 플레이가 죽었을때랑 살았을때 구분해서 쓰기*/
 	/*살았을때*/
-	m_CurAnimqeue.push({ 13 ,0.1f });
-	m_CurAnimqeue.push({ 36,0.1f });
+	m_CurAnimqeue.push({ 13 ,	1.f });
+	m_CurAnimqeue.push({ 36,	1.f });
 
 	/* 죽었을때*/
 	//m_CurAnimqeue.push({ 33 ,0.1f });

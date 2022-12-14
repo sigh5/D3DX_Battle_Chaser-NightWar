@@ -7,6 +7,17 @@ CChannel::CChannel()
 {
 }
 
+void CChannel::Set_DurationTime(_double Ratio)
+{
+	size_t	VecSize	=m_Origin_TimeVec.size();
+
+	for (size_t i = 0; i < VecSize; ++i)
+	{
+		m_KeyFrames[i].Time = m_Origin_TimeVec[i] * Ratio;
+	}
+
+}
+
 HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 {
 
@@ -26,6 +37,7 @@ HRESULT CChannel::Initialize(HANDLE hFile, CModel * pModel)
 	{
 		ReadFile(hFile, &keyFrame, sizeof(KEYFRAME), &dwByte, nullptr);
 		m_KeyFrames.push_back(keyFrame);
+		m_Origin_TimeVec.push_back(keyFrame.Time);
 	}
 
 	m_OldFrame = m_KeyFrames[0];
@@ -120,8 +132,6 @@ void CChannel::BlendingFrame(CChannel * pPrevChannel)
 	XMStoreFloat3(&m_KeyFrames[0].vScale, vScale);
 	XMStoreFloat4(&m_KeyFrames[0].vRotation, vRotation);
 	XMStoreFloat3(&m_KeyFrames[0].vPosition, vPosition);
-
-
 }
 
 CChannel * CChannel::Create(HANDLE hFile, CModel * pModel)
@@ -141,5 +151,6 @@ void CChannel::Free()
 	Safe_Release(m_pBone);
 
 	m_KeyFrames.clear();
+	m_Origin_TimeVec.clear();
 }
 

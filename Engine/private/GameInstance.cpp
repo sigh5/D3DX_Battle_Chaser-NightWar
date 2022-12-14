@@ -31,7 +31,6 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pLevel_Manager);
 	Safe_AddRef(m_pInput_Device);
 	Safe_AddRef(m_pGraphic_Device);
-
 	Safe_AddRef(m_pImgui_Manager);
 }
 

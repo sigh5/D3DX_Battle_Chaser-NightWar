@@ -4,6 +4,9 @@
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
+#include "AnimFsm.h"
+#include "PlayerController.h"
+
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -55,18 +58,15 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	queue<pair<_uint, _double>> AnimQueue;
-	CClient_Manager::Make_Anim_Queue(AnimQueue, ANIM_CHAR3);
-	if (ImGui::Button("MakeQueue"))
-	{
-		m_CurAnimqeue = AnimQueue;
-	}
-
 	if (m_bIsCombatScene == false)
 		Dungeon_Tick(TimeDelta);
 	else
-		Combat_Tick(TimeDelta);
-
+	{
+		Combat_Initialize();
+		if (CPlayerController::GetInstance()->Get_CurActor() == this)
+			m_pFsmCom->Tick(TimeDelta);
+	}
+		
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -93,7 +93,6 @@ HRESULT CHero_Calibretto::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
-
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 #endif
@@ -175,9 +174,22 @@ void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
+HRESULT CHero_Calibretto::Combat_Initialize()
+{
+	if (m_bCombat_LastInit)
+		return S_OK;
+
+	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
+	m_bCombat_LastInit = true;
+
+	return S_OK;
+}
+
 void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 {
 	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
 }
 
 void CHero_Calibretto::ObserverTest()
@@ -200,6 +212,7 @@ void CHero_Calibretto::ObserverTest()
 
 HRESULT CHero_Calibretto::SetUp_Components()
 {
+	
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -256,6 +269,104 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 	return S_OK;
 }
 
+void CHero_Calibretto::Anim_Idle()
+{
+	m_CurAnimqeue.push({ 2,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Intro()
+{
+	m_CurAnimqeue.push({ 17, 1.f });
+	m_CurAnimqeue.push({ 1,	 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::AnimNormalAttack()
+{
+	m_CurAnimqeue.push({ 15, 1.f });
+	m_CurAnimqeue.push({ 3,	 1.f });
+	m_CurAnimqeue.push({ 16, 1.f });
+	m_CurAnimqeue.push({ 9,  1.f });
+	m_CurAnimqeue.push({ 10, 1.f });
+	m_CurAnimqeue.push({ 1,	 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Skill1_Attack()
+{
+	m_CurAnimqeue.push({ 8, 1.f });		//¸ÖÆ¼ ¼¦	
+	m_CurAnimqeue.push({ 1,	 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Skill2_Attack()
+{
+	m_CurAnimqeue.push({ 20, 1.f });		// Âð °ø°Ý±Ã Brust??
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Uitimate()
+{
+	m_CurAnimqeue.push({ 46, 1.f }); // À§¿¡¼­ ·ÎÄÏ½î±â
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Buff()
+{
+	m_CurAnimqeue.push({ 7,  1.f });
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_WideAreaBuff()
+{
+	m_CurAnimqeue.push({ 40, 1.f });		// ÆÀ¿ø ´ëÆøÈú										
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Use_Item()
+{
+	m_CurAnimqeue.push({ 19, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Light_Hit()
+{
+	m_CurAnimqeue.push({ 4 , 1.f });		// 4 or 5
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Heavy_Hit()
+{
+	m_CurAnimqeue.push({ 11, 1.f });		// 11,12,13,14
+	m_CurAnimqeue.push({ 1, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Flee()
+{
+	m_CurAnimqeue.push({ 43, 1.f });
+	m_CurAnimqeue.push({ 42, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Die()
+{
+	m_CurAnimqeue.push({ 6,  1.f });
+	m_CurAnimqeue.push({ 35, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CHero_Calibretto::Anim_Viroty()
+{
+	Is_PlayerDead();
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
 CHero_Calibretto * CHero_Calibretto::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CHero_Calibretto*		pInstance = new CHero_Calibretto(pDevice, pContext);
@@ -284,101 +395,19 @@ void CHero_Calibretto::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }
 
-void CHero_Calibretto::Set_Current_AnimQueue(CurrentState eType, _bool IsEvent)
-{
-	if (!IsEvent)
-		return;
-
-	m_eType = eType;
-
-	switch (eType)
-	{
-	case Engine::CPlayer::STATE_INTRO:
-		m_CurAnimqeue.push({ 17 ,1.f });
-		m_CurAnimqeue.push({ 1,0.1f });
-		m_CurAnimqeue.push({ 2,0.1f });
-		break;
-	case Engine::CPlayer::STATE_NORMAL_ATTACK:
-		m_CurAnimqeue.push({ 15, 1.f });
-		m_CurAnimqeue.push({ 3,	 1.f });
-		m_CurAnimqeue.push({ 16, 1.f });
-		m_CurAnimqeue.push({ 9,  1.f });
-		m_CurAnimqeue.push({ 10, 1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_SKILL_ATTACK1:
-		m_CurAnimqeue.push({ 8, 1.f });		//¸ÖÆ¼ ¼¦
-		m_CurAnimqeue.push({ 1, 1.f });
-		m_CurAnimqeue.push({ 2, 1.f });
-		break;
-	case Engine::CPlayer::STATE_SKILL_ATTACK2:
-		m_CurAnimqeue.push({ 20, 1.f });		// Âð °ø°Ý±Ã Brust??
-		m_CurAnimqeue.push({ 1,	 1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_UlTIMATE:	// À§¿¡¼­ ·ÎÄÏ½î±â
-		m_CurAnimqeue.push({ 46, 1.f });
-		m_CurAnimqeue.push({ 1,  1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_BUFF:
-		m_CurAnimqeue.push({ 7,  1.f });
-		m_CurAnimqeue.push({ 1,	 1.f });
-		m_CurAnimqeue.push({ 2,  1.f });
-		break;
-	case Engine::CPlayer::STATE_WIDEAREA_BUFF:
-		m_CurAnimqeue.push({ 40, 1.f });		// ÆÀ¿ø ´ëÆøÈú
-		m_CurAnimqeue.push({ 1,	 1.f });
-		m_CurAnimqeue.push({ 2,	 1.f });
-		break;
-	case Engine::CPlayer::STATE_USE_ITEM:
-		m_CurAnimqeue.push({ 19, 1.f });
-		m_CurAnimqeue.push({ 1,	 1.f });
-		m_CurAnimqeue.push({ 2,	 1.f });
-		break;
-	case Engine::CPlayer::STATE_DEFENCE:
-		//¾øÀ½
-		m_CurAnimqeue.push({ 2,	 1.f });
-		break;
-	case Engine::CPlayer::STATE_LIGHT_HIT:
-		m_CurAnimqeue.push({ 4 , 1.f });		// 4 or 5
-		m_CurAnimqeue.push({ 2,	 1.f });
-		break;
-	case Engine::CPlayer::STATE_HEAVY_HIT:
-		m_CurAnimqeue.push({ 11, 1.f });		// 11,12,13,14
-		m_CurAnimqeue.push({ 2,	 1.f });
-		break;
-	case Engine::CPlayer::STATE_FLEE:
-		m_CurAnimqeue.push({ 43, 1.f });
-		m_CurAnimqeue.push({ 42, 1.f });
-		break;
-	case Engine::CPlayer::STATE_DIE:
-		m_CurAnimqeue.push({ 6,  1.f });
-		m_CurAnimqeue.push({ 35, 1.f });
-		break;
-	case Engine::CPlayer::STATE_VITORY:
-		Is_PlayerDead();
-		break;
-	case Engine::CPlayer::STATE_END:
-		break;
-	default:
-		break;
-	}
-	Set_CombatAnim_Index(m_pModelCom);
-}
 
 _bool CHero_Calibretto::Is_PlayerDead()
 {
 	/* ÀÌ°åÀ» °æ¿ì*/
-	m_CurAnimqeue.push({ 6 ,	0.1f });
-	m_CurAnimqeue.push({ 35,	0.1f });
+	m_CurAnimqeue.push({ 6 ,	1.f });
+	m_CurAnimqeue.push({ 35,	1.f });
 
 	/*Á×¾ú´Ù°¡ ÀÌ°åÀ» °æ¿ì*/
 	/*m_CurAnimqeue.push({ 38 ,	0.1f });
@@ -386,4 +415,35 @@ _bool CHero_Calibretto::Is_PlayerDead()
 	m_CurAnimqeue.push({ 30,	0.1f });
 	m_CurAnimqeue.push({ 36,	0.1f });*/
 	return false;
+}
+
+_int CHero_Calibretto::Is_MovingAnim()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (m_pModelCom->Get_AnimIndex() == 3)
+	{
+		bResult = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(3, 2);
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 9)
+	{
+		bResult = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(9, 2);
+	}
+	else
+		bResult = ANIM_EMD;
+
+
+	RELEASE_INSTANCE(CGameInstance);
+	return bResult;
+}
+
+void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
+{
+	if (bResult == ANIM_DIR_STRAIGHT)
+		m_pTransformCom->Go_Straight(TImeDelta);
+
+	else if (bResult == ANIM_DIR_BACK)
+		m_pTransformCom->Go_Backward(TImeDelta);
 }

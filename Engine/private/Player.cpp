@@ -36,9 +36,6 @@ HRESULT CPlayer::Initialize(void * pArg)
 
 	if (FAILED(__super::Initialize(&m_PlayerDesc)))
 		return E_FAIL;
-
-
-
 	return S_OK;
 }
 
@@ -81,8 +78,6 @@ void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 	}
 	
 }
-
-
 
 void CPlayer::ChaseTarget(_double TimeDelta)
 {
@@ -146,9 +141,10 @@ void CPlayer::CurAnimQueue_Play_Tick(_double Time,CModel* pModel)
 		m_iOldAnim = pModel->Get_AnimIndex();
 		_uint i = m_CurAnimqeue.front().first;
 		pModel->Set_AnimIndex(i);
+		pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
 		m_CurAnimqeue.pop();
 		m_bFinishOption = ANIM_CONTROL_NEXT;
-
+		
 		if (m_CurAnimqeue.empty())
 		{
 			m_bIsCombatAndAnimSequnce = true;
@@ -163,10 +159,12 @@ void CPlayer::CurAnimQueue_Play_LateTick(CModel* pModel)
 	{
 		pModel->Set_Finished(m_iOldAnim, false);
 		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
+		m_bIsIdle = false;
 	}
 	if (m_bIsCombatAndAnimSequnce && m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
 	{
 		pModel->Set_PlayTime(pModel->Get_AnimIndex());
+		m_bIsIdle = true;
 	}
 
 }
@@ -175,8 +173,10 @@ void CPlayer::Set_CombatAnim_Index(CModel * pModel)
 {
 	pModel->Set_PlayTime(pModel->Get_AnimIndex());
 	pModel->InitChannel();
-	pModel->Set_AnimIndex(m_CurAnimqeue.front().first, (_double)m_CurAnimqeue.front().second);
-
+	pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
+	pModel->Set_AnimIndex(m_CurAnimqeue.front().first);
+	pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
+	m_bIsIdle = false;
 	m_CurAnimqeue.pop();
 }
 

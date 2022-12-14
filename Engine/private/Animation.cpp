@@ -8,6 +8,23 @@ CAnimation::CAnimation()
 }
 
 
+void CAnimation::Set_Duration(_double Ratio)
+{
+	m_Duration	=m_Origin_Duration*Ratio;
+
+	for (auto& pChanel : m_Channels)
+	{
+		pChanel->Set_DurationTime(Ratio);
+	}
+
+}
+
+_uint CAnimation::Get_Key_Frame()
+{
+	return m_Channels[0]->Get_CurrentKeyFrameIndex();
+}
+
+
 HRESULT CAnimation::Initialize(HANDLE hFile, CModel * pModel)
 {
 	DWORD   dwByte = 0;
@@ -20,6 +37,7 @@ HRESULT CAnimation::Initialize(HANDLE hFile, CModel * pModel)
 	ReadFile(hFile, &m_iNumChannels, sizeof(_uint), &dwByte, nullptr);
 	
 
+
 	for (_uint i = 0; i < m_iNumChannels; ++i)
 	{
 		CChannel* pChannel = CChannel::Create(hFile, pModel);
@@ -28,6 +46,9 @@ HRESULT CAnimation::Initialize(HANDLE hFile, CModel * pModel)
 
 		m_Channels.push_back(pChannel);
 	}
+
+	m_Origin_Duration = m_Duration;
+
 	return S_OK;
 }
 
@@ -56,6 +77,8 @@ void CAnimation::Update_Bones(_double TimeDelta,_bool IsCombat)
 		m_Channels[i]->Update_TransformMatrix(m_PlayTime);
 	}
 }
+
+
 
 void CAnimation::InitChannel()
 {

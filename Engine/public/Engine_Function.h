@@ -72,4 +72,6 @@ namespace Engine
 
 		return dwRefCnt;
 	}
+
+	enum e_ANIM_CONTROL { ANIM_CONTROL_SEQUNCE, ANIM_CONTROL_NEXT, ANIM_CONTROL_END };
 }

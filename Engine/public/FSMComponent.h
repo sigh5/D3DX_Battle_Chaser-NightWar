@@ -23,7 +23,14 @@ typedef struct ENGINE_DLL tagFSM_Transition
 
 	// 멤버함수 바인드용 생성자
 	template<typename T>
-	tagFSM_Transition(const _tchar* pTransitionName, T* obj, bool (T::*memFunc)(), _uint iPriority = 0);
+	tagFSM_Transition(const _tchar* pTransitionName, T* obj, bool (T::*memFunc)(), _uint iPriority = 0)
+		: pTransitionName(pTransitionName), iPriority(iPriority)
+	{ 
+		Predicator = [obj, memFunc]()
+		{
+			return (obj->*memFunc)();
+		};
+	}
 
 	// 복사 및 이동 생성자
 	tagFSM_Transition(const tagFSM_Transition& other);
@@ -75,8 +82,6 @@ protected:
 	virtual ~CFSMComponent() override = default;
 
 public:
-	void FirstNodeStrat(); // 첫 fsm 시작할때 
-
 	void Tick(_double TimeDelta);
 
 	// CFSMComponentBuilder을 통해 FMS을 만들고 이를 pArg로 전해준다.
@@ -84,7 +89,7 @@ public:
 	static CFSMComponent* Create();
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Imgui_RenderProperty() override;
-	virtual		void	Final_Update()override {};
+
 private:
 	void StateHistoryUpdate(const _tchar* pNextStateName);
 

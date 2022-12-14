@@ -148,6 +148,9 @@
     <Filter Include="01.Utility\03.Components\07.Colider">
       <UniqueIdentifier>{4a656bf6-d15c-4484-a9cd-1e4ced795def}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\06.FSM\AnimFsmComponent">
+      <UniqueIdentifier>{ba8899b0-2298-49ff-86c1-dc05abf035c5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -342,6 +345,12 @@
     <ClInclude Include="..\public\Collider.h">
       <Filter>01.Utility\03.Components\07.Colider</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\FSMComponent.h">
+      <Filter>01.Utility\03.Components\06.FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>01.Utility\02.GameObject\Dynamic\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -508,6 +517,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Collider.cpp">
       <Filter>01.Utility\03.Components\07.Colider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FSMComponent.cpp">
+      <Filter>01.Utility\03.Components\06.FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>01.Utility\02.GameObject\Dynamic\Monster</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

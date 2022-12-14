@@ -173,9 +173,6 @@ void CPlayerController::CurrentTurn_AnimControl()
 		}
 	}
 
-
-
-
 	ImGui::InputInt("Anim Type MAX=10", &Type_Num);
 
 	if (Type_Num >= 14)
@@ -183,15 +180,211 @@ void CPlayerController::CurrentTurn_AnimControl()
 	ImGui::Text(str[Type_Num].c_str());
 
 
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	/*CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (pGameInstance->Key_Down(DIK_P))
 	{
 		static_cast<CPlayer*>(pCurentActor)->Set_Current_AnimQueue(CPlayer::CurrentState(Type_Num), true);
 	}
 
-	RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);*/
 	
+}
+
+_bool CPlayerController::To_Idle()
+{
+	_bool bResult = false;
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Key_Down(DIK_1))
+	{
+		bResult=  true;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+	return bResult;
+}
+
+_bool CPlayerController::To_Intro()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_2))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+_bool CPlayerController::To_Normal_Attack()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_3))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Skill1_Attack()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_4))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Skill2_Attack()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_5))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Uitimate()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_6))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Buff()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_7))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_WideAreaBuff()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_8))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Use_Item()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_9))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Defence()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_P))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Light_Hit()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_O))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Heavy_Hit()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_I))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Flee()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_U))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+}
+
+_bool CPlayerController::To_Die()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_Y))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
+	
+}
+
+_bool CPlayerController::To_Viroty()
+{
+	_bool bResult = false;
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_L))
+		bResult = true;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return bResult;
 }
 
 void CPlayerController::Free()

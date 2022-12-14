@@ -173,7 +173,6 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 		}
 
 		pShader->Begin(iShaderIndex);
-
 		m_Meshes[iMeshIndex]->Render();
 	}
 
@@ -196,6 +195,11 @@ void CModel::Set_Finished(_uint iAnimIndex, _bool bFinish)
 	m_Animations[iAnimIndex]->Set_Finished(bFinish);
 }
 
+void CModel::Set_Duration(_uint iAnimIndex, _double Ratio)
+{
+	m_Animations[iAnimIndex]->Set_Duration(Ratio);
+}
+
 void CModel::Set_PlayTime(_uint iAnimIndex)
 {
 	m_Animations[iAnimIndex]->Set_Looping(true);
@@ -205,6 +209,18 @@ void CModel::Set_PlayTime(_uint iAnimIndex)
 void CModel::InitChannel()
 {
 	m_Animations[m_iCurrentAnimIndex]->InitChannel();
+}
+
+_bool CModel::Control_KeyFrame(_uint iAnimIndex,_uint KeyBegin, _uint KeyEnd)
+{
+	_uint	iFrameIndex = m_Animations[iAnimIndex]->Get_Key_Frame();
+
+	if (iFrameIndex >= KeyBegin  && KeyEnd >= iFrameIndex)
+	{
+		m_Animations[iAnimIndex]->Set_TickPerSecond(0.5f);
+		return true;
+	}
+	return false;
 }
 
 void CModel::Imgui_RenderProperty()
@@ -254,60 +270,53 @@ void CModel::Imgui_RenderProperty()
 			}
 			ImGui::EndListBox();
 		}
-
 		ImGui::TreePop();
 	}
+
 	string str = "Current Anim Index :" +  to_string(m_iCurrentAnimIndex);
-	
+	strcpy_s(m_imguiAnimName,MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
+
 	ImGui::Text(str.c_str());
-
-
-	_uint iMeshNoRenderIndex = 0;
-	if (ImGui::TreeNode("MeshName"))
-	{
-		char szMeshName[MAX_PATH];
-
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& pMesh : m_Meshes)
-			{
-				if (pMesh != nullptr)
-				{
-					strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
-
-					if (ImGui::Selectable(szMeshName))
-					{
-						m_iMeshIndex = iMeshNoRenderIndex;
-					}
-					++iMeshNoRenderIndex;
-				}
-			}
-			ImGui::EndListBox();
-		}
-
-		ImGui::TreePop();
-	}
+	ImGui::Text(m_imguiAnimName);
 
 	_double iTickPerSecond =	m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
-
 	char szTickPerSecond[MAX_PATH];
-	//to_string(iTickPerSecond);
 	strcpy_s(szTickPerSecond,MAX_PATH, to_string(iTickPerSecond).c_str());
-
 	ImGui::Text(szTickPerSecond);
-
-	ImGui::InputFloat("TickPerSecone", &m_iTickPerSecond);
-	
+	ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
 	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
+
+
+	_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
+	char szDurationSecond[MAX_PATH];
+	string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
+	strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
+	ImGui::Text(str2.c_str());
+	ImGui::Text(szDurationSecond);
+
+
+	 int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
+
+	ImGui::Text("FrameIndex : %d", iFrameIndex);
+	//if (ImGui::Button("Set_Frame"))
+	//{
+	//	m_Animations[m_iCurrentAnimIndex]->Set_KeyFrame(iIndex);
+	//}
+
+
 
 	ImGui::End();
 
 }
 
 
-void CModel::Set_AnimIndex(_uint iAnimIndex, _float TickTime)
+void CModel::Set_AnimIndex(_uint iAnimIndex)
 {
 	m_iCurrentAnimIndex = iAnimIndex;
+}
+
+void CModel::Set_AnimTickTime(_double TickTime)
+{
 	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(TickTime);
 }
 

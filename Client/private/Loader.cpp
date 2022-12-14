@@ -10,6 +10,10 @@
 #include "Hero_Garrison.h"
 #include "Hero_Calibretto.h"
 
+#include "SlimeKing.h"
+#include "Skeleton_Naked.h"
+#include "Spider_Mana.h"
+
 #include "BackGround.h"
 #include "MainLogo.h"
 
@@ -196,6 +200,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 	/* Model */
 	
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("AllModels"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
@@ -318,12 +323,26 @@ HRESULT CLoader::Loading_Combat()
 
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
-
-
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MT"), LEVEL_COMBAT);
+	
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
 
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_SlimeKing"),
+		CSlimeKing::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Skeleton_Naked"),
+		CSkeleton_Naked::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Spider_Mana"),
+		CSpider_Mana::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));

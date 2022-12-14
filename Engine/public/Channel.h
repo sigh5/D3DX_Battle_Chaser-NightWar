@@ -11,16 +11,19 @@ public:
 
 public:
 	const char*		GetName()const { return m_szName; }
-
+	void			Set_DurationTime(_double Ratio);
 public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void Update_TransformMatrix(_double PlayTime);
 	
-	void Set_CurrentFrameIndex(_uint iStartIndex) {m_iCurrentKeyFrameIndex = iStartIndex;}
 	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0;
 	m_KeyFrames[0] = m_OldFrame;}
 
 	void BlendingFrame(CChannel* pPrevChannel);
+
+
+
+	const _uint Get_CurrentKeyFrameIndex()const { return m_iCurrentKeyFrameIndex; }
 
 private:
 	char			m_szName[MAX_PATH] = "";
@@ -28,8 +31,14 @@ private:
 
 	_uint				m_iNumKeyframes = 0;
 	vector<KEYFRAME>	m_KeyFrames;
+	
+	vector<_double>		m_Origin_TimeVec;
+
+
 
 	_uint				m_iCurrentKeyFrameIndex = 0;
+	
+
 
 	KEYFRAME			m_OldFrame;
 	

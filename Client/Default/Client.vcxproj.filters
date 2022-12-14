@@ -100,6 +100,12 @@
     <Filter Include="01.Levels\03.CombatLevel">
       <UniqueIdentifier>{dae64ca7-40c5-470d-80bf-c722c116657d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\AnimFsm">
+      <UniqueIdentifier>{c987a72f-e145-4739-af54-d356615df899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster">
+      <UniqueIdentifier>{4b7bc227-dfb6-466b-a1ee-e76e5a0dab46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -201,6 +207,16 @@
     <ClInclude Include="..\public\Hero_Knolan.h">
       <Filter>02.GameObjects\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\AnimFsm.h">
+      <Filter>02.GameObjects\Player\AnimFsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlimeKing.h">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Spider_Mana.h">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Skeleton_Naked.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -290,6 +306,16 @@
     <ClCompile Include="..\private\Hero_Knolan.cpp">
       <Filter>02.GameObjects\Player</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\AnimFsm.cpp">
+      <Filter>02.GameObjects\Player\AnimFsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlimeKing.cpp">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Spider_Mana.cpp">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

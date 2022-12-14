@@ -39,9 +39,12 @@ public: /*For.Dungeon*/
 	virtual	  void		Dungeon_Tick(_double TimeDelta)override;;
 
 public:  /*For.Combat*/
+	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  _bool	  Is_PlayerDead()override;
-	virtual void	  Set_Current_AnimQueue(CurrentState eType, _bool IsEvent)override; // Queue 데이타 넣는 함수
+	
+	_int	  Is_MovingAnim();
+	void	  CombatAnim_Move(_double TImeDelta);
 
 private:
 	void				ObserverTest();
@@ -51,10 +54,31 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
+	class CAnimFsm*			m_pFsmCom = nullptr;
+
+private:
+	_bool					m_bCombat_LastInit = false;
+	_int					bResult = ANIM_EMD;
 
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
+
+public:
+	void					Anim_Idle();
+	void					Anim_Intro();
+	void					AnimNormalAttack();
+	void					Anim_Skill1_Attack();
+	void					Anim_Skill2_Attack();
+	void					Anim_Uitimate();
+	void					Anim_Buff();
+	void					Anim_WideAreaBuff();
+	void					Anim_Use_Item();
+	void					Anim_Light_Hit();
+	void					Anim_Heavy_Hit();
+	void					Anim_Flee();
+	void					Anim_Die();
+	void					Anim_Viroty();
 
 public:
 	static CHero_Calibretto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

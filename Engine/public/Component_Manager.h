@@ -8,6 +8,8 @@
 #include "Texture.h"
 #include "VIBuffer_Cube.h"
 #include "Model.h"
+#include "FSMComponent.h"
+
 
 #include "Collider.h"
 
