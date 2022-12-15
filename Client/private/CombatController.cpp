@@ -61,6 +61,11 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 		}
 	}
 
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		if (nullptr != dynamic_cast<CTurnUICanvas*>(pCanvas))
+			m_pTurnCanvas = static_cast<CTurnUICanvas*>(pCanvas);
+	}
 
 	return S_OK;
 }
@@ -69,7 +74,7 @@ HRESULT CCombatController::Late_Init()
 {
 	if (m_bLateInit)
 		return S_OK;
-
+	
 	Set_CurrentActor();
 
 	m_bLateInit = true;
@@ -88,31 +93,48 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	else
 		To_Intro();
 
-	 CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	 if (pInstance->Key_Down(DIK_SPACE))
-	 {
-		 /*_uint iMoveSpeed = 100;
-		 m_CurActorDelegator.broadcast(iMoveSpeed);
-	 }*/
-	 }
-	RELEASE_INSTANCE(CGameInstance);
+	 Active_Fsm();
+}
+
+void CCombatController::Refresh_CurActor()
+{
+	Set_CurrentActor();
+}
+
+void CCombatController::Active_Fsm()
+{
+	To_Idle();
+	To_Intro();
+	To_Normal_Attack();
+	To_Skill1_Attack();
+	To_Skill2_Attack();
+	To_Uitimate();
+	To_Buff();
+	To_WideAreaBuff();
+	To_Use_Item();
+	To_Defence();
+	To_Light_Hit();
+	To_Heavy_Hit();
+	To_Flee();
+	To_Die();
+	To_Viroty();
+}
+
+void CCombatController::ResetState()
+{
+	if (m_pCurentActor == nullptr)
+		return;
+	for (_uint i = 0; i < (_uint)(CGameObject::CHAR_STATE_END); ++i)
+	{
+		m_pCurentActor->Set_FsmState(false, (CGameObject::CHAR_STATE)(i));
+	}
 }
 
 HRESULT CCombatController::Set_CurrentActor()
 {
-	CTurnUICanvas* pTrunCanvas = nullptr;
+	assert(m_pTurnCanvas != nullptr && "CCombatController::Set_CurrentActor issue");
 
-	for (auto& pCanvas : m_CanvasVec)
-	{
-		if (dynamic_cast<CTurnUICanvas*>(pCanvas) != nullptr)
-		{
-			pTrunCanvas = static_cast<CTurnUICanvas*>(pCanvas);
-			break;
-		}
-	}
-	assert(pTrunCanvas != nullptr && "CCombatController::Set_CurrentActor issue");
-
-	UI_REPRESENT eCurActor = pTrunCanvas->Get_CurrentActor();
+	UI_REPRESENT eCurActor = m_pTurnCanvas->Get_CurrentActor();
 	
 	switch (eCurActor)
 	{
@@ -134,6 +156,8 @@ HRESULT CCombatController::Set_CurrentActor()
 	case Client::REPRESENT_SPIDER_MANA:
 		m_pCurentActor = Find_CurActor(TEXT("Spider_Mana"));
 		break;
+
+
 	case Client::REPRESENT_END:
 		break;
 	default:
@@ -156,69 +180,6 @@ void CCombatController::Imgui_CharAnim()
 	ImGui::RadioButton("Slime", &CharIndex, 3);
 	ImGui::RadioButton("Skeleton_Naked", &CharIndex, 4);
 	ImGui::RadioButton("Spider_Mana", &CharIndex, 5);
-	//if (CharIndex == 0)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-	//else if (CharIndex == 1)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-	//else if (CharIndex == 2)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-
-	//else if (CharIndex == 3)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Monster_SlimeKing")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-	//else if (CharIndex == 4)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Skeleton_Naked")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-
-	//else if (CharIndex == 5)
-	//{
-	//	for (auto& pPlayer : m_CombatActors)
-	//	{
-	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Spider_Mana")))
-	//		{
-	//			m_pCurentActor = pPlayer;
-	//		}
-	//	}
-	//}
-
 
 	ImGui::InputInt("Anim Type MAX=10", &Type_Num);
 
@@ -229,26 +190,14 @@ void CCombatController::Imgui_CharAnim()
 
 #endif // !DEBUG
 
-
-
-_bool CCombatController::Test()
-{
-	for (auto& Pair : m_CurActorMap)
-	{
-		if (!lstrcmp(m_pCurentActor->Get_ObjectName(), Pair.first.c_str()))
-			return true;
-	}
-	
-	return false;
-}
-
 _bool CCombatController::To_Idle()
 {
 	_bool bResult = false;
 
 	if (m_pGameInstace->Key_Down(DIK_1))
+	{	
 		bResult = true;
-	
+	}
 	return bResult;
 }
 
@@ -262,138 +211,127 @@ _bool CCombatController::To_Intro()
 	return bResult;
 }
 
-_bool CCombatController::To_Normal_Attack()
+void CCombatController::To_Normal_Attack()
 {
-	_bool bResult = false;
-	if (m_pGameInstace->Key_Down(DIK_3))
-		bResult = Test();
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 
-	return bResult;
+	if (m_pGameInstace->Key_Down(DIK_3))
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Normal_Attack);
+		m_pTurnCanvas->Move_Children();
+	}
 }
 
-_bool CCombatController::To_Skill1_Attack()
+void CCombatController::To_Skill1_Attack()
 {
-	_bool bResult = false;
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 
 	if (m_pGameInstace->Key_Down(DIK_4))
-		bResult = true;
-
-	return bResult;
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Skill1_Attack);
+		m_pTurnCanvas->Move_Children();
+	}
 }
 
-_bool CCombatController::To_Skill2_Attack()
+void CCombatController::To_Skill2_Attack()
 {
-	_bool bResult = false;
-
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 	if (m_pGameInstace->Key_Down(DIK_5))
-		bResult = true;
-
-	return bResult;
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Skill2_Attack);
+		m_pTurnCanvas->Move_Children();
+	}
 }
 
-_bool CCombatController::To_Uitimate()
+void CCombatController::To_Uitimate()
 {
-	_bool bResult = false;
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 	if (m_pGameInstace->Key_Down(DIK_6))
-		bResult = true;
-
-	return bResult;
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Uitimate);
+		m_pTurnCanvas->Move_Children();
+	}
 }
 
-_bool CCombatController::To_Buff()
+void CCombatController::To_Buff()
 {
-	_bool bResult = false;
-
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 	if (m_pGameInstace->Key_Down(DIK_7))
-		bResult = true;
-
-	return bResult;
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Buff);
+		m_pTurnCanvas->Move_Children();
+	}
 }
 
-_bool CCombatController::To_WideAreaBuff()
+void CCombatController::To_WideAreaBuff()
 {
-	_bool bResult = false;
-
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
 	if (m_pGameInstace->Key_Down(DIK_8))
-		bResult = true;
-
-	return bResult;
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_WideAreaBuff);
+		m_pTurnCanvas->Move_Children();
+	}
 }
-
-_bool CCombatController::To_Use_Item()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_9))
-		bResult = true;
-
-	return bResult;
-}
-
-_bool CCombatController::To_Defence()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_P))
-		bResult = true;
-
-	return bResult;
-}
-
-_bool CCombatController::To_Light_Hit()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_O))
-		bResult = true;
-
-	return bResult;
-}
-
-_bool CCombatController::To_Heavy_Hit()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_I))
-		bResult = true;
-
-
-	return bResult;
-}
-
-_bool CCombatController::To_Flee()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_U))
-		bResult = true;
-
-	return bResult;
-}
-
-_bool CCombatController::To_Die()
-{
-	_bool bResult = false;
-
-	if (m_pGameInstace->Key_Down(DIK_Y))
-		bResult = true;
-
-	return bResult;
-
-}
-
-_bool CCombatController::To_Viroty()
-{
-	_bool bResult = false;
-
 	
-	if (m_pGameInstace->Key_Down(DIK_L))
-		bResult = true;
-
-
-	return bResult;
+void CCombatController::To_Use_Item()
+{
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
+	if (m_pGameInstace->Key_Down(DIK_9))
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
+		m_pTurnCanvas->Move_Children();
+	}
+	
 }
 
+void CCombatController::To_Defence()
+{
+	/*어쩃든 턴을 쓴거니까*/
+	assert(m_pTurnCanvas != nullptr && "CCombatController::To_Normal_Attack");
+	if (m_pGameInstace->Key_Down(DIK_P))
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Defence);
+		m_pTurnCanvas->Move_Children();
+	}
+}
+
+void CCombatController::To_Light_Hit()
+{
+	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
+	if (m_pGameInstace->Key_Down(DIK_O))
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Light_Hit);
+
+	}
+}
+
+void CCombatController::To_Heavy_Hit()
+{
+	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
+	if (m_pGameInstace->Key_Down(DIK_I))
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Heavy_Hit);
+		
+	}
+}
+
+void CCombatController::To_Flee()
+{
+	if (m_pGameInstace->Key_Down(DIK_U))
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Flee);
+}
+
+void CCombatController::To_Die()
+{
+	if (m_pGameInstace->Key_Down(DIK_U))
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Die);
+}
+
+void CCombatController::To_Viroty()
+{
+	if (m_pGameInstace->Key_Down(DIK_L))
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Viroty);
+}
 
 CGameObject * CCombatController::Find_CurActor(const wstring& pNameTag)
 {

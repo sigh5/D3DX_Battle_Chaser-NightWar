@@ -83,6 +83,9 @@ void CMonster::CurAnimQueue_Play_LateTick(CModel * pModel)
 
 void CMonster::Set_CombatAnim_Index(CModel * pModel)
 {
+	for (_uint i = 0; i < _uint(CHAR_STATE_END); ++i)
+		Set_FsmState(false, CHAR_STATE(i));
+
 	pModel->Set_PlayTime(pModel->Get_AnimIndex());
 	pModel->InitChannel();
 //	pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);

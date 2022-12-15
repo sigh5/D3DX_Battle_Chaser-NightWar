@@ -185,7 +185,6 @@ HRESULT CTurnUICanvas::SetUp_MatchingOption()
 
 void CTurnUICanvas::Move_Children()
 {
-	
 	_float					fTopY = 0.f;
 	m_pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
 	
@@ -202,9 +201,7 @@ void CTurnUICanvas::Move_Children()
 			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(1);
 	}
 
-	
-
-	//m_pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+	m_pTopUI = CClient_Manager::Get_SecondMaxValue_Pointer(m_ChildrenVec, fTopY);
 
 	CCombatController::GetInstance()->Refresh_CurActor();
 

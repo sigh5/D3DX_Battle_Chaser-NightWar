@@ -8,6 +8,11 @@ class ENGINE_DLL CGameObject abstract : public CBase
 {
 public:
 	enum COLLIDERTYPE { COLLTYPE_AABB, COLLTYPE_OBB, COLLTYPE_SPHERE, COLLTYPE_END };
+	enum CHAR_STATE {
+		m_Normal_Attack, m_Skill1_Attack, m_Skill2_Attack, m_Uitimate, m_Buff
+		, m_WideAreaBuff, m_Use_Item, m_Defence, m_Light_Hit, m_Heavy_Hit, m_Flee, m_Die, m_Viroty
+		, CHAR_STATE_END
+	};
 public:
 	typedef struct tagGameObjectDesc
 	{
@@ -65,7 +70,7 @@ public: /* imgui */
 	}
 
 
-
+	
 
 public:
 	CTransform*		Get_Transform() { return m_pTransformCom; }
@@ -93,6 +98,29 @@ protected:
 	const					_tchar*					m_ProtoName = TEXT("");
 
 	_bool											m_bLast_Initlize = false;
+
+
+public:
+	virtual _bool		To_Normal_Attack();
+	virtual _bool		To_Skill1_Attack();
+	virtual _bool		To_Skill2_Attack();
+	virtual _bool		To_Uitimate();
+	virtual _bool		To_Buff();
+	virtual _bool		To_WideAreaBuff();
+	virtual _bool		To_Use_Item();
+	virtual _bool		To_Defence();
+	virtual _bool		To_Light_Hit();
+	virtual _bool		To_Heavy_Hit();
+	virtual _bool		To_Flee();
+	virtual _bool		To_Die();
+	virtual _bool		To_Viroty();
+
+
+
+	void Set_FsmState(_bool bTrue, CHAR_STATE eType) { m_bState[eType] = bTrue; }
+
+private:
+	_bool	m_bState[CHAR_STATE_END] = { false, };
 
 public:	
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

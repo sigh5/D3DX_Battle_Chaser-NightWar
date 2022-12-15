@@ -201,20 +201,20 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 
 void CHero_Knolan::ObserverTest(_double TimeDelta)
 {
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	if (pInstance->Key_Down(DIK_SPACE))
-	{
-		_uint iMoveSpeed = 100;
-		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
-	}
-	/*if (pInstance->Key_Down(DIK_O))
-	{
-		_uint iShakingTime = 3;
-		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	}*/
+	//CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	//if (pInstance->Key_Down(DIK_SPACE))
+	//{
+	//	_uint iMoveSpeed = 100;
+	//	m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
+	//}
+	///*if (pInstance->Key_Down(DIK_O))
+	//{
+	//	_uint iShakingTime = 3;
+	//	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
+	//}*/
 
 
-	RELEASE_INSTANCE(CGameInstance);
+	//RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CHero_Knolan::SetUp_Components()

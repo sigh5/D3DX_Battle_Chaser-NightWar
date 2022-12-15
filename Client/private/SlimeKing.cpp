@@ -104,12 +104,12 @@ _int CSlimeKing::Is_MovingAnim()
 	if (m_pModelCom->Get_AnimIndex() == 9)
 	{
 		m_iMovingDir = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(9, 2);
+		m_pModelCom->Set_Duration(9, 1.5);
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 4)
 	{
 		m_iMovingDir = ANIM_DIR_BACK;
-		m_pModelCom->Set_Duration(4, 2);
+		m_pModelCom->Set_Duration(4, 1.5);
 	}
 	else
 		m_iMovingDir = ANIM_EMD;
@@ -178,7 +178,7 @@ void CSlimeKing::Anim_Idle()
 void CSlimeKing::Anim_Intro()
 {
 	m_CurAnimqeue.push({ 12,m_IntroTimer });	//2개 넣어야함.. 처음에
-	m_CurAnimqeue.push({ 0,1.f });
+	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

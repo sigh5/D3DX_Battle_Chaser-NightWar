@@ -179,3 +179,68 @@ void CGameObject::Free()
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 }
+
+_bool CGameObject::To_Normal_Attack()
+{
+	return m_bState[m_Normal_Attack];
+}
+
+_bool CGameObject::To_Skill1_Attack()
+{
+	return m_bState[m_Skill1_Attack];
+}
+
+_bool CGameObject::To_Skill2_Attack()
+{
+	return  m_bState[m_Skill2_Attack];
+}
+
+_bool CGameObject::To_Uitimate()
+{
+	return  m_bState[m_Uitimate];
+}
+
+_bool CGameObject::To_Buff()
+{
+	return m_bState[m_Buff] ;
+}
+
+_bool CGameObject::To_WideAreaBuff()
+{
+	return  m_bState[m_WideAreaBuff];
+}
+
+_bool CGameObject::To_Use_Item()
+{
+	return  m_bState[m_Use_Item];
+}
+
+_bool CGameObject::To_Defence()
+{
+	return  m_bState[m_Defence];
+}
+
+_bool CGameObject::To_Light_Hit()
+{
+	return  m_bState[m_Light_Hit];
+}
+
+_bool CGameObject::To_Heavy_Hit()
+{
+	return  m_bState[m_Heavy_Hit];
+}
+
+_bool CGameObject::To_Flee()
+{
+	return  m_bState[m_Flee];
+}
+
+_bool CGameObject::To_Die()
+{
+	return  m_bState[m_Die];
+}
+
+_bool CGameObject::To_Viroty()
+{
+	return  m_bState[m_Viroty];
+}

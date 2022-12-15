@@ -171,6 +171,9 @@ void CPlayer::CurAnimQueue_Play_LateTick(CModel* pModel)
 
 void CPlayer::Set_CombatAnim_Index(CModel * pModel)
 {
+	for (_uint i = 0; i < _uint(CHAR_STATE_END); ++i)
+		Set_FsmState(false, CHAR_STATE(i));
+
 	pModel->Set_PlayTime(pModel->Get_AnimIndex());
 	pModel->InitChannel();
 	//pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
@@ -264,11 +267,7 @@ _bool CPlayer::KeyInput(_double TimeDelta)
 		m_fWalkTime = 0.0;
 		return false;
 	}
-
-	
-
 }
-
 
 void CPlayer::Free()
 {
@@ -276,3 +275,4 @@ void CPlayer::Free()
 
 	Safe_Release(m_pTargetPlayer);
 }
+

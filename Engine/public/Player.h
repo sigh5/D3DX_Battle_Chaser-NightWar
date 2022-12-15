@@ -93,6 +93,9 @@ private:
 	_bool					m_bIsSwap = false;
 	_bool					m_isStop = false;
 
+
+
+
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

@@ -12,7 +12,11 @@ class CModel;
 class CCollider;
 END
 
-
+//bool compare(pair<int, int>a, pair<int, int>b) {
+//	
+//	return a.first < b.first;
+//	
+//}
 
 
 enum  DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
@@ -35,6 +39,11 @@ public: /* For_UI */
 	// UI 위치비교
 	template<typename T>
 	static T*	Get_MaxValue_Pointer(vector<T*>& pVec, _float &fMAX , COMPARE_UI_POS eType);
+
+	template<typename T>
+	static T*	Get_SecondMaxValue_Pointer(vector<T*>& pVec, _float fMAX);
+
+
 	template<typename T>
 	static T*	Get_SmallValue_Pointer(vector<T*>& pVec, _float &fSmall, COMPARE_UI_POS eType);
 	// ~UI 위치비교
@@ -91,6 +100,29 @@ static T * CClient_Manager::Get_MaxValue_Pointer(vector<T*>& pVec, _float & fMAX
 	fMAX = fMax;
 	return pMaxObject;
 }
+
+template<typename T>
+inline T * CClient_Manager::Get_SecondMaxValue_Pointer(vector<T*>& pVec , _float fMAX)
+{
+	_float4 vPos;
+	vector<pair<_float,int>> iSubVec;			// 값 , 인덱스
+	_float	iSubValue = 0;
+	_int	iIndex = 0;
+		
+	for (auto pGameObject : pVec)
+	{
+		_float MaxMAx = fMAX;
+		XMStoreFloat4(&vPos, pGameObject->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		iSubValue = MaxMAx - vPos.y;
+		_float	iTemp = fabs(iSubValue);
+		iSubVec.push_back({ iTemp, iIndex });
+		++iIndex;
+	}
+		
+	sort(iSubVec.begin(), iSubVec.end());
+	return	pVec[iSubVec[1].second];
+}
+
 
 template<typename T>
 inline T * CClient_Manager::Get_SmallValue_Pointer(vector<T*>& pVec, _float & fSmallY, COMPARE_UI_POS eType)

@@ -40,28 +40,30 @@ public:  /*Combat Logic*/
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	
 public:
-	void	Refresh_CurActor() { Set_CurrentActor(); }
+	void	Refresh_CurActor();
 
+public:
+	void	Active_Fsm();
+	void	ResetState();
 
-	_bool			Test();
 
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
-	_bool			To_Idle();
-	_bool			To_Intro();
-	_bool			To_Normal_Attack();
-	_bool			To_Skill1_Attack();
-	_bool			To_Skill2_Attack();
-	_bool			To_Uitimate();
-	_bool			To_Buff();
-	_bool			To_WideAreaBuff();
-	_bool			To_Use_Item();
-	_bool			To_Defence();
-	_bool			To_Light_Hit();
-	_bool			To_Heavy_Hit();
-	_bool			To_Flee();
-	_bool			To_Die();
-	_bool			To_Viroty();
+	_bool		To_Idle();				// 애는 좀 애매함
+	_bool		To_Intro();				//이놈만 살아있어야함
+	void		To_Normal_Attack();
+	void		To_Skill1_Attack();
+	void		To_Skill2_Attack();
+	void		To_Uitimate();
+	void		To_Buff();
+	void		To_WideAreaBuff();
+	void		To_Use_Item();
+	void		To_Defence();
+	void		To_Light_Hit();
+	void		To_Heavy_Hit();
+	void		To_Flee();
+	void		To_Die();
+	void		To_Viroty();
 
 private:
 	CGameInstance*			m_pGameInstace = nullptr;
@@ -72,6 +74,7 @@ private:
 	CGameObject*			m_pCurentActor = nullptr;		// 현재 순서인놈
 	CGameObject*			m_pHitActor =	nullptr;		// 맞은놈
 
+	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 
 private:
 	_bool					m_bCombatIntro = false;
@@ -85,9 +88,6 @@ private:
 
 public:
 	virtual void	Free()override;
-
-public:
-	BaseDelegater<_double, _uint> m_CurActorDelegator;
 
 
 #ifndef DEBUG

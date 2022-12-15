@@ -11,9 +11,6 @@
 
 _double CClient_Manager::TimeDelta = 0;
 
-
-
-
 void CClient_Manager::Client_Manager_Update()
 {
 	
