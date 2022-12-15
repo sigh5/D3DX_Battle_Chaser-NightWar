@@ -19,7 +19,7 @@ public:
 	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0;
 	m_KeyFrames[0] = m_OldFrame;}
 
-	void BlendingFrame(CChannel* pPrevChannel);
+	void BlendingFrame(CChannel* pPrevChannel,_double TimeDelta, _bool IsLerp);
 
 
 
@@ -41,8 +41,8 @@ private:
 
 
 	KEYFRAME			m_OldFrame;
-	
-	
+	_double				m_FixTime = 0.5;
+	_double				m_newFixTime = 0.0;
 
 public:
 	static CChannel* Create(HANDLE hFile, class CModel* pModel);

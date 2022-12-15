@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
+#include "CombatController.h"
 #include "PlayerController.h"
 #include "AnimFsm.h"
 
@@ -47,8 +48,6 @@ HRESULT CHero_Garrison::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 	
-	m_pAnimFsm = CAnimFsm::Create(this,ANIM_CHAR2);
-
 	
 
 	m_bLast_Initlize = true;
@@ -57,21 +56,17 @@ HRESULT CHero_Garrison::Last_Initialize()
 
 void CHero_Garrison::Tick(_double TimeDelta)
 {
-
+	Last_Initialize();
 	__super::Tick(TimeDelta);
-
 
 	if (m_bIsCombatScene == false)
 		Dungeon_Tick(TimeDelta);
 	else
 	{
-		Last_Initialize();
-		
-		if (CPlayerController::GetInstance()->Get_CurActor() == this)
-			m_pAnimFsm->Tick(TimeDelta);
-		//Combat_Tick(TimeDelta);
-	}
+		Combat_Init();
 
+		m_pAnimFsm->Tick(TimeDelta);
+	}
 
 	m_pModelCom->Play_Animation(TimeDelta,m_bIsCombatScene);
 }
@@ -218,10 +213,6 @@ HRESULT CHero_Garrison::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
-	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Slime_King"), TEXT("Com_Model"),
-	//	(CComponent**)&m_pModelCom)))
-	//	return E_FAIL;
-
 
 
 	CCollider::COLLIDERDESC			ColliderDesc;
@@ -235,8 +226,6 @@ HRESULT CHero_Garrison::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), TEXT("Com_OBB"),
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }
@@ -281,10 +270,21 @@ HRESULT CHero_Garrison::SetUp_ShaderResources()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+	return S_OK;
+}
 
+HRESULT CHero_Garrison::Combat_Init()
+{
+	if (m_bCombatInit)
+		return S_OK;
 
+	m_pAnimFsm = CAnimFsm::Create(this, ANIM_CHAR2);
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 12.f, 1.f));
+	
+	m_CurAnimqeue.push({ 0,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
 
-
+	m_bCombatInit = true;
 	return S_OK;
 }
 
@@ -378,7 +378,7 @@ void CHero_Garrison::Anim_Idle()
 
 void CHero_Garrison::Anim_Intro()
 {	
-	m_CurAnimqeue.push({ 21, 1.f });
+	m_CurAnimqeue.push({ 21, m_IntroTimer });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 	

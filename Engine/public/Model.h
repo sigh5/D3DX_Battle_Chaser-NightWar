@@ -21,7 +21,7 @@ private:
 
 public:
 	void	Set_NoRenderMeshName(const char* pBoneConstantName) {strcpy_s(m_szNoRenderMeshName, MAX_PATH, pBoneConstantName);}
-	_uint								m_iNoRenderIndex = 999;
+	
 public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_matrix Get_PivotMatrix() const { return XMLoadFloat4x4(&m_PivotMatrix); }
@@ -33,6 +33,7 @@ public:
 
 public:
 	void Play_Animation(_double TimeDelta,_bool IsCombat=false);
+
 
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
@@ -58,7 +59,7 @@ public: /*For.Animation*/
 
 
 public:
-	void	Set_Lerp(_uint iprevIndex, _uint iNextIndex);
+	void	Set_Lerp(_uint iprevIndex, _uint iNextIndex,_double TimeDelta, _bool bIsLerp);
 
 private:
 	LOAD_TYPE							m_eType = TYPE_END;
@@ -78,12 +79,13 @@ private:
 	LOAD_MODELDESC						m_ModelDesc;
 	_float4x4							m_PivotMatrix;
 
-
+	
 private: /*For.Imgui*/
 	_bool								m_bAnimcontrol = false;
 	int									m_iMeshIndex = -1;
 	_double								m_iTickPerSecond = 0.0;
 	char								m_imguiAnimName[MAX_PATH] = "";
+	_uint								m_iNoRenderIndex = 999;
 
 private:
 	char								m_szModelPath[MAX_PATH] = "";

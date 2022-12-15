@@ -2,6 +2,7 @@
 #include "..\public\TurnUICanvas.h"
 #include "GameInstance.h"
 
+#include "CombatController.h"
 #include "Hero_Knolan.h"
 #include "TurnCharcterUI.h"
 
@@ -15,12 +16,17 @@ CTurnUICanvas::CTurnUICanvas(const CTurnUICanvas & rhs)
 {
 }
 
+const UI_REPRESENT CTurnUICanvas::Get_CurrentActor() const
+{
+	assert(m_pTopUI != nullptr&&"CTurnUICanvas::Get_CurrentActor()");
+
+	return static_cast<CTurnCharcterUI*>(m_pTopUI)->Get_Represent_Char();
+}
+
 HRESULT CTurnUICanvas::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
-
-
 	return S_OK;
 }
 
@@ -37,7 +43,6 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 
 	if (FAILED(__super::Initialize(&CanvasDesc)))
 		return E_FAIL;
-
 
 	m_fSizeX = (_float)g_iWinSizeX / 11;
 	m_fSizeY = (_float)g_iWinSizeY * 1.1f;
@@ -63,7 +68,6 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 
-	
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyTestShakingDelegater.bind(this, &CTurnUICanvas::ChildrenShakingCheck);
 
@@ -78,19 +82,9 @@ HRESULT CTurnUICanvas::Last_Initialize()
 
 void CTurnUICanvas::Tick(_double TimeDelta)
 {
+
 	Last_Initialize();
 	__super::Tick(TimeDelta);
-
-	// Test
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (pGameInstance->Key_Down(DIK_M))
-	{
-		DeleteCharUI(TEXT("UI_Trun_Garrison1"));
-	}
-
-	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CTurnUICanvas::Late_Tick(_double TimeDelta)
@@ -130,12 +124,10 @@ HRESULT CTurnUICanvas::SetUp_Components()
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
-
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_UI_Turn_canvas"), TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
@@ -150,19 +142,12 @@ HRESULT CTurnUICanvas::SetUp_ShaderResources()
 		return E_FAIL;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
-
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
-
-
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
 
@@ -173,28 +158,21 @@ HRESULT CTurnUICanvas::SetUp_ShaderResources()
 
 HRESULT CTurnUICanvas::SetUp_ChildrenPosition()
 {
-	CUI* pTopUI = nullptr;
-	CUI* pBottomUI = nullptr;
-	
 	_float fTopY = 0.f;
 	_float fBottomY = 0.f;
 
-	pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
-	pBottomUI = CClient_Manager::Get_SmallValue_Pointer(m_ChildrenVec, fBottomY, COMPARE_UI_POS_Y);
+	m_pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+	m_pBottomUI = CClient_Manager::Get_SmallValue_Pointer(m_ChildrenVec, fBottomY, COMPARE_UI_POS_Y);
 
-	if (pTopUI == nullptr || nullptr == pBottomUI)
+	if (m_pTopUI == nullptr || nullptr == m_pBottomUI)
 		assert("CTurnUICanvas::SetUp_ChildrenPosition");
-
-	Safe_AddRef(pTopUI);
-	Safe_AddRef(pBottomUI);
 
 	for (auto& pUI : m_ChildrenVec)
 	{
 		dynamic_cast<CTurnCharcterUI*>(pUI)->Set_Top_BottomYPos(fTopY, fBottomY);
 	}
 
-	Safe_Release(pTopUI);
-	Safe_Release(pBottomUI);
+	
 
 	return S_OK;
 }
@@ -207,24 +185,28 @@ HRESULT CTurnUICanvas::SetUp_MatchingOption()
 
 void CTurnUICanvas::Move_Children()
 {
-	CUI*					pTopUI = nullptr;
-	_float					fTopY = 0.f;
-
-	pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
 	
-	if (nullptr == pTopUI)
+	_float					fTopY = 0.f;
+	m_pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+	
+	if (nullptr == m_pTopUI)
 		assert("Move_Children");
-
 
 	for (auto &iter : m_ChildrenVec)
 	{
 		if (iter == nullptr)
 			continue;
-		if (iter == pTopUI)
+		if (iter == m_pTopUI)
 			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(0);
 		else
 			dynamic_cast<CTurnCharcterUI*>(iter)->MoveControl(1);
 	}
+
+	
+
+	//m_pTopUI = CClient_Manager::Get_MaxValue_Pointer(m_ChildrenVec, fTopY, COMPARE_UI_POS_Y);
+
+	CCombatController::GetInstance()->Refresh_CurActor();
 
 }
 

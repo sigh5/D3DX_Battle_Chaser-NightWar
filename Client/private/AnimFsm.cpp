@@ -1,17 +1,19 @@
 #include "stdafx.h"
 #include "AnimFsm.h"
 
+#include "CombatController.h"
 #include "PlayerController.h"
 #include "Hero_Garrison.h"
 #include "Hero_Knolan.h"
 #include "Hero_Calibretto.h"
 
-#include "SlimeKing.h"
+
 
 // ¾îÂ÷ÇÇ »ý¼ºÀº ³ªÁß¿¡ ÇÒ°ÅÀÓ
 
 CAnimFsm::CAnimFsm()
-	:m_pPlayerController(CPlayerController::GetInstance())
+	: m_pPlayerController(CPlayerController::GetInstance())
+	, m_pCombatController(CCombatController::GetInstance())
 {
 }
 
@@ -33,17 +35,6 @@ HRESULT CAnimFsm::Initialize(CGameObject * pTarget, AnimType eType)
 	case Client::ANIM_CHAR3:
 		hr = Init_Calibretto(pTarget);
 		break;
-	case Client::ANIM_CHAR4:
-		hr = Init_SlimeKing(pTarget);
-		break;
-	case Client::ANIM_CHAR5:
-		hr = Init_Monster2(pTarget);
-		break;
-	case Client::ANIM_CHAR6:
-		hr = Init_Monster3(pTarget);
-		break;
-	case Client::ANIM_CHAR_END:
-		break;
 	default:
 		break;
 	}
@@ -64,20 +55,20 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 			.Tick([this](_double TimeDelta) {
 			static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta); })
-			.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pPlayerController->To_Intro(); }))
-			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pPlayerController->To_Normal_Attack(); }))
-			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pPlayerController->To_Skill1_Attack(); }))
-			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pPlayerController->To_Skill2_Attack(); }))
-			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pPlayerController->To_Uitimate(); }))
-			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pPlayerController->To_Buff(); }))
-			.Transition(TEXT("WideBuff"), FSM_TRANSITION(TEXT("Idle To WideBuff"), [this]() {return m_pPlayerController->To_WideAreaBuff(); }))
-			.Transition(TEXT("Defence"), FSM_TRANSITION(TEXT("Idle To Defence"), [this]() {return m_pPlayerController->To_Defence(); }))
-			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pPlayerController->To_Use_Item(); }))
-			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pPlayerController->To_Light_Hit(); }))
-			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pPlayerController->To_Heavy_Hit(); }))
-			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pPlayerController->To_Flee(); }))
-			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pPlayerController->To_Die(); }))
-			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pPlayerController->To_Viroty(); }))
+			.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pCombatController->To_Intro(); }))
+			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pCombatController->To_Normal_Attack(); }))
+			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pCombatController->To_Skill1_Attack(); }))
+			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pCombatController->To_Skill2_Attack(); }))
+			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pCombatController->To_Uitimate(); }))
+			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pCombatController->To_Buff(); }))
+			.Transition(TEXT("WideBuff"), FSM_TRANSITION(TEXT("Idle To WideBuff"), [this]() {return m_pCombatController->To_WideAreaBuff(); }))
+			.Transition(TEXT("Defence"), FSM_TRANSITION(TEXT("Idle To Defence"), [this]() {return m_pCombatController->To_Defence(); }))
+			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pCombatController->To_Use_Item(); }))
+			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pCombatController->To_Light_Hit(); }))
+			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pCombatController->To_Heavy_Hit(); }))
+			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pCombatController->To_Flee(); }))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pCombatController->To_Die(); }))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pCombatController->To_Viroty(); }))
 
 		.AddState(L"Intro")
 			.OnStart([this]()
@@ -246,7 +237,7 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();
+				return m_pCombatController->To_Idle();
 			}))
 
 		.AddState(L"Die")
@@ -260,7 +251,7 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();
+				return m_pCombatController->To_Idle();
 			}))
 
 		.AddState(L"Viroty")
@@ -274,7 +265,7 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();
+				return m_pCombatController->To_Idle();
 			}))
 
 		.Build();
@@ -287,30 +278,30 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 {
 	assert(pTarget != nullptr);
 	CFSMComponentBuilder builder = CFSMComponentBuilder()
-		.InitState(TEXT("Idle"))
+	.InitState(TEXT("Idle"))
 
-		.AddState(TEXT("Idle"))
+	.AddState(TEXT("Idle"))
 		.OnStart([this]()
 	{
 		static_cast<CHero_Garrison*>(m_pTarget)->Anim_Idle();
 	})
-		.Tick([this](_double TimeDelta) {
-		static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta); })
-		.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pPlayerController->To_Intro(); }))
-			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pPlayerController->To_Normal_Attack(); }))
-			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pPlayerController->To_Skill1_Attack(); }))
-			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pPlayerController->To_Skill2_Attack(); }))
-			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pPlayerController->To_Uitimate(); }))
-			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pPlayerController->To_Buff(); }))
-			.Transition(TEXT("Defence"), FSM_TRANSITION(TEXT("Idle To Defence"), [this]() {return m_pPlayerController->To_Defence(); }))
-			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pPlayerController->To_Use_Item(); }))
-			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pPlayerController->To_Light_Hit(); }))
-			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pPlayerController->To_Heavy_Hit(); }))
-			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pPlayerController->To_Flee(); }))
-			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pPlayerController->To_Die(); }))
-			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pPlayerController->To_Viroty(); }))
+			.Tick([this](_double TimeDelta) {
+					static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta); })
+			.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pCombatController->To_Intro(); }))
+			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pCombatController->To_Normal_Attack(); }))
+			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pCombatController->To_Skill1_Attack(); }))
+			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pCombatController->To_Skill2_Attack(); }))
+			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pCombatController->To_Uitimate(); }))
+			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pCombatController->To_Buff(); }))
+			.Transition(TEXT("Defence"), FSM_TRANSITION(TEXT("Idle To Defence"), [this]() {return m_pCombatController->To_Defence(); }))
+			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pCombatController->To_Use_Item(); }))
+			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pCombatController->To_Light_Hit(); }))
+			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pCombatController->To_Heavy_Hit(); }))
+			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pCombatController->To_Flee(); }))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pCombatController->To_Die(); }))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pCombatController->To_Viroty(); }))
 
-			.AddState(L"Intro")
+		.AddState(L"Intro")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Anim_Intro();
@@ -465,7 +456,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();		//¾ê´Â µµ¸ÁÄ¡´Â°Å
+				return m_pCombatController->To_Idle();		//¾ê´Â µµ¸ÁÄ¡´Â°Å
 			}))
 
 		.AddState(L"Die")
@@ -479,7 +470,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();	// ¾ê´Â Á×´Â°Å
+				return m_pCombatController->To_Idle();	// ¾ê´Â Á×´Â°Å
 			}))
 
 		.AddState(L"Viroty")
@@ -493,7 +484,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
-				return m_pPlayerController->To_Idle();		//¾ê´Â ½Â¸®
+				return m_pCombatController->To_Idle();		//¾ê´Â ½Â¸®
 			}))
 
 			.Build();
@@ -509,27 +500,27 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		.InitState(TEXT("Idle"))
 
 		.AddState(TEXT("Idle"))
-		.OnStart([this]()
-	{
-		static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Idle();
-	})
-		.Tick([this](_double TimeDelta) {
-		static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta); })
-		.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pPlayerController->To_Intro(); }))
-			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pPlayerController->To_Normal_Attack(); }))
-			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pPlayerController->To_Skill1_Attack(); }))
-			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pPlayerController->To_Skill2_Attack(); }))
-			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pPlayerController->To_Uitimate(); }))
-			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pPlayerController->To_Buff(); }))
-			.Transition(TEXT("WideBuff"), FSM_TRANSITION(TEXT("Idle To WideBuff"), [this]() {return m_pPlayerController->To_WideAreaBuff(); }))
-			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pPlayerController->To_Use_Item(); }))
-			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pPlayerController->To_Light_Hit(); }))
-			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pPlayerController->To_Heavy_Hit(); }))
-			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pPlayerController->To_Flee(); }))
-			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pPlayerController->To_Die(); }))
-			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pPlayerController->To_Viroty(); }))
+			.OnStart([this]()
+			{
+				static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Idle();})
+			.Tick([this](_double TimeDelta) {
+				static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta); 
+				})
+			.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pCombatController->To_Intro(); }))
+			.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return m_pCombatController->To_Normal_Attack(); }))
+			.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return m_pCombatController->To_Skill1_Attack(); }))
+			.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return m_pCombatController->To_Skill2_Attack(); }))
+			.Transition(TEXT("Uitimate"), FSM_TRANSITION(TEXT("Idle To Uitimate"), [this]() {return m_pCombatController->To_Uitimate(); }))
+			.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return m_pCombatController->To_Buff(); }))
+			.Transition(TEXT("WideBuff"), FSM_TRANSITION(TEXT("Idle To WideBuff"), [this]() {return m_pCombatController->To_WideAreaBuff(); }))
+			.Transition(TEXT("UseItem"), FSM_TRANSITION(TEXT("Idle To UseItem"), [this]() {return m_pCombatController->To_Use_Item(); }))
+			.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return m_pCombatController->To_Light_Hit(); }))
+			.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return m_pCombatController->To_Heavy_Hit(); }))
+			.Transition(TEXT("Flee"), FSM_TRANSITION(TEXT("Idle To Flee"), [this]() {return m_pCombatController->To_Flee(); }))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return m_pCombatController->To_Die(); }))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return m_pCombatController->To_Viroty(); }))
 
-			.AddState(L"Intro")
+		.AddState(L"Intro")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Intro();
@@ -543,7 +534,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"NormalAttack")
+		.AddState(L"NormalAttack")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->AnimNormalAttack();
@@ -557,7 +548,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"SkillAttack1")
+		.AddState(L"SkillAttack1")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Skill1_Attack();
@@ -571,7 +562,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"SkillAttack2")
+		.AddState(L"SkillAttack2")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Skill2_Attack();
@@ -585,7 +576,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"Uitimate")
+		.AddState(L"Uitimate")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Uitimate();
@@ -599,7 +590,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"Buff")
+		.AddState(L"Buff")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Uitimate();
@@ -613,7 +604,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"WideBuff")
+		.AddState(L"WideBuff")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_WideAreaBuff();
@@ -627,7 +618,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"UseItem")
+		.AddState(L"UseItem")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Use_Item();
@@ -655,7 +646,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"Heavy_Hit")
+		.AddState(L"Heavy_Hit")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Heavy_Hit();
@@ -669,7 +660,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
 		}))
 
-			.AddState(L"Flee")
+		.AddState(L"Flee")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Flee();
@@ -680,10 +671,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
-			return m_pPlayerController->To_Idle();
+			return m_pCombatController->To_Idle();
 		}))
 
-			.AddState(L"Die")
+		.AddState(L"Die")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Die();
@@ -694,10 +685,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
-			return m_pPlayerController->To_Idle();
+			return m_pCombatController->To_Idle();
 		}))
 
-			.AddState(L"Viroty")
+		.AddState(L"Viroty")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Viroty();
@@ -708,68 +699,18 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
-			return m_pPlayerController->To_Idle();
+			return m_pCombatController->To_Idle();
 		}))
 
-			.Build();
-		__super::Initialize(&builder);
+		.Build();
+	
+	__super::Initialize(&builder);
 
 		return S_OK;
 }
 
-HRESULT CAnimFsm::Init_SlimeKing(CGameObject * pTarget)
-{
-	assert(pTarget != nullptr);
-	CFSMComponentBuilder builder = CFSMComponentBuilder()
-		.InitState(TEXT("Idle"))
 
-		.AddState(TEXT("Idle"))
-		.OnStart([this]()
-		{
-			static_cast<CSlimeKing*>(m_pTarget)->Anim_Idle();
-		})
-		
-		.Tick([this](_double TimeDelta)
-		{
-			static_cast<CSlimeKing*>(m_pTarget)->Combat_Tick(TimeDelta);
-		})
-		.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {
-			return static_cast<CSlimeKing*>(m_pTarget)->DemoTest();
-		}))
 
-		
-		.AddState(L"Intro")
-			.OnStart([this]()
-		{
-			static_cast<CSlimeKing*>(m_pTarget)->Anim_Intro();
-		})
-			.Tick([this](_double TimeDelta)
-		{
-			static_cast<CSlimeKing*>(m_pTarget)->Combat_Tick(TimeDelta);
-		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]()
-		{
-			return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
-		}))
-
-		
-
-		
-	.Build();
-	__super::Initialize(&builder);
-
-	return S_OK;
-}
-
-HRESULT CAnimFsm::Init_Monster2(CGameObject * pTarget)
-{
-	return S_OK;
-}
-
-HRESULT CAnimFsm::Init_Monster3(CGameObject * pTarget)
-{
-	return S_OK;
-}
 
 CAnimFsm * CAnimFsm::Create(CGameObject *pTarget, AnimType eType)
 {

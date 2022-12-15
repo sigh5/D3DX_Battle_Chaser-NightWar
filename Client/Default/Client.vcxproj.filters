@@ -106,6 +106,12 @@
     <Filter Include="02.GameObjects\Monster">
       <UniqueIdentifier>{4b7bc227-dfb6-466b-a1ee-e76e5a0dab46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="96. CombatController">
+      <UniqueIdentifier>{7860fe08-6afa-40ba-9195-7647e0a51579}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster\MonsterFsm">
+      <UniqueIdentifier>{22474feb-2d12-4cc7-9d7a-a25264537187}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -216,7 +222,15 @@
     <ClInclude Include="..\Public\Spider_Mana.h">
       <Filter>02.GameObjects\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Skeleton_Naked.h" />
+    <ClInclude Include="..\Public\Skeleton_Naked.h">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CombatController.h">
+      <Filter>96. CombatController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MonsterFsm.h">
+      <Filter>02.GameObjects\Monster\MonsterFsm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -315,7 +329,15 @@
     <ClCompile Include="..\Private\Spider_Mana.cpp">
       <Filter>02.GameObjects\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
+    <ClCompile Include="..\Private\Skeleton_Naked.cpp">
+      <Filter>02.GameObjects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CombatController.cpp">
+      <Filter>96. CombatController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterFsm.cpp">
+      <Filter>02.GameObjects\Monster\MonsterFsm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

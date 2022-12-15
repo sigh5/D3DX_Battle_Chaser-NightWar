@@ -55,6 +55,8 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 	
+	if (FAILED(Set_Represent_Char()))
+		return S_OK;
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -111,9 +113,6 @@ void CTurnCharcterUI::Change_Texture(_uint iLevel, const wstring & NewComPonentT
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		assert("CTurnCharcterUI Change_Texture");
-
-
-
 }
 
 
@@ -266,6 +265,24 @@ _float CTurnCharcterUI::Get_PosY()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
 	return vPos.y;
+}
+
+HRESULT CTurnCharcterUI::Set_Represent_Char()
+{
+	if (m_pTextureCom->Get_SelectTextureIndex()==0)
+		m_iRepresent_Char = REPRESENT_KNOLAN;
+	else if (m_pTextureCom->Get_SelectTextureIndex() == 1)
+		m_iRepresent_Char = REPRESENT_GARRISON;
+	else if (m_pTextureCom->Get_SelectTextureIndex() == 2)
+		m_iRepresent_Char = REPRESENT_CALIBRETTO;
+	else if(m_pTextureCom->Get_SelectTextureIndex() == 3)
+		m_iRepresent_Char = REPRESENT_SKELTON_NAKED;
+	else if (m_pTextureCom->Get_SelectTextureIndex() == 4)
+		m_iRepresent_Char = REPRESENT_SLIMEKING;
+	else if (m_pTextureCom->Get_SelectTextureIndex() == 5)
+		m_iRepresent_Char = REPRESENT_SPIDER_MANA;
+
+	return S_OK;
 }
 
 HRESULT CTurnCharcterUI::SetUp_Components()

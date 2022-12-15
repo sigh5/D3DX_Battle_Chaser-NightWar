@@ -2,6 +2,9 @@
 #include "..\public\Skeleton_Naked.h"
 
 #include "GameInstance.h"
+#include "MonsterFsm.h"
+
+#include "CombatController.h"
 
 CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -35,8 +38,8 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(5.f, 0.f, 10.f, 1.f));
-
-
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(24.f, 0.f, 16.f, 1.f));
+	
 	m_pModelCom->Set_AnimIndex(0);
 
 	return S_OK;
@@ -46,6 +49,7 @@ HRESULT CSkeleton_Naked::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR2);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -56,12 +60,17 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	m_pModelCom->Play_Animation(TimeDelta);
+	
+	m_pFsmCom->Tick(TimeDelta);
+
+	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
 void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	CurAnimQueue_Play_LateTick(m_pModelCom);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -83,9 +92,49 @@ HRESULT CSkeleton_Naked::Render()
 	return S_OK;
 }
 
+void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
+{
+	CMonster::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
+}
+
+_int CSkeleton_Naked::Is_MovingAnim()
+{
+	if (m_pModelCom->Get_AnimIndex() == 9)
+	{
+		m_iMovingDir = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(9, 2);
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 15)
+	{
+		m_iMovingDir = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(15, 2);
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 4)
+	{
+		m_iMovingDir = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(4, 2);
+	}
+	else
+		m_iMovingDir = ANIM_EMD;
+
+	return m_iMovingDir;
+}
+
+void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
+{
+	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
+		m_pTransformCom->Go_Straight(TImeDelta);
+
+	else if (m_iMovingDir == ANIM_DIR_BACK)
+		m_pTransformCom->Go_Backward(TImeDelta);
+}
+
+
+
 HRESULT CSkeleton_Naked::SetUp_Components()
 {
-
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -126,6 +175,78 @@ HRESULT CSkeleton_Naked::SetUp_ShaderResources()
 	return S_OK;
 }
 
+void CSkeleton_Naked::Anim_Idle()
+{
+	m_CurAnimqeue.push({ 0, 1.f });		
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Intro()
+{
+	m_CurAnimqeue.push({ 13, 1.f });		//이때 안보이게 뭐를 설정해야함
+	m_CurAnimqeue.push({ 12, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_NormalAttack()
+{
+	m_CurAnimqeue.push({ 8, 1.f });	// 한대툭
+	m_CurAnimqeue.push({ 9, 1.f });
+	m_CurAnimqeue.push({ 10, 1.f });
+	m_CurAnimqeue.push({ 4, 1.f });
+	m_CurAnimqeue.push({ 5, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Skill1_Attack()
+{
+	m_CurAnimqeue.push({ 8, 1.f });	// 2대 툭
+	m_CurAnimqeue.push({ 15, 1.f });
+	m_CurAnimqeue.push({ 16, 0.5f });	// 선형보관 필수?
+	m_CurAnimqeue.push({ 4, 0.5f });
+	m_CurAnimqeue.push({ 5, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Defence()
+{
+	m_CurAnimqeue.push({ 14, 1.f });	
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Buff()
+{
+	m_CurAnimqeue.push({ 3, 1.f }); 
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Light_Hit()
+{
+	m_CurAnimqeue.push({ 7, 1.f });	 
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Heavy_Hit()
+{
+	m_CurAnimqeue.push({ 6, 1.f });	 
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Die()
+{
+	m_CurAnimqeue.push({ 2, 1.f });	 
+	m_CurAnimqeue.push({ 18, 1.f });	
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSkeleton_Naked::Anim_Viroty()
+{
+	/*죽었으면 가만히 있기*/
+	m_CurAnimqeue.push({ 0, 1.f });	
+	Set_CombatAnim_Index(m_pModelCom);
+	
+}
+
 CSkeleton_Naked * CSkeleton_Naked::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CSkeleton_Naked*		pInstance = new CSkeleton_Naked(pDevice, pContext);
@@ -154,7 +275,7 @@ void CSkeleton_Naked::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_pFsmCom);
+	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 

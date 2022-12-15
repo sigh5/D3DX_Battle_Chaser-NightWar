@@ -6,7 +6,7 @@
 
 #include "AnimFsm.h"
 #include "PlayerController.h"
-
+#include "CombatController.h"
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -63,8 +63,9 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	else
 	{
 		Combat_Initialize();
-		if (CPlayerController::GetInstance()->Get_CurActor() == this)
-			m_pFsmCom->Tick(TimeDelta);
+		
+		m_pFsmCom->Tick(TimeDelta);
+
 	}
 		
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -180,8 +181,10 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.5f, 0.f, 22.f, 1.f));
+	
+	
 	m_bCombat_LastInit = true;
-
 	return S_OK;
 }
 
@@ -277,7 +280,7 @@ void CHero_Calibretto::Anim_Idle()
 
 void CHero_Calibretto::Anim_Intro()
 {
-	m_CurAnimqeue.push({ 17, 1.f });
+	m_CurAnimqeue.push({ 17, m_IntroTimer });
 	m_CurAnimqeue.push({ 1,	 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -419,8 +422,6 @@ _bool CHero_Calibretto::Is_PlayerDead()
 
 _int CHero_Calibretto::Is_MovingAnim()
 {
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
 	if (m_pModelCom->Get_AnimIndex() == 3)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
@@ -434,8 +435,6 @@ _int CHero_Calibretto::Is_MovingAnim()
 	else
 		bResult = ANIM_EMD;
 
-
-	RELEASE_INSTANCE(CGameInstance);
 	return bResult;
 }
 

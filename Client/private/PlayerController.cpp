@@ -5,24 +5,15 @@
 #include "GameInstance.h"
 #include "Layer.h"
 
-// 디버그용
-static string str[14] = { {"STATE_INTRO"},{ "STATE_NORMAL_ATTACK" },{ "STATE_SKILL_ATTACK1" },
-						{ "STATE_SKILL_ATTACK2" },{ "STATE_UlTIMATE" },{ "STATE_BUFF" },
-						  {"STATE_WIDEAREA_BUFF"},{ "STATE_USE_ITEM" },{ "STATE_DEFENCE" },
-							{"STATE_LIGHT_HIT"},{ "STATE_HEAVY_HIT" },{ "STATE_FLEE" },
-							{"STATE_DIE"},{ "STATE_VITORY" } };
-			
-
-
 IMPLEMENT_SINGLETON(CPlayerController);
 
-HRESULT CPlayerController::Initialize()
+HRESULT CPlayerController::Initialize(_uint iLevel)
 {
 	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);
 
 	CGameObject *pTarget = nullptr;
 	_int iIndex = 0;
-	for (auto& Pair : pGameInstace->Get_Layer()[pGameInstace->GetCurLevelIdx()])
+	for (auto& Pair : pGameInstace->Get_Layer()[iLevel])
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
 		{
@@ -111,18 +102,11 @@ void CPlayerController::Change_Scene(_uint	iLevelIndex)
 		for (auto& pPlayer : m_pPlayerVec)
 		{
 			pPlayer->Set_FollowTarget(nullptr);
-			
-			/*Test*/
-			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
-			{
-				pCurentActor = pPlayer;
-			}
-			/*Test*/
 		}
 	}
 	else if(iLevelIndex == LEVEL_GAMEPLAY)
 	{
-		Initialize();
+		Initialize(LEVEL_GAMEPLAY);
 	}
 }
 
@@ -134,258 +118,54 @@ _bool CPlayerController::CombatScene()
 	return false;
 }
 
-void CPlayerController::CurrentTurn_AnimControl()
-{
-	static int CharIndex = 0;
-	static int Type_Num = 0;
+//void CPlayerController::CurrentTurn_AnimControl()
+//{
+//	//static int CharIndex = 0;
+//	//static int Type_Num = 0;
+//
+//	//ImGui::RadioButton("Garrison", &CharIndex, 0);
+//	//ImGui::RadioButton("Knolan", &CharIndex, 1);
+//	//ImGui::RadioButton("Calibreotto", &CharIndex, 2);
+//	//if (CharIndex == 0)
+//	//{
+//	//	for (auto& pPlayer : m_pPlayerVec)
+//	//	{
+//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
+//	//		{
+//	//			pCurentActor = pPlayer;
+//	//		}
+//	//	}
+//	//}
+//	//else if (CharIndex == 1)
+//	//{
+//	//	for (auto& pPlayer : m_pPlayerVec)
+//	//	{
+//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
+//	//		{
+//	//			pCurentActor = pPlayer;
+//	//		}
+//	//	}
+//	//}
+//	//else if (CharIndex == 2)
+//	//{
+//	//	for (auto& pPlayer : m_pPlayerVec)
+//	//	{
+//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
+//	//		{
+//	//			pCurentActor = pPlayer;
+//	//		}
+//	//	}
+//	//}
+//
+//	//ImGui::InputInt("Anim Type MAX=10", &Type_Num);
+//
+//	//if (Type_Num >= 14)
+//	//	Type_Num = 0;
+//	//ImGui::Text(str[Type_Num].c_str());
+//	
+//}
+//
 
-	ImGui::RadioButton("Garrison", &CharIndex, 0);
-	ImGui::RadioButton("Knolan", &CharIndex, 1);
-	ImGui::RadioButton("Calibreotto", &CharIndex, 2);
-	if (CharIndex == 0)
-	{
-		for (auto& pPlayer : m_pPlayerVec)
-		{
-			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
-			{
-				pCurentActor = pPlayer;
-			}
-		}
-	}
-	else if (CharIndex == 1)
-	{
-		for (auto& pPlayer : m_pPlayerVec)
-		{
-			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
-			{
-				pCurentActor = pPlayer;
-			}
-		}
-	}
-	else if (CharIndex == 2)
-	{
-		for (auto& pPlayer : m_pPlayerVec)
-		{
-			if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
-			{
-				pCurentActor = pPlayer;
-			}
-		}
-	}
-
-	ImGui::InputInt("Anim Type MAX=10", &Type_Num);
-
-	if (Type_Num >= 14)
-		Type_Num = 0;
-	ImGui::Text(str[Type_Num].c_str());
-
-
-	/*CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (pGameInstance->Key_Down(DIK_P))
-	{
-		static_cast<CPlayer*>(pCurentActor)->Set_Current_AnimQueue(CPlayer::CurrentState(Type_Num), true);
-	}
-
-	RELEASE_INSTANCE(CGameInstance);*/
-	
-}
-
-_bool CPlayerController::To_Idle()
-{
-	_bool bResult = false;
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	if (pGameInstance->Key_Down(DIK_1))
-	{
-		bResult=  true;
-	}
-
-	RELEASE_INSTANCE(CGameInstance);
-	return bResult;
-}
-
-_bool CPlayerController::To_Intro()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_2))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-_bool CPlayerController::To_Normal_Attack()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_3))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Skill1_Attack()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_4))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Skill2_Attack()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_5))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Uitimate()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_6))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Buff()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_7))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_WideAreaBuff()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_8))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Use_Item()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_9))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Defence()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_P))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Light_Hit()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_O))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Heavy_Hit()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_I))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Flee()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_U))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
-
-_bool CPlayerController::To_Die()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_Y))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-	
-}
-
-_bool CPlayerController::To_Viroty()
-{
-	_bool bResult = false;
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	if (pGameInstance->Key_Down(DIK_L))
-		bResult = true;
-
-	RELEASE_INSTANCE(CGameInstance);
-
-	return bResult;
-}
 
 void CPlayerController::Free()
 {

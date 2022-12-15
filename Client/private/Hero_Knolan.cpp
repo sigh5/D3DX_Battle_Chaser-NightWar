@@ -5,6 +5,7 @@
 #include "Client_Manager.h"
 
 #include "PlayerController.h"
+#include "CombatController.h"
 #include "AnimFsm.h"
 
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -66,12 +67,12 @@ void CHero_Knolan::Tick(_double TimeDelta)
 	else
 	{
 		Combat_Initialize();
-		
-		if(CPlayerController::GetInstance()->Get_CurActor() == this)
-			m_pFsmCom->Tick(TimeDelta);
-		//Combat_Tick(TimeDelta);
+		m_pFsmCom->Tick(TimeDelta);
+
 	}
 		
+	ObserverTest(TimeDelta);
+
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -182,8 +183,14 @@ HRESULT CHero_Knolan::Combat_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR1);
-	m_bCombat_LastInit = true;
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(12.f, 0.f, 17.f, 1.f));
 	
+	
+	m_CurAnimqeue.push({ 0,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+
+
+	m_bCombat_LastInit = true;
 	return S_OK;
 }
 
@@ -200,11 +207,11 @@ void CHero_Knolan::ObserverTest(_double TimeDelta)
 		_uint iMoveSpeed = 100;
 		m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
 	}
-	if (pInstance->Key_Down(DIK_O))
+	/*if (pInstance->Key_Down(DIK_O))
 	{
 		_uint iShakingTime = 3;
 		m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	}
+	}*/
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -280,7 +287,7 @@ void CHero_Knolan::Anim_Idle()
 
 void CHero_Knolan::Anim_Intro()
 {
-	m_CurAnimqeue.push({ 12, 1.f });
+	m_CurAnimqeue.push({ 12, m_IntroTimer });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }

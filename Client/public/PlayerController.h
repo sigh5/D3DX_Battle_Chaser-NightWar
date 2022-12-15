@@ -28,7 +28,7 @@ public:
 	vector<CPlayer*>& Get_Players() { return m_pPlayerVec; }
 
 public:
-	virtual HRESULT Initialize();
+	virtual HRESULT Initialize(_uint iLevel);
 	
 public: /* For.Dungeon*/
 	CPlayer*	Get_Captin() { return m_pCaptinPlayer;}
@@ -37,37 +37,20 @@ public: /* For.Dungeon*/
 	void		Change_Scene(_uint	iLevelIndex);
 	
 public: /*For.Combat*/
-	CGameObject*		Get_CurActor()const { return pCurentActor; }
-
-
 	_bool			CombatScene(void);
-	void			CurrentTurn_AnimControl();
+	//void			CurrentTurn_AnimControl();
 	
 	/* 조건들 나중에 현재 순서에맞는 애들을 채워야함*/
-	_bool			To_Idle();
-	_bool			To_Intro();
-	_bool			To_Normal_Attack();
-	_bool			To_Skill1_Attack();
-	_bool			To_Skill2_Attack();
-	_bool			To_Uitimate();
-	_bool			To_Buff();
-	_bool			To_WideAreaBuff();
-	_bool			To_Use_Item();
-	_bool			To_Defence();
-	_bool			To_Light_Hit();
-	_bool			To_Heavy_Hit();
-	_bool			To_Flee();
-	_bool			To_Die();
-	_bool			To_Viroty();
+	
 
 private:
 	_uint					m_iCurrentScene = 0;
 	vector<CPlayer*> m_pPlayerVec;
 	CPlayer*		m_pCaptinPlayer = nullptr;
 
-	vector<class CGameObject*> CombatActors;	// 전체적인 흐름담당
-	class CGameObject*			pCurentActor = nullptr;		// 현재 순서인놈
-	class CGameObject*			pHitActor = nullptr;		// 맞은놈
+	//vector<class CGameObject*> CombatActors;	// 전체적인 흐름담당
+	//class CGameObject*			pCurentActor = nullptr;		// 현재 순서인놈
+	//class CGameObject*			pHitActor = nullptr;		// 맞은놈
 
 
 

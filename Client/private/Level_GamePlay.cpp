@@ -1,13 +1,18 @@
 #include "stdafx.h"
 #include "..\public\Level_GamePlay.h"
 #include "GameInstance.h"
-#include "UI.h"
+
+#include "PlayerController.h"
 #include "Client_Manager.h"
+
+
 #include "Level_Loading.h"
+#include "UI.h"
+
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
+	, m_pPlayerController(CPlayerController::GetInstance())
 {
-
 }
 
 HRESULT CLevel_GamePlay::Initialize()
@@ -30,9 +35,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
-	///*UI*/
-	//CClient_Manager::UI_Load(m_pDevice, m_pContext, TEXT("Test"), LEVEL_GAMEPLAY);
-	///*~UI*/
+	m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
+
 
 	return S_OK;
 
@@ -42,6 +46,8 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 		
+	Dungeon_Controll_Tick(TimeDelta);
+
 }
 
 void CLevel_GamePlay::Late_Tick(_double TimeDelta)
@@ -69,6 +75,13 @@ HRESULT CLevel_GamePlay::Render()
 	SetWindowText(g_hWnd, TEXT("Level : GAMEPLAY"));
 
 	return S_OK;
+}
+
+void CLevel_GamePlay::Dungeon_Controll_Tick(_double TimeDelta)
+{
+	m_pPlayerController->Set_CaptinPlayer();
+	m_pPlayerController->SyncAninmation();
+
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
@@ -172,6 +185,5 @@ CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device * pDevice, ID3D11DeviceCo
 void CLevel_GamePlay::Free()
 {
 	__super::Free();
-
-
+	
 }

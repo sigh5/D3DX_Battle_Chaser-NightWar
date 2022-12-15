@@ -101,7 +101,7 @@ void CAnimation::Set_Finished(_bool bFinish)
 	m_PlayTime = 0.0;
 }
 
-void CAnimation::InitLerp(vector<CChannel*> PrevChannels)
+void CAnimation::InitLerp(vector<CChannel*> PrevChannels,_double TimeDelta ,_bool IsLerp)
 {	
 	for (auto& MyChannel : m_Channels)
 	{
@@ -109,7 +109,7 @@ void CAnimation::InitLerp(vector<CChannel*> PrevChannels)
 		{
 			if (!strcmp(MyChannel->GetName(), PrevChannel->GetName()))
 			{
-				MyChannel->BlendingFrame(PrevChannel);
+				MyChannel->BlendingFrame(PrevChannel, TimeDelta,IsLerp);
 			}
 		}
 

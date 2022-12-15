@@ -26,16 +26,37 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void			Combat_Tick(_double TimeDelta);
+	_int			Is_MovingAnim();
+	void			CombatAnim_Move(_double TImeDelta);
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
-	//class CAnimFsm*			m_pFsmCom = nullptr;
+	class CMonsterFsm*		m_pFsmCom = nullptr;
 
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
+
+public:
+	void					Anim_Idle();
+	void					Anim_Intro();
+	void					Anim_NormalAttack();
+	void					Anim_Skill1_Attack();
+	void					Anim_Defence();
+	void					Anim_Buff();
+	void					Anim_Light_Hit();
+	void					Anim_Heavy_Hit();
+	void					Anim_Die();
+	void					Anim_Viroty();
+
+private:
+	_int							m_iMovingDir = ANIM_EMD;
+
 
 public:
 	static CSkeleton_Naked* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

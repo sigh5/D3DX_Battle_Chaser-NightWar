@@ -85,7 +85,7 @@ void CMonster::Set_CombatAnim_Index(CModel * pModel)
 {
 	pModel->Set_PlayTime(pModel->Get_AnimIndex());
 	pModel->InitChannel();
-	pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
+//	pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
 	pModel->Set_AnimIndex(m_CurAnimqeue.front().first);
 	pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
 	m_bIsIdle = false;

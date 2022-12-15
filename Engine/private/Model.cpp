@@ -126,7 +126,6 @@ void CModel::Play_Animation(_double TimeDelta,_bool IsCombat)
 }
 
 
-
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)
 {
 	if (iMeshIndex >= m_iNumMeshes)
@@ -180,9 +179,28 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 	return S_OK;
 }
 
-void CModel::Set_Lerp(_uint iprevIndex, _uint iNextIndex)
+void CModel::Set_Lerp(_uint iprevIndex, _uint iNextIndex,_double TimeDelta,_bool bIsLerp)
 {
-	m_Animations[iNextIndex]->InitLerp(m_Animations[iprevIndex]->Get_Channles());
+	if (TYPE_NONANIM == m_eType)
+		return;
+
+	if (bIsLerp == false)
+	{
+		m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta, false);
+	}
+	else
+	{
+		m_Animations[iNextIndex]->InitLerp(m_Animations[iprevIndex]->Get_Channles(), TimeDelta, bIsLerp);
+	}
+
+
+	for (auto& pBone : m_Bones)
+	{
+		if (nullptr != pBone)
+			pBone->Compute_CombindTransformationMatrix();
+	}
+
+
 }
 
 _bool CModel::Get_Finished(_uint iAnimIndex)
@@ -283,9 +301,9 @@ void CModel::Imgui_RenderProperty()
 	char szTickPerSecond[MAX_PATH];
 	strcpy_s(szTickPerSecond,MAX_PATH, to_string(iTickPerSecond).c_str());
 	ImGui::Text(szTickPerSecond);
-	ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
+	/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
 	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
-
+*/
 
 	_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
 	char szDurationSecond[MAX_PATH];
@@ -296,12 +314,35 @@ void CModel::Imgui_RenderProperty()
 
 
 	 int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
-
 	ImGui::Text("FrameIndex : %d", iFrameIndex);
-	//if (ImGui::Button("Set_Frame"))
-	//{
-	//	m_Animations[m_iCurrentAnimIndex]->Set_KeyFrame(iIndex);
-	//}
+	
+
+	_uint iMeshNum = 0;
+	if (ImGui::TreeNode("MeshName"))
+	{
+		char szMeshName[MAX_PATH];
+
+		if (ImGui::BeginListBox("##"))
+		{
+			for (auto& pMesh : m_Meshes)
+			{
+				if (pMesh != nullptr)
+				{
+					strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
+
+					if (ImGui::Selectable(szMeshName))
+					{
+						m_iNoRenderIndex = iMeshNum;
+					}
+					++iMeshNum;
+				}
+			}
+			ImGui::EndListBox();
+		}
+		ImGui::TreePop();
+	}
+
+	
 
 
 

@@ -37,7 +37,7 @@ public:
 	void		Set_PlayTime() { m_PlayTime = 0.0; }
 	
 	/* 선형보관*/
-	void		InitLerp(vector<class CChannel*> Channels);
+	void		InitLerp(vector<class CChannel*> Channels, _double TimeDelta, _bool IsLerp);
 	vector<class CChannel*>&		Get_Channles() {return m_Channels;	}
 private:
 	char								m_szName[MAX_PATH];
@@ -54,6 +54,7 @@ private:
 	vector<class CChannel*>				m_Channels;
 	_uint								m_iJumpIndexNum = 0;
 	
+
 
 public:
 	static CAnimation* Create(HANDLE hFile, class CModel* pModel);

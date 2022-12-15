@@ -19,7 +19,6 @@ class CTurnCharcterUI final : public CUI
 public:
 	enum UI_POS { UI_POS_TOP , UI_POS_NORMAL, UI_POS_DOWN, UI_POS_ALL ,UI_POS_END, };
 
-
 private:
 	CTurnCharcterUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTurnCharcterUI(const CTurnCharcterUI& rhs);
@@ -27,6 +26,7 @@ private:
 
 public:
 	void Set_Top_BottomYPos(_float& fTopY, _float& fBottomY) {m_fTopY = fTopY; m_fBottomY = fBottomY;}
+	const UI_REPRESENT Get_Represent_Char()const { return m_iRepresent_Char; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -47,12 +47,13 @@ public: /*Observer Pattern*/
 	void	MoveControl(_uint iOption);
 	void	ShakingControl(_uint iOption);
 
-
 	_bool	isUITop(OUT CUI*& pUI);
 	_bool	isUIBottom(OUT CUI*& pUI);
 	_float	Get_PosY();
 
 
+private:
+	HRESULT  Set_Represent_Char();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -75,7 +76,8 @@ private:
 
 	_float					m_fTopY=0.f, m_fBottomY=0.f;
 
-
+private:
+	UI_REPRESENT			m_iRepresent_Char = REPRESENT_END;		// 현재 어떤 캐릭터 담당인지
 
 
 private:

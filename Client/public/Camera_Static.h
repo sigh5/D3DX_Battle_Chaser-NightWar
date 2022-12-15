@@ -50,7 +50,7 @@ private:
 	
 	wstring					m_ChaseTargetTag = TEXT("");
 	
-	class					CPlayerController* m_pPlayerController = nullptr;
+	//class					CPlayerController* m_pPlayerController = nullptr;
 
 
 public:

@@ -52,7 +52,7 @@ public: /* imgui */
 
 	// 이 오브젝트에서 보여줄 데이터를 imgui로 작성한다.
 	virtual void Imgui_RenderProperty(){}
-	virtual _bool Piciking_GameObject() = 0;
+	virtual _bool Piciking_GameObject() { return false; }
 
 	void					Set_parent(CGameObject* pGameObject);
 	virtual void			Set_parentName(_uint iCulLevel, const _tchar* pParentTag) {};

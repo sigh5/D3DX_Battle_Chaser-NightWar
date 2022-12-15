@@ -2,7 +2,8 @@
 #include "..\public\SlimeKing.h"
 
 #include "GameInstance.h"
-#include "AnimFsm.h"
+#include "MonsterFsm.h"
+#include "CombatController.h"
 
 CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice,pContext)
@@ -36,7 +37,7 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, 0.f, 10.f, 1.f));
-
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(21.f, 0.f, 20.f, 1.f));
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -48,7 +49,7 @@ HRESULT CSlimeKing::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR4);
+	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR1);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -59,11 +60,10 @@ void CSlimeKing::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-
 	m_pFsmCom->Tick(TimeDelta);
-	//Combat_Tick(TimeDelta);
+	
 
-	m_pModelCom->Play_Animation(TimeDelta);
+	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
 
 void CSlimeKing::Late_Tick(_double TimeDelta)
@@ -94,18 +94,38 @@ HRESULT CSlimeKing::Render()
 
 void CSlimeKing::Combat_Tick(_double TimeDelta)
 {
-	CSlimeKing::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	CMonster::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
 }
 
-_bool CSlimeKing::DemoTest()
+_int CSlimeKing::Is_MovingAnim()
 {
-	if (GetKeyState('Z') & 0x8000)
+	if (m_pModelCom->Get_AnimIndex() == 9)
 	{
-		return true;
+		m_iMovingDir = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(9, 2);
 	}
+	else if (m_pModelCom->Get_AnimIndex() == 4)
+	{
+		m_iMovingDir = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(4, 2);
+	}
+	else
+		m_iMovingDir = ANIM_EMD;
 
-	return false;
+	return m_iMovingDir;
 }
+
+void CSlimeKing::CombatAnim_Move(_double TImeDelta)
+{
+	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
+		m_pTransformCom->Go_Straight(TImeDelta);
+
+	else if (m_iMovingDir == ANIM_DIR_BACK)
+		m_pTransformCom->Go_Backward(TImeDelta);
+}
+
 
 HRESULT CSlimeKing::SetUp_Components()
 {
@@ -151,19 +171,22 @@ HRESULT CSlimeKing::SetUp_ShaderResources()
 
 void CSlimeKing::Anim_Idle()
 {
-	m_CurAnimqeue.push({ 2,1.f });
+	m_CurAnimqeue.push({ 0,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSlimeKing::Anim_Intro()
 {
-	m_CurAnimqeue.push({ 1,1.f });
-	m_CurAnimqeue.push({ 3,1.f });
+	m_CurAnimqeue.push({ 12,m_IntroTimer });	//2개 넣어야함.. 처음에
+	m_CurAnimqeue.push({ 0,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSlimeKing::AnimNormalAttack()
 {
+	m_CurAnimqeue.push({ 8,1.f });
+	m_CurAnimqeue.push({ 9,1.f });
+	m_CurAnimqeue.push({ 10,1.f });
 	m_CurAnimqeue.push({ 4,1.f });
 	m_CurAnimqeue.push({ 5,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -171,9 +194,45 @@ void CSlimeKing::AnimNormalAttack()
 
 void CSlimeKing::Anim_Skill1_Attack()
 {
-	m_CurAnimqeue.push({ 6,1.f });
+	m_CurAnimqeue.push({ 16,1.f }); // 브레쓰
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Uitimate()
+{
+	m_CurAnimqeue.push({ 14,1.f });  // 몸커지기 
+	m_CurAnimqeue.push({ 15,1.f }); 
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Buff()
+{
+	m_CurAnimqeue.push({ 3,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Light_Hit()
+{
 	m_CurAnimqeue.push({ 7,1.f });
-	m_CurAnimqeue.push({ 8,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Heavy_Hit()
+{
+	m_CurAnimqeue.push({ 6,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Die()
+{
+	m_CurAnimqeue.push({ 2,1.f });
+	m_CurAnimqeue.push({ 17,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSlimeKing::Anim_Viroty()
+{
+	m_CurAnimqeue.push({ 12,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

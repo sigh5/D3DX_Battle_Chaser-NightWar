@@ -18,12 +18,18 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	void	Dungeon_Controll_Tick(_double TimeDelta);
+
+private:
 	HRESULT Ready_Layer_BackGround(const wstring& pLayerTag);
 	HRESULT Ready_Layer_Camera(const wstring& pLayerTag);
 	HRESULT Ready_Layer_Player(const wstring& pLayerTag);
 	HRESULT Ready_Layer_UI(const wstring& pLayerTag);
 	HRESULT Ready_Lights();
 
+
+private:
+	class CPlayerController*		m_pPlayerController = nullptr; // Dungeon
 
 
 public:

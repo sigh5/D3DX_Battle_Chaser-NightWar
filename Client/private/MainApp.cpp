@@ -8,18 +8,14 @@
 #include "Client_Manager.h"
 #include "ToolManager.h"
 #include "PlayerController.h"
+#include "CombatController.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 	, m_pToolManager(CToolManager::GetInstance())
-	, m_pPlayerController(CPlayerController::GetInstance())
 
 {
 	Safe_AddRef(m_pGameInstance);
-
-	//D3D11_SAMPLER_DESC		samplerDesc;
-
-
 }
 
 HRESULT CMainApp::Initialize()
@@ -283,7 +279,7 @@ void CMainApp::Free()
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
 
-
+	CCombatController::DestroyInstance();
 	CPlayerController::DestroyInstance();
 	CToolManager::DestroyInstance();
 	CGameInstance::Release_Engine();

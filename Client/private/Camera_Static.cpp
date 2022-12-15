@@ -26,7 +26,6 @@ HRESULT CCamera_Static::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Static_Camera");
 
-
 	CCamera::CAMERADESC			CameraDesc;
 	ZeroMemory(&CameraDesc, sizeof CameraDesc);
 
@@ -53,27 +52,14 @@ HRESULT CCamera_Static::Initialize(void * pArg)
 
 void CCamera_Static::Tick(_double TimeDelta)
 {
-	Last_Initialize();
-
-	/*나중에 삭제바람*/
-	if(m_pPlayerController->CombatScene())
-		m_pPlayerController->CurrentTurn_AnimControl();
-	
 	if (!m_bCameraActive)
 		return;
-
-	if (!m_pPlayerController->CombatScene())
-	{
-		m_pPlayerController->Set_CaptinPlayer();
-		Update_CameraLookPos();
-		m_pPlayerController->SyncAninmation();
-	}
-	else
-	{
-		m_pPlayerController->CurrentTurn_AnimControl();
-	}
-
+	Last_Initialize();
 	__super::Tick(TimeDelta);
+	
+	Update_CameraLookPos();
+
+	
 }
 
 void CCamera_Static::Late_Tick(_double TimeDelta)	
@@ -88,9 +74,6 @@ HRESULT CCamera_Static::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-
-	m_pPlayerController = GET_INSTANCE(CPlayerController);
-	m_pPlayerController->Initialize();
 
 	m_bLast_Initlize = true;
 	
@@ -118,30 +101,32 @@ HRESULT CCamera_Static::SetUp_Components()
 
 HRESULT CCamera_Static::Update_CameraLookPos()
 {
-	if (m_pPlayerController->Get_Captin() == nullptr)
-		return S_OK;
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+
+	HRESULT hr = 0;
+	hr = FAILED(pPlayerController->Get_Captin() == nullptr);
+
+	if (hr != E_FAIL)
+	{
+		_vector vPlayerPos = pPlayerController->Get_Captin()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+		_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+		_vector vLook = vPlayerPos - CameraPos;
+
+		_float4 PlayerVecotr;
+		XMStoreFloat4(&PlayerVecotr, vPlayerPos);
+
+
+		PlayerVecotr.x += m_CameraDistanceX;
+		PlayerVecotr.y += m_CameraDistanceY;
+		PlayerVecotr.z -= m_CameraDistanceZ;
+
+
+		m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
+	}
 	
-	_vector vPlayerPos = m_pPlayerController->Get_Captin()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
-
-	_vector vLook = vPlayerPos - CameraPos;
-
-	_float4 PlayerVecotr;
-	XMStoreFloat4(&PlayerVecotr, vPlayerPos);
-
-	ImGui::InputFloat("m_CameraDistanceX", &m_CameraDistanceX);
-	ImGui::InputFloat("m_CameraDistanceY", &m_CameraDistanceY);
-	ImGui::InputFloat("m_CameraDistanceZ", &m_CameraDistanceZ);
-
-	PlayerVecotr.x += m_CameraDistanceX;
-	PlayerVecotr.y += m_CameraDistanceY;
-	PlayerVecotr.z -= m_CameraDistanceZ;
-
-
-	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
-
-
+	RELEASE_INSTANCE(CPlayerController);
 	return S_OK;
 }
 
@@ -172,9 +157,5 @@ CGameObject * CCamera_Static::Clone(void * pArg)
 void CCamera_Static::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pPlayerController);
-
-	
 
 }

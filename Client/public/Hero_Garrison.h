@@ -44,10 +44,11 @@ public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_Ultimate(_double TimeDelta);
 	
+
+public:
 	virtual	  _bool	  Is_PlayerDead()override;
 	_int	  Is_MovingAnim();
 	 void	  CombatAnim_Move(_double TImeDelta);
-	 
 
 
 
@@ -70,17 +71,18 @@ public:
 
 private:
 	_int	 bResult = ANIM_EMD;
-
+	_bool	m_bCombatInit = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	class CAnimFsm*				m_pAnimFsm = nullptr;
+
 private:
 	HRESULT		SetUp_Components();
 	HRESULT		SetUp_ShaderResources();
-
+	HRESULT		Combat_Init();
 public:
 	static CHero_Garrison* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

@@ -176,6 +176,7 @@
     <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
+    <ClInclude Include="..\Public\CombatController.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="..\Public\LoadingImage.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
+    <ClInclude Include="..\Public\MonsterFsm.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
@@ -213,6 +215,7 @@
     <ClCompile Include="..\Private\Camera_Static.cpp" />
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
+    <ClCompile Include="..\Private\CombatController.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />
@@ -226,6 +229,7 @@
     <ClCompile Include="..\Private\LoadingImage.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
+    <ClCompile Include="..\Private\MonsterFsm.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />

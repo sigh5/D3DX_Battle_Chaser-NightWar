@@ -2,6 +2,9 @@
 #include "..\public\Spider_Mana.h"
 
 #include "GameInstance.h"
+#include "Client_Manager.h"
+#include "MonsterFsm.h"
+#include "CombatController.h"
 
 CSpider_Mana::CSpider_Mana(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -35,7 +38,7 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(5.f, 0.f, 15.f, 1.f));
-
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(23.f, 0.f, 11.f, 1.f));
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -47,6 +50,7 @@ HRESULT CSpider_Mana::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR3);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -57,12 +61,17 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	m_pModelCom->Play_Animation(TimeDelta);
+	
+	m_pFsmCom->Tick(TimeDelta);
+	
+	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
 void CSpider_Mana::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+	
+	CurAnimQueue_Play_LateTick(m_pModelCom);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -82,6 +91,50 @@ HRESULT CSpider_Mana::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 	return S_OK;
+}
+
+void CSpider_Mana::Combat_Tick(_double TimeDelta)
+{
+	CMonster::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
+}
+
+_int CSpider_Mana::Is_MovingAnim()
+{
+	if (m_pModelCom->Get_AnimIndex() == 9 )
+	{
+		m_iMovingDir = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(9, 2);
+	}
+	else if  (m_pModelCom->Get_AnimIndex() == 13)
+	{
+		m_iMovingDir = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(13, 2);
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 4)
+	{
+		m_iMovingDir = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(4, 2);
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 12)
+	{
+		m_iMovingDir = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(12, 2);
+	}
+	else
+		m_iMovingDir = ANIM_EMD;
+
+	return m_iMovingDir;
+}
+
+void CSpider_Mana::CombatAnim_Move(_double TImeDelta)
+{
+	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
+		m_pTransformCom->Go_Straight(TImeDelta);		//chase로 바꾸기
+
+	else if (m_iMovingDir == ANIM_DIR_BACK)
+		m_pTransformCom->Go_Backward(TImeDelta);
 }
 
 
@@ -127,6 +180,79 @@ HRESULT CSpider_Mana::SetUp_ShaderResources()
 	return S_OK;
 }
 
+void CSpider_Mana::Anim_Idle()
+{
+	m_CurAnimqeue.push({ 0, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Intro()
+{
+	m_CurAnimqeue.push({ 11, m_IntroTimer });
+	m_CurAnimqeue.push({ 0, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_NormalAttack()
+{
+	m_CurAnimqeue.push({ 8, 1.f });
+	m_CurAnimqeue.push({ 9, 1.f });
+	m_CurAnimqeue.push({ 10, 1.f });
+	m_CurAnimqeue.push({ 4, 1.f });
+	m_CurAnimqeue.push({ 5, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Skill1_Attack()
+{
+	m_CurAnimqeue.push({ 13, 1.f });	//깨물기
+	m_CurAnimqeue.push({ 14, 1.f });
+	m_CurAnimqeue.push({ 12, 1.f });
+	m_CurAnimqeue.push({ 5, 1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Skill2_Attack()
+{
+	m_CurAnimqeue.push({ 15, 0.8f });	// 거미줄 발사
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Buff()
+{
+	m_CurAnimqeue.push({ 3, 0.7f });	
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Light_Hit()
+{
+	m_CurAnimqeue.push({ 1, 1.f });	
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Heavy_Hit()
+{
+	m_CurAnimqeue.push({ 6,1.f });	
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Die()
+{
+	m_CurAnimqeue.push({ 2,1.f });	
+	m_CurAnimqeue.push({ 19,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+}
+
+void CSpider_Mana::Anim_Viroty()
+{
+	m_CurAnimqeue.push({ 17,1.f });
+	m_CurAnimqeue.push({ 16,1.f });
+	m_CurAnimqeue.push({ 18,1.f });
+	m_CurAnimqeue.push({ 0,1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+
+}
+
 CSpider_Mana * CSpider_Mana::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CSpider_Mana*		pInstance = new CSpider_Mana(pDevice, pContext);
@@ -155,7 +281,7 @@ void CSpider_Mana::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_pFsmCom);
+	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 

@@ -34,6 +34,9 @@ protected:
 	_bool							m_bIsCombatAndAnimSequnce = false;
 	queue<pair<_uint, _double>>		m_CurAnimqeue;
 	_bool							m_bIsIdle = false;;
+	
+	_double							m_NormalTikcPerSecond=1.0;
+	_double							m_IntroTimer = 0.7;
 
 private:
 	_double					m_fWalkTime = 0.f;

@@ -23,6 +23,10 @@ private:
 	virtual ~CTurnUICanvas() = default;
 
 public:
+	const UI_REPRESENT	Get_CurrentActor()const;
+
+
+public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
 	virtual HRESULT Last_Initialize()override;
@@ -30,12 +34,14 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 
-
 public:
 	void	ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed); // Obsever
 	void	ChildrenShakingCheck(_uint CoolTime);
 	void	DeleteCharUI(const wstring& pNametag);		// Obsever
 	void	Move_Children(); /*logic*/
+
+
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -49,10 +55,13 @@ private:
 	HRESULT SetUp_ChildrenPosition();
 	HRESULT SetUp_MatchingOption();
 
-
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
+
+	class CUI*				m_pTopUI = nullptr;
+	class CUI*				m_pBottomUI = nullptr;
+
 
 public:
 	static CTurnUICanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

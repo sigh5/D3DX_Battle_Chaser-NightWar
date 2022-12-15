@@ -42,17 +42,16 @@ public: /* For_UI */
 public:
 	static _double	 TimeDelta;
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
-	
-public:/*For.Imgui_AnimTool*/
-	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
 
 public: /* For_Player */
 	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
-	static bool		Test() { return true; }
+
 
 
 #ifdef _DEBUG
 
+public:/*For.Imgui_AnimTool*/
+	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
 	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider);
 
 #endif // _DEBUG
