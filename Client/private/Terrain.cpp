@@ -81,6 +81,10 @@ HRESULT CTerrain::Render()
 	m_pShaderCom->Begin(0);
 	m_pVIBufferCom->Render();
 
+#ifdef _DEBUG
+	m_pNavigationCom->Render();
+#endif
+
 	return S_OK;
 }
 
@@ -274,6 +278,11 @@ HRESULT CTerrain::SetUp_Components()
 		(CComponent**)&m_pTextureCom[TYPE_FILTER])))
 		return E_FAIL;
 
+	/* For.Com_Navigation */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), TEXT("Com_Navigation"),
+		(CComponent**)&m_pNavigationCom)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -360,14 +369,15 @@ void CTerrain::Free()
 	Safe_Delete_Array(m_pPixel);
 	temp.clear();
 
-
 	for (auto& pName : m_NameVector)
 		Safe_Delete_Array(pName);
-
+	m_NameVector.clear();
 
 	for (auto& pTextureCom : m_pTextureCom)
 		Safe_Release(pTextureCom);
 
+	
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);

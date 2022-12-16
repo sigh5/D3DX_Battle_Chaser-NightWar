@@ -184,7 +184,7 @@ void CPlayer::Set_CombatAnim_Index(CModel * pModel)
 }
 
 
-_bool CPlayer::KeyInput(_double TimeDelta)
+_bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 {
 
 	if (!m_bControlKeyInput)
@@ -258,7 +258,7 @@ _bool CPlayer::KeyInput(_double TimeDelta)
 			m_iAnimIndex = 1;
 			m_fMoveSpeedRatio = 0.5f;
 		}
-		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio);
+		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, pNavigation);
 
 		return true;
 	}

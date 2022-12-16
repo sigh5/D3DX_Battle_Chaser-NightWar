@@ -78,7 +78,7 @@ public:
 	virtual void Imgui_RenderProperty() override;
 
 public:
-	void Go_Straight(_double TimeDelta,_float fSpeedRatio =1.f);
+	void Go_Straight(_double TimeDelta,_float fSpeedRatio =1.f, class CNavigation* pNaviCom = nullptr);
 	void Go_Backward(_double TimeDelta);
 	void Go_Left(_double TimeDelta);
 	void Go_Right(_double TimeDelta);

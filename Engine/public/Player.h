@@ -5,7 +5,7 @@
 BEGIN(Engine)
 
 class CFSMComponent;
-
+class CNavigation;
 
 class ENGINE_DLL CPlayer abstract: public CGameObject
 {
@@ -43,7 +43,7 @@ public: /*For.PlayerController*/
 	_bool				IsCaptin();
 	virtual				 _bool	  Is_PlayerDead() { return false; }
 protected:
-	_bool				KeyInput(_double TimeDelta);
+	_bool				KeyInput(_double TimeDelta, CNavigation* pNavigation);
 	virtual void		Change_Level_Data(_uint iLevleIdx) {}
 
 protected: /*For.Tick*/

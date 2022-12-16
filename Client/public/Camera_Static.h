@@ -17,8 +17,6 @@ private:
 	CCamera_Static(const CCamera_Static& rhs);
 	virtual ~CCamera_Static() = default;
 
-public:
-	void	Set_CurrentCameraTargetTag(const wstring& ChaseTargetTag) {m_ChaseTargetTag = ChaseTargetTag;}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -29,28 +27,29 @@ public:
 	virtual HRESULT Render() override;
 
 	virtual void	Set_CameraActive(_bool bCameraActive)override;
-	
-private:
-	//void	Set_CaptinPlayer();
 
 
 
 private:
 	HRESULT SetUp_Components();
-	HRESULT Update_CameraLookPos();
+	HRESULT Update_CameraLookPos(_double TimeDelta);
 
+	void	NormalCameraActive();
+	void	Lerp_CameraActive(_float Ratio,CPlayer* pCurCaptin);
+
+private:
+	CPlayer*				m_pCurTaget = nullptr;
 
 
 private:
 	_float					m_CameraDistanceX = 0.f;
 	_float					m_CameraDistanceY = 15.f;
 	_float					m_CameraDistanceZ = 15.f;
-	
-	
-	
-	wstring					m_ChaseTargetTag = TEXT("");
-	
-	//class					CPlayerController* m_pPlayerController = nullptr;
+
+
+	_float					m_fLerpTimer = 0.0f;
+	_float					m_fLerpTime = 2.f;
+	_bool					m_bLerp = false;
 
 
 public:

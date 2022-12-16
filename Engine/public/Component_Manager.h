@@ -9,7 +9,7 @@
 #include "VIBuffer_Cube.h"
 #include "Model.h"
 #include "FSMComponent.h"
-
+#include "Navigation.h"
 
 #include "Collider.h"
 

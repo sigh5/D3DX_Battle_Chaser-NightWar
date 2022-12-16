@@ -8,7 +8,7 @@ class CShader;
 class CRenderer;
 class CModel;
 class CCollider;
-
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -78,6 +78,7 @@ private:
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	class CAnimFsm*				m_pAnimFsm = nullptr;
+	CNavigation*			m_pNavigationCom = nullptr;
 
 private:
 	HRESULT		SetUp_Components();

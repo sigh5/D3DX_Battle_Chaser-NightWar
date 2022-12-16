@@ -79,7 +79,12 @@ private:
 	LOAD_MODELDESC						m_ModelDesc;
 	_float4x4							m_PivotMatrix;
 
-	
+	_float								m_fBlendDuration = 0.2f; //0.2초가 가장 자연스럽다.
+	_float								m_fBlendCurTime = 0.2f;
+	_uint								m_iPreAnimIndex = 0;
+
+
+
 private: /*For.Imgui*/
 	_bool								m_bAnimcontrol = false;
 	int									m_iMeshIndex = -1;

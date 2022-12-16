@@ -57,7 +57,7 @@ void CCamera_Static::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 	
-	Update_CameraLookPos();
+	Update_CameraLookPos(TimeDelta);
 
 	
 }
@@ -75,6 +75,12 @@ HRESULT CCamera_Static::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+	m_pCurTaget = pPlayerController->Get_Captin();
+
+	assert(m_pCurTaget != nullptr && " CCamera_Static::Last_Initialize");
+
+	RELEASE_INSTANCE(CPlayerController);
 	m_bLast_Initlize = true;
 	
 	return S_OK;
@@ -99,35 +105,89 @@ HRESULT CCamera_Static::SetUp_Components()
 	return S_OK;
 }
 
-HRESULT CCamera_Static::Update_CameraLookPos()
+HRESULT CCamera_Static::Update_CameraLookPos(_double TimeDelta)
 {
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
-
 	HRESULT hr = 0;
-	hr = FAILED(pPlayerController->Get_Captin() == nullptr);
+	CPlayer* pPlayer = pPlayerController->Get_Captin();
 
-	if (hr != E_FAIL)
-	{
-		_vector vPlayerPos = pPlayerController->Get_Captin()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-		_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
-
-		_vector vLook = vPlayerPos - CameraPos;
-
-		_float4 PlayerVecotr;
-		XMStoreFloat4(&PlayerVecotr, vPlayerPos);
-
-
-		PlayerVecotr.x += m_CameraDistanceX;
-		PlayerVecotr.y += m_CameraDistanceY;
-		PlayerVecotr.z -= m_CameraDistanceZ;
-
-
-		m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
-		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
-	}
-	
 	RELEASE_INSTANCE(CPlayerController);
+	
+	hr = FAILED(m_pCurTaget == nullptr);
+	if (hr == E_FAIL)
+		assert("Error");
+
+	/*if (lstrcmp(pPlayer->Get_ObjectName(), m_pCurTaget->Get_ObjectName()))
+	{
+		m_bLerp = true;
+	}
+
+	if (!m_bLerp)
+	{*/
+	//	m_pCurTaget = pPlayer;
+		NormalCameraActive();
+	//}
+	//else			// 0.2 초가 적당하다.
+	//{
+	//	m_fLerpTimer += (_float)(TimeDelta* 1.f);
+	//	if (m_fLerpTimer <= 2.f)
+	//	{
+	//		_double Ratio = m_fLerpTimer;
+	//		Lerp_CameraActive((_float)Ratio, pPlayer);
+	//	}
+	//	else
+	//	{
+	//		m_bLerp = false;
+	//		m_fLerpTimer = 0.f;
+	//		m_pCurTaget = pPlayer;
+	//	}
+
+	//}
+	
+
 	return S_OK;
+}
+
+void CCamera_Static::NormalCameraActive()
+{
+	_vector vPlayerPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vLook = vPlayerPos - CameraPos;
+
+	_float4 PlayerVecotr;
+	XMStoreFloat4(&PlayerVecotr, vPlayerPos);
+
+
+	PlayerVecotr.x += m_CameraDistanceX;
+	PlayerVecotr.y += m_CameraDistanceY;
+	PlayerVecotr.z -= m_CameraDistanceZ;
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
+
+}
+
+void CCamera_Static::Lerp_CameraActive(_float Ratio, CPlayer* pCurCaptin)
+{
+	_vector vPrevCapPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vCurCapPos = pCurCaptin->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+	_vector vLerpVector = XMVectorLerp(vCurCapPos,vPrevCapPos, Ratio);
+	_vector vLook = vLerpVector - CameraPos;
+
+	_float4 PlayerVecotr;
+	XMStoreFloat4(&PlayerVecotr, vLerpVector);
+
+	PlayerVecotr.x += m_CameraDistanceX;
+	PlayerVecotr.y += m_CameraDistanceY;
+	PlayerVecotr.z -= m_CameraDistanceZ;
+
+
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
+
 }
 
 CCamera_Static * CCamera_Static::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

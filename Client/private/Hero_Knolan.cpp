@@ -50,7 +50,8 @@ HRESULT CHero_Knolan::Last_Initialize()
 		return S_OK;
 
 	m_bControlKeyInput = true;
-	
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(1.f, 0.f, 1.f, 1.f));
+
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -101,6 +102,7 @@ HRESULT CHero_Knolan::Render()
 	}
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
+	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
 #endif
 	return S_OK;
 }
@@ -170,7 +172,7 @@ void CHero_Knolan::NormalLightCharUI()
 
 void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta))
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta,m_pNavigationCom))
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -251,6 +253,19 @@ HRESULT CHero_Knolan::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), TEXT("Com_OBB"),
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
+
+
+	/* For.Com_Navigation */
+	CNavigation::NAVIDESC			NaviDesc;
+	ZeroMemory(&NaviDesc, sizeof(CNavigation::NAVIDESC));
+
+	NaviDesc.iCurrentIndex = 0;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), TEXT("Com_Navigation"),
+		(CComponent**)&m_pNavigationCom, &NaviDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -411,6 +426,7 @@ void CHero_Knolan::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);

@@ -35,7 +35,7 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 		return E_FAIL;
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-
+	m_pTransformCom->Set_Scaled(_float3(2.f, 2.f, 2.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, 0.f, 10.f, 1.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(21.f, 0.f, 20.f, 1.f));
 

@@ -2,6 +2,7 @@
 #include "Shader.h"
 #include "ImGuizmo.h"
 #include "GameInstance.h"
+#include "Navigation.h"
 
 CTransform::CTransform(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -159,7 +160,7 @@ void CTransform::Imgui_RenderProperty()
 		nullptr, useSnap ? &snap[0] : nullptr);
 }
 
-void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio)
+void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio, CNavigation* pNaviCom)
 {
 	_vector	vPosition = Get_State(CTransform::STATE_TRANSLATION);
 	_vector	vLook = Get_State(CTransform::STATE_LOOK);
@@ -167,7 +168,13 @@ void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio)
 	/* 이렇게 얻어온 VlOOK은 Z축 스케일을 포함하낟. */
 	vPosition += XMVector3Normalize(vLook) * (m_TransformDesc.fSpeedPerSec * fSpeedRatio) * (_float)TimeDelta;
 
-	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	if (nullptr == pNaviCom)
+		Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	else
+	{
+		if (true == pNaviCom->isMove_OnNavigation(vPosition))
+			Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	}
 }
 
 void CTransform::Go_Backward(_double TimeDelta)

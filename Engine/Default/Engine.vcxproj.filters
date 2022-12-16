@@ -148,6 +148,18 @@
     <Filter Include="01.Utility\03.Components\07.Colider">
       <UniqueIdentifier>{4a656bf6-d15c-4484-a9cd-1e4ced795def}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\09.Navigation">
+      <UniqueIdentifier>{146e79bf-71b7-401a-b478-ebf030d78f42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\09.Navigation\Cell">
+      <UniqueIdentifier>{51a5bf73-f1cb-4e53-94d4-677f8fb442b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\09.Navigation\Shader">
+      <UniqueIdentifier>{fad08eeb-8789-4616-a48d-6719ebf1e53f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\02.VIBuffer\Cell">
+      <UniqueIdentifier>{1da78855-78b6-43ae-884b-13edb8b81470}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -348,6 +360,15 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>01.Utility\02.GameObject\Dynamic\Monster</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Cell.h">
+      <Filter>01.Utility\03.Components\09.Navigation\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Navigation.h">
+      <Filter>01.Utility\03.Components\09.Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Cell.h">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Cell</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -521,5 +542,19 @@
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>01.Utility\02.GameObject\Dynamic\Monster</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Cell.cpp">
+      <Filter>01.Utility\03.Components\09.Navigation\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Navigation.cpp">
+      <Filter>01.Utility\03.Components\09.Navigation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Cell.cpp">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Cell</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Navigation.hlsl">
+      <Filter>01.Utility\03.Components\09.Navigation\Shader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

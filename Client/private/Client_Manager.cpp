@@ -185,6 +185,29 @@ void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pCo
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom)
+{
+	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->GetCurLevelIdx() == LEVEL_COMBAT)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+
+
+	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
+	{
+		pNavigationCom->Render();
+	}
+
+	RELEASE_INSTANCE(CPlayerController);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+
+
 #endif
 
 

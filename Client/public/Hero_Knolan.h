@@ -7,6 +7,7 @@ class CShader;
 class CRenderer;
 class CModel;
 class CCollider;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -51,7 +52,8 @@ private:
 	CModel*					m_pModelCom =  nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	class CAnimFsm*			m_pFsmCom = nullptr;
-
+	
+	CNavigation*			m_pNavigationCom = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
 

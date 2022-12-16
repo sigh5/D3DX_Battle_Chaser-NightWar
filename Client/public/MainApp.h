@@ -26,7 +26,8 @@ public:
 	void Tick(_double TimeDelta);
 	HRESULT Render();	
 	
-
+private:
+	HRESULT Ready_Gara();
 
 public:
 	HRESULT	Resize_BackBuffer();

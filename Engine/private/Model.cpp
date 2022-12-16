@@ -49,7 +49,6 @@ CModel::CModel(const CModel & rhs)
 
 	for (auto& pMesh : rhs.m_Meshes)
 		Safe_AddRef(pMesh);
-
 }
 
 CBone * CModel::Get_BonePtr(const char * pBoneName)
@@ -349,7 +348,6 @@ void CModel::Imgui_RenderProperty()
 	ImGui::End();
 
 }
-
 
 void CModel::Set_AnimIndex(_uint iAnimIndex)
 {

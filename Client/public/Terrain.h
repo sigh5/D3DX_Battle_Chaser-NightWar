@@ -8,6 +8,7 @@ class CShader;
 class CRenderer;
 class CVI_Buffer_Terrain;
 class CTexture;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -64,14 +65,13 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CVI_Buffer_Terrain*		m_pVIBufferCom = nullptr;
 	CTexture*				m_pTextureCom[TYPE_END] = { nullptr, };
+	CNavigation*			m_pNavigationCom = nullptr;
 
+private:
 	_bool					m_bCreateObject = false;
 	_bool					m_bCreateCheck = false;
-
-
 	Create_OBJECTDESC		m_ObjData;
 	_uint					m_iObjNameNumber = 0;
-
 	vector<_tchar*>			m_NameVector;
 
 private:

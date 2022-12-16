@@ -37,6 +37,7 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
+	m_pTransformCom->Set_Scaled(_float3(2.f, 2.f, 2.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(5.f, 0.f, 15.f, 1.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(23.f, 0.f, 11.f, 1.f));
 

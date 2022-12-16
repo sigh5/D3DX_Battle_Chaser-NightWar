@@ -9,6 +9,7 @@ BEGIN(Engine)
 class CTransform;
 class CGameObject;
 class CModel;
+class CNavigation;
 class CCollider;
 END
 
@@ -62,6 +63,7 @@ public: /* For_Player */
 public:/*For.Imgui_AnimTool*/
 	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
 	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider);
+	static void		Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom);
 
 #endif // _DEBUG
 
