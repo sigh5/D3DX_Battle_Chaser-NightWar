@@ -49,7 +49,6 @@ HRESULT CHero_Garrison::Last_Initialize()
 		return S_OK;
 	
 	
-
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -68,7 +67,7 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		m_pAnimFsm->Tick(TimeDelta);
 	}
 
-	m_pModelCom->Play_Animation(TimeDelta,m_bIsCombatScene);
+	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
 
@@ -195,7 +194,13 @@ void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 	{
 		m_pTransformCom->Go_Straight(TimeDelta);
 	}
-	
+}
+
+void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
+{
+	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	Is_Skill1MovingAnim();
+	CombatAnim_Move(TimeDelta);
 }
 
 HRESULT CHero_Garrison::SetUp_Components()
@@ -339,8 +344,6 @@ void CHero_Garrison::Free()
 
 _int CHero_Garrison::Is_MovingAnim()
 {
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
 	if (m_pModelCom->Get_AnimIndex() == 4)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
@@ -359,9 +362,36 @@ _int CHero_Garrison::Is_MovingAnim()
 	else
 		bResult = ANIM_EMD;
 
-	
-	RELEASE_INSTANCE(CGameInstance);
 	return bResult;
+}
+
+void CHero_Garrison::Is_Skill1MovingAnim()
+{
+	/*To_Do 나중에 가려는 몬스터 위치 받아오기*/
+	//_float4 Target;
+	//XMStoreFloat4(&Target, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	//Target.x += 5;
+	//Target.z += 5;
+	//m_pTransformCom->Chase(XMLoadFloat4(&Target), TImeDelta);
+
+
+	if (m_pModelCom->Get_AnimIndex() == 4)
+	{
+		bResult = ANIM_DIR_STRAIGHT;
+		m_pModelCom->Set_Duration(4, 2);
+	}
+
+	else if (m_pModelCom->Get_AnimIndex() == 12)
+	{
+		m_pModelCom->Set_Duration(12, 0.2);
+		bResult = ANIM_EMD;
+	}
+	else if (m_pModelCom->Get_AnimIndex() == 11)
+	{
+		bResult = ANIM_DIR_BACK;
+		m_pModelCom->Set_Duration(11, 2);
+	}
+
 }
 
 void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
@@ -409,10 +439,10 @@ void CHero_Garrison::AnimNormalAttack()
 
 void CHero_Garrison::Anim_Skill1_Attack()
 {
-	m_CurAnimqeue.push({ 4,  0.9f });
+	m_CurAnimqeue.push({ 4,  1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
-	m_CurAnimqeue.push({ 11, 0.9f });
+	m_CurAnimqeue.push({ 11, 1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);

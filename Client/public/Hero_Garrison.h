@@ -43,13 +43,15 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_Ultimate(_double TimeDelta);
-	
+	virtual   void	  Combat_BlendAnimTick(_double TimeDelta);
 
 public:
 	virtual	  _bool	  Is_PlayerDead()override;
 	_int	  Is_MovingAnim();
-	 void	  CombatAnim_Move(_double TImeDelta);
-
+	
+	void	  Is_Skill1MovingAnim();
+	void	  CombatAnim_Move(_double TImeDelta);
+	 
 
 
 public: 

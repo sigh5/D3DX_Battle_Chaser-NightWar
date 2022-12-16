@@ -78,7 +78,31 @@ void CAnimation::Update_Bones(_double TimeDelta,_bool IsCombat)
 	}
 }
 
+void CAnimation::Update_Bones_Blend(_double TimeDelta, _bool IsCombat, _float fBlendRatio)
+{
+	if (true == m_isFinished &&
+		false == m_isLooping)
+	{
+		return;
+	}
 
+	m_PlayTime += m_TickPerSecond * TimeDelta;
+
+	if (m_PlayTime >= m_Duration)
+	{
+		m_isFinished = true;
+		if (IsCombat == false)
+			m_PlayTime = 0.0;
+	}
+
+	for (_uint i = 0; i < m_iNumChannels; ++i)
+	{
+		if (true == m_isFinished)
+			m_Channels[i]->Reset_KeyFrameIndex();
+
+		m_Channels[i]->Blend_TransformMatrix(m_PlayTime, fBlendRatio);
+	}
+}
 
 void CAnimation::InitChannel()
 {
@@ -101,21 +125,7 @@ void CAnimation::Set_Finished(_bool bFinish)
 	m_PlayTime = 0.0;
 }
 
-void CAnimation::InitLerp(vector<CChannel*> PrevChannels,_double TimeDelta ,_bool IsLerp)
-{	
-	for (auto& MyChannel : m_Channels)
-	{
-		for (auto& PrevChannel : PrevChannels)
-		{
-			if (!strcmp(MyChannel->GetName(), PrevChannel->GetName()))
-			{
-				MyChannel->BlendingFrame(PrevChannel, TimeDelta,IsLerp);
-			}
-		}
 
-	}
-
-}
 
 CAnimation * CAnimation::Create(HANDLE hFile, CModel * pModel)
 {

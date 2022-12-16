@@ -32,8 +32,8 @@ public:
 	virtual HRESULT Initialize(void* pArg);
 
 public:
-	void Play_Animation(_double TimeDelta,_bool IsCombat=false);
-
+	void	 Play_Animation(_double TimeDelta,_bool IsCombat=false);
+	void	 Play_BlendAnimation(_double TimeDelta, _bool IsCombat = false);
 
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
@@ -58,8 +58,6 @@ public: /*For.Animation*/
 	_bool	Control_KeyFrame(_uint iAnimIndex,_uint KeyBegin, _uint KeyEnd);
 
 
-public:
-	void	Set_Lerp(_uint iprevIndex, _uint iNextIndex,_double TimeDelta, _bool bIsLerp);
 
 private:
 	LOAD_TYPE							m_eType = TYPE_END;

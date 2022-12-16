@@ -100,57 +100,17 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 	
 }
 
-void CChannel::BlendingFrame(CChannel * pPrevChannel,_double TimeDelta,_bool IsLerp)
+void CChannel::Blend_TransformMatrix(_double PlayTime, _float fBlendRatio)
 {
+	_vector		vBaseScale, vBaseRot, vBasePos;
+	/* 벡터에 스케일 로테이션 포지션을 조각내서 저장해주는 함수*/
+	XMMatrixDecompose(&vBaseScale, &vBaseRot, &vBasePos, m_pBone->Get_TransformMatrix());
 
 	_vector			vScale;
 	_vector			vRotation;
 	_vector			vPosition;
 
-	_matrix			TransformMatrix;
-	//if (m_iCurrentKeyFrameIndex == 0)
-	//{
-	//	_vector			vScale;
-	//	_vector			vRotation;
-	//	_vector			vPosition;
-
-	//	_matrix			TransformMatrix;
-
-	//	_vector			vSourScale, vDestScale;
-	//	_vector			vSourRotation, vDestRotation;
-	//	_vector			vSourPosition, vDestPosition;
-
-	//	m_newFixTime += TimeDelta;
-	//	
-	//	vSourScale = XMLoadFloat3(&m_KeyFrames[0].vScale);
-	//	vSourRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
-	//	vSourPosition = XMLoadFloat3(&m_KeyFrames[0].vPosition);
-
-	//	vDestScale = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vScale);
-	//	vDestRotation = XMLoadFloat4(&pPrevChannel->m_KeyFrames.back().vRotation);
-	//	vDestPosition = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vPosition);
-
-	//	_double			Ratio = (m_FixTime - m_newFixTime) / (m_FixTime);
-
-	//	vScale = XMVectorLerp(vSourScale, vDestScale, Ratio);
-	//	vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, Ratio);
-	//	vPosition = XMVectorLerp(vSourPosition, vDestPosition, Ratio);
-	//	vPosition = XMVectorSetW(vPosition, 1.f);
-
-	//	XMStoreFloat3(&m_KeyFrames[0].vScale, vScale);
-	//	XMStoreFloat4(&m_KeyFrames[0].vRotation, vRotation);
-	//	XMStoreFloat3(&m_KeyFrames[0].vPosition, vPosition);
-
-
-	//	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
-
-	//	m_pBone->Set_TransformMatrix(TransformMatrix);
-	//	return;
-	//}
-	
-
-	/* 현재 재생된 시간이 마지막 키프레임시간보다 커지며.ㄴ */
-	if (TimeDelta >= m_KeyFrames.back().Time)
+	if (PlayTime >= m_KeyFrames.back().Time)
 	{
 		vScale = XMLoadFloat3(&m_KeyFrames.back().vScale);
 		vRotation = XMLoadFloat4(&m_KeyFrames.back().vRotation);
@@ -159,22 +119,14 @@ void CChannel::BlendingFrame(CChannel * pPrevChannel,_double TimeDelta,_bool IsL
 	}
 	else
 	{
-		while (TimeDelta >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
+		while (PlayTime >= m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time)
 		{
 			++m_iCurrentKeyFrameIndex;
 		}
-		_double			Ratio = 0;
-		if (m_iCurrentKeyFrameIndex == 0)
-		{
-			m_newFixTime += TimeDelta;
-			Ratio = (m_FixTime - m_newFixTime) / (m_FixTime);
-		}
-		else
-		{
-			m_newFixTime = 0;
-			Ratio = (TimeDelta - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
-				(m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time - m_KeyFrames[m_iCurrentKeyFrameIndex].Time);
-		}
+
+		_double			Ratio = (PlayTime - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
+			(m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time - m_KeyFrames[m_iCurrentKeyFrameIndex].Time);
+
 		_vector			vSourScale, vDestScale;
 		_vector			vSourRotation, vDestRotation;
 		_vector			vSourPosition, vDestPosition;
@@ -183,34 +135,28 @@ void CChannel::BlendingFrame(CChannel * pPrevChannel,_double TimeDelta,_bool IsL
 		vSourRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex].vRotation);
 		vSourPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex].vPosition);
 
-		if (m_iCurrentKeyFrameIndex == 0)
-		{
-			vDestScale = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vScale);
-			vDestRotation = XMLoadFloat4(&pPrevChannel->m_KeyFrames.back().vRotation);
-			vDestPosition = XMLoadFloat3(&pPrevChannel->m_KeyFrames.back().vPosition);
-		}
-		else
-		{
-			vDestScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vScale);
-			vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
-			vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
-		}
-		
+		vDestScale = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vScale);
+		vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
+		vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
 
-		
-		vScale = XMVectorLerp(vSourScale, vDestScale, (_float)Ratio);
+		vScale = XMVectorLerp(vSourScale, vDestScale,(_float)Ratio);
 		vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)Ratio);
 		vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)Ratio);
 		vPosition = XMVectorSetW(vPosition, 1.f);
 	}
 
-	TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+	vScale = XMVectorLerp(vBaseScale, vScale, (_float)fBlendRatio);
+	vRotation = XMQuaternionSlerp(vBaseRot, vRotation, (_float)fBlendRatio);
+	vPosition = XMVectorLerp(vBasePos, vPosition, (_float)fBlendRatio);
+	vPosition = XMVectorSetW(vPosition, 1.f);
+
+
+	_matrix TransformMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
 	m_pBone->Set_TransformMatrix(TransformMatrix);
 
-	
-
 }
+
 
 CChannel * CChannel::Create(HANDLE hFile, CModel * pModel)
 {

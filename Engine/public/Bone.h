@@ -21,6 +21,9 @@ public:
 	void Set_TransformMatrix(_fmatrix TransformMatrix) {
 		XMStoreFloat4x4(&m_TransformMatrix, TransformMatrix);
 	}
+	_matrix Get_TransformMatrix() {
+		return XMLoadFloat4x4(&m_TransformMatrix);
+	}
 
 	void Set_Parent(CBone* pBone) { m_pParent = pBone; Safe_AddRef(m_pParent); }
 public:

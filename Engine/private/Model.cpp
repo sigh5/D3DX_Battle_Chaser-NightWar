@@ -109,7 +109,7 @@ HRESULT CModel::Initialize(void * pArg)
 
 	return S_OK;
 }
-
+/*기본 애니메이션을 돌리고싶다.*/
 void CModel::Play_Animation(_double TimeDelta,_bool IsCombat)
 {
 	if (TYPE_NONANIM == m_eType)
@@ -122,8 +122,34 @@ void CModel::Play_Animation(_double TimeDelta,_bool IsCombat)
 		if (nullptr != pBone)
 			pBone->Compute_CombindTransformationMatrix();
 	}
+
 }
 
+/*부드럽게 애니메이션을 돌리고싶다*/
+void CModel::Play_BlendAnimation(_double TimeDelta, _bool IsCombat)
+{
+	if (TYPE_NONANIM == m_eType)
+		return;
+
+	if (m_fBlendCurTime < m_fBlendDuration)
+	{
+		_double fBlendRatio = m_fBlendCurTime / m_fBlendDuration;
+		m_Animations[m_iPreAnimIndex]->Update_Bones(TimeDelta, IsCombat);
+		m_Animations[m_iCurrentAnimIndex]->Update_Bones_Blend(TimeDelta, IsCombat, (_float)fBlendRatio);
+		m_fBlendCurTime += (_float)(TimeDelta);
+	}
+	else
+	{
+		m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta, IsCombat);
+	}
+
+
+	for (auto& pBone : m_Bones)
+	{
+		if (nullptr != pBone)
+			pBone->Compute_CombindTransformationMatrix();
+	}
+}
 
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)
 {
@@ -176,30 +202,6 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 
 
 	return S_OK;
-}
-
-void CModel::Set_Lerp(_uint iprevIndex, _uint iNextIndex,_double TimeDelta,_bool bIsLerp)
-{
-	if (TYPE_NONANIM == m_eType)
-		return;
-
-	if (bIsLerp == false)
-	{
-		m_Animations[m_iCurrentAnimIndex]->Update_Bones(TimeDelta, false);
-	}
-	else
-	{
-		m_Animations[iNextIndex]->InitLerp(m_Animations[iprevIndex]->Get_Channles(), TimeDelta, bIsLerp);
-	}
-
-
-	for (auto& pBone : m_Bones)
-	{
-		if (nullptr != pBone)
-			pBone->Compute_CombindTransformationMatrix();
-	}
-
-
 }
 
 _bool CModel::Get_Finished(_uint iAnimIndex)
@@ -351,6 +353,15 @@ void CModel::Imgui_RenderProperty()
 
 void CModel::Set_AnimIndex(_uint iAnimIndex)
 {
+	
+	if (m_iCurrentAnimIndex != iAnimIndex)
+	{
+		// 이전 애니메이션 번호와 현재 거를 보관한다.
+		m_iPreAnimIndex = m_iCurrentAnimIndex;
+		m_fBlendCurTime = 0.f;
+		// 바뀔떄 블랜딩 시간을 초기화한다.
+	}
+
 	m_iCurrentAnimIndex = iAnimIndex;
 }
 
@@ -374,7 +385,6 @@ void CModel::Set_AnimName(char * pAnimName )
 	}
 	
 }
-
 
 HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 {

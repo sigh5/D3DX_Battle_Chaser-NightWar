@@ -14,13 +14,14 @@ public:
 	void			Set_DurationTime(_double Ratio);
 public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
-	void Update_TransformMatrix(_double PlayTime);
-	
+	void	Update_TransformMatrix(_double PlayTime);
+	void	Blend_TransformMatrix(_double PlayTime, _float fBlendRatio);
+
+
 	void Reset_KeyFrameIndex() { m_iCurrentKeyFrameIndex = 0;
 	m_KeyFrames[0] = m_OldFrame;}
 
-	void BlendingFrame(CChannel* pPrevChannel,_double TimeDelta, _bool IsLerp);
-
+	
 
 
 	const _uint Get_CurrentKeyFrameIndex()const { return m_iCurrentKeyFrameIndex; }

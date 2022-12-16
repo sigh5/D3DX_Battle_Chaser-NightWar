@@ -23,6 +23,7 @@ public:
 public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void    Update_Bones(_double TimeDelta, _bool IsCombat);
+	void	 Update_Bones_Blend(_double TimeDelta,_bool IsCombat ,_float fBlendRatio);
 
 public:
 	void		Set_TickPerSecond(_double TickPerSecond) {m_TickPerSecond = TickPerSecond;}
@@ -37,7 +38,7 @@ public:
 	void		Set_PlayTime() { m_PlayTime = 0.0; }
 	
 	/* 선형보관*/
-	void		InitLerp(vector<class CChannel*> Channels, _double TimeDelta, _bool IsLerp);
+	
 	vector<class CChannel*>&		Get_Channles() {return m_Channels;	}
 private:
 	char								m_szName[MAX_PATH];

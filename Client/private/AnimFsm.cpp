@@ -339,7 +339,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		})
 			.Tick([this](_double TimeDelta)
 		{
-			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
+			static_cast<CHero_Garrison*>(m_pTarget)->Combat_BlendAnimTick(TimeDelta);
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
