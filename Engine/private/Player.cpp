@@ -46,8 +46,11 @@ HRESULT CPlayer::Last_Initialize()
 
 void CPlayer::Tick(_double TimeDelta)
 {
-	LookAtTarget();
-	ChaseTarget(TimeDelta);
+
+	/* 수정 필요*/
+
+	LookAtTarget(TimeDelta);
+	//ChaseTarget(TimeDelta);
 
 }
 
@@ -80,8 +83,7 @@ void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 }
 
 void CPlayer::ChaseTarget(_double TimeDelta)
-{
-	
+{	
 	if (nullptr == m_pTargetPlayer)
 		return;
 
@@ -93,7 +95,9 @@ void CPlayer::ChaseTarget(_double TimeDelta)
 		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 2.5f);
 	
 	if (m_isStop)
+	{
 		m_pTransformCom->Chase(vTargetPos, TimeDelta, 2.5f);
+	}
 	else
 		m_iAnimIndex = 0;
 	
@@ -101,7 +105,7 @@ void CPlayer::ChaseTarget(_double TimeDelta)
 
 
 
-void CPlayer::LookAtTarget()
+void CPlayer::LookAtTarget(_double TimeDelta)
 {
 	if (m_pTargetPlayer == nullptr )
 		return;
@@ -120,9 +124,17 @@ void CPlayer::LookAtTarget()
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight)*vScale.x );
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp)*vScale.y);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook)*vScale.z);
+	_vector vTargetPos = m_pTargetPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 
+	if (m_bIsSwap == true)
+		return;
+	else if (!m_bIsSwap && !m_isStop)
+		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 2.5f);
 
-
+	if (m_isStop)
+		m_pTransformCom->Go_Straight(TimeDelta);
+	else
+		m_iAnimIndex = 0;
 }
 
 _bool CPlayer::IsCaptin()
@@ -258,7 +270,7 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 			m_iAnimIndex = 1;
 			m_fMoveSpeedRatio = 0.5f;
 		}
-		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, pNavigation);
+		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, nullptr);
 
 		return true;
 	}

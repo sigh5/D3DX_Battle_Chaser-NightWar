@@ -48,7 +48,6 @@ HRESULT CHero_Garrison::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 	
-	
 	m_bLast_Initlize = true;
 	return S_OK;
 }

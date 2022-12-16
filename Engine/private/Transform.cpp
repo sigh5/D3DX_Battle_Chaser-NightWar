@@ -278,6 +278,23 @@ _bool CTransform::JudgeChaseState(_fvector vTargetPos, _float fLimit)
 	return false;
 }
 
+void CTransform::Chase_Lerp(_fvector vTargetPos, _double TimeDelta, _float fLimit)
+{
+	//_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);	//현재 내위치
+	//_vector		vFrontTargetQueue = m_pTargetPosQueue.front();			//가야할 위치
+	//
+	//_vector		vDir = vFrontTargetQueue - vPosition;
+
+	//_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
+	//if (fDistance > fLimit)
+	//{
+	//	vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
+	//	Set_State(CTransform::STATE_TRANSLATION, vPosition);
+	//}
+
+
+}
+
 void CTransform::Go_Up(_double TimeDelta)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);

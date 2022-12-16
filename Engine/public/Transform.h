@@ -95,7 +95,9 @@ public:
 	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
 	_bool JudgeChaseState(_fvector vTargetPos, _float fLimit = 0.1f);
 
-	
+	void Chase_Lerp(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+
+
 
 public: /* for_UI*/
 	void Go_Up(_double TimeDelta);
@@ -109,8 +111,12 @@ private:
 	_float4x4				m_ParentAndChildWorldMatrix;
 	TRANSFORMDESC			m_TransformDesc;
 
+	std::queue<_vector>		m_pTargetPosQueue;
+	_float					m_fChaseLerpFixTimer = 0.1f;
+	_float					m_fChaseLerpTimer = 0.0f;
 private:
 	CTransform*				m_pParentTransfrom = nullptr;
+	
 
 
 public:

@@ -65,13 +65,15 @@ public: /*For.Imgui*/
 
 private:
 	void	ChaseTarget(_double TimeDelta);
-	void	LookAtTarget();
+	void	LookAtTarget(_double TimeDelta);
 
 protected:
 	PLAYERDESC						m_PlayerDesc;
 	MAPTYPE							m_ePlayerType = DUNGEON_PLAYER;
 	_bool							m_bControlKeyInput = false;
 	
+	
+
 protected:
 	_uint							m_bFinishOption = 0;
 	_uint							m_iOldAnim = 0;

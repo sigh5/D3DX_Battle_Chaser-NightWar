@@ -33,7 +33,7 @@ HRESULT CCamera_Static::Initialize(void * pArg)
 		memcpy(&CameraDesc, pArg, sizeof(CAMERADESC));
 	else
 	{
-		CameraDesc.vEye = _float4(0.f, 20.f, -10.f, 1.f);
+		CameraDesc.vEye = _float4(0.f, 15.f, -8.f, 1.f);
 		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
 		CameraDesc.fMouse_sensitivity = 0.1f;
@@ -80,6 +80,14 @@ HRESULT CCamera_Static::Last_Initialize()
 
 	assert(m_pCurTaget != nullptr && " CCamera_Static::Last_Initialize");
 
+
+	_vector vTargetPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vCamPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+	
+	m_CameraEyeZ =	fabs(XMVectorGetZ(vTargetPos) - XMVectorGetZ(vCamPos));
+
+
 	RELEASE_INSTANCE(CPlayerController);
 	m_bLast_Initlize = true;
 	
@@ -117,32 +125,34 @@ HRESULT CCamera_Static::Update_CameraLookPos(_double TimeDelta)
 	if (hr == E_FAIL)
 		assert("Error");
 
-	/*if (lstrcmp(pPlayer->Get_ObjectName(), m_pCurTaget->Get_ObjectName()))
+	ImGui::InputFloat("LerpTime", &m_fLerpTime);
+
+	if (lstrcmp(pPlayer->Get_ObjectName(), m_pCurTaget->Get_ObjectName()))
 	{
 		m_bLerp = true;
 	}
 
 	if (!m_bLerp)
-	{*/
-	//	m_pCurTaget = pPlayer;
+	{
+		m_pCurTaget = pPlayer;
 		NormalCameraActive();
-	//}
-	//else			// 0.2 초가 적당하다.
-	//{
-	//	m_fLerpTimer += (_float)(TimeDelta* 1.f);
-	//	if (m_fLerpTimer <= 2.f)
-	//	{
-	//		_double Ratio = m_fLerpTimer;
-	//		Lerp_CameraActive((_float)Ratio, pPlayer);
-	//	}
-	//	else
-	//	{
-	//		m_bLerp = false;
-	//		m_fLerpTimer = 0.f;
-	//		m_pCurTaget = pPlayer;
-	//	}
+	}
+	else			// 0.2 초가 적당하다.
+	{
+		_vector vNewTargetPos = pPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 
-	//}
+
+		m_fLerpTimer += (_float)TimeDelta;
+		if (m_fLerpTimer >= m_fLerpTime)
+		{
+			m_bLerp = false;
+			m_fLerpTimer = 0.f;
+			m_pCurTaget = pPlayer;
+		}
+		else
+			Lerp_CameraActive(m_fLerpTimer, pPlayer);
+
+	}
 	
 
 	return S_OK;
@@ -157,37 +167,38 @@ void CCamera_Static::NormalCameraActive()
 	_float4 PlayerVecotr;
 	XMStoreFloat4(&PlayerVecotr, vPlayerPos);
 
+	_float4 vNewCam;
+	XMStoreFloat4(&vNewCam, CameraPos);
 
-	PlayerVecotr.x += m_CameraDistanceX;
-	PlayerVecotr.y += m_CameraDistanceY;
-	PlayerVecotr.z -= m_CameraDistanceZ;
+	vNewCam.x = XMVectorGetX(vPlayerPos);
+	vNewCam.z = XMVectorGetZ(vPlayerPos) - m_CameraEyeZ;
 
-
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vNewCam));
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
-
 }
 
-void CCamera_Static::Lerp_CameraActive(_float Ratio, CPlayer* pCurCaptin)
+void CCamera_Static::Lerp_CameraActive(_float LerpTime, CPlayer* pNewCaptin)
 {
 	_vector vPrevCapPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-	_vector vCurCapPos = pCurCaptin->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vNewCapPos = pNewCaptin->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 	_vector CameraPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
-	_vector vLerpVector = XMVectorLerp(vCurCapPos,vPrevCapPos, Ratio);
-	_vector vLook = vLerpVector - CameraPos;
+	_vector vPrevLook = vPrevCapPos - CameraPos;
+	_vector vNewLook  = vNewCapPos  - CameraPos;
 
-	_float4 PlayerVecotr;
-	XMStoreFloat4(&PlayerVecotr, vLerpVector);
+	_float Ratio = LerpTime / m_fLerpTime;
+	_vector vCameraPos = XMVectorLerp(vPrevCapPos, vNewCapPos, Ratio);
 
-	PlayerVecotr.x += m_CameraDistanceX;
-	PlayerVecotr.y += m_CameraDistanceY;
-	PlayerVecotr.z -= m_CameraDistanceZ;
+	_float4 vNewCam;
+	XMStoreFloat4(&vNewCam, CameraPos);
+	vNewCam.x = XMVectorGetX(vCameraPos);
+	vNewCam.z = XMVectorGetZ(vCameraPos) - m_CameraEyeZ;
 
 
-	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&PlayerVecotr));
-
+	_vector vNewLerpLook = XMVectorLerp(vPrevLook, vNewLook, Ratio);
+	
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vNewCam));
+	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vNewLerpLook));
 }
 
 CCamera_Static * CCamera_Static::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

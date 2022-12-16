@@ -35,7 +35,7 @@ private:
 	HRESULT Update_CameraLookPos(_double TimeDelta);
 
 	void	NormalCameraActive();
-	void	Lerp_CameraActive(_float Ratio,CPlayer* pCurCaptin);
+	void	Lerp_CameraActive(_float LerpTime,CPlayer* pCurCaptin);
 
 private:
 	CPlayer*				m_pCurTaget = nullptr;
@@ -43,12 +43,14 @@ private:
 
 private:
 	_float					m_CameraDistanceX = 0.f;
-	_float					m_CameraDistanceY = 15.f;
-	_float					m_CameraDistanceZ = 15.f;
+	_float					m_CameraEyeY = 0.f;
+	_float					m_CameraEyeZ = 0.f;
 
+	
+					
 
 	_float					m_fLerpTimer = 0.0f;
-	_float					m_fLerpTime = 2.f;
+	_float					m_fLerpTime = 0.3f;
 	_bool					m_bLerp = false;
 
 

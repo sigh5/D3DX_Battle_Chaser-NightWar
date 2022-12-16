@@ -80,7 +80,7 @@ HRESULT CLevel_GamePlay::Render()
 void CLevel_GamePlay::Dungeon_Controll_Tick(_double TimeDelta)
 {
 	m_pPlayerController->Set_CaptinPlayer();
-	m_pPlayerController->SyncAninmation();
+	m_pPlayerController->SyncAninmation();	//->여건 내가 맞춰야겠다.
 
 }
 
