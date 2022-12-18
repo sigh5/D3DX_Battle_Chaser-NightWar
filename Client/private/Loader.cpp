@@ -213,9 +213,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Forest_Maps"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
 
@@ -259,18 +260,18 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	///* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Knolan::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
-		CHero_Garrison::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Calibretto */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
-		CHero_Calibretto::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	/////* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	//	CHero_Knolan::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
+	//	CHero_Garrison::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Calibretto */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
+	//	CHero_Calibretto::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 	/* For.Prototype_GameObject_BaseCanvas */
