@@ -177,6 +177,7 @@
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\CombatController.h" />
+    <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
+    <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />

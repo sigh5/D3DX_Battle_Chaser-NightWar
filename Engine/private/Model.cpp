@@ -8,6 +8,10 @@
 #include "Animation.h"
 #include "GameUtils.h"
 #include <string>
+
+#include "ImGuizmo.h"
+#include "GameInstance.h"
+
 CModel::CModel(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -27,7 +31,11 @@ CModel::CModel(const CModel & rhs)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
 	, m_pCameraBone(rhs.m_pCameraBone)
+	
 {
+
+	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
+
 	//Test ¾èÀºº¹»ç
 	for (auto& m_Bones : m_Bones)
 	{
@@ -87,12 +95,12 @@ HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePat
 		pMesh->LoadFile(hFile,this);
 	}
 
+	
 	if (FAILED(Ready_Animation(hFile)))		// ±íÀº º¹»ç ÇÊ¿ä
-		return E_FAIL;
+			return E_FAIL;
+	
 
-
-	if (FAILED(Ready_CameraBone()))
-		return E_FAIL;
+	
 
 
 
@@ -106,6 +114,11 @@ HRESULT CModel::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
 
+//#ifndef DEBUG
+//	XMStoreFloat4x4(&m_ImguiPivotMatrix, XMMatrixIdentity());
+//#endif // !DEBUG
+//
+	
 
 	return S_OK;
 }
@@ -190,12 +203,11 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 		if (nullptr != pBoneConstantName)
 		{
 			_float4x4		BoneMatrices[256];
-
 			m_Meshes[iMeshIndex]->SetUp_BoneMatrices(BoneMatrices, XMLoadFloat4x4(&m_PivotMatrix));
-
 			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 256);
 		}
 
+		
 		pShader->Begin(iShaderIndex);
 		m_Meshes[iMeshIndex]->Render();
 	}
@@ -254,10 +266,11 @@ void CModel::Imgui_RenderProperty()
 		{
 			for (auto& bone : m_Bones)
 			{
-				if (bone != nullptr)
-				{
+				strcpy_s(szBoneTag, MAX_PATH, bone->Get_Name());
 
-					strcpy_s(szBoneTag, MAX_PATH,bone->Get_Name());
+				if (ImGui::Selectable(szBoneTag))
+				{
+					m_pSelectedBone = bone;
 					ImGui::Text(szBoneTag);
 				}
 			}
@@ -292,32 +305,34 @@ void CModel::Imgui_RenderProperty()
 		ImGui::TreePop();
 	}
 
-	string str = "Current Anim Index :" +  to_string(m_iCurrentAnimIndex);
-	strcpy_s(m_imguiAnimName,MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
+	if (!m_Animations.size() ==0 )
+	{ 
+		string str = "Current Anim Index :" + to_string(m_iCurrentAnimIndex);
+		strcpy_s(m_imguiAnimName, MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
 
-	ImGui::Text(str.c_str());
-	ImGui::Text(m_imguiAnimName);
+		ImGui::Text(str.c_str());
+		ImGui::Text(m_imguiAnimName);
 
-	_double iTickPerSecond =	m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
-	char szTickPerSecond[MAX_PATH];
-	strcpy_s(szTickPerSecond,MAX_PATH, to_string(iTickPerSecond).c_str());
-	ImGui::Text(szTickPerSecond);
-	/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
-	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
-*/
+		_double iTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+		char szTickPerSecond[MAX_PATH];
+		strcpy_s(szTickPerSecond, MAX_PATH, to_string(iTickPerSecond).c_str());
+		ImGui::Text(szTickPerSecond);
+		/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
+	*/
 
-	_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
-	char szDurationSecond[MAX_PATH];
-	string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
-	strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
-	ImGui::Text(str2.c_str());
-	ImGui::Text(szDurationSecond);
+		_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
+		char szDurationSecond[MAX_PATH];
+		string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
+		strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
+		ImGui::Text(str2.c_str());
+		ImGui::Text(szDurationSecond);
 
 
-	 int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
-	ImGui::Text("FrameIndex : %d", iFrameIndex);
+		int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
+		ImGui::Text("FrameIndex : %d", iFrameIndex);
 	
-
+	}
 	_uint iMeshNum = 0;
 	if (ImGui::TreeNode("MeshName"))
 	{
@@ -343,11 +358,104 @@ void CModel::Imgui_RenderProperty()
 		ImGui::TreePop();
 	}
 
-	
+	Imgui_Gizmo_Bone();
 
 
 
 	ImGui::End();
+
+}
+
+void CModel::Imgui_Gizmo_Bone()
+{
+	if (m_pSelectedBone == nullptr)
+		return;
+
+	ImGuizmo::BeginFrame();
+	static float snap[3] = { 1.f, 1.f, 1.f };
+	static ImGuizmo::OPERATION mCurrentGizmoOperation(ImGuizmo::ROTATE);
+	static ImGuizmo::MODE mCurrentGizmoMode(ImGuizmo::WORLD);
+	if (ImGui::IsKeyPressed(90))
+		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	if (ImGui::IsKeyPressed(69))
+		mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	if (ImGui::IsKeyPressed(82)) // r Key
+		mCurrentGizmoOperation = ImGuizmo::SCALE;
+	if (ImGui::RadioButton("Translate", mCurrentGizmoOperation == ImGuizmo::TRANSLATE))
+		mCurrentGizmoOperation = ImGuizmo::TRANSLATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Rotate", mCurrentGizmoOperation == ImGuizmo::ROTATE))
+		mCurrentGizmoOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Scale", mCurrentGizmoOperation == ImGuizmo::SCALE))
+		mCurrentGizmoOperation = ImGuizmo::SCALE;
+
+	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
+	
+	_float4x4		TransMatrix;
+	XMStoreFloat4x4(&TransMatrix, m_pSelectedBone->Get_TransformMatrix());
+
+	ImGuizmo::DecomposeMatrixToComponents(reinterpret_cast<float*>(&TransMatrix), matrixTranslation, matrixRotation, matrixScale);
+	ImGui::InputFloat3("Translate", matrixTranslation);
+	ImGui::InputFloat3("Rotate", matrixRotation);
+	ImGui::InputFloat3("Scale", matrixScale);
+	ImGuizmo::RecomposeMatrixFromComponents(matrixTranslation, matrixRotation, matrixScale, reinterpret_cast<float*>(&TransMatrix));
+
+	if (mCurrentGizmoOperation != ImGuizmo::SCALE)
+	{
+		if (ImGui::RadioButton("Local", mCurrentGizmoMode == ImGuizmo::LOCAL))
+			mCurrentGizmoMode = ImGuizmo::LOCAL;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("World", mCurrentGizmoMode == ImGuizmo::WORLD))
+			mCurrentGizmoMode = ImGuizmo::WORLD;
+	}
+
+	static bool useSnap(false);
+	if (ImGui::IsKeyPressed(83))
+		useSnap = !useSnap;
+	ImGui::Checkbox("##something", &useSnap);
+	ImGui::SameLine();
+	switch (mCurrentGizmoOperation)
+	{
+	case ImGuizmo::TRANSLATE:
+		ImGui::InputFloat3("Snap", &snap[0]);
+		break;
+	case ImGuizmo::ROTATE:
+		ImGui::InputFloat("Angle Snap", &snap[0]);
+		break;
+	case ImGuizmo::SCALE:
+		ImGui::InputFloat("Scale Snap", &snap[0]);
+		break;
+	}
+
+	ImGuiIO& io = ImGui::GetIO();
+	RECT rt;
+	GetClientRect(CGameInstance::GetInstance()->GetHWND(), &rt);
+	POINT lt{ rt.left, rt.top };
+	ClientToScreen(CGameInstance::GetInstance()->GetHWND(), &lt);
+	ImGuizmo::SetRect((_float)lt.x, (_float)lt.y, io.DisplaySize.x, io.DisplaySize.y);
+
+	_float4x4 matView, matProj;
+	XMStoreFloat4x4(&matView, CGameInstance::GetInstance()->Get_TransformMatrix(CPipeLine::D3DTS_VIEW));
+	XMStoreFloat4x4(&matProj, CGameInstance::GetInstance()->Get_TransformMatrix(CPipeLine::D3DTS_PROJ));
+
+	ImGuizmo::Manipulate(
+		reinterpret_cast<float*>(&matView),
+		reinterpret_cast<float*>(&matProj),
+		mCurrentGizmoOperation,
+		mCurrentGizmoMode,
+		reinterpret_cast<float*>(&TransMatrix),
+		nullptr, useSnap ? &snap[0] : nullptr);
+
+
+
+	m_pSelectedBone->Set_TransformMatrix(XMLoadFloat4x4(&TransMatrix));
+
+	for (auto& pBone : m_Bones)
+	{
+		if (pBone != nullptr)
+			pBone->Compute_CombindTransformationMatrix();
+	}
 
 }
 

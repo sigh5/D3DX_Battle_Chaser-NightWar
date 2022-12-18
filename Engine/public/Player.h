@@ -94,7 +94,7 @@ private:
 	CGameObject*			m_pTargetPlayer = nullptr;
 	_bool					m_bIsSwap = false;
 	_bool					m_isStop = false;
-
+	_bool					m_bIsWalk = false;
 
 
 

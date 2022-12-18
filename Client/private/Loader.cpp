@@ -16,6 +16,8 @@
 
 #include "BackGround.h"
 #include "MainLogo.h"
+#include "DungeonMaps.h"
+
 
 #include "ClientBaseCanvas.h"
 #include "TurnUICanvas.h"
@@ -179,10 +181,17 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_Dungeon//UI_Dungeon_%d.png"), CTexture::TYPE_END, 16))))
 		return E_FAIL;
 
-	/*For.Water*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Water_WaterFall"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/FBX/WaterFall/WaterFall_%d.png"), CTexture::TYPE_END,2))))
+
+	/* For.Prototype_Component_Texture_UITrunCharUI */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_COmbatScene"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/CombatScene//BG_Forest_%d.png"), CTexture::TYPE_END, 6))))
 		return E_FAIL;
+
+
+	///*For.Water*/
+	//if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Water_WaterFall"),
+	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/FBX/WaterFall/WaterFall_%d.png"), CTexture::TYPE_END,2))))
+	//	return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 	/* For.Prototype_Component_VIBuffer_Terrain */
@@ -205,8 +214,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 	/* Model */
 	
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
-
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("AllModels"), LEVEL_GAMEPLAY);
+	
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Forest_Maps"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
 
@@ -250,7 +259,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Gully */
+	///* For.Prototype_GameObject_Hero_Gully */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 		CHero_Knolan::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -290,10 +299,21 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
+	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMaps"),
+		CDungeonMaps::Create(m_pDevice, m_pContext))))
+		return E_FAIL;*/
+
+
 	/* For.Prototype_GameObject_NoneAnim */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
 		CNoneAnim_BG::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	/* For.Prototype_GameObject_NoneAnim */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMap"),
+		CDungeonMaps::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WaterTile"),
 		CWaterTile::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -328,8 +348,11 @@ HRESULT CLoader::Loading_Combat()
 
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
+	
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MT"), LEVEL_COMBAT);
 	
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Forest_Combats"), LEVEL_GAMEPLAY);
+
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
 

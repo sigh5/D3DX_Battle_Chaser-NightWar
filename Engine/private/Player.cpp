@@ -48,7 +48,6 @@ void CPlayer::Tick(_double TimeDelta)
 {
 
 	/* 수정 필요*/
-
 	LookAtTarget(TimeDelta);
 	//ChaseTarget(TimeDelta);
 
@@ -84,7 +83,7 @@ void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 
 void CPlayer::ChaseTarget(_double TimeDelta)
 {	
-	if (nullptr == m_pTargetPlayer)
+	/*if (nullptr == m_pTargetPlayer)
 		return;
 
 	_vector vTargetPos = m_pTargetPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
@@ -93,14 +92,16 @@ void CPlayer::ChaseTarget(_double TimeDelta)
 		return;
 	else if (!m_bIsSwap && !m_isStop)
 		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 2.5f);
-	
+
 	if (m_isStop)
 	{
+		if(m_pTargetPlayer->m_bIsWalk)
+
 		m_pTransformCom->Chase(vTargetPos, TimeDelta, 2.5f);
 	}
 	else
 		m_iAnimIndex = 0;
-	
+	*/
 }
 
 
@@ -129,10 +130,15 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 	if (m_bIsSwap == true)
 		return;
 	else if (!m_bIsSwap && !m_isStop)
-		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 2.5f);
+		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 3.f);
 
 	if (m_isStop)
-		m_pTransformCom->Go_Straight(TimeDelta);
+	{
+		if(static_cast<CPlayer*>(m_pTargetPlayer)->m_bIsWalk)
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 2.5f);
+		else
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.f, 2.5f);
+	}	
 	else
 		m_iAnimIndex = 0;
 }
@@ -264,11 +270,13 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 		{
 			m_iAnimIndex = 2;
 			m_fMoveSpeedRatio = 1.f;
+			m_bIsWalk = false;
 		}
 		else
 		{
 			m_iAnimIndex = 1;
-			m_fMoveSpeedRatio = 0.5f;
+			m_fMoveSpeedRatio = 0.5f;	
+			m_bIsWalk = true;
 		}
 		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, nullptr);
 

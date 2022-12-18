@@ -95,7 +95,7 @@ public:
 	void Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
 	_bool JudgeChaseState(_fvector vTargetPos, _float fLimit = 0.1f);
 
-	void Chase_Lerp(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+	void Chase_Speed(_fvector vTargetPos, _double TimeDelta,_float fSpeedRatio ,_float fLimit = 0.1f);
 
 
 

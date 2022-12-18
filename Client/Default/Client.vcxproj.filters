@@ -112,6 +112,9 @@
     <Filter Include="02.GameObjects\Monster\MonsterFsm">
       <UniqueIdentifier>{22474feb-2d12-4cc7-9d7a-a25264537187}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\DungeonMaps">
+      <UniqueIdentifier>{30604179-3c24-49ae-a533-92455e4bed0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -231,6 +234,9 @@
     <ClInclude Include="..\Public\MonsterFsm.h">
       <Filter>02.GameObjects\Monster\MonsterFsm</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DungeonMaps.h">
+      <Filter>02.GameObjects\DungeonMaps</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -337,6 +343,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MonsterFsm.cpp">
       <Filter>02.GameObjects\Monster\MonsterFsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DungeonMaps.cpp">
+      <Filter>02.GameObjects\DungeonMaps</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

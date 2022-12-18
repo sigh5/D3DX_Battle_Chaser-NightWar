@@ -44,6 +44,7 @@ public:
 	
 public: /*For.Imgui*/
 	virtual void Imgui_RenderProperty() override;
+	void		 Imgui_Gizmo_Bone();
 
 
 public: /*For.Animation*/
@@ -89,6 +90,8 @@ private: /*For.Imgui*/
 	_double								m_iTickPerSecond = 0.0;
 	char								m_imguiAnimName[MAX_PATH] = "";
 	_uint								m_iNoRenderIndex = 999;
+	class CBone*						m_pSelectedBone = nullptr;
+//	_float4x4							m_ImguiPivotMatrix;
 
 private:
 	char								m_szModelPath[MAX_PATH] = "";

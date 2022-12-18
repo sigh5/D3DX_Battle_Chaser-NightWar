@@ -25,6 +25,13 @@ public:
 		return XMLoadFloat4x4(&m_TransformMatrix);
 	}
 
+	void	Set_CombindMatrix(_fmatrix CombindMaxtrix)
+	{
+		XMStoreFloat4x4(&m_CombindTransformMatrix, CombindMaxtrix);
+	}
+
+
+
 	void Set_Parent(CBone* pBone) { m_pParent = pBone; Safe_AddRef(m_pParent); }
 public:
 	HRESULT Initialize(class CModel* pModel, HANDLE hFile);

@@ -139,14 +139,6 @@ HRESULT CMesh::Ready_VertexBuffer_NonAnimModel(HANDLE hFile, CModel * pModel)
 {
 	DWORD   dwByte = 0;
 
-	VTXMODEL*	 	pVertices = new VTXMODEL[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXMODEL) * m_iNumVertices);
-
-	for (_uint i = 0; i < m_iNumVertices; ++i)
-	{
-		ReadFile(hFile, &pVertices[i], sizeof(VTXMODEL), &dwByte, nullptr);
-	}
-
 	m_iStride = sizeof(VTXMODEL);
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
@@ -156,6 +148,15 @@ HRESULT CMesh::Ready_VertexBuffer_NonAnimModel(HANDLE hFile, CModel * pModel)
 	m_BufferDesc.StructureByteStride = m_iStride;
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
+
+
+	VTXMODEL*	 	pVertices = new VTXMODEL[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXMODEL)*m_iNumVertices);
+
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+	{
+		ReadFile(hFile, &pVertices[i], sizeof(VTXMODEL), &dwByte, nullptr);
+	}
 
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
