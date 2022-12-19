@@ -278,7 +278,7 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 			m_fMoveSpeedRatio = 0.5f;	
 			m_bIsWalk = true;
 		}
-		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, nullptr);
+		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, pNavigation);
 
 		return true;
 	}

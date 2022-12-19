@@ -49,17 +49,11 @@
     <Filter Include="02.GameObjects\LogoBackGround">
       <UniqueIdentifier>{736b5dd5-5d59-4789-adeb-42fe0c8ccf73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\LogoBackGround\BackGround">
-      <UniqueIdentifier>{4802a01c-abcc-4482-81b4-37cfe572eb1d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\LogoBackGround\Logo">
       <UniqueIdentifier>{0a4bf59e-658b-4782-aac3-26d8f8b3bdef}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\LogoBackGround\LoadingImage">
       <UniqueIdentifier>{63b8bfc7-7ca1-4ca0-a575-b02f59be3c5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround">
-      <UniqueIdentifier>{7a8efa89-8fd5-4af5-983c-7a9e4a0592b5}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObjects\UI\TrunBattle">
       <UniqueIdentifier>{fd606b99-856d-4b8e-bc88-302cd8a94fd2}</UniqueIdentifier>
@@ -115,6 +109,15 @@
     <Filter Include="02.GameObjects\DungeonMaps">
       <UniqueIdentifier>{30604179-3c24-49ae-a533-92455e4bed0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\SkyBox">
+      <UniqueIdentifier>{93e4a22a-19a3-4915-8dc9-23c11a20eafc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\LoadingImage\BackGround">
+      <UniqueIdentifier>{4802a01c-abcc-4482-81b4-37cfe572eb1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\LoadingImage\BackGround\NoAnimBackGround">
+      <UniqueIdentifier>{7a8efa89-8fd5-4af5-983c-7a9e4a0592b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -151,7 +154,7 @@
       <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BackGround.h">
-      <Filter>02.GameObjects\LogoBackGround\BackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage\BackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Terrain.h">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -169,7 +172,7 @@
       <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
     </ClInclude>
     <ClInclude Include="..\public\NoneAnim_BG.h">
-      <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage\BackGround\NoAnimBackGround</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TurnUICanvas.h">
       <Filter>02.GameObjects\UI\TrunBattle\TurnUICanvas</Filter>
@@ -237,6 +240,12 @@
     <ClInclude Include="..\Public\DungeonMaps.h">
       <Filter>02.GameObjects\DungeonMaps</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SkyBox.h">
+      <Filter>02.GameObjects\SkyBox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h">
+      <Filter>97.ShaderFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -261,7 +270,7 @@
       <Filter>01.Levels\00.Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BackGround.cpp">
-      <Filter>02.GameObjects\LogoBackGround\BackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage\BackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Terrain.cpp">
       <Filter>02.GameObjects\Terrain</Filter>
@@ -279,7 +288,7 @@
       <Filter>02.GameObjects\LogoBackGround\LoadingImage</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\NoneAnim_BG.cpp">
-      <Filter>02.GameObjects\LogoBackGround\BackGround\NoAnimBackGround</Filter>
+      <Filter>02.GameObjects\LogoBackGround\LoadingImage\BackGround\NoAnimBackGround</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TurnUICanvas.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TurnUICanvas</Filter>
@@ -347,6 +356,9 @@
     <ClCompile Include="..\Private\DungeonMaps.cpp">
       <Filter>02.GameObjects\DungeonMaps</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SkyBox.cpp">
+      <Filter>02.GameObjects\SkyBox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -371,9 +383,6 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCubeTex.hlsl">
-      <Filter>97.ShaderFiles</Filter>
-    </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
@@ -381,6 +390,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCubeTex.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

@@ -54,6 +54,8 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 	if (!m_bCameraActive)
 		return;
 
+	__super::Tick(TimeDelta);
+
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 
@@ -118,7 +120,7 @@ void CCamera_Dynamic::Tick(_double TimeDelta)
 	RELEASE_INSTANCE(CGameInstance);
 
 
-	__super::Tick(TimeDelta);
+	
 }
 
 void CCamera_Dynamic::Late_Tick(_double TimeDelta)

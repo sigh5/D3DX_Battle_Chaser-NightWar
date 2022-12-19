@@ -281,7 +281,7 @@ _float4 CVI_Buffer_Terrain::PickingTerrain(HWND hWnd, CTransform * pCubeTransCom
 	return _float4(0.f,0.f,0.f,0.f);
 }
 
-_bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _float4 &vPosition)
+_bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _float4 *vPosition)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
 
@@ -343,10 +343,10 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 				fDist))
 			{
 			
-				vPosition.x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x)/3.f;
-				vPosition.y = 0.f;
-				vPosition.z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
-				vPosition.w = 1.f;
+				vPosition->x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x)/3.f;
+				vPosition->y = 0.f;
+				vPosition->z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
+				vPosition->w = 1.f;
 				return  true;
 			}
 
@@ -363,10 +363,10 @@ _bool CVI_Buffer_Terrain::PickingBuffer(HWND hWnd, CTransform * pCubeTransCom, _
 				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
 				fDist))
 			{
-				vPosition.x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x) / 3.f;
-				vPosition.y = 0.f;
-				vPosition.z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
-				vPosition.w = 1.f;
+				vPosition->x = (m_pVtx[dwVtxIdx[0]].x + m_pVtx[dwVtxIdx[1]].x + m_pVtx[dwVtxIdx[2]].x) / 3.f;
+				vPosition->y = 0.f;
+				vPosition->z = (m_pVtx[dwVtxIdx[0]].z + m_pVtx[dwVtxIdx[1]].z + m_pVtx[dwVtxIdx[2]].z) / 3.f;
+				vPosition->w = 1.f;
 				return  true;
 			}
 		}
@@ -476,6 +476,195 @@ _bool CVI_Buffer_Terrain::PickingRetrunIndex(HWND hWnd, CTransform * pCubeTransC
 
 	return false;
 
+}
+
+_bool CVI_Buffer_Terrain::PickingNavi(HWND hWnd, CTransform * pCubeTransCom, _float4& vPosition)
+{
+	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
+
+	POINT		ptMouse{};
+
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	_float4		vPoint;
+
+	D3D11_VIEWPORT		ViewPort;
+	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
+	ViewPort.Width = 1280;
+	ViewPort.Height = 720;
+
+	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
+	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
+	vPoint.z = 1.f;
+	vPoint.w = 1.f;
+
+	_matrix		matProj;
+	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
+
+	_matrix		matView;
+	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
+
+	_float4		vRayPos;
+	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
+	_float4		vRayDir;
+	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
+
+
+	_matrix		matWorld;
+	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
+	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
+	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
+
+	RELEASE_INSTANCE(CGameInstance);
+	_ulong	dwVtxIdx[3]{};
+	_float fDist;
+
+	for (_ulong i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_ulong j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_ulong dwIndex = i * (m_iNumVerticesX)+j;
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + (m_iNumVerticesX)+1;
+			dwVtxIdx[2] = dwIndex + 1;
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+
+				_vector vPos = XMLoadFloat4(&vRayPos) + XMVector3Normalize(XMLoadFloat4(&vRayDir))* fDist;
+
+				XMStoreFloat4(&vPosition, vPos);
+
+				return  true;
+			}
+
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + 1;
+			dwVtxIdx[2] = dwIndex;
+
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+				_vector vPos = XMLoadFloat4(&vRayPos) + XMVector3Normalize(XMLoadFloat4(&vRayDir))* fDist;
+
+				XMStoreFloat4(&vPosition, vPos);
+				return true;
+			}
+		}
+	}
+
+
+	return false;
+}
+
+_bool CVI_Buffer_Terrain::Picking_Index(HWND hWnd, class CTransform * pCubeTransCom, _float4* fIndexs)
+{
+	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
+
+	POINT		ptMouse{};
+
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	_float4		vPoint;
+
+	D3D11_VIEWPORT		ViewPort;
+	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
+	ViewPort.Width = 1280;
+	ViewPort.Height = 720;
+
+
+	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
+	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
+	vPoint.z = 1.f;
+	vPoint.w = 1.f;
+
+	_matrix		matProj;
+	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
+
+	_matrix		matView;
+	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
+
+	_float4		vRayPos;
+	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
+	_float4		vRayDir;
+	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
+
+
+	_matrix		matWorld;
+	matWorld = pCubeTransCom->Get_WorldMatrix_Inverse();
+	XMVector3TransformCoord(XMLoadFloat4(&vRayPos), matWorld);
+	XMVector3TransformNormal(XMLoadFloat4(&vRayDir), matWorld);
+
+	RELEASE_INSTANCE(CGameInstance);
+	_ulong	dwVtxIdx[3]{};
+	_float fDist;
+
+	for (_ulong i = 0; i < m_iNumVerticesZ - 1; ++i)
+	{
+		for (_ulong j = 0; j < m_iNumVerticesX - 1; ++j)
+		{
+			_ulong dwIndex = i * (m_iNumVerticesX)+j;
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + (m_iNumVerticesX)+1;
+			dwVtxIdx[2] = dwIndex + 1;
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+				// 여기서 바꿔야함
+				fIndexs[0] = m_pVtx[dwVtxIdx[0]];
+				fIndexs[1] = m_pVtx[dwVtxIdx[1]];
+				fIndexs[2] = m_pVtx[dwVtxIdx[2]];
+
+				return  true;
+			}
+
+
+			dwVtxIdx[0] = dwIndex + (m_iNumVerticesX);
+			dwVtxIdx[1] = dwIndex + 1;
+			dwVtxIdx[2] = dwIndex;
+
+
+			if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+				XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[1]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[0]]),
+				XMLoadFloat4(&m_pVtx[dwVtxIdx[2]]),
+				fDist))
+			{
+				fIndexs[0] = m_pVtx[dwVtxIdx[0]];
+				fIndexs[1] = m_pVtx[dwVtxIdx[1]];
+				fIndexs[2] = m_pVtx[dwVtxIdx[2]];
+				return  true;
+			}
+		}
+	}
+
+
+	return false;
 }
 
 CVI_Buffer_Terrain * CVI_Buffer_Terrain::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const wstring & terrainFilePath)

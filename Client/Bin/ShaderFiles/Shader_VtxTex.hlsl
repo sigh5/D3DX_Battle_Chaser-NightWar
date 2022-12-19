@@ -1,17 +1,9 @@
+#include "Shader_Client_Defines.h"
+
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_Texture;
 
-//sampler			DefaultSampler = sampler_state
-//{
-//
-//};
 
-sampler				LinearSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_LINEAR;		//D3D11_SAMPLER_DESC 참고
-	AddressU = CLAMP;	// 기본적으로 안적으면 CLamp가 기본이다.
-	AddressV = CLAMP;
-};
 
 BlendState			AlphaBlend
 {
@@ -86,7 +78,6 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-
 	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexUV);
 
 	
@@ -98,6 +89,9 @@ technique11 DefaultTechnique
 {
 	pass Rect
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;
@@ -109,7 +103,9 @@ technique11 DefaultTechnique
 	pass AlPhaBlend
 	{
 
-		SetBlendState(AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
+		//SetBlendState(AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;

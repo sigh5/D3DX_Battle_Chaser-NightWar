@@ -1,3 +1,6 @@
+
+#include "Shader_Client_Defines.h"
+
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 vector			g_vCamPosition;
@@ -18,20 +21,6 @@ vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 
 /* 지형 셰이딩*/
 texture2D		g_BrushTexture;
-
-sampler				LinearSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_LINEAR;		//D3D11_SAMPLER_DESC 참고
-	AddressU = WRAP;	// 기본적으로 안적으면 CLamp가 기본이다.
-	AddressV = WRAP;
-};
-
-sampler				PointSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_POINT;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
 
 
 struct VS_IN
@@ -113,6 +102,9 @@ technique11 DefaultTechnique
 {
 	pass Terrain
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;

@@ -31,7 +31,7 @@ public:
 
 #ifdef _DEBUG
 public:
-	HRESULT Render(class CShader* pShader);
+	HRESULT Render(class CShader* pShader, _uint iShaderPass=0);
 #endif
 
 private:

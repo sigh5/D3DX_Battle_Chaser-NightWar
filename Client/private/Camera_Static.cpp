@@ -84,8 +84,8 @@ HRESULT CCamera_Static::Last_Initialize()
 	_vector vTargetPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 	_vector vCamPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
-	
-	m_CameraEyeZ =	fabs(XMVectorGetZ(vTargetPos) - XMVectorGetZ(vCamPos));
+
+	m_CameraEyeZ = fabs(XMVectorGetZ(vTargetPos) - XMVectorGetZ(vCamPos));
 
 
 	RELEASE_INSTANCE(CPlayerController);

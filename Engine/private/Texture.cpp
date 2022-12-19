@@ -69,10 +69,7 @@ HRESULT CTexture::Initialize(void * pArg)
 
 HRESULT CTexture::Bind_ShaderResources(CShader * pShaderCom, const char * pConstantName)
 {
-	if (nullptr == pShaderCom)
-		return S_OK;
-
-	return pShaderCom->Set_ShaderResourceViewArray(pConstantName, m_pTextures, m_iNumTextures);;
+	return pShaderCom->Set_ShaderResourceViewArray(pConstantName, m_pTextures, m_iNumTextures);
 }
 
 HRESULT CTexture::Bind_ShaderResource(CShader * pShaderCom, const char * pConstantName, _uint iTextureIndex)

@@ -1,3 +1,6 @@
+
+#include "Shader_Client_Defines.h"
+
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 vector			g_vCamPosition;
 
@@ -19,21 +22,6 @@ vector			g_vLightSpecular;
 /* 재질정보 */
 vector			g_vMtrlAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
 vector			g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
-
-
-sampler				LinearSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_LINEAR;		//D3D11_SAMPLER_DESC 참고
-	AddressU = WRAP;	// 기본적으로 안적으면 CLamp가 기본이다.
-	AddressV = WRAP;
-};
-
-sampler				PointSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_POINT;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
 
 
 struct VS_IN
@@ -151,6 +139,9 @@ technique11 DefaultTechnique
 
 	pass Water_Diffuse
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;
@@ -161,6 +152,9 @@ technique11 DefaultTechnique
 
 	pass Water_Fall
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_WaterFall();
 		GeometryShader = NULL;
 		HullShader = NULL;

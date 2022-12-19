@@ -48,6 +48,16 @@ HRESULT CDungeonMaps::Last_Initialize()
 void CDungeonMaps::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
+
+	if (GetKeyState('Z') & 0x8000)
+	{
+		m_iShaderPass = 0;
+	}
+	if (GetKeyState('X') & 0x8000)
+	{
+		m_iShaderPass = 1;
+	}
+
 }
 
 void CDungeonMaps::Late_Tick(_double TimeDelta)
@@ -72,7 +82,7 @@ HRESULT CDungeonMaps::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0);
+		m_pModelCom->Render(m_pShaderCom, i, m_iShaderPass);
 	}
 
 	return S_OK;

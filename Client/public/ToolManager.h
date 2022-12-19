@@ -47,7 +47,11 @@ private:
 
 	void	Imgui_Crate_FilterMap();
 	void	Imgui_Camera_Type();
+	void	Imgui_Create_NaviGator();
 
+
+
+	HRESULT	Imgui_Save_NaviGator();
 
 private:
 	char						m_szSaveDataname[MAX_PATH] = "";
@@ -80,6 +84,7 @@ private:
 		len = ::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, 0, 0, 0, 0);
 		::WideCharToMultiByte(CP_ACP, 0, szWchar, slength, szChar, len, 0, 0);
 	}
+	
 
 public:
 	virtual void Free()override;

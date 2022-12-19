@@ -109,7 +109,7 @@ HRESULT CVIBuffer_Rect::Initialize(void * pArg)
 	return S_OK;
 }
 
-_bool CVIBuffer_Rect::PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 &vPosition)
+_bool CVIBuffer_Rect::PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom, _float4 *vPosition)
 {
 	return false;
 }

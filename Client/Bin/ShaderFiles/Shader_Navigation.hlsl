@@ -17,6 +17,18 @@ sampler PointSampler = sampler_state
 	AddressV = wrap;
 };
 
+RasterizerState RS_WIRE
+{
+	FillMode = WIREFRAME;
+
+};
+
+RasterizerState RS_Option_SOLID
+{
+	FillMode = Solid;
+};
+
+
 
 struct VS_IN
 {
@@ -70,10 +82,24 @@ technique11 DefaultTechnique
 {
 	pass Default
 	{
+		SetRasterizerState(RS_WIRE);
+
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+
+	pass Default_SOlid
+	{
+		SetRasterizerState(RS_Option_SOLID);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN();
+	}
+
 }

@@ -84,7 +84,7 @@ _bool CNoneAnim_BG::Piciking_GameObject()
 
 	if (ImGui::IsMouseClicked(0))
 	{
-		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, Temp))
+		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, &Temp))
 		{
 			return true;
 		}

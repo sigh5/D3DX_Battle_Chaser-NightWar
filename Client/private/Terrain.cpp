@@ -4,6 +4,8 @@
 #include "Environment_Object.h"
 #include "ToolManager.h"
 
+#include "Cell.h"
+
 CTerrain::CTerrain(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CGameObject(pDevice, pContext)
 {
@@ -45,6 +47,11 @@ HRESULT CTerrain::Last_Initialize()
 
 	m_ProtoName = TEXT("Prototype_GameObject_Terrain");
 
+	/*For.Imgui */
+	//m_pNavigationCom->Set_SaveSort_NavigatorVector(&CToolManager::GetInstance()->m_SaveSort_PickingPos);
+
+
+
 	m_bLast_Initlize = true;
 
 
@@ -54,6 +61,10 @@ HRESULT CTerrain::Last_Initialize()
 void CTerrain::Tick(_double TimeDelta)
 {
 	Last_Initialize();
+
+	ImGui::RadioButton("NaviWireFrame", &m_iNaviShaderPass, 0);
+	ImGui::RadioButton("NaviSolid", &m_iNaviShaderPass, 1);
+
 
 	__super::Tick(TimeDelta);
 }
@@ -67,7 +78,7 @@ void CTerrain::Late_Tick(_double TimeDelta)
 	Ready_BufferLock_UnLock();
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
 HRESULT CTerrain::Render()
@@ -82,7 +93,7 @@ HRESULT CTerrain::Render()
 	m_pVIBufferCom->Render();
 
 #ifdef _DEBUG
-	m_pNavigationCom->Render();
+	m_pNavigationCom->Render(m_iNaviShaderPass);
 #endif
 
 	return S_OK;
@@ -128,10 +139,10 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 	{
 		if (m_pVIBufferCom->PickingRetrunIndex(g_hWnd, m_pTransformCom, iIndex))
 		{
-			temp.insert(_ulong(iIndex.x));
-			temp.insert(_ulong(iIndex.y));
-			temp.insert(_ulong(iIndex.z));
-			temp.insert(_ulong(iIndex.w));
+			m_FilterIndexSet.insert(_ulong(iIndex.x));
+			m_FilterIndexSet.insert(_ulong(iIndex.y));
+			m_FilterIndexSet.insert(_ulong(iIndex.z));
+			m_FilterIndexSet.insert(_ulong(iIndex.w));
 		}
 
 		ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -152,7 +163,7 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 		if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pTexture2D)))
 			return E_FAIL;
 
-		for (auto iter = temp.begin(); iter != temp.end(); ++iter)
+		for (auto iter = m_FilterIndexSet.begin(); iter != m_FilterIndexSet.end(); ++iter)
 		{
 			m_pPixel[(*iter)] = D3DCOLOR_ARGB(255, 0, 0, 0);
 		}
@@ -204,7 +215,7 @@ void CTerrain::Create_Object()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	if (pGameInstance->Mouse_Down(CInput_Device::DIM_LB))
 	{
-		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, vPos))
+		if (m_pVIBufferCom->PickingBuffer(g_hWnd, m_pTransformCom, &vPos))
 		{
 			CGameObject* pGameObject = nullptr;
 			CEnvironment_Object::ENVIRONMENTDESC Desc;
@@ -230,6 +241,149 @@ void CTerrain::Create_Object()
 	RELEASE_INSTANCE(CGameInstance);
 
 	
+}
+
+void CTerrain::Get_PickingPos()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_float4	vPickPos;
+
+	if (pGameInstance->Mouse_Down(CInput_Device::DIM_LB))
+	{
+		if (m_pVIBufferCom->PickingNavi(g_hWnd, m_pTransformCom, vPickPos))
+		{
+			XMStoreFloat4(&vPickPos, XMVector3TransformCoord(XMLoadFloat4(&vPickPos), m_pTransformCom->Get_WorldMatrix()));
+			Create_NaviMap(vPickPos);
+		}
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+
+}
+
+void CTerrain::DeleteNavi()
+{
+	m_pNavigationCom->Delete_Navi();
+
+	size_t size_Num = m_vecAllNavi.size()-3;
+	
+	_uint i = 0;
+
+	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+}
+
+void CTerrain::Create_NaviMap(_float4 vPos)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
+
+	for (auto PrevPos : m_vecAllNavi)
+	{
+		_vector vPrevPos = XMVectorSetW(XMLoadFloat3(&PrevPos), 1.f);
+		_vector		vDir = XMLoadFloat4(&vPos) - vPrevPos;
+		_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
+
+		if (fDistance < 2.f)
+		{
+			XMStoreFloat4(&vPos, vPrevPos);
+			break;
+		}
+	}
+
+	_float3		vRealPos;
+	vRealPos.x = vPos.x;
+	vRealPos.y = 0;			// 일단은 0
+	vRealPos.z = vPos.z;
+	m_vNaviPosVec.push_back(vRealPos);
+
+
+	if (m_vNaviPosVec.size() == 3)
+	{
+		Create_Cells();
+	}
+
+
+	RELEASE_INSTANCE(CToolManager);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CTerrain::Create_Cells()
+{
+	if (FLOAT_EQ(m_vNaviPosVec[0].z, m_vNaviPosVec[1].z) && FLOAT_EQ(m_vNaviPosVec[1].z, m_vNaviPosVec[2].z))
+	{
+		m_vNaviPosVec.clear();		// 있을수 없는 경우
+		return;
+	}
+	else   // 3개 다 다를경우
+	{
+		if ((m_vNaviPosVec[0].z >= m_vNaviPosVec[1].z) && (m_vNaviPosVec[0].z >= m_vNaviPosVec[2].z))
+		{
+			m_vecSortNavi.push_back(m_vNaviPosVec[0]);
+
+			if (m_vNaviPosVec[1].x >= m_vNaviPosVec[2].x)
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
+			}
+			else
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
+			}
+
+		}
+		else if ((m_vNaviPosVec[1].z > m_vNaviPosVec[0].z) && (m_vNaviPosVec[1].z >= m_vNaviPosVec[2].z))
+		{
+			m_vecSortNavi.push_back(m_vNaviPosVec[1]);
+
+			if (m_vNaviPosVec[0].x >= m_vNaviPosVec[2].x)
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
+			}
+			else
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
+			}
+		}
+
+		else if ((m_vNaviPosVec[2].z > m_vNaviPosVec[0].z) && (m_vNaviPosVec[2].z > m_vNaviPosVec[1].z))
+		{
+			m_vecSortNavi.push_back(m_vNaviPosVec[2]);
+
+			if (m_vNaviPosVec[0].x >= m_vNaviPosVec[1].x)
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
+			}
+			else
+			{
+				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
+				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
+			}
+		}
+	}
+
+	m_vNaviPosVec.clear();
+
+
+	_float3 Temp[3] = { m_vecSortNavi[0],m_vecSortNavi[1],m_vecSortNavi[2] };
+
+	m_pNavigationCom->AddCell(Temp);
+
+	for (_uint i = 0; i < 3; ++i)
+	{
+		m_vecAllNavi.push_back(m_vecSortNavi[i]);
+	}
+	
+	m_vecSortNavi.clear();
+
 }
 
 
@@ -367,7 +521,7 @@ void CTerrain::Free()
 	__super::Free();
 
 	Safe_Delete_Array(m_pPixel);
-	temp.clear();
+	m_FilterIndexSet.clear();
 
 	for (auto& pName : m_NameVector)
 		Safe_Delete_Array(pName);

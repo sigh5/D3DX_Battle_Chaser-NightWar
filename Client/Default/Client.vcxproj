@@ -169,6 +169,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h" />
     <ClInclude Include="..\public\AnimFsm.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
@@ -195,6 +196,7 @@
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
+    <ClInclude Include="..\Public\SkyBox.h" />
     <ClInclude Include="..\Public\SlimeKing.h" />
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
@@ -235,6 +237,7 @@
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
+    <ClCompile Include="..\Private\SkyBox.cpp" />
     <ClCompile Include="..\Private\SlimeKing.cpp" />
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />

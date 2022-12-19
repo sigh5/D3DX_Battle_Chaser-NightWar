@@ -44,6 +44,10 @@ void CToolManager::Imgui_SelectParentViewer()
 	Imgui_Change_model();
 	Imgui_Change_Texture();
 	Imgui_Camera_Type();
+
+
+	Imgui_Create_NaviGator();
+
 	ImGui::End();
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -404,6 +408,53 @@ void CToolManager::Imgui_Camera_Type()
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CToolManager::Imgui_Create_NaviGator()
+{
+	ImGui::Text("Create_NaviGator");
+
+	static int	iCreateNaviButton = 0;
+
+	ImGui::RadioButton("None_CreateNaviPos", &iCreateNaviButton, 0);
+	ImGui::SameLine();
+	ImGui::RadioButton("CreateNaviPos", &iCreateNaviButton, 1);
+
+	if (ImGui::Button("NaviGator_Save"))
+	{
+		Imgui_Save_NaviGator();
+	}
+
+	if (ImGui::Button("NaviGator_Delete"))
+	{
+		static_cast<CTerrain*>(m_pSelectTerrain)->DeleteNavi();
+	}
+
+	if (iCreateNaviButton == 0 || m_pSelectTerrain == nullptr)
+		return;
+
+	static_cast<CTerrain*>(m_pSelectTerrain)->Get_PickingPos();
+
+}
+
+HRESULT CToolManager::Imgui_Save_NaviGator()
+{
+	_ulong		dwByte = 0;
+	HANDLE		hFile = CreateFile(TEXT("../../Data/Navigation.dat"), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	if (0 == hFile)
+		return E_FAIL;
+
+	for (auto vPos : static_cast<CTerrain*>(m_pSelectTerrain)->m_vecAllNavi)
+	{
+		WriteFile(hFile, &vPos, sizeof(_float3), &dwByte, nullptr);
+	}
+
+	MSG_BOX("NaviSave");
+	CloseHandle(hFile);
+
+	return S_OK;
+
 
 }
 

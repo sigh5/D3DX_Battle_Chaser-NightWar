@@ -12,6 +12,9 @@ public:
 		_int		iCurrentIndex = -1;
 	}NAVIDESC;
 
+public:
+	void	Set_SaveSort_NavigatorVector(vector<_float3>* SortVec);
+
 private:
 	CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNavigation(const CNavigation& rhs);
@@ -24,9 +27,14 @@ public:
 public:
 	_bool isMove_OnNavigation(_fvector TargetPos);
 
+public:	/*For.Tool*/
+	void	AddCell(_float3* vPoints);
+	void	Delete_Navi();
+
+
 #ifdef _DEBUG
 public:
-	HRESULT Render();
+	HRESULT Render(_uint iShaderPass=0);
 #endif // 
 
 private:

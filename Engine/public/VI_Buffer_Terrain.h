@@ -20,11 +20,16 @@ public:
 	_float4				PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
 	virtual		void	Final_Update()override {}
 	
-	virtual  _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom,_float4 &vPosition)override;
+	virtual  _bool		PickingBuffer(HWND hWnd, class CTransform * pCubeTransCom,_float4 *vPosition)override;
 	
 
 	_bool				PickingRetrunIndex(HWND hWnd, class CTransform * pCubeTransCom, _float4& fIndexs);
 			
+
+	virtual  _bool		PickingNavi(HWND hWnd, class CTransform * pCubeTransCom, _float4& vPosition);
+
+	_bool				Picking_Index(HWND hWnd, class CTransform * pCubeTransCom, _float4* fIndexs);
+
 
 private:
 	_uint		m_iNumVerticesX = 0;

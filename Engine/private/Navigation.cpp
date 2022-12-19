@@ -2,6 +2,8 @@
 #include "Cell.h"
 #include "Shader.h"
 
+
+
 CNavigation::CNavigation(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
 {
@@ -88,9 +90,20 @@ _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 		/* 나간방향으로 이웃이 있었다면ㄴ. */
 		if (-1 != iNeighborIndex)
 		{
-			// m_NaviDesc.iCurrentIndex = 이웃의 인덱스;
-			m_NaviDesc.iCurrentIndex = iNeighborIndex;
-			return true;
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+				{
+					return false;
+				}
+
+				if (true == m_Cells[iNeighborIndex]->isIn(TargetPos, &iNeighborIndex))
+				{
+					// m_NaviDesc.iCurrentIndex = 이웃의 인덱스;
+					m_NaviDesc.iCurrentIndex = iNeighborIndex;
+					return true;
+				}
+			}
 		}
 		/* 나간방향으로 이웃이 없었다면 */
 		else
@@ -101,9 +114,29 @@ _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 
 }
 
+void CNavigation::AddCell(_float3* vPoints)
+{
+	CCell*		pCell = CCell::Create(m_pDevice, m_pContext, vPoints, (_int)m_Cells.size());
+	if (nullptr == pCell)
+		assert("CNavigation::AddCell");
+
+	m_Cells.push_back(pCell);
+
+	if (FAILED(Ready_Neighbor()))
+		MSG_BOX("AddCell_Error");
+
+
+}
+
+void CNavigation::Delete_Navi()
+{
+	m_Cells.erase(m_Cells.end() - 1);
+}
+
+
 #ifdef _DEBUG
 
-HRESULT CNavigation::Render()
+HRESULT CNavigation::Render(_uint iShaderPass)
 {
 	_float		fHeight = 0.0f;
 
@@ -115,7 +148,7 @@ HRESULT CNavigation::Render()
 	}
 	else
 	{
-		fHeight = 0.1f;
+		fHeight = 0.3f;
 		HRESULT hr = m_pShader->Set_RawValue("g_fHeight", &fHeight, sizeof(_float));
 		m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
 
@@ -127,7 +160,7 @@ HRESULT CNavigation::Render()
 	for (auto& pCell : m_Cells)
 	{
 		if (nullptr != pCell)
-			pCell->Render(m_pShader);
+			pCell->Render(m_pShader, iShaderPass);
 	}
 
 	return S_OK;
@@ -200,4 +233,16 @@ void CNavigation::Free()
 #ifdef _DEBUG
 	Safe_Release(m_pShader);
 #endif // _DEBUG
+}
+
+void CNavigation::Set_SaveSort_NavigatorVector(vector<_float3>* SortVec)
+{
+	for (auto& pCell : m_Cells)
+	{
+		for (_uint i = 0; i < 3; ++i)
+		{
+			SortVec->push_back(pCell->Get_Point(CCell::POINT(i)));
+		}
+	}
+
 }

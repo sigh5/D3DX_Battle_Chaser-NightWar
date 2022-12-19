@@ -25,6 +25,7 @@ typedef struct tag_Create_object
 }Create_OBJECTDESC;
 
 
+
 class CTerrain final : public CGameObject
 {
 private:
@@ -47,6 +48,15 @@ public:	/*For_Imgui*/
 	void			Create_Object();
 	void			Set_CreateObject(_bool bCreateObject) {m_bCreateObject = bCreateObject;}
 
+	void			Get_PickingPos();
+	void			DeleteNavi();
+
+
+	void			Create_NaviMap(_float4 vPos);
+	void			Create_Cells();
+
+	
+
 
 private: /* for_ FilterMap*/
 	HRESULT	Ready_FilterBuffer();
@@ -56,9 +66,13 @@ private: /* for_ FilterMap*/
 	ID3D11Texture2D*			pTexture2D = nullptr;
 	D3D11_TEXTURE2D_DESC		TextureDesc;
 
-	std::set<_ulong>   temp;
+	std::set<_ulong>			m_FilterIndexSet;
 
-	
+	vector<_float3>				m_vNaviPosVec;
+	vector<_float3>				m_vecSortNavi;
+
+public:
+	vector<_float3>				m_vecAllNavi;
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -66,13 +80,17 @@ private:
 	CVI_Buffer_Terrain*		m_pVIBufferCom = nullptr;
 	CTexture*				m_pTextureCom[TYPE_END] = { nullptr, };
 	CNavigation*			m_pNavigationCom = nullptr;
-
+	
 private:
 	_bool					m_bCreateObject = false;
 	_bool					m_bCreateCheck = false;
 	Create_OBJECTDESC		m_ObjData;
 	_uint					m_iObjNameNumber = 0;
 	vector<_tchar*>			m_NameVector;
+
+private: /*For.Imgui*/
+	int					m_iNaviShaderPass = 0;
+
 
 private:
 	HRESULT SetUp_Components();

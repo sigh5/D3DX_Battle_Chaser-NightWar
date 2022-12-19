@@ -1,3 +1,6 @@
+
+#include "Shader_Client_Defines.h"
+
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 vector			g_vCamPosition;
@@ -27,21 +30,6 @@ vector			g_vBrushPos;
 float			g_fBrushRange = 5.f;
 texture2D		g_FilterTexture;
 
-
-
-sampler				LinearSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_LINEAR;		//D3D11_SAMPLER_DESC 참고
-	AddressU = WRAP;	// 기본적으로 안적으면 CLamp가 기본이다.
-	AddressV = WRAP;
-};
-
-sampler				PointSampler = sampler_state
-{
-	filter = MIN_MAG_MIP_POINT;
-	AddressU = WRAP;
-	AddressV = WRAP;
-};
 
 
 struct VS_IN
@@ -240,6 +228,9 @@ technique11 DefaultTechnique
 
 	pass Terrain_Diffuse
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;
@@ -250,6 +241,9 @@ technique11 DefaultTechnique
 
 	pass Terrain_Phong
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_PHONG();
 		GeometryShader = NULL;
 		HullShader = NULL;
@@ -260,11 +254,27 @@ technique11 DefaultTechnique
 
 	pass Point
 	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+
 		VertexShader = compile vs_5_0 VS_MAIN_PHONG();
 		GeometryShader = NULL;
 		HullShader = NULL;
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_POINT();
+	}
+
+
+	pass Terrain_Diffuse_WireFrame
+	{
+		SetRasterizerState(RS_WIRE_Model);
+		SetDepthStencilState(DS_Default, 0);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
 
