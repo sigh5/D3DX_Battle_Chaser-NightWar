@@ -83,12 +83,12 @@ HRESULT CTexture::Bind_ShaderResource(CShader * pShaderCom, const char * pConsta
 
 void CTexture::Imgui_RenderProperty()
 {
-	ImGui::Begin("Terrain_Texture");
-	ImGui::NewLine();
+	
+	
 
 	if (ImGui::CollapsingHeader(m_szName, ImGuiTreeNodeFlags_DefaultOpen))
 	{
-	
+
 		for (_uint i = 0; i < m_iNumTextures; ++i)
 		{
 			if (ImGui::ImageButton((void*)m_pTextures[i], ImVec2(32.f, 32.f)))
@@ -99,7 +99,7 @@ void CTexture::Imgui_RenderProperty()
 				ImGui::SameLine();
 		}
 	}
-	ImGui::End();
+
 
 }
 

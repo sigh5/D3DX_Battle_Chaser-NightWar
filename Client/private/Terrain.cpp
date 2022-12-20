@@ -61,10 +61,6 @@ void CTerrain::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
-	ImGui::RadioButton("NaviWireFrame", &m_iNaviShaderPass, 0);
-	ImGui::RadioButton("NaviSolid", &m_iNaviShaderPass, 1);
-
-
 	__super::Tick(TimeDelta);
 }
 

@@ -47,6 +47,7 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 		return E_FAIL;
 
 
+
 	_matrix		m_matWorld,matScale, matRotX, matRotY, matRotZ, matTrans;
 
 	matScale	=	XMMatrixScaling(1.f, 1.f, 1.f);

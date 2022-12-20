@@ -260,20 +260,20 @@ void CObject_Manager::Final_Update()
 
 void CObject_Manager::Imgui_Picking(_uint iLevel, OUT CGameObject *& pSelectedObject)
 {
-	const LAYERS& targetLevel = m_pLayers[iLevel];
+	//const LAYERS& targetLevel = m_pLayers[iLevel];
 
-	for (auto& Pair : targetLevel) // for layer loop
-	{
+	//for (auto& Pair : targetLevel) // for layer loop
+	//{
 
-		for (auto& obj : Pair.second->GetGameObjects())
-		{
-			if (obj->Piciking_GameObject())
-			{
-				pSelectedObject = obj;
-			}
+	//	for (auto& obj : Pair.second->GetGameObjects())
+	//	{
+	//		if (obj->Piciking_GameObject())
+	//		{
+	//			pSelectedObject = obj;
+	//		}
 
-		}
-	}
+	//	}
+	//}
 
 
 }
