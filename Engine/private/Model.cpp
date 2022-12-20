@@ -2,6 +2,8 @@
 
 #include "Texture.h"
 #include "Shader.h"
+#include "Transform.h"
+
 
 #include "Bone.h"
 #include "Mesh.h"
@@ -31,7 +33,7 @@ CModel::CModel(const CModel & rhs)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
 	, m_pCameraBone(rhs.m_pCameraBone)
-	
+
 {
 
 	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
@@ -92,15 +94,15 @@ HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePat
 
 	for (auto& pMesh : m_Meshes)
 	{
-		pMesh->LoadFile(hFile,this);
+		pMesh->LoadFile(hFile, this);
 	}
 
-	
-	if (FAILED(Ready_Animation(hFile)))		// 깊은 복사 필요
-			return E_FAIL;
-	
 
-	
+	if (FAILED(Ready_Animation(hFile)))		// 깊은 복사 필요
+		return E_FAIL;
+
+
+
 
 
 
@@ -114,16 +116,16 @@ HRESULT CModel::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
 
-//#ifndef DEBUG
-//	XMStoreFloat4x4(&m_ImguiPivotMatrix, XMMatrixIdentity());
-//#endif // !DEBUG
-//
-	
+	//#ifndef DEBUG
+	//	XMStoreFloat4x4(&m_ImguiPivotMatrix, XMMatrixIdentity());
+	//#endif // !DEBUG
+	//
+
 
 	return S_OK;
 }
 /*기본 애니메이션을 돌리고싶다.*/
-void CModel::Play_Animation(_double TimeDelta,_bool IsCombat)
+void CModel::Play_Animation(_double TimeDelta, _bool IsCombat)
 {
 	if (TYPE_NONANIM == m_eType)
 		return;
@@ -184,14 +186,14 @@ HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType
 	return S_OK;
 }
 
-HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, const char * pBoneConstantName,const char* pNoRenderName)
+HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, const char * pBoneConstantName, const char* pNoRenderName)
 {
 	if (pNoRenderName != nullptr && !strcmp(m_Meshes[iMeshIndex]->Get_MeshName(), pNoRenderName))
 		return S_OK;
 
 	if (!strcmp(m_szNoRenderMeshName, m_Meshes[iMeshIndex]->Get_MeshName()))
 		return S_OK;
-	
+
 	if (m_iNoRenderIndex == iMeshIndex)
 		return S_OK;
 
@@ -207,7 +209,7 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 			pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 256);
 		}
 
-		
+
 		pShader->Begin(iShaderIndex);
 		m_Meshes[iMeshIndex]->Render();
 	}
@@ -226,6 +228,103 @@ void CModel::Set_Finished(_uint iAnimIndex, _bool bFinish)
 	m_Animations[iAnimIndex]->Set_Finished(bFinish);
 }
 
+_bool CModel::PickingOnMesh(HWND hWnd, CTransform* pTransform, OUT _float3 & vPickPos)
+{
+	POINT      ptMouse{};
+
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	_float3         vMousePos;
+
+	vMousePos.x = _float(ptMouse.x / (1280 * 0.5f) - 1);
+	vMousePos.y = _float(ptMouse.y / (720 * -0.5f) + 1);
+	vMousePos.z = 0.f;
+
+	_vector   vecMousePos = XMLoadFloat3(&vMousePos);
+	vecMousePos = XMVectorSetW(vecMousePos, 1.f);
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_matrix      ProjMatrixInv;
+	ProjMatrixInv = pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_PROJ);
+	ProjMatrixInv = XMMatrixInverse(nullptr, ProjMatrixInv);
+	vecMousePos = XMVector3TransformCoord(vecMousePos, ProjMatrixInv);
+
+	_vector   vRayDir, vRayPos;
+
+	vRayPos = { 0.f, 0.f, 0.f , 1.f };
+	vRayDir = vecMousePos - vRayPos;
+
+	_matrix      ViewMatrixInv;
+	ViewMatrixInv = pGameInstance->Get_TransformMatrix(CPipeLine::D3DTS_VIEW);
+	ViewMatrixInv = XMMatrixInverse(nullptr, ViewMatrixInv);
+	vRayPos = XMVector3TransformCoord(vRayPos, ViewMatrixInv);
+	vRayDir = XMVector3TransformNormal(vRayDir, ViewMatrixInv);
+	vRayDir = XMVector3Normalize(vRayDir);
+
+	vRayPos = XMVector3TransformCoord(vRayPos, pTransform->Get_WorldMatrix_Inverse());
+	vRayDir = XMVector3TransformNormal(vRayDir, pTransform->Get_WorldMatrix_Inverse());
+	vRayDir = XMVector3Normalize(vRayDir);
+
+
+	_matrix		PivotMatirx = XMLoadFloat4x4(&m_PivotMatrix);
+
+	vRayPos = XMVector3TransformCoord(vRayPos, XMMatrixInverse(nullptr, PivotMatirx));
+	vRayDir = XMVector3TransformNormal(vRayDir, XMMatrixInverse(nullptr, PivotMatirx));
+	vRayDir = XMVector3Normalize(vRayDir);
+
+	_vector vUp = { 0.f, 1.f, 0.f };
+	RELEASE_INSTANCE(CGameInstance);
+
+	const _uint NumMeshes = m_iNumMeshes;
+
+	for (_uint i = 0; i < NumMeshes; ++i)
+	{
+		_float fDist = 0.f;
+
+		if (m_eType == CModel::TYPE_ANIM)
+		{
+			return false;
+		}
+		else
+		{
+			VTXMODEL* pVtxModel = m_Meshes[i]->Get_NonAnimVertex();
+			//에드 레퍼런스
+
+			FACEINDICES32* pIndices = m_Meshes[i]->Get_ModelIndeices();
+			_uint   iNumPrimitive = m_Meshes[i]->Get_NumPrimitive();
+
+			for (_uint j = 0; j < iNumPrimitive; ++j)
+			{
+
+				////0.4f : 0.8로 하면 피킹이 잘 안됨. 0.4가 적당한 위쪽 피킹 가능한 정도같음
+				//if (0.4f > XMVectorGetX(XMVector3Dot(XMLoadFloat3(&pVtxModel[pIndices[j]._0].vNormal), vUp))) continue;
+
+				if (TriangleTests::Intersects(vRayPos, vRayDir,
+					XMLoadFloat3(&pVtxModel[pIndices[j]._0].vPosition),
+					XMLoadFloat3(&pVtxModel[pIndices[j]._1].vPosition),
+					XMLoadFloat3(&pVtxModel[pIndices[j]._2].vPosition),
+					fDist))
+				{
+
+					_vector vPos = vRayPos + XMVector3Normalize(vRayDir) * fDist;
+					vPos = XMVector3TransformCoord(vPos, pTransform->Get_WorldMatrix());
+					vPos = XMVector3TransformCoord(vPos, XMLoadFloat4x4(&m_PivotMatrix));
+					
+					XMStoreFloat3(&vPickPos, vPos);
+
+					return true;
+
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
 void CModel::Set_Duration(_uint iAnimIndex, _double Ratio)
 {
 	m_Animations[iAnimIndex]->Set_Duration(Ratio);
@@ -242,7 +341,7 @@ void CModel::InitChannel()
 	m_Animations[m_iCurrentAnimIndex]->InitChannel();
 }
 
-_bool CModel::Control_KeyFrame(_uint iAnimIndex,_uint KeyBegin, _uint KeyEnd)
+_bool CModel::Control_KeyFrame(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
 {
 	_uint	iFrameIndex = m_Animations[iAnimIndex]->Get_Key_Frame();
 
@@ -256,113 +355,113 @@ _bool CModel::Control_KeyFrame(_uint iAnimIndex,_uint KeyBegin, _uint KeyEnd)
 
 void CModel::Imgui_RenderProperty()
 {
-	ImGui::Begin("BoneName");
+	//ImGui::Begin("BoneName");
 
-	if (ImGui::TreeNode("BoneNameViewer"))
-	{
-		char szBoneTag[MAX_PATH];
-		
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& bone : m_Bones)
-			{
-				strcpy_s(szBoneTag, MAX_PATH, bone->Get_Name());
+	//if (ImGui::TreeNode("BoneNameViewer"))
+	//{
+	//	char szBoneTag[MAX_PATH];
 
-				if (ImGui::Selectable(szBoneTag))
-				{
-					m_pSelectedBone = bone;
-					ImGui::Text(szBoneTag);
-				}
-			}
-			ImGui::EndListBox();
-		}
+	//	if (ImGui::BeginListBox("##"))
+	//	{
+	//		for (auto& bone : m_Bones)
+	//		{
+	//			strcpy_s(szBoneTag, MAX_PATH, bone->Get_Name());
 
-		ImGui::TreePop();
-	}
+	//			if (ImGui::Selectable(szBoneTag))
+	//			{
+	//				m_pSelectedBone = bone;
+	//				ImGui::Text(szBoneTag);
+	//			}
+	//		}
+	//		ImGui::EndListBox();
+	//	}
 
-	_uint iIndex = 0;
-	if (ImGui::TreeNode("Animation"))
-	{
-		char szAnimTag[MAX_PATH];
+	//	ImGui::TreePop();
+	//}
 
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& pAnim : m_Animations)
-			{
-				if (pAnim != nullptr)
-				{
-					strcpy_s(szAnimTag, MAX_PATH, pAnim->Get_Name());
-					
-					if (ImGui::Selectable(szAnimTag))
-					{
-						m_iCurrentAnimIndex = iIndex;
-					}
-					++iIndex;
-				}
-			}
-			ImGui::EndListBox();
-		}
-		ImGui::TreePop();
-	}
+	//_uint iIndex = 0;
+	//if (ImGui::TreeNode("Animation"))
+	//{
+	//	char szAnimTag[MAX_PATH];
 
-	if (!m_Animations.size() ==0 )
-	{ 
-		string str = "Current Anim Index :" + to_string(m_iCurrentAnimIndex);
-		strcpy_s(m_imguiAnimName, MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
+	//	if (ImGui::BeginListBox("##"))
+	//	{
+	//		for (auto& pAnim : m_Animations)
+	//		{
+	//			if (pAnim != nullptr)
+	//			{
+	//				strcpy_s(szAnimTag, MAX_PATH, pAnim->Get_Name());
 
-		ImGui::Text(str.c_str());
-		ImGui::Text(m_imguiAnimName);
+	//				if (ImGui::Selectable(szAnimTag))
+	//				{
+	//					m_iCurrentAnimIndex = iIndex;
+	//				}
+	//				++iIndex;
+	//			}
+	//		}
+	//		ImGui::EndListBox();
+	//	}
+	//	ImGui::TreePop();
+	//}
 
-		_double iTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
-		char szTickPerSecond[MAX_PATH];
-		strcpy_s(szTickPerSecond, MAX_PATH, to_string(iTickPerSecond).c_str());
-		ImGui::Text(szTickPerSecond);
-		/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
-		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
-	*/
+	//if (!m_Animations.size() == 0)
+	//{
+	//	string str = "Current Anim Index :" + to_string(m_iCurrentAnimIndex);
+	//	strcpy_s(m_imguiAnimName, MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
 
-		_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
-		char szDurationSecond[MAX_PATH];
-		string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
-		strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
-		ImGui::Text(str2.c_str());
-		ImGui::Text(szDurationSecond);
+	//	ImGui::Text(str.c_str());
+	//	ImGui::Text(m_imguiAnimName);
 
+	//	_double iTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
+	//	char szTickPerSecond[MAX_PATH];
+	//	strcpy_s(szTickPerSecond, MAX_PATH, to_string(iTickPerSecond).c_str());
+	//	ImGui::Text(szTickPerSecond);
+	//	/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
+	//	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
+	//*/
 
-		int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
-		ImGui::Text("FrameIndex : %d", iFrameIndex);
-	
-	}
-	_uint iMeshNum = 0;
-	if (ImGui::TreeNode("MeshName"))
-	{
-		char szMeshName[MAX_PATH];
-
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& pMesh : m_Meshes)
-			{
-				if (pMesh != nullptr)
-				{
-					strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
-
-					if (ImGui::Selectable(szMeshName))
-					{
-						m_iNoRenderIndex = iMeshNum;
-					}
-					++iMeshNum;
-				}
-			}
-			ImGui::EndListBox();
-		}
-		ImGui::TreePop();
-	}
-
-	Imgui_Gizmo_Bone();
+	//	_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
+	//	char szDurationSecond[MAX_PATH];
+	//	string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
+	//	strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
+	//	ImGui::Text(str2.c_str());
+	//	ImGui::Text(szDurationSecond);
 
 
+	//	int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
+	//	ImGui::Text("FrameIndex : %d", iFrameIndex);
 
-	ImGui::End();
+	//}
+	//_uint iMeshNum = 0;
+	//if (ImGui::TreeNode("MeshName"))
+	//{
+	//	char szMeshName[MAX_PATH];
+
+	//	if (ImGui::BeginListBox("##"))
+	//	{
+	//		for (auto& pMesh : m_Meshes)
+	//		{
+	//			if (pMesh != nullptr)
+	//			{
+	//				strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
+
+	//				if (ImGui::Selectable(szMeshName))
+	//				{
+	//					m_iNoRenderIndex = iMeshNum;
+	//				}
+	//				++iMeshNum;
+	//			}
+	//		}
+	//		ImGui::EndListBox();
+	//	}
+	//	ImGui::TreePop();
+	//}
+
+	//Imgui_Gizmo_Bone();
+
+
+
+	//ImGui::End();
 
 }
 
@@ -391,7 +490,7 @@ void CModel::Imgui_Gizmo_Bone()
 		mCurrentGizmoOperation = ImGuizmo::SCALE;
 
 	float matrixTranslation[3], matrixRotation[3], matrixScale[3];
-	
+
 	_float4x4		TransMatrix;
 	XMStoreFloat4x4(&TransMatrix, m_pSelectedBone->Get_TransformMatrix());
 
@@ -461,7 +560,7 @@ void CModel::Imgui_Gizmo_Bone()
 
 void CModel::Set_AnimIndex(_uint iAnimIndex)
 {
-	
+
 	if (m_iCurrentAnimIndex != iAnimIndex)
 	{
 		// 이전 애니메이션 번호와 현재 거를 보관한다.
@@ -478,7 +577,7 @@ void CModel::Set_AnimTickTime(_double TickTime)
 	m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(TickTime);
 }
 
-void CModel::Set_AnimName(char * pAnimName )
+void CModel::Set_AnimName(char * pAnimName)
 {
 	_uint iIndex = 0;
 
@@ -491,7 +590,7 @@ void CModel::Set_AnimName(char * pAnimName )
 		}
 		++iIndex;
 	}
-	
+
 }
 
 HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
@@ -502,8 +601,8 @@ HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 	CBone* pBone = CBone::Create(this, hFile);
 	if (nullptr == pBone)
 		assert("CLoadModel_Ready_Bones");
-	
-	if(pParent!=nullptr)
+
+	if (pParent != nullptr)
 		pBone->Set_Parent(pParent);
 	m_Bones.push_back(pBone);
 
@@ -514,9 +613,9 @@ HRESULT CModel::Ready_Bones(HANDLE hFile, CBone * pParent)
 		Ready_Bones(hFile, pBone);
 
 	}
-		
 
-	
+
+
 	return S_OK;
 }
 
@@ -527,7 +626,7 @@ HRESULT CModel::Ready_MeshContainers(HANDLE hFile, LOAD_TYPE eType)
 
 	for (_uint i = 0; i < m_iNumMeshes; ++i)
 	{
-		CMesh *pMesh = CMesh::Create(m_pDevice, m_pContext, this, hFile,eType);
+		CMesh *pMesh = CMesh::Create(m_pDevice, m_pContext, this, hFile, eType);
 
 		if (nullptr == pMesh)
 			assert("CLoadModel::Ready_MeshContainers");
@@ -561,12 +660,12 @@ HRESULT CModel::Ready_Materials(HANDLE hFile, const char * pModelFilePath, LOAD_
 			_tchar szFilePath[MAX_PATH] = TEXT("");
 			_uint TextureFilePathLen = 0;
 			ReadFile(hFile, &TextureFilePathLen, sizeof(_uint), &dwByte, nullptr);
-			ReadFile(hFile, szFilePath,sizeof(_tchar)* TextureFilePathLen, &dwByte, nullptr);
+			ReadFile(hFile, szFilePath, sizeof(_tchar)* TextureFilePathLen, &dwByte, nullptr);
 
 			if (!lstrcmp(szFilePath, TEXT("")))
 				assert("CLoadModel: Ready_Materials issue");
 
-			ModelMaterial.pTexture[iTextureIndex] = CTexture::Create(m_pDevice, m_pContext ,szFilePath);
+			ModelMaterial.pTexture[iTextureIndex] = CTexture::Create(m_pDevice, m_pContext, szFilePath);
 			if (nullptr == ModelMaterial.pTexture[j])
 				return E_FAIL;
 		}
@@ -600,7 +699,7 @@ HRESULT CModel::Ready_Animation(HANDLE hFile)
 HRESULT CModel::Ready_CameraBone()
 {
 	m_pCameraBone = Get_BonePtr("Node_Camera");
-	
+
 	if (nullptr != m_pCameraBone)
 		Safe_AddRef(m_pCameraBone);
 	return S_OK;

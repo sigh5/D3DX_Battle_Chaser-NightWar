@@ -14,6 +14,9 @@ CMesh::CMesh(const CMesh & rhs)
 	, m_iMaterialIndex(rhs.m_iMaterialIndex)
 	, m_iNumBones(rhs.m_iNumBones)
 	, m_Bones(rhs.m_Bones)
+	, m_pAnimVertices(rhs.m_pAnimVertices)
+	, m_pVertices(rhs.m_pVertices)
+	, m_pIndices(rhs.m_pIndices)
 {
 	strcpy_s(m_szName, MAX_PATH, rhs.m_szName);
 
@@ -63,21 +66,21 @@ HRESULT CMesh::Initialize_Prototype(CModel * pModel, HANDLE hFile, CModel::LOAD_
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 
-	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
-	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
+	m_pIndices = new FACEINDICES32[m_iNumPrimitive];
+	ZeroMemory(m_pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
 
 	for (_uint i = 0; i < m_iNumPrimitive; ++i)
 	{
-		ReadFile(hFile, &pIndices[i], sizeof(FACEINDICES32), &dwByte, nullptr);
+		ReadFile(hFile, &m_pIndices[i], sizeof(FACEINDICES32), &dwByte, nullptr);
 	}
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pIndices;
+	m_SubResourceData.pSysMem = m_pIndices;
 
 	if (FAILED(__super::Create_IndexBuffer()))
 		return E_FAIL;
 
-	Safe_Delete_Array(pIndices);
+	
 
 
 	return S_OK;
@@ -150,22 +153,22 @@ HRESULT CMesh::Ready_VertexBuffer_NonAnimModel(HANDLE hFile, CModel * pModel)
 	m_BufferDesc.MiscFlags = 0;
 
 
-	VTXMODEL*	 	pVertices = new VTXMODEL[m_iNumVertices];
-	ZeroMemory(pVertices, sizeof(VTXMODEL)*m_iNumVertices);
+	m_pVertices = new VTXMODEL[m_iNumVertices];
+	ZeroMemory(m_pVertices, sizeof(VTXMODEL)*m_iNumVertices);
 
 	for (_uint i = 0; i < m_iNumVertices; ++i)
 	{
-		ReadFile(hFile, &pVertices[i], sizeof(VTXMODEL), &dwByte, nullptr);
+		ReadFile(hFile, &m_pVertices[i], sizeof(VTXMODEL), &dwByte, nullptr);
 	}
 
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pVertices;
+	m_SubResourceData.pSysMem = m_pVertices;
 
 	if (FAILED(__super::Create_VertexBuffer()))
 		return E_FAIL;
 
-	Safe_Delete_Array(pVertices);
+	
 
 	return S_OK;
 }
@@ -184,21 +187,21 @@ HRESULT CMesh::Ready_VertexBuffer_AnimModel(HANDLE hFile, CModel * pModel)
 	m_BufferDesc.CPUAccessFlags = 0;
 	m_BufferDesc.MiscFlags = 0;
 
-	VTXANIMMODEL*	 	pAnimVertices = new VTXANIMMODEL[m_iNumVertices];
-	ZeroMemory(pAnimVertices, sizeof(VTXANIMMODEL) * m_iNumVertices);
+	m_pAnimVertices = new VTXANIMMODEL[m_iNumVertices];
+	ZeroMemory(m_pAnimVertices, sizeof(VTXANIMMODEL) * m_iNumVertices);
 
 	for (_uint i = 0; i < m_iNumVertices; ++i)
 	{
-		ReadFile(hFile, &pAnimVertices[i], sizeof(VTXANIMMODEL), &dwByte, nullptr);
+		ReadFile(hFile, &m_pAnimVertices[i], sizeof(VTXANIMMODEL), &dwByte, nullptr);
 	}
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pAnimVertices;
+	m_SubResourceData.pSysMem = m_pAnimVertices;
 
 	if (FAILED(__super::Create_VertexBuffer()))
 		return E_FAIL;
 
-	Safe_Delete_Array(pAnimVertices);
+
 
 	return S_OK;
 }
@@ -235,5 +238,12 @@ void CMesh::Free()
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);
+
 	m_Bones.clear();
+
+	Safe_Delete_Array(m_pVertices);
+	Safe_Delete_Array(m_pIndices);
+	Safe_Delete_Array(m_pAnimVertices);
 }
+
+

@@ -7,7 +7,7 @@ BEGIN(Engine)
 class CShader;
 class CRenderer;
 class CModel;
-class CVIBuffer_Cube;
+class CNavigation;
 END
 
 BEGIN(Client)
@@ -30,6 +30,9 @@ public:
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
 	void	Change_Model(_uint iLevel, const wstring& NewComPonentTag);
+	void	Create_NaviMesh();
+
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;

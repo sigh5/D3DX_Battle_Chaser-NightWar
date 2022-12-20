@@ -92,12 +92,10 @@ HRESULT CTurnCharcterUI::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	CUI::Begin_UI();
 
 	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
-	CUI::End_UI();
 
 	return S_OK;
 }

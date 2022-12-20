@@ -63,7 +63,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	else
 	{
 		Combat_Initialize();
-		
+
 		m_pFsmCom->Tick(TimeDelta);
 
 	}
@@ -182,8 +182,11 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.5f, 0.f, 22.f, 1.f));
 	
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f,4.f,4.f));
+
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 30.f, 1.f));
 	
 	m_bCombat_LastInit = true;
 	return S_OK;

@@ -172,20 +172,24 @@
     <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h" />
     <ClInclude Include="..\public\AnimFsm.h" />
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Camera_Combat.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Camera_Static.h" />
     <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\CombatController.h" />
+    <ClInclude Include="..\Public\CombatMap.h" />
     <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
+    <ClInclude Include="..\Public\Effect_Rect_Instancing.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
     <ClInclude Include="..\public\Hero_Knolan.h" />
     <ClInclude Include="..\Public\HpBar.h" />
     <ClInclude Include="..\Public\Level_Combat.h" />
     <ClInclude Include="..\public\Level_GamePlay.h" />
+    <ClInclude Include="..\public\Level_GamePlayPreHeader.h" />
     <ClInclude Include="..\public\Level_Loading.h" />
     <ClInclude Include="..\public\Level_Logo.h" />
     <ClInclude Include="..\public\Loader.h" />
@@ -214,13 +218,16 @@
   <ItemGroup>
     <ClCompile Include="..\private\AnimFsm.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\private\Camera_Combat.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Camera_Static.cpp" />
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
+    <ClCompile Include="..\Private\CombatMap.cpp" />
     <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
+    <ClCompile Include="..\Private\Effect_Rect_Instancing.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />
     <ClCompile Include="..\private\Hero_Knolan.cpp" />
@@ -269,6 +276,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

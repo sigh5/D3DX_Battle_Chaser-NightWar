@@ -68,25 +68,18 @@ HRESULT CObject_Manager::Copy_Data(_uint iLevelIndex)
 
 	for (auto& Pair : m_pLayers[iLevelIndex])
 	{
-		if (Pair.first == LAYER_PLAYER || Pair.first == TEXT("Layer_Camera"))
+		if (Pair.first == LAYER_PLAYER)
 		{
 			CLayer * pLayer = CLayer::Create();
 			pLayer->CopyData(Pair.second->GetGameObjects());
-			m_pLayers[iLevelIndex + 1].emplace( Pair.first,pLayer);
+			m_pLayers[iLevelIndex + 1].emplace(Pair.first, pLayer);
 		}
-		
-
-
 	}
-
-
 
 	for (auto& Pair : m_pLayers[iLevelIndex])
 		Safe_Release(Pair.second);
 
 	m_pLayers[iLevelIndex].clear();
-
-
 	return S_OK;
 }
 

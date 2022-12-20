@@ -38,6 +38,11 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
+		return E_FAIL;
+	
+
+
 	m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
 
 
@@ -49,7 +54,7 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 		
-	Dungeon_Controll_Tick(TimeDelta);
+	//Dungeon_Controll_Tick(TimeDelta);
 
 }
 
@@ -126,7 +131,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -137,14 +142,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
+	//	return E_FAIL;
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Garrison"))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Garrison"))))
+	//	return E_FAIL;
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
+	//	return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -157,6 +162,18 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 
 	//pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Effect_Rect_Instancing"))))
+		return E_FAIL;*/
+	
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

@@ -48,8 +48,7 @@ HRESULT CTerrain::Last_Initialize()
 	m_ProtoName = TEXT("Prototype_GameObject_Terrain");
 
 	/*For.Imgui */
-	//m_pNavigationCom->Set_SaveSort_NavigatorVector(&CToolManager::GetInstance()->m_SaveSort_PickingPos);
-
+	m_pNavigationCom->Set_SaveSort_NavigatorVector(&m_vecAllNavi);
 
 
 	m_bLast_Initlize = true;

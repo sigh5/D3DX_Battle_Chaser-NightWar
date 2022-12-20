@@ -37,10 +37,10 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaled(_float3(2.f, 2.f, 2.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(5.f, 0.f, 10.f, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(24.f, 0.f, 16.f, 1.f));
-	
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(27.f, 0.f, -4.f, 1.f));
+
 	m_pModelCom->Set_AnimIndex(0);
 
 	return S_OK;
@@ -61,8 +61,8 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	
 	m_pFsmCom->Tick(TimeDelta);
+
 
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }

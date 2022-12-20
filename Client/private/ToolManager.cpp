@@ -24,23 +24,21 @@ CToolManager::CToolManager()
 }
 
 void CToolManager::Imgui_SelectParentViewer()
-{
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	
+{	
 	ImGui::Begin("Select_ParentObject");
 	ImGui::NewLine();
 	bool bFound = false;
 
 	Imgui_Select_ParentCanvas();
 	Imgui_Select_ParentTerrain();
-	
+
 	Imgui_Select_LayerType();
 	Imgui_Select_ProtoType();
 	Imgui_Select_Texture();
 	Imgui_Select_Model();
 
 	Imgui_CreateObject();
-	
+
 	Imgui_Change_model();
 	Imgui_Change_Texture();
 	Imgui_Camera_Type();
@@ -49,7 +47,7 @@ void CToolManager::Imgui_SelectParentViewer()
 	Imgui_Create_NaviGator();
 
 	ImGui::End();
-	RELEASE_INSTANCE(CGameInstance);
+	
 }
 
 void CToolManager::Imgui_Select_ParentCanvas()
@@ -177,7 +175,7 @@ void CToolManager::Imgui_Create_UI()
 		pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &m_Desc);
 
 		if (pGameObject == nullptr)
-			return;
+			assert("CreateUI");
 
 		pGameObject->Set_ProtoName(szProtoName);
 		pGameObject->Set_ObjectName(szObjectName);

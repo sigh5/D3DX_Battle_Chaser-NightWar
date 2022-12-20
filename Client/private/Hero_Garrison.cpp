@@ -182,6 +182,7 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 	CPlayer::CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
+
 }
 
 void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
@@ -295,10 +296,13 @@ HRESULT CHero_Garrison::Combat_Init()
 		return S_OK;
 
 	m_pAnimFsm = CAnimFsm::Create(this, ANIM_CHAR2);
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 12.f, 1.f));
-	
-	m_CurAnimqeue.push({ 0,1.f });
-	Set_CombatAnim_Index(m_pModelCom);
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 16.f, 1.f));
+
+
+	//m_CurAnimqeue.push({ 0,1.f });
+	//Set_CombatAnim_Index(m_pModelCom);
 
 	m_bCombatInit = true;
 	return S_OK;

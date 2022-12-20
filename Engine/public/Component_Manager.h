@@ -10,6 +10,7 @@
 #include "Model.h"
 #include "FSMComponent.h"
 #include "Navigation.h"
+#include "VIBuffer_Rect_Instancing.h"
 
 #include "Collider.h"
 

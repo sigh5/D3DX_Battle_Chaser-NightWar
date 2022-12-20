@@ -42,6 +42,11 @@ public:
 	void	Set_Finished(_uint iAnimIndex,_bool bFinish);
 	
 	
+public:
+	_bool	PickingOnMesh(HWND hWnd, class CTransform* pTransform, OUT _float3 & vPickPos);
+
+
+
 public: /*For.Imgui*/
 	virtual void Imgui_RenderProperty() override;
 	void		 Imgui_Gizmo_Bone();

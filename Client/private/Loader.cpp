@@ -3,36 +3,23 @@
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
-#include "Terrain.h"
-#include "WaterTile.h"
 
-#include "Hero_Knolan.h"
-#include "Hero_Garrison.h"
-#include "Hero_Calibretto.h"
 
+#include "Level_GamePlayPreHeader.h"
+
+/* For.CombatScene*/
 #include "SlimeKing.h"
 #include "Skeleton_Naked.h"
 #include "Spider_Mana.h"
 
-#include "SkyBox.h"
-#include "BackGround.h"
-#include "MainLogo.h"
-#include "DungeonMaps.h"
-
-
 #include "ClientBaseCanvas.h"
 #include "TurnUICanvas.h"
 #include "TurnStateCanvas.h"
-#include "Dungeon_Canvas.h"
-
-
-#include "TurnCharcterUI.h"
-#include "UIButton.h"
 #include "HpBar.h"
+#include "CombatMap.h"
 
-#include "NoneAnim_BG.h"
-
-#include "Camera_Static.h"
+#include "Camera_Combat.h"
+/* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -190,7 +177,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 
 	/* For.Prototype_Component_Texture_UITrunCharUI */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_COmbatScene"),
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_COmbatScene_Forest"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/CombatScene//BG_Forest_%d.png"), CTexture::TYPE_END, 6))))
 		return E_FAIL;
 
@@ -210,6 +197,12 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_VIBuffer_Rect_Instancing */					
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Instancing"),
+		CVIBuffer_Rect_Instancing::Create(m_pDevice, m_pContext, 100))))	//여기서 숫자 결정
+		return E_FAIL;
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션정보생성중"));
 	/* For.Prototype_Component_Navigation */
@@ -220,9 +213,9 @@ HRESULT CLoader::Loading_ForGamePlay()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
 	/* ~Model */
 
@@ -261,6 +254,12 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
+	
+	/* For.Prototype_Component_Shader_VtxRectInstance */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxRectInstance"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxRectInstance.hlsl"), VTXRECTINSTANCE_DECLARATION::Elements, VTXRECTINSTANCE_DECLARATION::iNumElements))))
+		return E_FAIL;
+	
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 	
 
@@ -274,18 +273,18 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
-	/* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Knolan::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
-		CHero_Garrison::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Calibretto */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
-		CHero_Calibretto::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	/////* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	//	CHero_Knolan::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
+	//	CHero_Garrison::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Calibretto */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
+	//	CHero_Calibretto::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 	/* For.Prototype_GameObject_BaseCanvas */
@@ -337,6 +336,13 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CCamera_Static::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Rect_Instancing"),
+		CEffect_Rect_Instancing::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCombatMap"),
+		CCombatMap::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 	
 
 
@@ -364,9 +370,7 @@ HRESULT CLoader::Loading_Combat()
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MT"), LEVEL_COMBAT);
-	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Forest_Combats"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
@@ -385,8 +389,11 @@ HRESULT CLoader::Loading_Combat()
 		CSpider_Mana::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CombatCamera"),
+		CCamera_Combat::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
-
+		
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 

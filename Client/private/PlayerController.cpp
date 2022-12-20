@@ -118,54 +118,6 @@ _bool CPlayerController::CombatScene()
 	return false;
 }
 
-//void CPlayerController::CurrentTurn_AnimControl()
-//{
-//	//static int CharIndex = 0;
-//	//static int Type_Num = 0;
-//
-//	//ImGui::RadioButton("Garrison", &CharIndex, 0);
-//	//ImGui::RadioButton("Knolan", &CharIndex, 1);
-//	//ImGui::RadioButton("Calibreotto", &CharIndex, 2);
-//	//if (CharIndex == 0)
-//	//{
-//	//	for (auto& pPlayer : m_pPlayerVec)
-//	//	{
-//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
-//	//		{
-//	//			pCurentActor = pPlayer;
-//	//		}
-//	//	}
-//	//}
-//	//else if (CharIndex == 1)
-//	//{
-//	//	for (auto& pPlayer : m_pPlayerVec)
-//	//	{
-//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
-//	//		{
-//	//			pCurentActor = pPlayer;
-//	//		}
-//	//	}
-//	//}
-//	//else if (CharIndex == 2)
-//	//{
-//	//	for (auto& pPlayer : m_pPlayerVec)
-//	//	{
-//	//		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
-//	//		{
-//	//			pCurentActor = pPlayer;
-//	//		}
-//	//	}
-//	//}
-//
-//	//ImGui::InputInt("Anim Type MAX=10", &Type_Num);
-//
-//	//if (Type_Num >= 14)
-//	//	Type_Num = 0;
-//	//ImGui::Text(str[Type_Num].c_str());
-//	
-//}
-//
-
 
 void CPlayerController::Free()
 {
@@ -173,6 +125,7 @@ void CPlayerController::Free()
 	{
 		Safe_Release(pPlayer);
 	}
+	m_pPlayerVec.clear();
 }
 
 

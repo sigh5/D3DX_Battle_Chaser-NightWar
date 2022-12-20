@@ -118,6 +118,12 @@
     <Filter Include="02.GameObjects\LogoBackGround\LoadingImage\BackGround\NoAnimBackGround">
       <UniqueIdentifier>{7a8efa89-8fd5-4af5-983c-7a9e4a0592b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect">
+      <UniqueIdentifier>{bd6a6a54-bdbf-4b34-9b85-1d8382e42bed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\CombatMaps">
+      <UniqueIdentifier>{07db2e14-6e63-4809-b202-a81494dea85e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -246,6 +252,18 @@
     <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h">
       <Filter>97.ShaderFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CombatMap.h">
+      <Filter>02.GameObjects\CombatMaps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Rect_Instancing.h">
+      <Filter>02.GameObjects\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_GamePlayPreHeader.h">
+      <Filter>01.Levels\00.Loading\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Combat.h">
+      <Filter>02.GameObjects\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -359,6 +377,15 @@
     <ClCompile Include="..\Private\SkyBox.cpp">
       <Filter>02.GameObjects\SkyBox</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\CombatMap.cpp">
+      <Filter>02.GameObjects\CombatMaps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Rect_Instancing.cpp">
+      <Filter>02.GameObjects\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Combat.cpp">
+      <Filter>02.GameObjects\Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -393,6 +420,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCubeTex.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

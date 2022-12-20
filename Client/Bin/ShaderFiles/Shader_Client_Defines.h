@@ -47,3 +47,34 @@ DepthStencilState DS_ZEnable_ZWriteEnable_FALSE
 	DepthEnable = false;
 	DepthWriteMask = zero;	
 };
+
+BlendState BS_Default
+{
+	BlendEnable[0] = false;
+
+
+//bool BlendEnable;
+//D3D11_BLEND SrcBlend;
+//D3D11_BLEND DestBlend;
+//D3D11_BLEND_OP BlendOp;
+//D3D11_BLEND SrcBlendAlpha;
+//D3D11_BLEND DestBlendAlpha;
+//D3D11_BLEND_OP BlendOpAlpha;
+//UINT8 RenderTargetWriteMask;
+};
+
+BlendState BS_AlphaBlend
+{
+	BlendEnable[0] = true;
+SrcBlend = SRC_ALPHA;
+DestBlend = INV_SRC_ALPHA;
+BlendOp = Add;
+};
+
+BlendState BS_One			// 나무 그릴때 멀리서 있으때 색깔을 섞는것
+{
+	BlendEnable[0] = true;
+SrcBlend = ONE;
+DestBlend = ONE;
+BlendOp = Add;
+};

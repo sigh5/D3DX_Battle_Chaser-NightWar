@@ -73,7 +73,7 @@ void CClient_Manager::Model_Load(ID3D11Device*	m_pDevice, ID3D11DeviceContext*	m
 
 		if (FAILED(pGameInstance->Add_Prototype(iLevel, ProtoName,
 			CModel::Create(m_pDevice, m_pDeviceContext, CModel::LOAD_TYPE(iAnimType), szModelPath, XMLoadFloat4x4(&PivotMatrix), hFile))))
-			assert("issue");
+				assert(!  "issue" );
 	}
 
 	CloseHandle(hFile);

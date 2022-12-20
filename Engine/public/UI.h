@@ -50,9 +50,7 @@ public: /* imgui */
 protected:
 	UIDESC						m_UIDesc;
 	
-	ID3D11DepthStencilState* m_OldDepthStencilState = nullptr;
-	ID3D11DepthStencilState* m_UIdepthStencilState = nullptr;
-	UINT                        m_StencilRef = 0;
+	
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

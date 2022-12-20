@@ -35,9 +35,11 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 		return E_FAIL;
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-	m_pTransformCom->Set_Scaled(_float3(2.f, 2.f, 2.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, 0.f, 10.f, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(21.f, 0.f, 20.f, 1.f));
+	
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.f, 0.f, -10.f, 1.f));
+
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -61,7 +63,8 @@ void CSlimeKing::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
-	
+	_float4 vRight, vUp, vLook;
+
 
 	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
@@ -97,6 +100,11 @@ void CSlimeKing::Combat_Tick(_double TimeDelta)
 	CMonster::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
+
+
+	
+
+
 }
 
 _int CSlimeKing::Is_MovingAnim()

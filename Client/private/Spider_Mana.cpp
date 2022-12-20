@@ -37,9 +37,9 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_Scaled(_float3(2.f, 2.f, 2.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(5.f, 0.f, 15.f, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(23.f, 0.f, 11.f, 1.f));
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(38.f, 0.f, -9.f, 1.f));
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -62,7 +62,7 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	
+
 	m_pFsmCom->Tick(TimeDelta);
 	
 	m_pModelCom->Play_Animation(TimeDelta, true);

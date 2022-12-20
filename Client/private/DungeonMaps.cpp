@@ -58,6 +58,8 @@ void CDungeonMaps::Tick(_double TimeDelta)
 		m_iShaderPass = 1;
 	}
 
+	//Create_NaviMesh();
+
 }
 
 void CDungeonMaps::Late_Tick(_double TimeDelta)
@@ -106,6 +108,22 @@ void CDungeonMaps::Change_Model(_uint iLevel, const wstring & NewComPonentTag)
 	if (FAILED(__super::Add_Component(iLevel, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		assert("Error");
+}
+
+void CDungeonMaps::Create_NaviMesh()
+{
+	_float3 vPickPos;
+
+	if (ImGui::IsMouseClicked(0))
+	{
+		if (m_pModelCom->PickingOnMesh(g_hWnd, m_pTransformCom, vPickPos))
+		{
+			MSG_BOX("Picking True");
+		}
+	}
+
+	
+
 }
 
 HRESULT CDungeonMaps::SetUp_Components()

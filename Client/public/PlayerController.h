@@ -45,14 +45,8 @@ public: /*For.Combat*/
 
 private:
 	_uint					m_iCurrentScene = 0;
-	vector<CPlayer*> m_pPlayerVec;
-	CPlayer*		m_pCaptinPlayer = nullptr;
-
-	//vector<class CGameObject*> CombatActors;	// 전체적인 흐름담당
-	//class CGameObject*			pCurentActor = nullptr;		// 현재 순서인놈
-	//class CGameObject*			pHitActor = nullptr;		// 맞은놈
-
-
+	vector<CPlayer*>		m_pPlayerVec;
+	CPlayer*				m_pCaptinPlayer = nullptr;
 
 
 public:

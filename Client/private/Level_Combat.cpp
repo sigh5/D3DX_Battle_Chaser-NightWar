@@ -22,7 +22,7 @@ HRESULT CLevel_Combat::Initialize()
 
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
-	
+
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 		return E_FAIL;
 
@@ -61,6 +61,7 @@ HRESULT CLevel_Combat::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
+
 
 	SetWindowText(g_hWnd, TEXT("Level : ComBat"));
 
@@ -101,8 +102,7 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
-		return E_FAIL;
+	
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -112,6 +112,8 @@ HRESULT CLevel_Combat::Ready_Layer_Camera(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_CombatCamera"))))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -148,6 +150,7 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+	pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
 	pGameInstance->Load_Object(TEXT("UISave"), LEVEL_COMBAT);
 
 	RELEASE_INSTANCE(CGameInstance);

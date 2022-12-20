@@ -185,11 +185,11 @@ HRESULT CHero_Knolan::Combat_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR1);
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(12.f, 0.f, 17.f, 1.f));
-	
-	
-	m_CurAnimqeue.push({ 0,1.f });
-	Set_CombatAnim_Index(m_pModelCom);
+	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-4.f, 0.f, 22.f, 1.f));
+
 
 
 	m_bCombat_LastInit = true;
@@ -199,6 +199,11 @@ HRESULT CHero_Knolan::Combat_Initialize()
 void CHero_Knolan::Combat_Tick(_double TimeDelta)
 {
 	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+	_float4 vRight, vUp, vLook;
+	XMStoreFloat4(&vRight, m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
+	XMStoreFloat4(&vUp, m_pTransformCom->Get_State(CTransform::STATE_UP));
+	XMStoreFloat4(&vLook, m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 }
 
 void CHero_Knolan::ObserverTest(_double TimeDelta)

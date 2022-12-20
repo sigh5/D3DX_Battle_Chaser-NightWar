@@ -131,6 +131,24 @@ namespace Engine
 	}VTXNORTEX_DECLARATION;
 
 
+	/* 인스턴싱을 위한 */
+	typedef struct tagVertexMatrix
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vPosition;
+	}VTXMATRIX;
+
+	typedef struct ENGINE_DLL tagVertexRectInstance_Declaration
+	{
+		static const unsigned int		iNumElements = 6;
+		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
+	}VTXRECTINSTANCE_DECLARATION;
+
+
+
+
 	typedef struct tagVertexModel
 	{
 		XMFLOAT3		vPosition;
