@@ -311,7 +311,7 @@ _bool CModel::PickingOnMesh(HWND hWnd, CTransform* pTransform, OUT _float3 & vPi
 					_vector vPos = vRayPos + XMVector3Normalize(vRayDir) * fDist;
 					vPos = XMVector3TransformCoord(vPos, pTransform->Get_WorldMatrix());
 					vPos = XMVector3TransformCoord(vPos, XMLoadFloat4x4(&m_PivotMatrix));
-					
+
 					XMStoreFloat3(&vPickPos, vPos);
 
 					return true;
@@ -355,8 +355,7 @@ _bool CModel::Control_KeyFrame(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
 
 void CModel::Imgui_RenderProperty()
 {
-	ImGui::Begin("BoneName");
-
+	ImGui::Begin("Why??");
 	if (ImGui::TreeNode("BoneNameViewer"))
 	{
 		char szBoneTag[MAX_PATH];
@@ -416,9 +415,6 @@ void CModel::Imgui_RenderProperty()
 		char szTickPerSecond[MAX_PATH];
 		strcpy_s(szTickPerSecond, MAX_PATH, to_string(iTickPerSecond).c_str());
 		ImGui::Text(szTickPerSecond);
-		/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
-		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
-	*/
 
 		_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
 		char szDurationSecond[MAX_PATH];
@@ -459,117 +455,10 @@ void CModel::Imgui_RenderProperty()
 
 	Imgui_Gizmo_Bone();
 
-
-
-	ImGui::End();ImGui::Begin("BoneName");
-
-	if (ImGui::TreeNode("BoneNameViewer"))
-	{
-		char szBoneTag[MAX_PATH];
-
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& bone : m_Bones)
-			{
-				strcpy_s(szBoneTag, MAX_PATH, bone->Get_Name());
-
-				if (ImGui::Selectable(szBoneTag))
-				{
-					m_pSelectedBone = bone;
-					ImGui::Text(szBoneTag);
-				}
-			}
-			ImGui::EndListBox();
-		}
-
-		ImGui::TreePop();
-	}
-
-	_uint iwIndex = 0;
-	if (ImGui::TreeNode("Animation"))
-	{
-		char szAnimTag[MAX_PATH];
-
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& pAnim : m_Animations)
-			{
-				if (pAnim != nullptr)
-				{
-					strcpy_s(szAnimTag, MAX_PATH, pAnim->Get_Name());
-
-					if (ImGui::Selectable(szAnimTag))
-					{
-						m_iCurrentAnimIndex = iwIndex;
-					}
-					++iwIndex;
-				}
-			}
-			ImGui::EndListBox();
-		}
-		ImGui::TreePop();
-	}
-
-	if (!m_Animations.size() == 0)
-	{
-		string str = "Current Anim Index :" + to_string(m_iCurrentAnimIndex);
-		strcpy_s(m_imguiAnimName, MAX_PATH, m_Animations[m_iCurrentAnimIndex]->Get_Name());
-
-		ImGui::Text(str.c_str());
-		ImGui::Text(m_imguiAnimName);
-
-		_double iTickPerSecond = m_Animations[m_iCurrentAnimIndex]->Get_TickPerSecond();
-		char szTickPerSecond[MAX_PATH];
-		strcpy_s(szTickPerSecond, MAX_PATH, to_string(iTickPerSecond).c_str());
-		ImGui::Text(szTickPerSecond);
-		/*ImGui::InputDouble("TickPerSecone", &m_iTickPerSecond);
-		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond((_double)m_iTickPerSecond);
-	*/
-
-		_double	 dDuration = m_Animations[m_iCurrentAnimIndex]->Get_Duration();
-		char szDurationSecond[MAX_PATH];
-		string str2 = "Current_Duration :" + to_string(m_iCurrentAnimIndex);
-		strcpy_s(szDurationSecond, MAX_PATH, to_string(dDuration).c_str());
-		ImGui::Text(str2.c_str());
-		ImGui::Text(szDurationSecond);
-
-
-		int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
-		ImGui::Text("FrameIndex : %d", iFrameIndex);
-
-	}
-	_uint iMesh22Num = 0;
-	if (ImGui::TreeNode("MeshName"))
-	{
-		char szMeshName[MAX_PATH];
-
-		if (ImGui::BeginListBox("##"))
-		{
-			for (auto& pMesh : m_Meshes)
-			{
-				if (pMesh != nullptr)
-				{
-					strcpy_s(szMeshName, MAX_PATH, pMesh->Get_MeshName());
-
-					if (ImGui::Selectable(szMeshName))
-					{
-						m_iNoRenderIndex = iMesh22Num;
-					}
-					++iMesh22Num;
-				}
-			}
-			ImGui::EndListBox();
-		}
-		ImGui::TreePop();
-	}
-
-	Imgui_Gizmo_Bone();
-
-
-
 	ImGui::End();
 
 }
+
 
 void CModel::Imgui_Gizmo_Bone()
 {

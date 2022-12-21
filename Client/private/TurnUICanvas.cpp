@@ -4,6 +4,14 @@
 
 #include "CombatController.h"
 #include "Hero_Knolan.h"
+#include "Hero_Calibretto.h"
+#include "Hero_Garrison.h"
+
+#include "Spider_Mana.h"
+#include "SlimeKing.h"
+#include "Skeleton_Naked.h"
+
+
 #include "TurnCharcterUI.h"
 
 CTurnUICanvas::CTurnUICanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -67,9 +75,22 @@ HRESULT CTurnUICanvas::Last_Initialize()
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
-	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyHPDelegater.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
-	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_GullyTestShakingDelegater.bind(this, &CTurnUICanvas::ChildrenShakingCheck);
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Skeleton_Naked"));
+	dynamic_cast<CSkeleton_Naked*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Spider_Mana"));
+	dynamic_cast<CSpider_Mana*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Monster_SlimeKing"));
+	dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
 	SetUp_ChildrenPosition();
 	SetUp_MatchingOption();

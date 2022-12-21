@@ -21,7 +21,8 @@ private:
 
 public:
 	void	Set_NoRenderMeshName(const char* pBoneConstantName) {strcpy_s(m_szNoRenderMeshName, MAX_PATH, pBoneConstantName);}
-	
+	void	Set_NoRenderMeshIndex(_uint iIndex) { m_iNoRenderIndex = iIndex; }
+
 public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_matrix Get_PivotMatrix() const { return XMLoadFloat4x4(&m_PivotMatrix); }

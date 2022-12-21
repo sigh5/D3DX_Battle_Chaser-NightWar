@@ -19,6 +19,10 @@ CPlayer::CPlayer(const CPlayer & rhs)
 {
 }
 
+void CPlayer::Fsm_Exit()
+{
+}
+
 HRESULT CPlayer::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))

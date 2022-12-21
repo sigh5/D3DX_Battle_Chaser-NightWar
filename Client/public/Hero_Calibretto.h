@@ -20,6 +20,7 @@ protected:
 	CHero_Calibretto(const CHero_Calibretto& rhs);
 	virtual ~CHero_Calibretto() = default;
 
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -27,6 +28,7 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
+
 
 
 public: /*For.SceneChange*/
@@ -46,9 +48,11 @@ public:  /*For.Combat*/
 	
 	_int	  Is_MovingAnim();
 	void	  CombatAnim_Move(_double TImeDelta);
+	void	  MovingAnimControl(_double TimeDelta);
 
-private:
-	void				ObserverTest();
+
+	virtual		void	Fsm_Exit()override;
+	void				Intro_Exit();
 	
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -81,6 +85,14 @@ public:
 	void					Anim_Die();
 	void					Anim_Viroty();
 
+
+private:
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
+	_vector		m_vOriginPos;				// for.Combat
+
+	_uint	m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
+
 public:
 	static CHero_Calibretto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
@@ -88,6 +100,20 @@ public:
 
 public:
 	BaseDelegater<HIGHLIGHT_UIDESC> m_Hero_DungeonUIDelegeter;
+	
+	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;			//옆에 턴 넘기는것
+	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
+
+
+private:
+	_bool		m_bCombatChaseTarget = false;
+
+
+	_float		m_SpeedRatio = 8.f;
+	_float		m_LimitDistance = 12.f;
+	_float		m_ReturnDistance = 0.1f;
+	_float		m_setTickForSecond = 0.9f;
+
 };
 
 END

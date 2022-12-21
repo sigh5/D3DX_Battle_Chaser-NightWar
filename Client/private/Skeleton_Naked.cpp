@@ -63,7 +63,7 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 
 	m_pFsmCom->Tick(TimeDelta);
 
-
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
@@ -90,6 +90,11 @@ HRESULT CSkeleton_Naked::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
+
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+
+#endif // !_DEBUG
 	return S_OK;
 }
 
@@ -132,7 +137,18 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 		m_pTransformCom->Go_Backward(TImeDelta);
 }
 
+void CSkeleton_Naked::Fsm_Exit()
+{
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
 
+	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+}
+
+_bool CSkeleton_Naked::IsCollMouse()
+{
+	return m_pColliderCom->Collision_Mouse(g_hWnd, m_pTransformCom);
+}
 
 HRESULT CSkeleton_Naked::SetUp_Components()
 {
@@ -146,6 +162,17 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_COMBAT, TEXT("Prototype_Component_Model_Skeleton_Naked"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
+		return E_FAIL;
+
+	CCollider::COLLIDERDESC			ColliderDesc;
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+	ColliderDesc.vSize = _float3(1.2f, 1.7f, 1.2f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vCenter = _float3(0.2f, ColliderDesc.vSize.y * 0.5f, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
+		(CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
 	return S_OK;

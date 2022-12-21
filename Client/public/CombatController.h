@@ -24,6 +24,8 @@ BEGIN(Client)
 class CCombatController final :public CBase
 {
 	DECLARE_SINGLETON(CCombatController);
+	
+
 
 public:
 	CCombatController();
@@ -47,6 +49,10 @@ public:
 	void	ResetState();
 
 
+private:
+	void	PickingTarget();		//플레이어의 턴일때
+
+	// 선 상태 설정 후 몬스터 설정
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 	_bool		To_Idle();				// 애는 좀 애매함
@@ -75,7 +81,7 @@ private:
 	CGameObject*			m_pHitActor =	nullptr;		// 맞은놈
 
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
-
+	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
 private:
 	_bool					m_bCombatIntro = false;
 	_bool					m_bLateInit = false;

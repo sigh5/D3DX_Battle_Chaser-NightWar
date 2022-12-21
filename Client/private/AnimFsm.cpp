@@ -80,6 +80,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
+				.OnExit([this]()
+			{
+				static_cast<CHero_Knolan*>(m_pTarget)->Intro_Exit();
+			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -93,6 +97,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+			})
+			.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
@@ -108,6 +116,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
+			.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -121,6 +133,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+			})
+			.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
@@ -136,6 +152,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
+			.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -149,6 +169,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+			})
+			.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
@@ -164,6 +188,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
+				.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+			})
 				.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -177,6 +205,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+			})
+				.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
@@ -192,6 +224,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+			})
+				.OnExit([this]()
+			{
+				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
@@ -326,6 +362,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -341,6 +381,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_BlendAnimTick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -354,6 +398,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -369,6 +417,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Ultimate(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -382,6 +434,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -397,6 +453,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -411,6 +471,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -530,6 +594,12 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CHero_Calibretto*>(m_pTarget)->Intro_Exit();
+		
+		})
+			
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -543,6 +613,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -558,6 +632,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -571,6 +649,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -586,6 +668,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -599,6 +685,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
@@ -614,6 +704,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
@@ -627,6 +721,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Tick([this](_double TimeDelta)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
+		})
+			.OnExit([this]()
+		{
+			static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 		})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{

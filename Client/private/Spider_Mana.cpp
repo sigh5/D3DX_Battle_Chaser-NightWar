@@ -62,8 +62,8 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-
 	m_pFsmCom->Tick(TimeDelta);
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
@@ -91,6 +91,14 @@ HRESULT CSpider_Mana::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
+
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+
+#endif // !_DEBUG
+
+
+
 	return S_OK;
 }
 
@@ -138,6 +146,20 @@ void CSpider_Mana::CombatAnim_Move(_double TImeDelta)
 		m_pTransformCom->Go_Backward(TImeDelta);
 }
 
+void CSpider_Mana::Fsm_Exit()
+{
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
+
+	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+
+}
+
+_bool CSpider_Mana::IsCollMouse()
+{
+	return m_pColliderCom->Collision_Mouse(g_hWnd, m_pTransformCom);
+}
+
 
 HRESULT CSpider_Mana::SetUp_Components()
 {
@@ -152,6 +174,19 @@ HRESULT CSpider_Mana::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_COMBAT, TEXT("Prototype_Component_Model_Spider_Mana_Baby"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+	CCollider::COLLIDERDESC			ColliderDesc;
+
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+	ColliderDesc.vSize = _float3(2.f, 1.7f, 2.f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vCenter = _float3(0.2f, ColliderDesc.vSize.y * 0.5f, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
+		(CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

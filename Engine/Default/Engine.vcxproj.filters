@@ -384,6 +384,9 @@
     <ClInclude Include="..\Public\VIBuffer_Rect_Instancing.h">
       <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Rect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Point_Instancing.h">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Point</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -571,6 +574,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Rect_Instancing.cpp">
       <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Rect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Point_Instancing.cpp">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Point</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

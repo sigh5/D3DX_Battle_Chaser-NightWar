@@ -182,6 +182,7 @@
     <ClInclude Include="..\Public\CombatMap.h" />
     <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
+    <ClInclude Include="..\Public\Effect_Point_Instancing.h" />
     <ClInclude Include="..\Public\Effect_Rect_Instancing.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
@@ -197,6 +198,7 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
+    <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
@@ -227,6 +229,7 @@
     <ClCompile Include="..\Private\CombatMap.cpp" />
     <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
+    <ClCompile Include="..\Private\Effect_Point_Instancing.cpp" />
     <ClCompile Include="..\Private\Effect_Rect_Instancing.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />
@@ -241,6 +244,7 @@
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
+    <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
@@ -276,6 +280,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
   </ItemGroup>

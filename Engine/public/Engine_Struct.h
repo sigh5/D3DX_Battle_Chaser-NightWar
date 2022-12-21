@@ -81,6 +81,21 @@ namespace Engine
 
 
 
+	typedef struct tagVertexPointInstancing
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT2		vPSize;
+	}VTXPOINTINSTANCING;
+
+	typedef struct ENGINE_DLL tagVertexPointInstancing_Declaration
+	{
+		static const unsigned int		iNumElements = 6;
+		static D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPOINTINSTANCING_DECLARATION;
+
+
+
+
 	typedef struct tagFaceIndices16
 	{
 		unsigned short			_0, _1, _2;

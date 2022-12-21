@@ -98,6 +98,7 @@ public:
 
 	void Chase_Speed(_fvector vTargetPos, _double TimeDelta,_float fSpeedRatio ,_float fLimit = 0.1f);
 
+	_bool	CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f,_float fSpeedMultiple=2.f);
 
 
 public: /* for_UI*/

@@ -16,12 +16,15 @@ void CImgui_PropertyEditor::Imgui_RenderTab()
 		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
 		m_pSelectedObject);
 
-	CObject_Manager::GetInstance()->Imgui_Picking(
-		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
-		m_pSelectedObject);
-
 	// todo: 마우스 피킹으로 오브젝트 선택하는 기능 추가
 	// todo: 현재 사본 object를 구분할 이름이 없기 때문에 일단 class이름으로 해놓음. 아이디어 있는사람이 추가하기~
+
+
+
+
+	CObject_Manager::GetInstance()->Imgui_Swap_Render_Sorting(
+		CLevel_Manager::GetInstance()->GetCurLevelIdx(),
+		m_pSelectedObject);
 
 	if (m_pSelectedObject)
 	{

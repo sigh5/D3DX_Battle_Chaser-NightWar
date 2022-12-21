@@ -24,6 +24,8 @@ public:
 	 void								Set_BraodCasterTag(const _tchar* BroadCasterTag) { lstrcpy(m_UIDesc.pBroadCasterTag, BroadCasterTag); };
 	  virtual const _tchar*				Get_TextureTag()const { return m_UIDesc.m_pTextureTag; }
 	  virtual void						Set_TextureTag(const _tchar* pTextureTag) { lstrcpy(m_UIDesc.m_pTextureTag, pTextureTag); };
+	  const		_bool					Get_RenderActive()const { return m_bRenderActive; }
+	  virtual  void								Set_RenderActive(_bool bActive) {m_bRenderActive = bActive;  }
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -32,6 +34,10 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag) {}
+
+public:
+	virtual void Set_ParentLoad(CUI * pUI);
+
 
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
@@ -49,7 +55,9 @@ public: /* imgui */
 
 protected:
 	UIDESC						m_UIDesc;
-	
+	_bool						m_bRenderActive = true;			//렌더를 결정 안결정
+
+
 	
 
 public:

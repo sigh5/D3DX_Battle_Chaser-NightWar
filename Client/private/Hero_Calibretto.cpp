@@ -33,7 +33,7 @@ HRESULT CHero_Calibretto::Initialize(void * pArg)
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
 	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
 	GameObjectDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	
+
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
 		return E_FAIL;
 	if (FAILED(SetUp_Components()))
@@ -67,14 +67,14 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		m_pFsmCom->Tick(TimeDelta);
 
 	}
-		
+
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
 void CHero_Calibretto::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-	
+
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
 	if (nullptr != m_pRendererCom)
@@ -88,18 +88,31 @@ HRESULT CHero_Calibretto::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
+	if (m_bIsCombatScene)
+		m_pModelCom->Set_NoRenderMeshIndex(10);	//  베이스무기  그리지말기
+	
+	else
+		m_pModelCom->Set_NoRenderMeshIndex(2);
+
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-	for (_uint i = 0; i < iNumMeshes; ++i)
+	for (_uint i = m_iNonRenderMeshIndex; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
+	
+
+	
+
+
+
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
 #endif
 	return S_OK;
 }
+
 
 void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
 {
@@ -169,7 +182,7 @@ void CHero_Calibretto::NormalLightCharUI()
 
 void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta,m_pNavigationCom))
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -182,44 +195,42 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
-	
+
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f,4.f,4.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 30.f, 1.f));
-	
+
+	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+
 	m_bCombat_LastInit = true;
 	return S_OK;
 }
 
 void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 {
-	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	ImGui::InputFloat("SpeedRatio", &m_SpeedRatio);
+	ImGui::InputFloat("LimitDistance", &m_LimitDistance);
+	ImGui::InputFloat("TickForSecond", &m_setTickForSecond);
+
+	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
+	{
+		MovingAnimControl(TimeDelta);
+	}
+	else
+		CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
 }
 
-void CHero_Calibretto::ObserverTest()
-{
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	/*if (pInstance->Key_Down(DIK_SPACE))
-	{
-	_uint iMoveSpeed = 100;
-	m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
 
-	}
-
-	if (pInstance->Key_Down(DIK_O))
-	{
-	_uint iShakingTime = 3;
-	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	}*/
-	RELEASE_INSTANCE(CGameInstance);
-}
 
 HRESULT CHero_Calibretto::SetUp_Components()
 {
-	
+
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -237,7 +248,7 @@ HRESULT CHero_Calibretto::SetUp_Components()
 	/* For.Com_OBB */
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
 	ColliderDesc.vSize = _float3(2.0f, 2.5f, 1.2f);
-	ColliderDesc.vRotation = _float3(0.f,0.f, 0.f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
 	ColliderDesc.vCenter = _float3(0.f, ColliderDesc.vSize.y * 0.5f, 0.f);
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"), TEXT("Com_OBB"),
@@ -273,7 +284,7 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
-	
+
 
 
 	/* For.Lights */
@@ -294,6 +305,7 @@ void CHero_Calibretto::Anim_Idle()
 
 void CHero_Calibretto::Anim_Intro()
 {
+	m_iNonRenderMeshIndex = 0;
 	m_CurAnimqeue.push({ 17, m_IntroTimer });
 	m_CurAnimqeue.push({ 1,	 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -438,15 +450,9 @@ _bool CHero_Calibretto::Is_PlayerDead()
 _int CHero_Calibretto::Is_MovingAnim()
 {
 	if (m_pModelCom->Get_AnimIndex() == 3)
-	{
 		bResult = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(3, 2);
-	}
 	else if (m_pModelCom->Get_AnimIndex() == 9)
-	{
 		bResult = ANIM_DIR_BACK;
-		m_pModelCom->Set_Duration(9, 2);
-	}
 	else
 		bResult = ANIM_EMD;
 
@@ -455,9 +461,55 @@ _int CHero_Calibretto::Is_MovingAnim()
 
 void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 {
+	if (m_pHitTarget == nullptr)
+		return;
+
+	_float4 Target;
+	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+
 	if (bResult == ANIM_DIR_STRAIGHT)
-		m_pTransformCom->Go_Straight(TImeDelta);
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 
 	else if (bResult == ANIM_DIR_BACK)
-		m_pTransformCom->Go_Backward(TImeDelta);
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
+}
+
+void CHero_Calibretto::MovingAnimControl(_double TimeDelta)
+{
+	if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	{
+		m_bIsCombatAndAnimSequnce = false;
+		m_iOldAnim = m_pModelCom->Get_AnimIndex();
+
+		if (m_bCombatChaseTarget == false)
+			return;
+
+		_uint i = m_CurAnimqeue.front().first;
+		m_pModelCom->Set_AnimIndex(i);
+		m_pModelCom->Set_AnimTickTime(m_CurAnimqeue.front().second);
+		m_CurAnimqeue.pop();
+		m_bFinishOption = ANIM_CONTROL_NEXT;
+
+
+
+		if (m_CurAnimqeue.empty())
+		{
+			m_bIsCombatAndAnimSequnce = true;
+		}
+	}
+}
+
+void CHero_Calibretto::Fsm_Exit()
+{
+	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+
+	_bool	bRenderTrue = true;
+	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
+	m_pHitTarget = nullptr;
+	
+}
+
+void CHero_Calibretto::Intro_Exit()
+{
+	m_iNonRenderMeshIndex = 8;
 }

@@ -28,7 +28,7 @@ public:
 	void	Imgui_SelectParentViewer();
 
 private:
-	void	Imgui_Select_ParentCanvas();
+	void	Imgui_Select_ParentCanvas_Button();
 	void	Imgui_Select_ParentTerrain();
 	
 	void	Imgui_CreateObject();

@@ -30,6 +30,7 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 
+
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 
@@ -44,11 +45,18 @@ public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_Ultimate(_double TimeDelta);
 	virtual   void	  Combat_BlendAnimTick(_double TimeDelta);
+	virtual		void	Fsm_Exit()override;
+
+
+	void			 MovingAnimControl(_double TimeDelta);
+
+
 
 public:
 	virtual	  _bool	  Is_PlayerDead()override;
 	_int	  Is_MovingAnim();
-	
+	void	  CombatAnim_Move_Ultimate(_double TImeDelta);
+
 	void	  Is_Skill1MovingAnim();
 	void	  CombatAnim_Move(_double TImeDelta);
 	 
@@ -62,7 +70,7 @@ public:
 	void				Anim_Skill2_Attack();
 	void				Anim_Uitimate();
 	void				Anim_Buff();
-	void				Anim_WideAreaBuff();
+
 	void				Anim_Use_Item();
 	void				Anim_Defence();
 	void				Anim_Light_Hit();
@@ -72,8 +80,9 @@ public:
 	void				Anim_Viroty();
 
 private:
-	_int	 bResult = ANIM_EMD;
-	_bool	m_bCombatInit = false;
+	_int		bResult = ANIM_EMD;
+	_bool		m_bCombatInit = false;
+	_vector		m_vOriginPos;				// for.Combat
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -81,6 +90,7 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	class CAnimFsm*				m_pAnimFsm = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
+
 
 private:
 	HRESULT		SetUp_Components();
@@ -93,11 +103,22 @@ public:
 
 public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
-	
+	BaseDelegater<_double, _uint>	  m_Hero_CombatTurnDelegeter;
+	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// ¹Ø¿¡ »óÅÂÄµ¹ö½º Å°´Â°Í
+
 private:
 	//queue<pair<_uint, _double>>	m_CurAnimqeue;
+private:
+
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
+	_bool		m_bCombatChaseTarget = false;
 
 
+	_float		m_SpeedRatio = 8.f;
+	_float		m_LimitDistance = 8.f;
+	_float		m_ReturnDistance = 0.1f;
+	_float		m_setTickForSecond = 0.9f;
 };
 
 END

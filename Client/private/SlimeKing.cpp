@@ -63,8 +63,7 @@ void CSlimeKing::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
-	_float4 vRight, vUp, vLook;
-
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
@@ -92,6 +91,12 @@ HRESULT CSlimeKing::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
+
+#ifdef _DEBUG
+	m_pColliderCom->Render();
+
+#endif // !_DEBUG
+
 	return S_OK;
 }
 
@@ -134,6 +139,19 @@ void CSlimeKing::CombatAnim_Move(_double TImeDelta)
 		m_pTransformCom->Go_Backward(TImeDelta);
 }
 
+void CSlimeKing::Fsm_Exit()
+{
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
+
+	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+}
+
+_bool CSlimeKing::IsCollMouse()
+{
+	return m_pColliderCom->Collision_Mouse(g_hWnd, m_pTransformCom);
+}
+
 
 HRESULT CSlimeKing::SetUp_Components()
 {
@@ -148,6 +166,20 @@ HRESULT CSlimeKing::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_COMBAT, TEXT("Prototype_Component_Model_Slime_King"), TEXT("Com_Model"),
 	(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+
+	CCollider::COLLIDERDESC			ColliderDesc;
+
+	/* For.Com_AABB */
+	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
+	ColliderDesc.vSize = _float3(1.3f, 1.5f, 1.3f);
+	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
+	ColliderDesc.vCenter = _float3(0.2f, ColliderDesc.vSize.y * 0.5f, 0.f);
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
+		(CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }

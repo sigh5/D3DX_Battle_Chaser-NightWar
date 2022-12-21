@@ -1,115 +1,95 @@
 #include "stdafx.h"
-#include "..\public\Dungeon_Canvas.h"
-
+#include "..\public\MyImage.h"
 #include "GameInstance.h"
-#include "Hero_Knolan.h"
-#include "Hero_Calibretto.h"
-#include "Hero_Garrison.h"
 
-CDungeon_Canvas::CDungeon_Canvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CCanvas(pDevice, pContext)
+CMyImage::CMyImage(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+	: CUI(pDevice, pContext)
 {
 }
 
-CDungeon_Canvas::CDungeon_Canvas(const CDungeon_Canvas & rhs)
-	: CCanvas(rhs)
+CMyImage::CMyImage(const CMyImage & rhs)
+	: CUI(rhs)
 {
 }
 
-HRESULT CDungeon_Canvas::Initialize_Prototype()
+HRESULT CMyImage::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
-HRESULT CDungeon_Canvas::Initialize(void * pArg)
+HRESULT CMyImage::Initialize(void * pArg)
 {
-	CCanvas::CANVASDESC		CanvasDesc;
-	ZeroMemory(&CanvasDesc, sizeof(CanvasDesc));
-
 	if (nullptr != pArg)
-		memcpy(&CanvasDesc, pArg, sizeof(CanvasDesc));
+		memcpy(&m_UIDesc, pArg, sizeof(UIDESC));
 
-	if (FAILED(__super::Initialize(&CanvasDesc)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-
-	m_fSizeX = (_float)g_iWinSizeX / 11;
-	m_fSizeY = (_float)g_iWinSizeY * 1.1f;
+	m_fSizeX = (_float)g_iWinSizeX / 16;
+	m_fSizeY = (_float)g_iWinSizeY / 16;
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f - (585.f), -m_fY + m_fSizeY * 0.5f, 0.1f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f, -m_fY + m_fSizeY * 0.5f + 50.f, 0.1f, 1.f));
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
+	m_bRenderActive = true;
 
 	return S_OK;
 }
 
-HRESULT CDungeon_Canvas::Last_Initialize()
+HRESULT CMyImage::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
-	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
-	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
-
-	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Alumon"));
-	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
-
-	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
-	dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_DungeonUIDelegeter.bind(this, &CDungeon_Canvas::Change_UITexture);
-
 	m_bLast_Initlize = true;
-	RELEASE_INSTANCE(CGameInstance);
-
 	return S_OK;
 }
 
-void CDungeon_Canvas::Tick(_double TimeDelta)
+void CMyImage::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
-
-
 }
 
-void CDungeon_Canvas::Late_Tick(_double TimeDelta)
+void CMyImage::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
-
 }
 
-HRESULT CDungeon_Canvas::Render()
+HRESULT CMyImage::Render()
 {
+	if (!m_bRenderActive)
+		return S_OK;
+
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(1);
+
+	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
+
 
 	return S_OK;
 }
 
-void CDungeon_Canvas::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
+void CMyImage::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 {
 	Safe_Release(m_pTextureCom);
 	Remove_component(TEXT("Com_Texture"));
@@ -120,12 +100,10 @@ void CDungeon_Canvas::Change_Texture(_uint iLevel, const wstring & NewComPonentT
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		assert("CTurnCharcterUI Change_Texture");
-
 }
 
-HRESULT CDungeon_Canvas::SetUp_Components()
+HRESULT CMyImage::SetUp_Components()
 {
-	/*For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
 		(CComponent**)&m_pRendererCom)))
 		return E_FAIL;
@@ -139,17 +117,15 @@ HRESULT CDungeon_Canvas::SetUp_Components()
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
-	_tchar* pTemp = m_CanvasDesc.m_pTextureTag;
-
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, pTemp, TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CDungeon_Canvas::SetUp_ShaderResources()
+HRESULT CMyImage::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -176,49 +152,31 @@ HRESULT CDungeon_Canvas::SetUp_ShaderResources()
 	return S_OK;
 }
 
-void CDungeon_Canvas::Change_UITexture(HIGHLIGHT_UIDESC Desc)
+CMyImage * CMyImage::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	for (auto& pChildUI : m_ChildrenVec)
-	{
-		if (!lstrcmp(pChildUI->Get_ObjectName(), Desc.szObjectName))
-		{
-			pChildUI->Set_HighRightUIDesc(Desc);
-			break;
-		}
-
-
-	}
-}
-
-
-
-
-
-CDungeon_Canvas * CDungeon_Canvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-{
-	CDungeon_Canvas*		pInstance = new CDungeon_Canvas(pDevice, pContext);
+	CMyImage*		pInstance = new CMyImage(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CTurnUICanvas");
+		MSG_BOX("Failed to Created : CTurnCharcterUI");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CDungeon_Canvas::Clone(void * pArg)
+CGameObject * CMyImage::Clone(void * pArg)
 {
-	CDungeon_Canvas*		pInstance = new CDungeon_Canvas(*this);
+	CMyImage*		pInstance = new CMyImage(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CTurnUICanvas");
+		MSG_BOX("Failed to Cloned : CTurnCharcterUI");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CDungeon_Canvas::Free()
+void CMyImage::Free()
 {
 	__super::Free();
 
@@ -226,7 +184,4 @@ void CDungeon_Canvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
 }
-
-

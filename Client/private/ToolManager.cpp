@@ -11,6 +11,7 @@
 
 #include "Camera_Static.h"
 #include "Camera_Dynamic.h"
+#include "UIButton.h"
 
 IMPLEMENT_SINGLETON(CToolManager)
 
@@ -29,7 +30,7 @@ void CToolManager::Imgui_SelectParentViewer()
 	ImGui::NewLine();
 	bool bFound = false;
 
-	Imgui_Select_ParentCanvas();
+	Imgui_Select_ParentCanvas_Button();
 	Imgui_Select_ParentTerrain();
 
 	Imgui_Select_LayerType();
@@ -50,7 +51,7 @@ void CToolManager::Imgui_SelectParentViewer()
 	
 }
 
-void CToolManager::Imgui_Select_ParentCanvas()
+void CToolManager::Imgui_Select_ParentCanvas_Button()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	
@@ -88,6 +89,45 @@ void CToolManager::Imgui_Select_ParentCanvas()
 			ImGui::TreePop();
 		}
 	}
+
+	/*Button*/
+
+	if (ImGui::CollapsingHeader("Select_Button", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+
+		if (ImGui::TreeNode("ButtonParent"))  // for object loop listbox
+		{
+			for (auto& Pair : targetLevel)
+			{
+				if (ImGui::BeginListBox("##"))
+				{
+					char szobjectTag[128];
+
+					for (auto& obj : Pair.second->GetGameObjects())
+					{
+						if (dynamic_cast<CUIButton*>(obj) == nullptr)
+							continue;
+
+						if (obj != nullptr)
+							wc2c((obj->Get_ObjectName()), szobjectTag);
+
+						if (ImGui::Selectable(szobjectTag))
+						{
+							if (dynamic_cast<CUI*>(pGameInstance->Get_SelectObject()) == nullptr)
+								return;
+
+							dynamic_cast<CUIButton*>(obj)->Set_ButtonImage(dynamic_cast<CUI*>(pGameInstance->Get_SelectObject()));
+						}
+					}
+					ImGui::EndListBox();
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
+
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 

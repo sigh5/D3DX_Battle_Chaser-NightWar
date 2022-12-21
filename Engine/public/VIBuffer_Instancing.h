@@ -14,6 +14,7 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Tick(_double TimeDelta) = 0;
 	virtual HRESULT Render();
 
 protected:

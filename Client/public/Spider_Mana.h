@@ -8,6 +8,7 @@ class CShader;
 class CRenderer;
 class CModel;
 class CCollider;
+
 END
 
 BEGIN(Client)
@@ -25,10 +26,13 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
+
 public:
 	void			Combat_Tick(_double TimeDelta);
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
+	virtual		void	Fsm_Exit()override;
+	virtual		_bool	IsCollMouse()override;
 
 
 private:
@@ -56,6 +60,10 @@ public:
 	void					Anim_Heavy_Hit();
 	void					Anim_Die();
 	void					Anim_Viroty();
+
+public:
+	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// ≈œ¡¶
+
 
 public:
 	static CSpider_Mana* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

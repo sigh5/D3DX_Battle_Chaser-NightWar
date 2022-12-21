@@ -44,9 +44,6 @@ HRESULT CTurnCharcterUI::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
-
 	return S_OK;
 }
 

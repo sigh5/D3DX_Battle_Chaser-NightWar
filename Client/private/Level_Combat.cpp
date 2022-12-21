@@ -78,7 +78,7 @@ void CLevel_Combat::Combat_Intro()
 	if (m_bIntroFinish)
 		return;
 
-	if (m_dCombatIntroTimer >= 2.f)
+	if (m_dCombatIntroTimer >= 0.2f)
 	{
 		m_pCombatController->Set_CombatIntro(true);
 		m_bIntroFinish = true;
@@ -152,6 +152,8 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 
 	pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
 	pGameInstance->Load_Object(TEXT("UISave"), LEVEL_COMBAT);
+	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

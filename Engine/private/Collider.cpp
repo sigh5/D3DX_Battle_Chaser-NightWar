@@ -2,6 +2,7 @@
 #include "DebugDraw.h"
 
 #include "PipeLine.h"
+#include "GameInstance.h"
 
 CCollider::CCollider(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -139,6 +140,184 @@ _bool CCollider::Collision(CCollider * pTargetCollider)
 	}
 
 	return m_isColl;
+}
+
+_bool CCollider::Collision_Mouse(HWND hWnd,CTransform* pTransform)
+{
+	m_isColl = false;
+
+
+	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
+
+	POINT		ptMouse{};
+
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	_float4		vPoint;
+
+	D3D11_VIEWPORT		ViewPort;
+	ZeroMemory(&ViewPort, sizeof(D3D11_VIEWPORT));
+	ViewPort.Width = 1280;
+	ViewPort.Height = 720;
+
+	vPoint.x = ptMouse.x / (1280 * 0.5f) - 1.f;
+	vPoint.y = ptMouse.y / -(720 * 0.5f) + 1.f;
+	vPoint.z = 1.f;
+	vPoint.w = 1.f;
+
+	_matrix		matProj;
+	matProj = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_PROJ);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matProj));
+
+	_matrix		matView;
+	matView = pGameIntance->Get_TransformMatrix_Inverse(CPipeLine::D3DTS_VIEW);
+	XMStoreFloat4(&vPoint, XMVector3TransformCoord(XMLoadFloat4(&vPoint), matView));
+
+	_float4		vRayPos;
+	memcpy(&vRayPos, &matView.r[3], sizeof(_float4));
+	_float4		vRayDir;
+	XMStoreFloat4(&vRayDir, (XMLoadFloat4(&vPoint) - XMLoadFloat4(&vRayPos)));
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	_float4 vCenter,vExtension;
+	
+	vCenter.x = m_pAABB->Center.x;
+	vCenter.y = m_pAABB->Center.y;
+	vCenter.z = m_pAABB->Center.z;
+	vCenter.w = 1.f;
+	
+	vExtension.x = m_pAABB->Extents.x;
+	vExtension.y = m_pAABB->Extents.y;
+	vExtension.z = m_pAABB->Extents.z;
+	vExtension.w = 0;
+
+	_float4	dwVtxIdx[8]{};
+	_float fDist;
+
+	dwVtxIdx[0] = { vCenter.x - vExtension.x,vCenter.y + vExtension.y,vCenter.z - vExtension.z,1.f };
+	dwVtxIdx[1] = { vCenter.x + vExtension.x,vCenter.y + vExtension.y,vCenter.z - vExtension.z,1.f };
+	dwVtxIdx[2] = { vCenter.x + vExtension.x,vCenter.y - vExtension.y,vCenter.z - vExtension.z,1.f };
+	dwVtxIdx[3] = { vCenter.x - vExtension.x,vCenter.y - vExtension.y,vCenter.z - vExtension.z,1.f };
+	dwVtxIdx[4] = { vCenter.x - vExtension.x,vCenter.y + vExtension.y,vCenter.z + vExtension.z,1.f };
+	dwVtxIdx[5] = { vCenter.x + vExtension.x,vCenter.y + vExtension.y,vCenter.z + vExtension.z,1.f };
+	dwVtxIdx[6] = { vCenter.x + vExtension.x,vCenter.y - vExtension.y,vCenter.z + vExtension.z,1.f };
+	dwVtxIdx[7] = { vCenter.x - vExtension.x,vCenter.y - vExtension.y,vCenter.z + vExtension.z,1.f };
+
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[1]),
+		XMLoadFloat4(&dwVtxIdx[5]),
+		XMLoadFloat4(&dwVtxIdx[6]),
+		fDist))
+	{
+		return true;
+	}
+	
+	
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[1]),
+		XMLoadFloat4(&dwVtxIdx[6]),
+		XMLoadFloat4(&dwVtxIdx[2]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[4]),
+		XMLoadFloat4(&dwVtxIdx[0]),
+		XMLoadFloat4(&dwVtxIdx[3]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[4]),
+		XMLoadFloat4(&dwVtxIdx[3]),
+		XMLoadFloat4(&dwVtxIdx[7]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[4]),
+		XMLoadFloat4(&dwVtxIdx[5]),
+		XMLoadFloat4(&dwVtxIdx[1]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[4]),
+		XMLoadFloat4(&dwVtxIdx[1]),
+		XMLoadFloat4(&dwVtxIdx[0]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[3]),
+		XMLoadFloat4(&dwVtxIdx[2]),
+		XMLoadFloat4(&dwVtxIdx[6]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[7]),
+		XMLoadFloat4(&dwVtxIdx[6]),
+		XMLoadFloat4(&dwVtxIdx[5]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[7]),
+		XMLoadFloat4(&dwVtxIdx[5]),
+		XMLoadFloat4(&dwVtxIdx[4]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[0]),
+		XMLoadFloat4(&dwVtxIdx[1]),
+		XMLoadFloat4(&dwVtxIdx[2]),
+		fDist))
+	{
+		return true;
+	}
+
+	if (TriangleTests::Intersects(XMLoadFloat4(&vRayPos),
+		XMVector3Normalize(XMLoadFloat4(&vRayDir)),
+		XMLoadFloat4(&dwVtxIdx[0]),
+		XMLoadFloat4(&dwVtxIdx[2]),
+		XMLoadFloat4(&dwVtxIdx[3]),
+		fDist))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 #ifdef _DEBUG

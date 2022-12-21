@@ -63,7 +63,6 @@ HRESULT CCanvas::Add_ChildUI(CUI * pUI)
 
 	m_ChildrenVec.push_back(pUI);
 	Safe_AddRef(pUI);
-	
 
 	pUI->Set_parent(this);
 

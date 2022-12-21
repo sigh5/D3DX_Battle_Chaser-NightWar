@@ -100,6 +100,7 @@ HRESULT CHero_Garrison::Render()
 	return S_OK;
 }
 
+
 void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 {
 	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
@@ -179,7 +180,18 @@ void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 
 void CHero_Garrison::Combat_Tick(_double TimeDelta)
 {
-	CPlayer::CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
+	/*ImGui::InputFloat("SpeedRatio", &m_SpeedRatio);
+	ImGui::InputFloat("LimitDistance", &m_LimitDistance);
+	ImGui::InputFloat("TickForSecond", &m_setTickForSecond);*/
+	
+	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
+	{
+		MovingAnimControl(TimeDelta);
+	}
+	else
+		CPlayer::CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
+	
+	m_bCombatChaseTarget = false;
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
 
@@ -187,13 +199,17 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 
 void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 {
-	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
-	if (m_pModelCom->Control_KeyFrame(30, 83, 94))
+	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
-		m_pTransformCom->Go_Straight(TimeDelta);
+		MovingAnimControl(TimeDelta);
 	}
+	else
+		CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+	m_bCombatChaseTarget = false;
+	Is_MovingAnim();
+	CombatAnim_Move_Ultimate(TimeDelta);
+	
 }
 
 void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
@@ -201,6 +217,39 @@ void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
 	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Is_Skill1MovingAnim();
 	CombatAnim_Move(TimeDelta);
+}
+
+void CHero_Garrison::Fsm_Exit()
+{
+	_bool	bRenderTrue = true;
+	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
+	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_pHitTarget = nullptr;
+}
+
+void CHero_Garrison::MovingAnimControl(_double TimeDelta)
+{
+	if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	{
+		m_bIsCombatAndAnimSequnce = false;
+		m_iOldAnim = m_pModelCom->Get_AnimIndex();
+
+		if (m_bCombatChaseTarget == false)
+			return;
+
+		_uint i = m_CurAnimqeue.front().first;
+		m_pModelCom->Set_AnimIndex(i);
+		m_pModelCom->Set_AnimTickTime(m_CurAnimqeue.front().second);
+		m_CurAnimqeue.pop();
+		m_bFinishOption = ANIM_CONTROL_NEXT;
+
+	
+
+		if (m_CurAnimqeue.empty())
+		{
+			m_bIsCombatAndAnimSequnce = true;
+		}
+	}
 }
 
 HRESULT CHero_Garrison::SetUp_Components()
@@ -301,6 +350,8 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 16.f, 1.f));
 
 
+	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
 	//m_CurAnimqeue.push({ 0,1.f });
 	//Set_CombatAnim_Index(m_pModelCom);
 
@@ -350,17 +401,14 @@ _int CHero_Garrison::Is_MovingAnim()
 	if (m_pModelCom->Get_AnimIndex() == 4)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(4, 2);
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 18)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(18, 3);
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 11)
 	{
 		bResult = ANIM_DIR_BACK;
-		m_pModelCom->Set_Duration(11, 2);
 	}
 	else
 		bResult = ANIM_EMD;
@@ -368,53 +416,54 @@ _int CHero_Garrison::Is_MovingAnim()
 	return bResult;
 }
 
+
 void CHero_Garrison::Is_Skill1MovingAnim()
 {
-	/*To_Do 나중에 가려는 몬스터 위치 받아오기*/
-	//_float4 Target;
-	//XMStoreFloat4(&Target, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-	//Target.x += 5;
-	//Target.z += 5;
-	//m_pTransformCom->Chase(XMLoadFloat4(&Target), TImeDelta);
-
-
 	if (m_pModelCom->Get_AnimIndex() == 4)
-	{
 		bResult = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(4, 2);
-	}
-
 	else if (m_pModelCom->Get_AnimIndex() == 12)
 	{
 		m_pModelCom->Set_Duration(12, 0.2);
 		bResult = ANIM_EMD;
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 11)
-	{
 		bResult = ANIM_DIR_BACK;
-		m_pModelCom->Set_Duration(11, 2);
-	}
-
 }
 
 void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 {
-	/*To_Do 나중에 가려는 몬스터 위치 받아오기*/
-	//_float4 Target;
-	//XMStoreFloat4(&Target, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-	//Target.x += 5;
-	//Target.z += 5;
-	//m_pTransformCom->Chase(XMLoadFloat4(&Target), TImeDelta);
+	if (m_pHitTarget == nullptr)
+		return;
+
+	_float4 Target;
+	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 
 	if (bResult == ANIM_DIR_STRAIGHT)
-		m_pTransformCom->Go_Straight(TImeDelta);
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 
 	else if (bResult == ANIM_DIR_BACK)
-		m_pTransformCom->Go_Backward(TImeDelta);
-	
-
-
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
+		
 }
+
+void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)
+{
+	if (m_pHitTarget == nullptr)
+		return;
+
+	_float4 Target;
+	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+
+	if (m_pModelCom->Control_KeyFrame(30, 83, 94))				// 특수사항
+	{
+		m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+	}
+
+
+	if (bResult == ANIM_DIR_BACK)
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, 6.f);
+}
+
 
 void CHero_Garrison::Anim_Idle()
 {
@@ -432,9 +481,14 @@ void CHero_Garrison::Anim_Intro()
 
 void CHero_Garrison::AnimNormalAttack()
 {
-	m_CurAnimqeue.push({ 4,  0.9f });
+	m_SpeedRatio = 7.f;
+	m_LimitDistance = 10.f;
+	m_ReturnDistance = 0.1f;
+	m_setTickForSecond = 0.9f;
+
+	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
 	m_CurAnimqeue.push({ 3,  1.f });
-	m_CurAnimqeue.push({ 11, 0.9f });
+	m_CurAnimqeue.push({ 11, m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -442,10 +496,15 @@ void CHero_Garrison::AnimNormalAttack()
 
 void CHero_Garrison::Anim_Skill1_Attack()
 {
-	m_CurAnimqeue.push({ 4,  1.f });
+	m_SpeedRatio = 7.f;
+	m_LimitDistance = 10.f;
+	m_ReturnDistance = 0.1f;
+	m_setTickForSecond = 0.9f;
+
+	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
-	m_CurAnimqeue.push({ 11, 1.f });
+	m_CurAnimqeue.push({ 11, m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -453,11 +512,15 @@ void CHero_Garrison::Anim_Skill1_Attack()
 
 void CHero_Garrison::Anim_Skill2_Attack()
 {
-	
+	m_LimitDistance = 12.f;
+	m_SpeedRatio = 6.f;
+	m_ReturnDistance = 0.5f;
+	m_setTickForSecond = 0.9f;
+
 	m_CurAnimqeue.push({ 17, 1.0f });
-	m_CurAnimqeue.push({ 18, 0.9f });
+	m_CurAnimqeue.push({ 18, 0.5f });
 	m_CurAnimqeue.push({ 19, 1.f });
-	m_CurAnimqeue.push({ 11, 0.9f });
+	m_CurAnimqeue.push({ 11, m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -465,8 +528,13 @@ void CHero_Garrison::Anim_Skill2_Attack()
 
 void CHero_Garrison::Anim_Uitimate()
 {	
+	m_LimitDistance = 12.f;
+	m_SpeedRatio = 6.f;
+	m_ReturnDistance = 0.5f;
+	m_setTickForSecond = 0.9f;
+
 	m_CurAnimqeue.push({ 30,  1.f });	// Key프레임 (뛰는 것)하나 찾기 83~94 는 움직여야함 
-	m_CurAnimqeue.push({ 11,  0.9f });
+	m_CurAnimqeue.push({ 11,  m_setTickForSecond });
 	m_CurAnimqeue.push({ 12,  1.f });
 	m_CurAnimqeue.push({ 1,   1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -479,11 +547,7 @@ void CHero_Garrison::Anim_Buff()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CHero_Garrison::Anim_WideAreaBuff()
-{
-	m_CurAnimqeue.push({ 2,  1.f });		//없음
-	Set_CombatAnim_Index(m_pModelCom);
-}
+
 
 void CHero_Garrison::Anim_Use_Item()
 {

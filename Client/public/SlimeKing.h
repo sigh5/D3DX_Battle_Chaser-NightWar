@@ -36,6 +36,10 @@ public:
 	void			Combat_Tick(_double TimeDelta);
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
+	virtual		void	Fsm_Exit()override;
+	virtual		_bool	IsCollMouse()override;
+
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -61,6 +65,10 @@ public:
 
 private:
 	_int							m_iMovingDir = ANIM_EMD;
+
+public:
+	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// ≈œ¡¶
+
 
 public:
 	static CSlimeKing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

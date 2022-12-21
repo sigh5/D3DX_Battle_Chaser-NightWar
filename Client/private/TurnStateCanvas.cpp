@@ -2,6 +2,11 @@
 #include "..\public\TurnStateCanvas.h"
 
 #include "GameInstance.h"
+#include "UIButton.h"
+
+#include "Hero_Knolan.h"
+#include "Hero_Calibretto.h"
+#include "Hero_Garrison.h"
 
 CTurnStateCanvas::CTurnStateCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
@@ -11,6 +16,11 @@ CTurnStateCanvas::CTurnStateCanvas(ID3D11Device * pDevice, ID3D11DeviceContext *
 CTurnStateCanvas::CTurnStateCanvas(const CTurnStateCanvas & rhs)
 	: CCanvas(rhs)
 {
+}
+
+void CTurnStateCanvas::Set_RenderActive(_bool bActive)
+{
+	Control_ChildRender(bActive);
 }
 
 HRESULT CTurnStateCanvas::Initialize_Prototype()
@@ -30,10 +40,10 @@ HRESULT CTurnStateCanvas::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&CanvasDesc, pArg, sizeof(CanvasDesc));
 
-	if (FAILED(SetUp_Components()))
+	if (FAILED(__super::Initialize(&CanvasDesc)))
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(&CanvasDesc)))
+	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
 
@@ -58,9 +68,17 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
+	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
 
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
 
-	SetUp_ChildrenPosition();
+	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
+
+	Control_ChildRender(false);
+	StateButton_Child();
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -74,12 +92,15 @@ void CTurnStateCanvas::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	// Test
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	
+	if (ImGui::IsMouseClicked(1))			// ÇÃ·¹ÀÌ¾î Â÷·Ê¶§ ·»´õ ¿ÀÇÂÇØ¾ßÇÑ´Ù.
+	{
+		Control_ChildRender(true);
+	}
 
-	RELEASE_INSTANCE(CGameInstance);
+
+	PickingChild();
+	//CurState_Image_Change();
 
 }
 
@@ -93,20 +114,128 @@ void CTurnStateCanvas::Late_Tick(_double TimeDelta)
 
 HRESULT CTurnStateCanvas::Render()
 {
-	if (FAILED(__super::Render()))
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
-	CUI::Begin_UI();
-
-	m_pShaderCom->Begin(1);
-	m_pVIBufferCom->Render();
-
-	CUI::End_UI();
-
+	/* ·»´õ¾ÈÇÒ°ÅÀÓ*/
 	return S_OK;
+}
+
+void CTurnStateCanvas::PickingChild()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	_bool	bIsPicking = false;
+
+	if((pGameInstance->Mouse_Down(CInput_Device::DIM_LB)))
+	{ 
+		for (auto& pChild : m_ChildrenVec)
+		{
+			if (nullptr == dynamic_cast<CUIButton*>(pChild))
+				continue;
+
+			if (static_cast<CUIButton*>(pChild)->Click_This_Button())
+			{
+				pCurPickingButton = pChild;
+				bIsPicking = true;
+				break;
+			}
+		}
+		
+		if (bIsPicking)
+		{
+			auto Pair = find_if(m_pCurState.begin(), m_pCurState.end(), [&](auto MyPair)->bool
+			{
+				return !lstrcmp(MyPair.first.c_str(), pCurPickingButton->Get_ObjectName());
+			});
+
+			if (Pair != m_pCurState.end())
+			{
+				pCurPickingState = Pair->second;
+				pCurPickingButton = nullptr;
+			}
+			
+			CurState_Image_Change();
+			CurState_Fsm_ButtonClick();
+		}
+	}
+
+
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CTurnStateCanvas::CurState_Image_Change()
+{
+	if (nullptr == pCurPickingState)
+		return;
+
+	if (!lstrcmp(pCurPickingState->Get_ObjectName(), STATE_ACTION))
+	{
+		m_StateType = BUTTON_STATE_ACTION;
+		static_cast<CUIButton*>(pCurPickingState)->State_Image_Change(BUTTON_STATE_ACTION);
+	}
+	else if (!lstrcmp(pCurPickingState->Get_ObjectName(), STATE_ABLILTY))
+	{
+		m_StateType = BUTTON_STATE_ABLILTY;
+		static_cast<CUIButton*>(pCurPickingState)->State_Image_Change(BUTTON_STATE_ABLILTY);
+	}
+	else if (!lstrcmp(pCurPickingState->Get_ObjectName(), STATE_ITEM))
+	{
+		m_StateType = BUTTON_STATE_ITEM;
+		static_cast<CUIButton*>(pCurPickingState)->State_Image_Change(BUTTON_STATE_ITEM);
+	}
+}
+
+void CTurnStateCanvas::CurState_Fsm_ButtonClick()
+{
+	if (nullptr == pCurPickingState || nullptr == pCurPickingButton)
+		return;
+
+	m_ButtonFsmType = static_cast<CUIButton*>(pCurPickingButton)->Get_ButtonFsmState();
+
+
+}
+
+void CTurnStateCanvas::Control_ChildRender(_bool bRenderActive)
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(bRenderActive);
+	}
+}
+
+void CTurnStateCanvas::StateButton_Child()
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Action")))
+		{
+			m_pCurState.emplace(TEXT("UI_State_Action"), pChild);
+		}
+		else if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Ablity")))
+		{
+			m_pCurState.emplace(TEXT("UI_State_Ablity"), pChild);
+		}
+		else if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Item")))
+		{
+			m_pCurState.emplace(TEXT("UI_State_Item"), pChild);
+		}
+		else if (nullptr != dynamic_cast<CUIButton*>(pChild))
+		{
+			m_pCurFsmButton.push_back(pChild);
+		}
+	}
+
+	size_t iFsmButtonSize = m_pCurFsmButton.size();
+
+	for (auto& pStateButton : m_pCurState)
+	{
+		for (size_t i =0; i<iFsmButtonSize; ++i)
+		{
+			static_cast<CUIButton*>(pStateButton.second)->Set_ChildFsmButton(static_cast<CUIButton*>(m_pCurFsmButton[i]));
+		}
+
+	}
+
+
 }
 
 HRESULT CTurnStateCanvas::SetUp_Components()
@@ -125,10 +254,12 @@ HRESULT CTurnStateCanvas::SetUp_Components()
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
 
+
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_State_Canvas"), TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_CanvasDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -152,7 +283,7 @@ HRESULT CTurnStateCanvas::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -160,10 +291,7 @@ HRESULT CTurnStateCanvas::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CTurnStateCanvas::SetUp_ChildrenPosition()
-{
-	return S_OK;
-}
+
 
 CTurnStateCanvas * CTurnStateCanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

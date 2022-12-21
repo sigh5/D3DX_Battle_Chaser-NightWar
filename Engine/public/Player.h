@@ -26,6 +26,10 @@ protected:
 public:
 	void	Set_ControlInput(_bool bControl) { m_bControlKeyInput = bControl; }
 	const _bool	Get_IsIdle()const { return m_bIsIdle; }
+	virtual		void	Fsm_Exit();
+	void	Set_HitTarget(CGameObject* pGameObject) { m_pHitTarget = pGameObject; }
+
+
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -72,7 +76,8 @@ protected:
 	MAPTYPE							m_ePlayerType = DUNGEON_PLAYER;
 	_bool							m_bControlKeyInput = false;
 	
-	
+	CGameObject*			m_pHitTarget = nullptr;		//Combat
+
 
 protected:
 	_uint							m_bFinishOption = 0;
@@ -91,7 +96,7 @@ private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;
 	_bool					m_bKeyInput = false;
-	CGameObject*			m_pTargetPlayer = nullptr;
+	CGameObject*			m_pTargetPlayer = nullptr;	//Dungeon
 	_bool					m_bIsSwap = false;
 	_bool					m_isStop = false;
 	_bool					m_bIsWalk = false;

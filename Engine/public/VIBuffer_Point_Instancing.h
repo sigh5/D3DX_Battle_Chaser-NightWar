@@ -1,0 +1,32 @@
+#pragma once
+
+#include "VIBuffer_Instancing.h"
+
+
+/* 인스턴싱 주의 사항 알파 블렌딩이랑 인스턴싱이랑 같이 쓰지말자 */
+
+BEGIN(Engine)
+
+class ENGINE_DLL CVIBuffer_Point_Instancing final : public CVIBuffer_Instancing
+{
+private:
+	CVIBuffer_Point_Instancing(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CVIBuffer_Point_Instancing(const CVIBuffer_Point_Instancing& rhs);
+	virtual ~CVIBuffer_Point_Instancing() = default;
+
+public:
+	virtual HRESULT Initialize_Prototype(_uint iNumInstance);
+	virtual HRESULT Initialize(void* pArg) override;
+	virtual HRESULT Tick(_double TimeDelta) override;
+	virtual HRESULT Render();
+
+private:
+	_double*				m_pSpeeds = nullptr;
+
+public:
+	static CVIBuffer_Point_Instancing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iNumInstance = 1);
+	virtual CComponent* Clone(void* pArg = nullptr) override;
+	virtual void Free() override;
+};
+
+END

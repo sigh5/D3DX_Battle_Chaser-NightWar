@@ -30,6 +30,8 @@ public:
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 
+	virtual		void	Fsm_Exit()override;
+	void				Intro_Exit();			//얘가 인트로가 제일길어서 
 
 public: /*For.Dungeon*/
 	virtual _uint		Get_AnimationIndex() override;
@@ -61,6 +63,8 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 
+	
+
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();
@@ -88,12 +92,12 @@ public:
 public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
 
-	/*Test*/
-	BaseDelegater<_double, _uint> m_Hero_GullyHPDelegater;
+	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;
+	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
-	/*Test*/
-	BaseDelegater<_uint> m_Hero_GullyTestShakingDelegater;
-
+private:
+	_uint iTestNum = 0;
+	_double TEst = 0.0;
 };
 
 END

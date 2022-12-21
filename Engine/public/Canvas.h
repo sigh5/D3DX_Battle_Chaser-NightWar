@@ -24,7 +24,7 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-
+	virtual void Set_ParentLoad(CUI * pUI)override {}
 
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }

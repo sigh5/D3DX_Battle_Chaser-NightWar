@@ -133,6 +133,22 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CHero_Knolan::Fsm_Exit()
+{
+	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	_bool	bRenderTrue = true;
+	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
+	m_pHitTarget = nullptr;
+}
+
+void CHero_Knolan::Intro_Exit()
+{
+	_bool	bRenderTrue = true;
+	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
+}
+
+
+
 _uint CHero_Knolan::Get_AnimationIndex()
 {
 	return m_pModelCom->Get_AnimIndex();

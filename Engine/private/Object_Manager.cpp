@@ -9,6 +9,9 @@
 #include "Camera.h"
 #include "Environment_Object.h"
 #include <utility>
+
+
+
 IMPLEMENT_SINGLETON(CObject_Manager)
 
 CObject_Manager::CObject_Manager()
@@ -258,25 +261,7 @@ void CObject_Manager::Final_Update()
 	}
 }
 
-void CObject_Manager::Imgui_Picking(_uint iLevel, OUT CGameObject *& pSelectedObject)
-{
-	//const LAYERS& targetLevel = m_pLayers[iLevel];
 
-	//for (auto& Pair : targetLevel) // for layer loop
-	//{
-
-	//	for (auto& obj : Pair.second->GetGameObjects())
-	//	{
-	//		if (obj->Piciking_GameObject())
-	//		{
-	//			pSelectedObject = obj;
-	//		}
-
-	//	}
-	//}
-
-
-}
 
 HRESULT CObject_Manager::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pPrototypeTag, OUT CGameObject** ppGameObject, void * pArg)
 {
@@ -306,6 +291,50 @@ HRESULT CObject_Manager::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstr
 	*ppGameObject = pGameObject;
 
 	return S_OK;
+}
+
+void CObject_Manager::Imgui_Swap_Render_Sorting(_uint iLevel, CGameObject* pSelectedObject)
+{
+	// OnlyUI
+	static int iWantIndex = 0;
+	ImGui::InputInt("SwapIndex", &iWantIndex);
+
+
+	if (ImGui::Button("Swap"))
+	{
+		const LAYERS& targetLevel = m_pLayers[iLevel];
+
+		CGameObject* pWantIndex = nullptr;
+
+		list<class CGameObject*>::iterator  SwapIter;
+		list<class CGameObject*>::iterator  SelcetIter;
+		_uint		iAddIndex = 0;
+		_uint		iSelectIndex = 0;
+	
+		for (auto& Pair : targetLevel) // for layer loop
+		{
+			if(Pair.first != LAYER_UI)
+				continue;
+
+			for (auto iter = Pair.second->GetGameObjects().begin(); iter != Pair.second->GetGameObjects().end(); ++iter )
+			{
+				if (iWantIndex == iAddIndex)
+				{
+					SwapIter = iter;
+				}
+
+				if (!lstrcmp((*iter)->Get_ObjectName(), pSelectedObject->Get_ObjectName()))
+				{
+					SelcetIter = iter;
+				}
+				++iAddIndex;
+			}
+
+			Pair.second->GetGameObjects().splice(SwapIter, Pair.second->GetGameObjects(),SelcetIter);
+		}
+	}
+
+
 }
 
 void CObject_Manager::Imgui_RemoveObject(_uint iLevel, OUT CGameObject ** ppGameObject)

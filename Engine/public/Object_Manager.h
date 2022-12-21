@@ -58,14 +58,13 @@ public: /* imgui */
 	// 해당 Object가 없거나 사라지면 nullptr로 돌려준다.
 	void	Imgui_ObjectViewer(_uint iLevel, OUT CGameObject*& pSelectedObject);
 
-	void	Imgui_Picking(_uint iLevel, OUT CGameObject*& pSelectedObject);
-
+	
 	HRESULT Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, OUT CGameObject** ppGameObject, void* pArg = nullptr);
 	
 
 	void		Set_SelectedGameObject(class CGameObject* pGameObject){m_pSelectObject =  pGameObject;}
 	class CGameObject* Get_SelectObject() { return m_pSelectObject; }
-
+	void		Imgui_Swap_Render_Sorting(_uint iLevel, CGameObject* pSelectedObject);
 
 private:
 	//void	Imgui_Select_LayerType();

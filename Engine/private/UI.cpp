@@ -11,6 +11,7 @@ CUI::CUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CUI::CUI(const CUI & rhs)
 	: CGameObject(rhs)
+	, m_bRenderActive(rhs.m_bRenderActive)
 {
 	
 }
@@ -59,14 +60,25 @@ HRESULT CUI::Render()
 	return S_OK;
 }
 
+void CUI::Set_ParentLoad(CUI * pUI)
+{
+}
+
 void CUI::Set_parentName(_uint iCulLevel, const _tchar * pParentTag)
 {
 	CObject_Manager*pObjMgr = GET_INSTANCE(CObject_Manager);
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pCanvas = pObjMgr->Get_GameObject(iCulLevel, TEXT("Layer_UI"), pParentTag);
-	dynamic_cast<CCanvas*>(pCanvas)->Add_ChildUI(this);
-
+	
+	if (dynamic_cast<CCanvas*>(pCanvas) != nullptr)
+	{
+		dynamic_cast<CCanvas*>(pCanvas)->Add_ChildUI(this);
+	}
+	else
+	{
+		static_cast<CUI*>(pCanvas)->Set_ParentLoad(this);
+	}
 	RELEASE_INSTANCE(CGameInstance);
 	RELEASE_INSTANCE(CObject_Manager);
 }

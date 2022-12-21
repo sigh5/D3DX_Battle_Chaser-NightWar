@@ -17,6 +17,13 @@ HRESULT CVIBuffer_Rect_Instancing::Initialize_Prototype(_uint iNumInstance)
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
+	m_pSpeeds = new _double[iNumInstance];
+
+	// 임의로 스피드 지정은 내가할 수 있게 만들기
+	for (_uint i = 0; i < iNumInstance; ++i)
+		m_pSpeeds[i] = rand() % 5 + 1.0;		
+
+
 	m_iNumInstance = iNumInstance;
 	m_iIndexCountPerInstance = 6;		// 사각형 하나 찍는데 6개의 인덱스가필요함 인스턴스도 동일
 	
@@ -63,89 +70,111 @@ HRESULT CVIBuffer_Rect_Instancing::Initialize_Prototype(_uint iNumInstance)
 	if (FAILED(__super::Create_VertexBuffer()))
 		return E_FAIL;
 
-	Safe_Delete_Array(pVertices);
+Safe_Delete_Array(pVertices);
 
 #pragma endregion
 
 #pragma region INDEX_BUFFER
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
-	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	m_BufferDesc.StructureByteStride = 0;
-	m_BufferDesc.CPUAccessFlags = 0;
-	m_BufferDesc.MiscFlags = 0;
+m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
+m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+m_BufferDesc.StructureByteStride = 0;
+m_BufferDesc.CPUAccessFlags = 0;
+m_BufferDesc.MiscFlags = 0;
 
-	FACEINDICES16*		pIndices = new FACEINDICES16[m_iNumPrimitive];
-	ZeroMemory(pIndices, sizeof(FACEINDICES16) * m_iNumPrimitive);
+FACEINDICES16*		pIndices = new FACEINDICES16[m_iNumPrimitive];
+ZeroMemory(pIndices, sizeof(FACEINDICES16) * m_iNumPrimitive);
 
-	_uint		iNumFaces = 0;
+_uint		iNumFaces = 0;
 
-	for (_uint i = 0; i < iNumInstance; ++i)
-	{
-		pIndices[iNumFaces]._0 = 0;
-		pIndices[iNumFaces]._1 = 1;
-		pIndices[iNumFaces]._2 = 2;
-		++iNumFaces;
+for (_uint i = 0; i < iNumInstance; ++i)
+{
+	pIndices[iNumFaces]._0 = 0;
+	pIndices[iNumFaces]._1 = 1;
+	pIndices[iNumFaces]._2 = 2;
+	++iNumFaces;
 
-		pIndices[iNumFaces]._0 = 0;
-		pIndices[iNumFaces]._1 = 2;
-		pIndices[iNumFaces]._2 = 3;
-		++iNumFaces;
-	}
+	pIndices[iNumFaces]._0 = 0;
+	pIndices[iNumFaces]._1 = 2;
+	pIndices[iNumFaces]._2 = 3;
+	++iNumFaces;
+}
 
 
 
-	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pIndices;
+ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+m_SubResourceData.pSysMem = pIndices;
 
-	if (FAILED(__super::Create_IndexBuffer()))
-		return E_FAIL;
+if (FAILED(__super::Create_IndexBuffer()))
+return E_FAIL;
 
-	Safe_Delete_Array(pIndices);
+Safe_Delete_Array(pIndices);
 #pragma endregion
 
 
 #pragma region INSTANCE_BUFFER
 
-	m_iInstanceStride = sizeof(VTXMATRIX);
+m_iInstanceStride = sizeof(VTXMATRIX);
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
-	m_BufferDesc.ByteWidth = m_iInstanceStride * iNumInstance;
-	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;					//Rock UnLock을 하겠다.
-	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	m_BufferDesc.StructureByteStride = m_iInstanceStride;
-	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		//Rock UnLock을 하겠다.
-	m_BufferDesc.MiscFlags = 0;
+m_BufferDesc.ByteWidth = m_iInstanceStride * iNumInstance;
+m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;					//Rock UnLock을 하겠다.
+m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+m_BufferDesc.StructureByteStride = m_iInstanceStride;
+m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;		//Rock UnLock을 하겠다.
+m_BufferDesc.MiscFlags = 0;
 
-	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iNumInstance];
-	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
+VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iNumInstance];
+ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
 
-	for (_uint i = 0; i < iNumInstance; ++i)
-	{
-		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 버퍼 하나의 행렬을 만들어서 쉐이더에게 전달해줘야한다.
-		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
-		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
-		pInstanceVertices[i].vPosition = _float4( _float(rand() % 5), 0.f, _float(rand() % 5), 1.f);		// 나중에 인스터닝을 할때 이포지션을 움직일 수 있게 락 언락구조를 짜야한다.
-	}
+for (_uint i = 0; i < iNumInstance; ++i)
+{
+	pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 버퍼 하나의 행렬을 만들어서 쉐이더에게 전달해줘야한다.
+	pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
+	pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
+	pInstanceVertices[i].vPosition = _float4(_float(rand() % 5), 0.f, _float(rand() % 5), 1.f);		// 나중에 인스터닝을 할때 이포지션을 움직일 수 있게 락 언락구조를 짜야한다.
+}
 
-	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pInstanceVertices;
+ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+m_SubResourceData.pSysMem = pInstanceVertices;
 
-	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
+m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
 
-	Safe_Delete_Array(pInstanceVertices);
+Safe_Delete_Array(pInstanceVertices);
 #pragma endregion
 
-	return S_OK;
+return S_OK;
 
 }
 
 HRESULT CVIBuffer_Rect_Instancing::Initialize(void * pArg)
 {
+	return S_OK;
+}
+
+HRESULT CVIBuffer_Rect_Instancing::Tick(_double TimeDelta)
+{
+	// 여기서 인스턴스 버퍼의 락,언락하기
+
+	D3D11_MAPPED_SUBRESOURCE		SubResource;
+	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += (_float)(m_pSpeeds[i] * TimeDelta);
+
+		if (((VTXMATRIX*)SubResource.pData)[i].vPosition.y > 3.f)
+			((VTXMATRIX*)SubResource.pData)[i].vPosition.y = 0.f;
+	}
+
+	m_pContext->Unmap(m_pInstanceBuffer, 0);
+
 	return S_OK;
 }
 
@@ -211,5 +240,9 @@ void CVIBuffer_Rect_Instancing::Free()
 {
 	__super::Free();
 
+	if (false == m_bClone)
+	{
+		Safe_Delete_Array(m_pSpeeds);
+	}
 
 }

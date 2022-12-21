@@ -12,6 +12,10 @@ protected:
 	virtual ~CMonster() = default;
 public:
 	const _bool	Get_IsIdle()const { return m_bIsIdle; }
+
+	virtual		void	Fsm_Exit() {}
+	virtual		_bool	IsCollMouse() = 0;
+
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
