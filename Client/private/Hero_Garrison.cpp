@@ -3,9 +3,12 @@
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
+#include "Model.h"
 #include "CombatController.h"
 #include "PlayerController.h"
 #include "AnimFsm.h"
+#include "Weapon.h"
+#include "Bone.h"
 
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
@@ -15,6 +18,28 @@ CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pCo
 CHero_Garrison::CHero_Garrison(const CHero_Garrison& rhs)
 	: CPlayer(rhs)
 {
+}
+
+CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
+{
+	for (auto& pParts : m_PlayerParts)
+	{
+		if (dynamic_cast<CWeapon*>(pParts) != nullptr)
+			return pParts;
+	}
+
+	return nullptr;
+}
+
+_bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
+{
+	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+
+	if (nullptr == pCurActorWepon)		//나중에 아래것으로
+		return false;
+	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+
+	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
 }
 
 HRESULT CHero_Garrison::Initialize_Prototype()
@@ -64,6 +89,7 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		Combat_Init();
 
 		m_pAnimFsm->Tick(TimeDelta);
+		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -76,6 +102,13 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 	
+	if (m_bIsCombatScene)
+	{
+		for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+		{
+			m_PlayerParts[i]->Late_Tick(TimeDelta);
+		}
+	}
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -96,6 +129,8 @@ HRESULT CHero_Garrison::Render()
 #ifdef _DEBUG
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
+	if (m_bIsCombatScene)
+		m_pColliderCom->Render();
 #endif
 	return S_OK;
 }
@@ -175,23 +210,22 @@ void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 }
 
 void CHero_Garrison::Combat_Tick(_double TimeDelta)
 {
-	/*ImGui::InputFloat("SpeedRatio", &m_SpeedRatio);
-	ImGui::InputFloat("LimitDistance", &m_LimitDistance);
-	ImGui::InputFloat("TickForSecond", &m_setTickForSecond);*/
-	
 	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
-		CPlayer::CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
+		CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
 	
-	m_bCombatChaseTarget = false;
+	for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+	{
+		m_PlayerParts[i]->Tick(TimeDelta);
+	}
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
 
@@ -204,9 +238,7 @@ void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 		MovingAnimControl(TimeDelta);
 	}
 	else
-		CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-
-	m_bCombatChaseTarget = false;
+		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Is_MovingAnim();
 	CombatAnim_Move_Ultimate(TimeDelta);
 	
@@ -214,7 +246,7 @@ void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 
 void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
 {
-	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Is_Skill1MovingAnim();
 	CombatAnim_Move(TimeDelta);
 }
@@ -242,9 +274,7 @@ void CHero_Garrison::MovingAnimControl(_double TimeDelta)
 		m_pModelCom->Set_AnimTickTime(m_CurAnimqeue.front().second);
 		m_CurAnimqeue.pop();
 		m_bFinishOption = ANIM_CONTROL_NEXT;
-
-	
-
+		
 		if (m_CurAnimqeue.empty())
 		{
 			m_bIsCombatAndAnimSequnce = true;
@@ -355,7 +385,39 @@ HRESULT CHero_Garrison::Combat_Init()
 	//m_CurAnimqeue.push({ 0,1.f });
 	//Set_CombatAnim_Index(m_pModelCom);
 
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
+
 	m_bCombatInit = true;
+	return S_OK;
+}
+
+HRESULT CHero_Garrison::Ready_Parts()
+{
+	CGameObject*		pPartObject = nullptr;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CWeapon::WEAPONDESC			WeaponDesc;
+	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
+
+	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
+	WeaponDesc.pTargetTransform = m_pTransformCom;
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -2.f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f,0.f));
+
+	Safe_AddRef(WeaponDesc.pSocket);
+	Safe_AddRef(m_pTransformCom);
+
+	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
+	if (nullptr == pPartObject)
+		return E_FAIL;
+
+	m_PlayerParts.push_back(pPartObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 
@@ -386,6 +448,10 @@ CGameObject * CHero_Garrison::Clone(void * pArg)
 void CHero_Garrison::Free()
 {
 	__super::Free();
+
+	for (auto& pPart : m_PlayerParts)
+		Safe_Release(pPart);
+	m_PlayerParts.clear();
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pAnimFsm);
@@ -428,11 +494,13 @@ void CHero_Garrison::Is_Skill1MovingAnim()
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 11)
 		bResult = ANIM_DIR_BACK;
+	else
+		bResult = ANIM_EMD;
 }
 
 void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 {
-	if (m_pHitTarget == nullptr)
+	if (m_pHitTarget == nullptr || bResult == ANIM_EMD)
 		return;
 
 	_float4 Target;
@@ -455,13 +523,11 @@ void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)
 	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 
 	if (m_pModelCom->Control_KeyFrame(30, 83, 94))				// 특수사항
-	{
 		m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-	}
-
-
-	if (bResult == ANIM_DIR_BACK)
+	else if (bResult == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, 6.f);
+
+
 }
 
 
@@ -594,11 +660,11 @@ void CHero_Garrison::Anim_Die()
 
 void CHero_Garrison::Anim_Viroty()
 {
-	Is_PlayerDead();
+	Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-_bool CHero_Garrison::Is_PlayerDead()
+_bool CHero_Garrison::Is_Dead()
 {
 	
 	//ToDo .. 다른 애님 추가

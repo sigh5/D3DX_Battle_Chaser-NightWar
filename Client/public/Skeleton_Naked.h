@@ -19,6 +19,10 @@ private:
 	virtual ~CSkeleton_Naked() = default;
 
 public:
+	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
+	virtual		_bool	IsCollMouse()override;
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Last_Initialize()override;
@@ -27,11 +31,13 @@ public:
 	virtual HRESULT Render();
 
 public:
+	virtual	void	Fsm_Exit()override;
 	void			Combat_Tick(_double TimeDelta);
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
-	virtual		void	Fsm_Exit()override;
-	virtual		_bool	IsCollMouse()override;
+	void			MovingAnimControl(_double TimeDelta);
+	
+	
 
 
 private:
@@ -44,7 +50,7 @@ private:
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
-
+	HRESULT					Ready_Parts();
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();
@@ -58,11 +64,19 @@ public:
 	void					Anim_Viroty();
 
 private:
-	_int							m_iMovingDir = ANIM_EMD;
+	vector<CGameObject*>	m_MonsterParts;
+	WeaponType				m_eWeaponType = WEAPON_SWORD;
+
+private:
+	_int					m_iMovingDir = ANIM_EMD;
+	_float					m_SpeedRatio = 8.f;
+	_float					m_LimitDistance = 8.f;
+	_float					m_ReturnDistance = 0.4f;
+	_float					m_setTickForSecond = 1.f;
+
 
 public:
 	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// 턴제
-
 
 public:
 	static CSkeleton_Naked* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

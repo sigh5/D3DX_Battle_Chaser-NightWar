@@ -18,6 +18,12 @@ private:
 	CSpider_Mana(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CSpider_Mana(const CSpider_Mana& rhs);
 	virtual ~CSpider_Mana() = default;
+
+public:
+	virtual  CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);
+	virtual		_bool	IsCollMouse()override;
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -26,13 +32,14 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-
 public:
-	void			Combat_Tick(_double TimeDelta);
-	_int			Is_MovingAnim();
-	void			CombatAnim_Move(_double TImeDelta);
+	void				Combat_Tick(_double TimeDelta);
+	_int				Is_MovingAnim();
+	void				CombatAnim_Move(_double TImeDelta);
+	void				MovingAnimControl(_double TimeDelta);
+	
 	virtual		void	Fsm_Exit()override;
-	virtual		_bool	IsCollMouse()override;
+	
 
 
 private:
@@ -45,6 +52,8 @@ private:
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
+	HRESULT					Ready_Parts();
+
 
 private:
 	_int					m_iMovingDir = ANIM_EMD;
@@ -63,6 +72,17 @@ public:
 
 public:
 	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// ≈œ¡¶
+
+private:
+	vector<CGameObject*>	m_MonsterParts;
+	WeaponType		m_eWeaponType = WEAPON_END;
+
+private:
+	_float					m_SpeedRatio = 7.f;
+	_float					m_LimitDistance = 6.f;
+	_float					m_ReturnDistance = 0.4f;
+	_float					m_setTickForSecond = 1.f;
+
 
 
 public:

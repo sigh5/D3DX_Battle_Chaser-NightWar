@@ -27,7 +27,10 @@ public:
 	_uint Get_NumMeshes() const { return m_iNumMeshes; }
 	_matrix Get_PivotMatrix() const { return XMLoadFloat4x4(&m_PivotMatrix); }
 	class CBone* Get_BonePtr(const char* pBoneName);
-	
+	_float4x4 Get_PivotFloat4x4() const {
+		return m_PivotMatrix;
+	}
+
 public:
 	virtual HRESULT Initialize_Prototype(LOAD_TYPE eType, const char* pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile);
 	virtual HRESULT Initialize(void* pArg);

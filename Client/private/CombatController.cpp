@@ -1,9 +1,14 @@
 #include "stdafx.h"
 #include "..\public\CombatController.h"
+
+#include "Client_Manager.h"
+
 #include "GameInstance.h"
 #include "Layer.h"
 #include "Canvas.h"
 
+#include "GameObject.h"
+#include "CombatActors.h"
 #include "Player.h"
 #include "Monster.h"
 
@@ -38,14 +43,11 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
 		{
-			if (nullptr != dynamic_cast<CPlayer*>(obj) ||
-				nullptr != dynamic_cast<CMonster*>(obj) )
+			if (nullptr != dynamic_cast<CCombatActors*>(obj))
 			{
-
 				ObjTag = obj->Get_ObjectName();
 				m_CurActorMap.emplace(ObjTag, obj);
 				Safe_AddRef(obj);
-
 			}
 		}
 	}
@@ -111,14 +113,21 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 		PickingTarget();
 	}
 
-
+	MonsterSetTarget();
 
 	 Active_Fsm();
+
+	 Collison_Event();
 }
 
 void CCombatController::Refresh_CurActor()
 {
 	Set_CurrentActor();
+
+	m_pHitActor = nullptr;
+	m_bIsHiterhit = false;
+	m_bisHitTimer_Alive = false;
+	m_fHitTimer = 0.0f;
 }
 
 void CCombatController::Active_Fsm()
@@ -155,9 +164,8 @@ void CCombatController::ResetState()
 	}
 }
 
-void CCombatController::PickingTarget()
+void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 {
-	
 	if (nullptr == dynamic_cast<CPlayer*>(m_pCurentActor))
 		return;
 
@@ -173,9 +181,79 @@ void CCombatController::PickingTarget()
 			break;
 		}
 	}
+}
+
+void CCombatController::MonsterSetTarget()
+{
+	if (nullptr == dynamic_cast<CMonster*>(m_pCurentActor))
+		return;
+	/*
+		 행동 우선순위 1) 본인 피가 절반이하일때 방어, 또는 버프 ,절반 이상일때 공격 
+					  2) 스킬 마나가 부족한 경우 (피가 절반이상) 기본_공격, (피가 절반) 이하 방어 
+					  3) 본인피가 20% 이하이고 마나가 절반 이상일 경우 궁극기 활용 
+					  4) 같은 스킬은 연속해서 쓰지 않음
+	 
+		 공격 우선순위 1) 피가 제일 작은 놈 ,2) 나를 때린 놈  3) 마나가 적은놈
+	*/
+
+	if (m_pGameInstace->Key_Down(DIK_V))
+	{
+		m_pHitActor = Find_CurActor(TEXT("Hero_Gully"));
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
+	}
+
+	if (m_pGameInstace->Key_Down(DIK_C))
+	{
+		m_pHitActor = Find_CurActor(TEXT("Hero_Alumon"));
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
+
+	}
+	if (m_pGameInstace->Key_Down(DIK_X))
+	{
+		m_pHitActor = Find_CurActor(TEXT("Hero_Calibretto"));
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
+
+	}
+
 	
+}
+
+void CCombatController::Collison_Event()
+{
+	if (nullptr == m_pHitActor || nullptr == m_pCurentActor)
+		return;
 
 
+	CGameObject* pWeapon = static_cast<CCombatActors*>(m_pCurentActor)->Get_Weapon_Or_SkillBody();
+
+
+	if (m_fHitTimer >= m_fHitRecoverTime)
+	{
+		m_bisHitTimer_Alive = false;
+		m_fHitTimer = 0.0f;
+	}
+
+	if (m_bisHitTimer_Alive)
+	{
+		m_fHitTimer	+= (_float)CClient_Manager::TimeDelta;
+		return;
+	}
+	if (static_cast<CCombatActors*>(m_pHitActor)->Calculator_HitColl(pWeapon))
+	{
+		m_bIsHiterhit = true;
+		static_cast<CCombatActors*>(m_pHitActor)->HitActor_LoseHP(m_pCurentActor);
+		m_bisHitTimer_Alive = true;
+		
+	}
+
+	// 모든 몸체 콜라이더 끌 필요가없다.
+	// hiter 콜라이더와 , 공격자 무기 콜라이더만 킨다. 
+	// 필요한것 공격자 무기(마법사 == 스킬구체, 총기류 총알) 포인터
+	// 맞는놈 콜라이더 근데 나는 공격자에서 가져가야된다는게 맞다고봄
+
+
+
+	//pHiterColl->Collision()
 }
 
 HRESULT CCombatController::Set_CurrentActor()
@@ -204,8 +282,6 @@ HRESULT CCombatController::Set_CurrentActor()
 	case Client::REPRESENT_SPIDER_MANA:
 		m_pCurentActor = Find_CurActor(TEXT("Spider_Mana"));
 		break;
-
-
 	case Client::REPRESENT_END:
 		break;
 	default:
@@ -216,7 +292,7 @@ HRESULT CCombatController::Set_CurrentActor()
 	return S_OK;
 }
 
-#ifndef DEBUG
+#ifdef _DEBUG
 void CCombatController::Imgui_CharAnim()
 {
 	static int CharIndex = 0;
@@ -264,16 +340,13 @@ void CCombatController::To_Normal_Attack()
 	if (nullptr == m_pHitActor	 && m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
 		return;
 
-	
 	if (m_pTurnStateButtonCanvas->Get_ButtonState()== BUTTON_STATE_ACTION 
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_NORMALATTACK)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Normal_Attack);
-
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		m_pHitActor = nullptr;
 	}
 }
 
@@ -290,7 +363,6 @@ void CCombatController::To_Skill1_Attack()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		m_pHitActor = nullptr;
 	}
 }
 
@@ -307,7 +379,6 @@ void CCombatController::To_Skill2_Attack()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		m_pHitActor = nullptr;
 	}
 }
 
@@ -324,7 +395,6 @@ void CCombatController::To_Uitimate()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		m_pHitActor = nullptr;
 	}
 }
 
@@ -399,9 +469,11 @@ void CCombatController::To_Defence()
 void CCombatController::To_Light_Hit()
 {
 	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
-	if (m_pGameInstace->Key_Down(DIK_O))
+	if (m_bIsHiterhit)
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Light_Hit);
+		m_pHitActor->Set_FsmState(true, CGameObject::m_Light_Hit);
+		m_bIsHiterhit = false;
+	
 	}
 }
 
@@ -411,7 +483,9 @@ void CCombatController::To_Heavy_Hit()
 	if (m_pGameInstace->Key_Down(DIK_I))
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Heavy_Hit);
-		
+		m_bIsHiterhit = false;
+		m_bisHitTimer_Alive = false;
+		m_fHitTimer = 0.0f;
 	}
 }
 

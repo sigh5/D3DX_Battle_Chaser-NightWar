@@ -20,6 +20,8 @@
 #include "CombatMap.h"
 
 #include "Camera_Combat.h"
+#include "Weapon.h"
+
 /* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -316,7 +318,12 @@ HRESULT CLoader::Loading_Combat()
 		CCamera_Combat::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-		
+	/* For.Prototype_GameObject_Weapon */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+		CWeapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("·Îµù³¡. "));
 

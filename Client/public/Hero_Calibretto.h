@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Player.h"
+#include "Weapon.h"
 
 BEGIN(Engine)
 class CShader;
@@ -15,12 +16,14 @@ BEGIN(Client)
 
 class CHero_Calibretto final :public CPlayer
 {
-protected:
+private:
 	CHero_Calibretto(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CHero_Calibretto(const CHero_Calibretto& rhs);
 	virtual ~CHero_Calibretto() = default;
 
-
+public:
+	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -42,9 +45,9 @@ public: /*For.Dungeon*/
 	virtual	  void		Dungeon_Tick(_double TimeDelta)override;;
 
 public:  /*For.Combat*/
-	HRESULT			  Combat_Initialize();
+
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	virtual	  _bool	  Is_PlayerDead()override;
+	virtual	  _bool	  Is_Dead()override;
 	
 	_int	  Is_MovingAnim();
 	void	  CombatAnim_Move(_double TImeDelta);
@@ -68,7 +71,8 @@ private:
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
-
+	HRESULT					Combat_Initialize();
+	HRESULT					Ready_Parts();
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();
@@ -89,8 +93,6 @@ public:
 private:
 	_uint iTestNum = 0;
 	_double TEst = 0.0;
-	_vector		m_vOriginPos;				// for.Combat
-
 	_uint	m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
 
 public:
@@ -104,14 +106,15 @@ public:
 	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;			//옆에 턴 넘기는것
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
+private:
+	vector<CGameObject*>	m_PlayerParts;
+	WeaponType		m_eWeaponType= WEAPON_END;
+
 
 private:
-	_bool		m_bCombatChaseTarget = false;
-
-
 	_float		m_SpeedRatio = 8.f;
 	_float		m_LimitDistance = 12.f;
-	_float		m_ReturnDistance = 0.1f;
+	_float		m_ReturnDistance = 0.4f;
 	_float		m_setTickForSecond = 0.9f;
 
 };

@@ -13,6 +13,7 @@
 BEGIN(Engine)
 
 class CGameInstance;
+class CombatActors;
 class CGameObject;
 class CPlayer;
 class CMonster;
@@ -24,9 +25,6 @@ BEGIN(Client)
 class CCombatController final :public CBase
 {
 	DECLARE_SINGLETON(CCombatController);
-	
-
-
 public:
 	CCombatController();
 	virtual ~CCombatController() = default;
@@ -51,6 +49,10 @@ public:
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
+	void	MonsterSetTarget();
+	
+	void	Collison_Event();
+
 
 	// 선 상태 설정 후 몬스터 설정
 
@@ -86,6 +88,12 @@ private:
 	_bool					m_bCombatIntro = false;
 	_bool					m_bLateInit = false;
 	_double					m_dIntroTimer = 0.0;
+
+	_bool					m_bIsHiterhit = false;
+	_bool					m_bisHitTimer_Alive = false;
+
+	_float					m_fHitTimer = 0.0f;
+	_float					m_fHitRecoverTime = 0.05f;		// 가리손 궁일때 뭔가 특단의 조치가 필요
 
 private:
 	HRESULT					Set_CurrentActor();

@@ -4,6 +4,8 @@
 #include "GameInstance.h"
 #include "MonsterFsm.h"
 #include "CombatController.h"
+#include "Weapon.h"
+
 
 CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice,pContext)
@@ -13,6 +15,28 @@ CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 CSlimeKing::CSlimeKing(const CSlimeKing & rhs)
 	:CMonster(rhs)
 {
+}
+
+CGameObject * CSlimeKing::Get_Weapon_Or_SkillBody()
+{
+	for (auto& pParts : m_MonsterParts)
+	{
+		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+			return pParts;
+	}
+
+	return nullptr;
+}
+
+_bool CSlimeKing::Calculator_HitColl(CGameObject * pWeapon)
+{
+	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+
+	if (nullptr == pCurActorWepon)		//나중에 아래것으로
+		return false;
+	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+
+	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
 }
 
 HRESULT CSlimeKing::Initialize_Prototype()
@@ -39,10 +63,11 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.f, 0.f, -10.f, 1.f));
-
-
 	m_pModelCom->Set_AnimIndex(0);
 
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
+	
 	return S_OK;
 }
 
@@ -52,6 +77,7 @@ HRESULT CSlimeKing::Last_Initialize()
 		return S_OK;
 
 	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR1);
+	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -65,6 +91,14 @@ void CSlimeKing::Tick(_double TimeDelta)
 	m_pFsmCom->Tick(TimeDelta);
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
+	ImGui::Text("SlimeKing");
+	ImGui::InputFloat("SlimeKing_SpeedRatio", &m_SpeedRatio);
+	ImGui::InputFloat("SlimeKing_LimitDistance", &m_LimitDistance);
+	ImGui::InputFloat("SlimeKing_ReturnDistance", &m_ReturnDistance);
+	ImGui::InputFloat("SlimeKing_setTickForSecond", &m_setTickForSecond);
+	ImGui::NewLine();
+
+
 	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
 
@@ -73,6 +107,11 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
+
+	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
+	{
+		m_MonsterParts[i]->Late_Tick(TimeDelta);
+	}
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -102,28 +141,28 @@ HRESULT CSlimeKing::Render()
 
 void CSlimeKing::Combat_Tick(_double TimeDelta)
 {
-	CMonster::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	if (m_iMovingDir == ANIM_DIR_STRAIGHT || m_iMovingDir == ANIM_DIR_BACK)
+	{
+		MovingAnimControl(TimeDelta);
+	}
+	else
+		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
+	{
+		m_MonsterParts[i]->Tick(TimeDelta);
+	}
+
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
-
-
-	
-
-
 }
 
 _int CSlimeKing::Is_MovingAnim()
 {
 	if (m_pModelCom->Get_AnimIndex() == 9)
-	{
 		m_iMovingDir = ANIM_DIR_STRAIGHT;
-		m_pModelCom->Set_Duration(9, 1.5);
-	}
 	else if (m_pModelCom->Get_AnimIndex() == 4)
-	{
 		m_iMovingDir = ANIM_DIR_BACK;
-		m_pModelCom->Set_Duration(4, 1.5);
-	}
 	else
 		m_iMovingDir = ANIM_EMD;
 
@@ -132,11 +171,37 @@ _int CSlimeKing::Is_MovingAnim()
 
 void CSlimeKing::CombatAnim_Move(_double TImeDelta)
 {
+	if (m_pHitTarget == nullptr)
+		return;
+	_float4 Target;
+	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+
 	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
-		m_pTransformCom->Go_Straight(TImeDelta);
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 
 	else if (m_iMovingDir == ANIM_DIR_BACK)
-		m_pTransformCom->Go_Backward(TImeDelta);
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
+	else
+		return;
+}
+
+void CSlimeKing::MovingAnimControl(_double TimeDelta)
+{
+	if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
+	{
+		m_bIsCombatAndAnimSequnce = false;
+		m_iOldAnim = m_pModelCom->Get_AnimIndex();
+		if (m_bCombatChaseTarget == false)
+			return;
+		
+		_uint i = m_CurAnimqeue.front().first;
+		m_pModelCom->Set_AnimIndex(i);
+		m_pModelCom->Set_AnimTickTime(m_CurAnimqeue.front().second);
+		m_CurAnimqeue.pop();
+		m_bFinishOption = ANIM_CONTROL_NEXT;
+		if (m_CurAnimqeue.empty())
+			m_bIsCombatAndAnimSequnce = true;
+	}
 }
 
 void CSlimeKing::Fsm_Exit()
@@ -145,11 +210,12 @@ void CSlimeKing::Fsm_Exit()
 	_double TEst = 0.0;
 
 	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_pHitTarget = nullptr;
 }
 
 _bool CSlimeKing::IsCollMouse()
 {
-	return m_pColliderCom->Collision_Mouse(g_hWnd, m_pTransformCom);
+	return m_pColliderCom->Collision_Mouse(g_hWnd);
 }
 
 
@@ -206,6 +272,40 @@ HRESULT CSlimeKing::SetUp_ShaderResources()
 
 
 	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CSlimeKing::Ready_Parts()
+{
+	CGameObject*		pPartObject = nullptr;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CWeapon::WEAPONDESC			WeaponDesc;
+	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
+
+	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+
+	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Slime_Head");
+	WeaponDesc.pTargetTransform = m_pTransformCom;
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, -0.0f, -0.0f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.f, 1.f, 1.f, 0.f));
+	WeaponDesc.eType = WEAPON_HEAD;
+	// 이놈은 아마 2개써야될듯?
+
+	Safe_AddRef(WeaponDesc.pSocket);
+	Safe_AddRef(m_pTransformCom);
+
+	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
+	if (nullptr == pPartObject)
+		return E_FAIL;
+	m_MonsterParts.push_back(pPartObject);
+
+	pPartObject->Get_Transform()->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.0f));
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 
@@ -303,6 +403,10 @@ CGameObject * CSlimeKing::Clone(void * pArg)
 void CSlimeKing::Free()
 {
 	__super::Free();
+
+	for (auto& pPart : m_MonsterParts)
+		Safe_Release(pPart);
+	m_MonsterParts.clear();
 
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);

@@ -142,7 +142,7 @@ _bool CCollider::Collision(CCollider * pTargetCollider)
 	return m_isColl;
 }
 
-_bool CCollider::Collision_Mouse(HWND hWnd,CTransform* pTransform)
+_bool CCollider::Collision_Mouse(HWND hWnd)
 {
 	m_isColl = false;
 

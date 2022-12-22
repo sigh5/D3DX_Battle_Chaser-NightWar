@@ -4,14 +4,13 @@
 #include "Model.h"
 
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CGameObject(pDevice, pContext)
+	:CCombatActors(pDevice, pContext)
 {
 }
 
 CPlayer::CPlayer(const CPlayer & rhs)
-	: CGameObject(rhs)
+	: CCombatActors(rhs)
 	, m_bControlKeyInput(rhs.m_bControlKeyInput)
-	, m_iAnimIndex(rhs.m_iAnimIndex)
 	, m_fWalkTime(rhs.m_fWalkTime)
 	, m_fMoveSpeedRatio(m_fMoveSpeedRatio)
 	, m_bKeyInput(rhs.m_bKeyInput)
@@ -19,9 +18,6 @@ CPlayer::CPlayer(const CPlayer & rhs)
 {
 }
 
-void CPlayer::Fsm_Exit()
-{
-}
 
 HRESULT CPlayer::Initialize_Prototype()
 {
@@ -69,54 +65,33 @@ HRESULT CPlayer::Render()
 void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 {
 	m_bIsSwap = true;
-	Safe_Release(m_pTargetPlayer);
-
+	Safe_Release(m_pCaptinPlayer);
+	
 	if (pPlayer != nullptr)
 	{
-		m_pTargetPlayer = pPlayer;
-		Safe_AddRef(m_pTargetPlayer);
+		m_pCaptinPlayer = pPlayer;
+		Safe_AddRef(m_pCaptinPlayer);
 		NormalLightCharUI();
 	}
 	else
 	{
-		m_pTargetPlayer = nullptr;
+		m_pCaptinPlayer = nullptr;
 		HighLightChar();
 	}
 	
 }
 
-void CPlayer::ChaseTarget(_double TimeDelta)
-{	
-	/*if (nullptr == m_pTargetPlayer)
-		return;
 
-	_vector vTargetPos = m_pTargetPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-
-	if (m_bIsSwap == true)
-		return;
-	else if (!m_bIsSwap && !m_isStop)
-		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 2.5f);
-
-	if (m_isStop)
-	{
-		if(m_pTargetPlayer->m_bIsWalk)
-
-		m_pTransformCom->Chase(vTargetPos, TimeDelta, 2.5f);
-	}
-	else
-		m_iAnimIndex = 0;
-	*/
-}
 
 
 
 void CPlayer::LookAtTarget(_double TimeDelta)
 {
-	if (m_pTargetPlayer == nullptr )
+	if (m_pCaptinPlayer == nullptr )
 		return;
 
 	_float4x4	TargetMat;
-	XMStoreFloat4x4(&TargetMat,m_pTargetPlayer->Get_Transform()->Get_WorldMatrix());
+	XMStoreFloat4x4(&TargetMat,m_pCaptinPlayer->Get_Transform()->Get_WorldMatrix());
 
 	_vector vRight, vUp, vLook;
 
@@ -129,7 +104,7 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 	m_pTransformCom->Set_State(CTransform::STATE_RIGHT, XMVector3Normalize(vRight)*vScale.x );
 	m_pTransformCom->Set_State(CTransform::STATE_UP, XMVector3Normalize(vUp)*vScale.y);
 	m_pTransformCom->Set_State(CTransform::STATE_LOOK, XMVector3Normalize(vLook)*vScale.z);
-	_vector vTargetPos = m_pTargetPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	_vector vTargetPos = m_pCaptinPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
 
 	if (m_bIsSwap == true)
 		return;
@@ -138,7 +113,7 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 
 	if (m_isStop)
 	{
-		if(static_cast<CPlayer*>(m_pTargetPlayer)->m_bIsWalk)
+		if(static_cast<CPlayer*>(m_pCaptinPlayer)->m_bIsWalk)
 			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 2.5f);
 		else
 			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.f, 2.5f);
@@ -149,66 +124,14 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 
 _bool CPlayer::IsCaptin()
 {
-	if (m_pTargetPlayer == nullptr)
+	if (m_pCaptinPlayer == nullptr)
 		return true;
 
 	return false;
 }
 
-void CPlayer::CurAnimQueue_Play_Tick(_double Time,CModel* pModel)
-{
-	if (!m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
-	{
-		m_bIsCombatAndAnimSequnce = false;
-		m_iOldAnim = pModel->Get_AnimIndex();
-		_uint i = m_CurAnimqeue.front().first;
-		pModel->Set_AnimIndex(i);
-		pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
-		m_CurAnimqeue.pop();
-		m_bFinishOption = ANIM_CONTROL_NEXT;
-		
-		if (m_CurAnimqeue.empty())
-		{
-			m_bIsCombatAndAnimSequnce = true;
-		}
-	}
-
-}
-
-void CPlayer::CurAnimQueue_Play_LateTick(CModel* pModel)
-{
-	if (m_bFinishOption == ANIM_CONTROL_NEXT)
-	{
-		pModel->Set_Finished(m_iOldAnim, false);
-		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
-		m_bIsIdle = false;
-	}
-	if (m_bIsCombatAndAnimSequnce && m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
-	{
-		pModel->Set_PlayTime(pModel->Get_AnimIndex());
-		m_bIsIdle = true;
-	}
-
-}
-
-void CPlayer::Set_CombatAnim_Index(CModel * pModel)
-{
-	for (_uint i = 0; i < _uint(CHAR_STATE_END); ++i)
-		Set_FsmState(false, CHAR_STATE(i));
-
-	pModel->Set_PlayTime(pModel->Get_AnimIndex());
-	pModel->InitChannel();
-	//pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
-	pModel->Set_AnimIndex(m_CurAnimqeue.front().first);
-	pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
-	m_bIsIdle = false;
-	m_CurAnimqeue.pop();
-}
-
-
 _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 {
-
 	if (!m_bControlKeyInput)
 		return false;
 
@@ -296,7 +219,6 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 void CPlayer::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pTargetPlayer);
+	Safe_Release(m_pCaptinPlayer);
 }
 

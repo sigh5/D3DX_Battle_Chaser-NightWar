@@ -38,7 +38,7 @@ public:
 	_bool Collision(class CCollider* pTargetCollider);
 
 	/*Only AABB*/
-	_bool Collision_Mouse(HWND hWnd, class CTransform* pTransform);
+	_bool Collision_Mouse(HWND hWnd);
 
 
 #ifdef _DEBUG

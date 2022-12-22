@@ -387,6 +387,9 @@
     <ClInclude Include="..\Public\VIBuffer_Point_Instancing.h">
       <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Point</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\CombatActors.h">
+      <Filter>01.Utility\02.GameObject\Dynamic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -577,6 +580,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Point_Instancing.cpp">
       <Filter>01.Utility\03.Components\02.VIBuffer\Instancing\Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CombatActors.cpp">
+      <Filter>01.Utility\02.GameObject\Dynamic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

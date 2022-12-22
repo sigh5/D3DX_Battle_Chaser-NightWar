@@ -9,7 +9,8 @@ class ENGINE_DLL CNavigation final : public CComponent
 public:
 	typedef struct tagNavigationDesc
 	{
-		_int		iCurrentIndex = -1;
+		_int		iCurrentIndex = -1;		// 객체마다 다 하나씩 있거든 
+								
 	}NAVIDESC;
 
 public:

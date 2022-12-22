@@ -160,7 +160,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	//pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
+	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 
 	RELEASE_INSTANCE(CGameInstance);
 

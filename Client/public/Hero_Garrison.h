@@ -23,6 +23,9 @@ private:
 	virtual ~CHero_Garrison() = default;
 
 public:
+	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Last_Initialize()override;
@@ -53,7 +56,7 @@ public:  /*For.Combat*/
 
 
 public:
-	virtual	  _bool	  Is_PlayerDead()override;
+	virtual	  _bool	  Is_Dead()override;
 	_int	  Is_MovingAnim();
 	void	  CombatAnim_Move_Ultimate(_double TImeDelta);
 
@@ -82,7 +85,7 @@ public:
 private:
 	_int		bResult = ANIM_EMD;
 	_bool		m_bCombatInit = false;
-	_vector		m_vOriginPos;				// for.Combat
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -91,11 +94,14 @@ private:
 	class CAnimFsm*				m_pAnimFsm = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 
+private:
+	vector<CGameObject*>	m_PlayerParts;
 
 private:
 	HRESULT		SetUp_Components();
 	HRESULT		SetUp_ShaderResources();
 	HRESULT		Combat_Init();
+	HRESULT		Ready_Parts();
 public:
 	static CHero_Garrison* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
@@ -112,12 +118,12 @@ private:
 
 	_uint iTestNum = 0;
 	_double TEst = 0.0;
-	_bool		m_bCombatChaseTarget = false;
+	
 
 
 	_float		m_SpeedRatio = 8.f;
 	_float		m_LimitDistance = 8.f;
-	_float		m_ReturnDistance = 0.1f;
+	_float		m_ReturnDistance = 0.4f;
 	_float		m_setTickForSecond = 0.9f;
 };
 

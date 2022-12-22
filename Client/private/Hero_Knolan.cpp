@@ -7,6 +7,7 @@
 #include "PlayerController.h"
 #include "CombatController.h"
 #include "AnimFsm.h"
+#include "Weapon.h"
 
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
@@ -16,6 +17,23 @@ CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContex
 CHero_Knolan::CHero_Knolan(const CHero_Knolan & rhs)
 	: CPlayer(rhs)
 {
+}
+
+CGameObject * CHero_Knolan::Get_Weapon_Or_SkillBody()
+{
+
+	return nullptr;
+}
+
+_bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
+{
+	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+
+	if (nullptr == pCurActorWepon)		//나중에 아래것으로
+		return false;
+	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+
+	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
 }
 
 HRESULT CHero_Knolan::Initialize_Prototype()
@@ -69,11 +87,10 @@ void CHero_Knolan::Tick(_double TimeDelta)
 	{
 		Combat_Initialize();
 		m_pFsmCom->Tick(TimeDelta);
+		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 	}
-		
-	ObserverTest(TimeDelta);
-
+	
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -103,6 +120,8 @@ HRESULT CHero_Knolan::Render()
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
+	if (m_bIsCombatScene)
+		m_pColliderCom->Render();
 #endif
 	return S_OK;
 }
@@ -139,6 +158,8 @@ void CHero_Knolan::Fsm_Exit()
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
+
+
 }
 
 void CHero_Knolan::Intro_Exit()
@@ -192,7 +213,6 @@ void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
 HRESULT CHero_Knolan::Combat_Initialize()
@@ -214,7 +234,7 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 void CHero_Knolan::Combat_Tick(_double TimeDelta)
 {
-	CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 
 	_float4 vRight, vUp, vLook;
 	XMStoreFloat4(&vRight, m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
@@ -222,23 +242,7 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 	XMStoreFloat4(&vLook, m_pTransformCom->Get_State(CTransform::STATE_LOOK));
 }
 
-void CHero_Knolan::ObserverTest(_double TimeDelta)
-{
-	//CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-	//if (pInstance->Key_Down(DIK_SPACE))
-	//{
-	//	_uint iMoveSpeed = 100;
-	//	m_Hero_GullyHPDelegater.broadcast(TimeDelta, iMoveSpeed);
-	//}
-	///*if (pInstance->Key_Down(DIK_O))
-	//{
-	//	_uint iShakingTime = 3;
-	//	m_Hero_GullyTestShakingDelegater.broadcast(iShakingTime);
-	//}*/
 
-
-	//RELEASE_INSTANCE(CGameInstance);
-}
 
 HRESULT CHero_Knolan::SetUp_Components()
 {
@@ -415,7 +419,7 @@ void CHero_Knolan::Anim_Die()
 
 void CHero_Knolan::Anim_Viroty()
 {
-	Is_PlayerDead();
+	Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -456,7 +460,7 @@ void CHero_Knolan::Free()
 	Safe_Release(m_pRendererCom);
 }
 
-_bool CHero_Knolan::Is_PlayerDead()
+_bool CHero_Knolan::Is_Dead()
 {
 	/* 플레이가 죽었을때랑 살았을때 구분해서 쓰기*/
 	/*살았을때*/

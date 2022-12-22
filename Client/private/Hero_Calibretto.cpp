@@ -7,6 +7,8 @@
 #include "AnimFsm.h"
 #include "PlayerController.h"
 #include "CombatController.h"
+
+
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -15,6 +17,28 @@ CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext *
 CHero_Calibretto::CHero_Calibretto(const CHero_Calibretto & rhs)
 	: CPlayer(rhs)
 {
+}
+
+CGameObject * CHero_Calibretto::Get_Weapon_Or_SkillBody()
+{
+	for (auto& pParts : m_PlayerParts)
+	{
+		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+			return pParts;
+	}
+
+	return nullptr;
+}
+
+_bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
+{
+	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+
+	if (nullptr == pCurActorWepon)		//나중에 아래것으로
+		return false;
+	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+
+	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
 }
 
 HRESULT CHero_Calibretto::Initialize_Prototype()
@@ -47,7 +71,7 @@ HRESULT CHero_Calibretto::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-
+	
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -64,8 +88,17 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	{
 		Combat_Initialize();
 
-		m_pFsmCom->Tick(TimeDelta);
+//#ifdef _DEBUG
+//		ImGui::Begin("Weapon_Gizmo");
+//		static int			iIndex = 0;
+//		ImGui::InputInt("Index", &iIndex);
+//
+//		m_PlayerParts[iIndex]->Get_Transform()->Imgui_RenderProperty();
+//		ImGui::End();
+//#endif // _DEBUG
 
+		m_pFsmCom->Tick(TimeDelta);
+		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -76,6 +109,14 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
+
+	if (m_bIsCombatScene)
+	{
+		for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+		{
+			m_PlayerParts[i]->Late_Tick(TimeDelta);
+		}
+	}
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -101,14 +142,12 @@ HRESULT CHero_Calibretto::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 	
-
-	
-
-
-
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
+
+	if (m_bIsCombatScene)
+		m_pColliderCom->Render();
 #endif
 	return S_OK;
 }
@@ -186,7 +225,7 @@ void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	
 }
 
 HRESULT CHero_Calibretto::Combat_Initialize()
@@ -198,10 +237,11 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 30.f, 1.f));
-
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
 
 
 	m_bCombat_LastInit = true;
@@ -210,20 +250,24 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 
 void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 {
-	ImGui::InputFloat("SpeedRatio", &m_SpeedRatio);
-	ImGui::InputFloat("LimitDistance", &m_LimitDistance);
-	ImGui::InputFloat("TickForSecond", &m_setTickForSecond);
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
 
 	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
-		CPlayer::CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 
-
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
+	for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+	{
+		m_PlayerParts[i]->Tick(TimeDelta);
+	}
+	
+	
+	
+	
 }
 
 
@@ -297,6 +341,37 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CHero_Calibretto::Ready_Parts()
+{
+	CGameObject*		pPartObject = nullptr;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CWeapon::WEAPONDESC			WeaponDesc;
+	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
+
+	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+
+	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Calibretto_Hand_R");
+	WeaponDesc.pTargetTransform = m_pTransformCom;
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(1.7f, 0.f, -1.1f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f, 0.f));
+	WeaponDesc.eType = WEAPON_HAND;
+
+	Safe_AddRef(WeaponDesc.pSocket);
+	Safe_AddRef(m_pTransformCom);
+
+	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
+	if (nullptr == pPartObject)
+		return E_FAIL;
+
+	m_PlayerParts.push_back(pPartObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	return S_OK;
+}
+
 void CHero_Calibretto::Anim_Idle()
 {
 	m_CurAnimqeue.push({ 2,1.f });
@@ -313,6 +388,8 @@ void CHero_Calibretto::Anim_Intro()
 
 void CHero_Calibretto::AnimNormalAttack()
 {
+	m_eWeaponType = WEAPON_HAND;
+
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 3,	 1.f });
 	m_CurAnimqeue.push({ 16, 1.f });
@@ -392,7 +469,7 @@ void CHero_Calibretto::Anim_Die()
 
 void CHero_Calibretto::Anim_Viroty()
 {
-	Is_PlayerDead();
+	Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -424,6 +501,10 @@ void CHero_Calibretto::Free()
 {
 	__super::Free();
 
+	for (auto& pPart : m_PlayerParts)
+		Safe_Release(pPart);
+	m_PlayerParts.clear();
+
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
@@ -433,7 +514,7 @@ void CHero_Calibretto::Free()
 }
 
 
-_bool CHero_Calibretto::Is_PlayerDead()
+_bool CHero_Calibretto::Is_Dead()
 {
 	/* 이겼을 경우*/
 	m_CurAnimqeue.push({ 6 ,	1.f });
@@ -463,7 +544,6 @@ void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 {
 	if (m_pHitTarget == nullptr)
 		return;
-
 	_float4 Target;
 	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 
@@ -472,6 +552,8 @@ void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 
 	else if (bResult == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
+	else
+		return;
 }
 
 void CHero_Calibretto::MovingAnimControl(_double TimeDelta)

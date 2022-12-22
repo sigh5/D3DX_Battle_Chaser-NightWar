@@ -212,6 +212,7 @@
     <ClInclude Include="..\Public\TurnUICanvas.h" />
     <ClInclude Include="..\public\UIButton.h" />
     <ClInclude Include="..\public\WaterTile.h" />
+    <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="..\Private\TurnUICanvas.cpp" />
     <ClCompile Include="..\private\UIButton.cpp" />
     <ClCompile Include="..\private\WaterTile.cpp" />
+    <ClCompile Include="..\private\Weapon.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

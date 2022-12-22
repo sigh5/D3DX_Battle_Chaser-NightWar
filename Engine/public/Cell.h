@@ -43,6 +43,7 @@ private:
 	_float3				m_vPoints[POINT_END];
 	_int				m_iNeighborIndices[NEIGHBOR_END];
 
+	// option
 #ifdef _DEBUG
 private:
 	class CVIBuffer_Cell*			m_pVIBuffer = nullptr;

@@ -127,6 +127,12 @@
     <Filter Include="02.GameObjects\UI\Image">
       <UniqueIdentifier>{253ac410-18ef-4117-9a42-517776458014}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Weapon">
+      <UniqueIdentifier>{2ffc174c-34a8-45e9-b4b4-c3e35c6d496d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster\MonsterWeapon">
+      <UniqueIdentifier>{f9e1cdc3-9f84-49a6-b5b3-2d46354dc90a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -273,6 +279,9 @@
     <ClInclude Include="..\Public\MyImage.h">
       <Filter>02.GameObjects\UI\Image</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02.GameObjects\Player\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -400,6 +409,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MyImage.cpp">
       <Filter>02.GameObjects\UI\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon.cpp">
+      <Filter>02.GameObjects\Player\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

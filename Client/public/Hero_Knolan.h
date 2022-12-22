@@ -20,6 +20,9 @@ protected:
 	virtual ~CHero_Knolan() = default;
 
 public:
+	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual HRESULT Last_Initialize()override;
@@ -43,10 +46,8 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	virtual	  _bool	  Is_PlayerDead()override;
+	virtual	  _bool	  Is_Dead()override;
 	
-private:
-	void			ObserverTest(_double TimeDelta);
 
 private:
 	CShader*				m_pShaderCom = nullptr;
