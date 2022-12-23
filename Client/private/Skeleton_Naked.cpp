@@ -90,12 +90,12 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 
 	m_pFsmCom->Tick(TimeDelta);
 
-	ImGui::Text("Skeleton_Naked");
+	/*ImGui::Text("Skeleton_Naked");
 	ImGui::InputFloat("Skeleton_SpeedRatio", &m_SpeedRatio);
 	ImGui::InputFloat("Skeleton_LimitDistance", &m_LimitDistance);
 	ImGui::InputFloat("Skeleton_ReturnDistance", &m_ReturnDistance);
 	ImGui::InputFloat("Skeleton_setTickForSecond", &m_setTickForSecond);
-	ImGui::NewLine();
+	ImGui::NewLine();*/
 
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
@@ -140,6 +140,9 @@ HRESULT CSkeleton_Naked::Render()
 
 void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
 {
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
+
 	if (m_iMovingDir == ANIM_DIR_STRAIGHT || m_iMovingDir == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
@@ -151,9 +154,6 @@ void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
 	{
 		m_MonsterParts[i]->Tick(TimeDelta);
 	}
-	
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
 }
 
 _int CSkeleton_Naked::Is_MovingAnim()
@@ -172,19 +172,18 @@ _int CSkeleton_Naked::Is_MovingAnim()
 
 void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 {
-	if (m_pHitTarget == nullptr)
+	if (m_pHitTarget == nullptr || m_iMovingDir == ANIM_EMD)
 		return;
 
-	_float4 Target;
-	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
-
-	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
-		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-
-	else if (m_iMovingDir == ANIM_DIR_BACK)
+	if (m_iMovingDir == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
-	else
-		return;
+	
+	else if (m_iMovingDir == ANIM_DIR_STRAIGHT)
+	{
+		_float4 Target;
+		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+	}
 }
 
 void CSkeleton_Naked::MovingAnimControl(_double TimeDelta)

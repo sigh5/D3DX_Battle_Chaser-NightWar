@@ -68,7 +68,7 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	/*CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
 
 	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
@@ -76,7 +76,7 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 
 	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
 	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
-
+*/
 	Control_ChildRender(false);
 	StateButton_Child();
 

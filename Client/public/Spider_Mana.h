@@ -78,9 +78,9 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_END;
 
 private:
-	_float					m_SpeedRatio = 7.f;
+	_float					m_SpeedRatio = 6.f;
 	_float					m_LimitDistance = 6.f;
-	_float					m_ReturnDistance = 0.4f;
+	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
 
 

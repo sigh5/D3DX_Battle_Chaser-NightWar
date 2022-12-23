@@ -8,6 +8,7 @@ class CRenderer;
 class CModel;
 class CCollider;
 class CNavigation;
+class CStatus;
 END
 
 BEGIN(Client)
@@ -32,7 +33,6 @@ public:
 
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
-
 	virtual		void	Fsm_Exit()override;
 	void				Intro_Exit();			//얘가 인트로가 제일길어서 
 
@@ -54,16 +54,18 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom =  nullptr;
 	CCollider*				m_pColliderCom = nullptr;
+	CNavigation*			m_pNavigationCom = nullptr;
+	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr, };
+
 	class CAnimFsm*			m_pFsmCom = nullptr;
 	
-	CNavigation*			m_pNavigationCom = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
 
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
-
+	HRESULT					Ready_Parts_Combat();
 	
 
 public:

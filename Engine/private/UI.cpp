@@ -4,6 +4,8 @@
 #include "Canvas.h"
 #include "Level_Manager.h"
 #include "GameInstance.h"
+
+
 CUI::CUI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CGameObject(pDevice, pContext)
 {
@@ -83,6 +85,7 @@ void CUI::Set_parentName(_uint iCulLevel, const _tchar * pParentTag)
 	RELEASE_INSTANCE(CObject_Manager);
 }
 
+
 HRESULT CUI::SetUp_UI()
 {
 	
@@ -92,13 +95,12 @@ HRESULT CUI::SetUp_UI()
 
 void CUI::Begin_UI()
 {
-	//m_pContext->OMSetDepthStencilState(m_UIdepthStencilState, 1);
+
 	
 }
 
 void CUI::End_UI()
 {
-	//m_pContext->OMSetDepthStencilState(m_OldDepthStencilState, m_StencilRef);
 }
 
 void CUI::Free()

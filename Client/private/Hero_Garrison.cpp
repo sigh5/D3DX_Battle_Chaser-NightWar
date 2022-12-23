@@ -87,7 +87,6 @@ void CHero_Garrison::Tick(_double TimeDelta)
 	else
 	{
 		Combat_Init();
-
 		m_pAnimFsm->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
@@ -215,6 +214,9 @@ void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 
 void CHero_Garrison::Combat_Tick(_double TimeDelta)
 {
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
+
 	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
@@ -226,22 +228,24 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
 	}
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
-
 }
 
 void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 {
+	Is_MovingAnim();
+	CombatAnim_Move_Ultimate(TimeDelta);
+
 	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-	Is_MovingAnim();
-	CombatAnim_Move_Ultimate(TimeDelta);
 	
+	for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+	{
+		m_PlayerParts[i]->Tick(TimeDelta);
+	}
 }
 
 void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
@@ -323,6 +327,19 @@ HRESULT CHero_Garrison::SetUp_Components()
 		return E_FAIL;
 
 
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 250;
+	StatusDesc.iMp = 150;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
+		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
+		return E_FAIL;
+
+
+
+
 	return S_OK;
 }
 
@@ -385,14 +402,14 @@ HRESULT CHero_Garrison::Combat_Init()
 	//m_CurAnimqeue.push({ 0,1.f });
 	//Set_CombatAnim_Index(m_pModelCom);
 
-	if (FAILED(Ready_Parts()))
+	if (FAILED(Ready_CombatParts()))
 		return E_FAIL;
 
 	m_bCombatInit = true;
 	return S_OK;
 }
 
-HRESULT CHero_Garrison::Ready_Parts()
+HRESULT CHero_Garrison::Ready_CombatParts()
 {
 	CGameObject*		pPartObject = nullptr;
 
@@ -415,6 +432,16 @@ HRESULT CHero_Garrison::Ready_Parts()
 		return E_FAIL;
 
 	m_PlayerParts.push_back(pPartObject);
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 150;
+	StatusDesc.iMp = 300;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
+		return E_FAIL;
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -452,6 +479,9 @@ void CHero_Garrison::Free()
 	for (auto& pPart : m_PlayerParts)
 		Safe_Release(pPart);
 	m_PlayerParts.clear();
+
+	for (_uint i = 0; i < MAPTYPE_END; ++i)
+		Safe_Release(m_pStatusCom[i]);
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pAnimFsm);
@@ -500,6 +530,9 @@ void CHero_Garrison::Is_Skill1MovingAnim()
 
 void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 {
+	if (bResult == ANIM_DIR_BACK)
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);	
+	
 	if (m_pHitTarget == nullptr || bResult == ANIM_EMD)
 		return;
 
@@ -509,8 +542,6 @@ void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 	if (bResult == ANIM_DIR_STRAIGHT)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 
-	else if (bResult == ANIM_DIR_BACK)
-		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
 		
 }
 
@@ -526,7 +557,6 @@ void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)
 		m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 	else if (bResult == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, 6.f);
-
 
 }
 

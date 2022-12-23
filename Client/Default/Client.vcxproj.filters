@@ -40,9 +40,6 @@
     <Filter Include="02.GameObjects\UI">
       <UniqueIdentifier>{6e243f85-6474-4acf-ad18-c4d2d71ceee9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\HPBar">
-      <UniqueIdentifier>{9095ff33-1570-4247-91bc-087c2668ee74}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player">
       <UniqueIdentifier>{6b361b72-e841-4213-91a0-2697c2510717}</UniqueIdentifier>
     </Filter>
@@ -130,8 +127,20 @@
     <Filter Include="02.GameObjects\Player\Weapon">
       <UniqueIdentifier>{2ffc174c-34a8-45e9-b4b4-c3e35c6d496d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Monster\MonsterWeapon">
+    <Filter Include="02.GameObjects\Monster\MonsterStateFsm">
       <UniqueIdentifier>{f9e1cdc3-9f84-49a6-b5b3-2d46354dc90a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\Hp_Mp_Buff">
+      <UniqueIdentifier>{8551a500-890c-43bd-a3eb-b1b802c20f8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\HPMPBar">
+      <UniqueIdentifier>{9095ff33-1570-4247-91bc-087c2668ee74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\Buff_Image">
+      <UniqueIdentifier>{eadbed41-ba74-46de-b3ab-2eb0cfd16db7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\HPMpCanvas">
+      <UniqueIdentifier>{8becbaea-0735-4140-8b63-6d8c6d868d41}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -176,9 +185,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Dynamic.h">
       <Filter>02.GameObjects\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\HpBar.h">
-      <Filter>02.GameObjects\UI\HPBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MainLogo.h">
       <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
@@ -282,6 +288,13 @@
     <ClInclude Include="..\Public\Weapon.h">
       <Filter>02.GameObjects\Player\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\HpMpBar.h">
+      <Filter>02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\HPMPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HpMpBuffCanvas.h">
+      <Filter>02.GameObjects\UI\TrunBattle\HPMpCanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Buff_Image.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -313,9 +326,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Dynamic.cpp">
       <Filter>02.GameObjects\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\HpBar.cpp">
-      <Filter>02.GameObjects\UI\HPBar</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MainLogo.cpp">
       <Filter>02.GameObjects\LogoBackGround\Logo</Filter>
@@ -413,6 +423,13 @@
     <ClCompile Include="..\private\Weapon.cpp">
       <Filter>02.GameObjects\Player\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\HpMpBar.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\HPMPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HpMpBuffCanvas.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\HPMpCanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buff_Image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

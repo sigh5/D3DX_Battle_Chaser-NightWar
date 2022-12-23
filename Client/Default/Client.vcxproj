@@ -172,6 +172,7 @@
     <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h" />
     <ClInclude Include="..\public\AnimFsm.h" />
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Buff_Image.h" />
     <ClInclude Include="..\Public\Camera_Combat.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Camera_Static.h" />
@@ -187,7 +188,8 @@
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
     <ClInclude Include="..\public\Hero_Knolan.h" />
-    <ClInclude Include="..\Public\HpBar.h" />
+    <ClInclude Include="..\public\HpMpBar.h" />
+    <ClInclude Include="..\Public\HpMpBuffCanvas.h" />
     <ClInclude Include="..\Public\Level_Combat.h" />
     <ClInclude Include="..\public\Level_GamePlay.h" />
     <ClInclude Include="..\public\Level_GamePlayPreHeader.h" />
@@ -221,6 +223,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\AnimFsm.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Buff_Image.cpp" />
     <ClCompile Include="..\private\Camera_Combat.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Camera_Static.cpp" />
@@ -235,7 +238,8 @@
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />
     <ClCompile Include="..\private\Hero_Knolan.cpp" />
-    <ClCompile Include="..\Private\HpBar.cpp" />
+    <ClCompile Include="..\private\HpMpBar.cpp" />
+    <ClCompile Include="..\Private\HpMpBuffCanvas.cpp" />
     <ClCompile Include="..\Private\Level_Combat.cpp" />
     <ClCompile Include="..\private\Level_GamePlay.cpp" />
     <ClCompile Include="..\private\Level_Loading.cpp" />

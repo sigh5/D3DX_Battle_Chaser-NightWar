@@ -305,11 +305,9 @@ _bool CTransform::CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _flo
 	if (fDistance >= fLimit)
 	{
 		vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec * fSpeedMultiple*  (_float)TimeDelta;
-		
 		Set_State(CTransform::STATE_TRANSLATION, vPosition);
 		return  false;
 	}
-	
 	
 	return true;		//거리에 도착했을 경우 트루 반환
 }

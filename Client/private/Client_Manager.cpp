@@ -90,7 +90,6 @@ void CClient_Manager::CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCol
 		pColider->Update(pTransform->Get_WorldMatrix());
 	}
 
-
 	RELEASE_INSTANCE(CPlayerController);
 }
 

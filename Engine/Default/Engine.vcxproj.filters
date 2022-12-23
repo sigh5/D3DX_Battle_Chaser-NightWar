@@ -169,6 +169,9 @@
     <Filter Include="01.Utility\03.Components\02.VIBuffer\Instancing\Rect">
       <UniqueIdentifier>{a1c047c9-2411-457b-a1f7-8c31a8472bd6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\10.Status">
+      <UniqueIdentifier>{5b81af99-83b0-4a38-9933-c1b95f834d66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -390,6 +393,9 @@
     <ClInclude Include="..\Public\CombatActors.h">
       <Filter>01.Utility\02.GameObject\Dynamic</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Status.h">
+      <Filter>01.Utility\03.Components\10.Status</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -583,6 +589,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\CombatActors.cpp">
       <Filter>01.Utility\02.GameObject\Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Status.cpp">
+      <Filter>01.Utility\03.Components\10.Status</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

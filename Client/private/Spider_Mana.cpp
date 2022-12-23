@@ -89,12 +89,12 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	ImGui::Text("Spider_Mana");
-	ImGui::InputFloat("Spider_Mana_SpeedRatio", &m_SpeedRatio);
-	ImGui::InputFloat("Spider_Mana_LimitDistance", &m_LimitDistance);
-	ImGui::InputFloat("Spider_Mana_ReturnDistance", &m_ReturnDistance);
-	ImGui::InputFloat("Spider_Mana_setTickForSecond", &m_setTickForSecond);
-	ImGui::NewLine();
+	//ImGui::Text("Spider_Mana");
+	//ImGui::InputFloat("Spider_Mana_SpeedRatio", &m_SpeedRatio);
+	//ImGui::InputFloat("Spider_Mana_LimitDistance", &m_LimitDistance);
+	//ImGui::InputFloat("Spider_Mana_ReturnDistance", &m_ReturnDistance);
+	//ImGui::InputFloat("Spider_Mana_setTickForSecond", &m_setTickForSecond);
+	//ImGui::NewLine();
 
 	m_pFsmCom->Tick(TimeDelta);
 
@@ -141,20 +141,20 @@ HRESULT CSpider_Mana::Render()
 
 void CSpider_Mana::Combat_Tick(_double TimeDelta)
 {
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
 	if (m_iMovingDir == ANIM_DIR_STRAIGHT || m_iMovingDir == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-	
+
 	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
 	{
 		m_MonsterParts[i]->Tick(TimeDelta);
 	}
 
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
 }
 
 _int CSpider_Mana::Is_MovingAnim()
@@ -175,19 +175,18 @@ _int CSpider_Mana::Is_MovingAnim()
 
 void CSpider_Mana::CombatAnim_Move(_double TImeDelta)
 {
-	if (m_pHitTarget == nullptr)
+	if (m_pHitTarget == nullptr || m_iMovingDir == ANIM_EMD)
 		return;
 
-	_float4 Target;
-	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
-
-	if (m_iMovingDir == ANIM_DIR_STRAIGHT)
-		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-
-	else if (m_iMovingDir == ANIM_DIR_BACK)
+	if (m_iMovingDir == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
-	else
-		return;
+
+	else if (m_iMovingDir == ANIM_DIR_STRAIGHT)
+	{
+		_float4 Target;
+		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+	}
 }
 
 void CSpider_Mana::MovingAnimControl(_double TimeDelta)

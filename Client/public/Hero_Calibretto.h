@@ -10,6 +10,7 @@ class CRenderer;
 class CModel;
 class CCollider;
 class CNavigation;
+class CStatus;
 END
 
 BEGIN(Client)
@@ -62,8 +63,11 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
-	class CAnimFsm*			m_pFsmCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
+	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
+	
+	class CAnimFsm*			m_pFsmCom = nullptr;
+	
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
@@ -72,7 +76,10 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Combat_Initialize();
-	HRESULT					Ready_Parts();
+	
+	HRESULT					Ready_Parts_Dungeon();
+	HRESULT					Ready_Parts_Combat();
+
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();

@@ -226,7 +226,8 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-4.f, 0.f, 22.f, 1.f));
 
-
+	if (FAILED(Ready_Parts_Combat()))
+		return E_FAIL;
 
 	m_bCombat_LastInit = true;
 	return S_OK;
@@ -258,15 +259,6 @@ HRESULT CHero_Knolan::SetUp_Components()
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-		/*if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_Spider_Mana_Baby"), TEXT("Com_Model"),
-			(CComponent**)&m_pModelCom)))
-			return E_FAIL;*/
-
-	///* For.Com_Model */
-	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GullyCombat"), TEXT("Com_Model2"),
-	//	(CComponent**)&m_pModelCom[COMBAT_PLAYER])))
-	//	return E_FAIL;
-
 	CCollider::COLLIDERDESC			ColliderDesc;
 
 	/* For.Com_OBB */
@@ -290,6 +282,13 @@ HRESULT CHero_Knolan::SetUp_Components()
 		(CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 150;
+	StatusDesc.iMp = 250;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
+		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -314,8 +313,26 @@ HRESULT CHero_Knolan::SetUp_ShaderResources()
 	if (nullptr == pLightDesc)
 		return E_FAIL;
 
+
+
 	
 	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
+}
+
+HRESULT CHero_Knolan::Ready_Parts_Combat()
+{
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 150;
+	StatusDesc.iMp = 250;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
+		return E_FAIL;
+
+
+
 	return S_OK;
 }
 
@@ -450,6 +467,9 @@ CGameObject * CHero_Knolan::Clone(void * pArg)
 void CHero_Knolan::Free()
 {
 	__super::Free();
+
+	for (_uint i = 0; i < MAPTYPE_END; ++i)
+		Safe_Release(m_pStatusCom[i]);
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);

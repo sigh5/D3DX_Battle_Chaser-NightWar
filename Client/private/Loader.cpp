@@ -16,11 +16,16 @@
 
 #include "TurnUICanvas.h"
 #include "TurnStateCanvas.h"
-#include "HpBar.h"
+#include "HpMpBar.h"
 #include "CombatMap.h"
+#include "Buff_Image.h"
+
 
 #include "Camera_Combat.h"
 #include "Weapon.h"
+
+#include "HpMpBuffCanvas.h"
+
 
 /* For.CombatScene*/
 
@@ -126,6 +131,21 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(ForGamePlay_Texture(pGameInstance)))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Texture_UI_HPMPFillBar_BG */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_HPMPFillBar_BG"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/HP_MPFillBar/HP_MPFillBar%d.png"),
+			CTexture::TYPE_END, 6))))	
+		return E_FAIL;
+
+	/* For.Prototype_Component_Texture_UI_CharState */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_CharState"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CharState/CharState%d.png"),
+			CTexture::TYPE_END, 11))))
+		return E_FAIL;
+
+
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 	/* For.Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
@@ -152,9 +172,17 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../Data/Navigation.dat")))))
 		return E_FAIL;
 	
+	lstrcpy(m_szLoadingText, TEXT("스테이터스생성중"));
+	/* For.Prototype_Component_Status */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"),
+		CStatus::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
 	/* ~Model */
@@ -191,18 +219,18 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
-	///* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Knolan::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
-		CHero_Garrison::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Calibretto */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
-		CHero_Calibretto::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+	/////* For.Prototype_GameObject_Hero_Gully */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+	//	CHero_Knolan::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Alumon */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
+	//	CHero_Garrison::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
+	///* For.Prototype_GameObject_Hero_Calibretto */
+	//if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
+	//	CHero_Calibretto::Create(m_pDevice, m_pContext))))
+	//	return E_FAIL;
 
 
 	/* For.Prototype_GameObject_TurnCanvas_UI */
@@ -268,6 +296,18 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CMyImage::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_HpMpBars"),
+		CHpMpBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HPMPBUFFCanvas"),
+		CHpMpBuffCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BuffImage"),
+		CBuff_Image::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 

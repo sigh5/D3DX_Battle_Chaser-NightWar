@@ -87,16 +87,6 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	else
 	{
 		Combat_Initialize();
-
-//#ifdef _DEBUG
-//		ImGui::Begin("Weapon_Gizmo");
-//		static int			iIndex = 0;
-//		ImGui::InputInt("Index", &iIndex);
-//
-//		m_PlayerParts[iIndex]->Get_Transform()->Imgui_RenderProperty();
-//		ImGui::End();
-//#endif // _DEBUG
-
 		m_pFsmCom->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	}
@@ -240,7 +230,7 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 30.f, 1.f));
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
-	if (FAILED(Ready_Parts()))
+	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;
 
 
@@ -265,7 +255,7 @@ void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 		m_PlayerParts[i]->Tick(TimeDelta);
 	}
 	
-	
+
 	
 	
 }
@@ -309,6 +299,17 @@ HRESULT CHero_Calibretto::SetUp_Components()
 		(CComponent**)&m_pNavigationCom, &NaviDesc)))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 400;
+	StatusDesc.iMp = 100;
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
+		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
+		return E_FAIL;
+
+
+
 
 	return S_OK;
 }
@@ -341,7 +342,12 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CHero_Calibretto::Ready_Parts()
+HRESULT CHero_Calibretto::Ready_Parts_Dungeon()
+{
+	return S_OK;
+}
+
+HRESULT CHero_Calibretto::Ready_Parts_Combat()
 {
 	CGameObject*		pPartObject = nullptr;
 
@@ -366,6 +372,18 @@ HRESULT CHero_Calibretto::Ready_Parts()
 		return E_FAIL;
 
 	m_PlayerParts.push_back(pPartObject);
+
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 350;
+	StatusDesc.iMp = 125;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
+		return E_FAIL;
+
+
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -505,6 +523,9 @@ void CHero_Calibretto::Free()
 		Safe_Release(pPart);
 	m_PlayerParts.clear();
 
+	for (_uint i = 0; i < MAPTYPE_END; ++i)
+		Safe_Release(m_pStatusCom[i]);
+
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
@@ -542,18 +563,21 @@ _int CHero_Calibretto::Is_MovingAnim()
 
 void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 {
-	if (m_pHitTarget == nullptr)
+	if (m_pHitTarget == nullptr || bResult == ANIM_EMD)
 		return;
-	_float4 Target;
-	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 
-	if (bResult == ANIM_DIR_STRAIGHT)
-		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-
-	else if (bResult == ANIM_DIR_BACK)
+	if (bResult == ANIM_DIR_BACK)
+	{
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
-	else
 		return;
+	}
+	else if (bResult == ANIM_DIR_STRAIGHT)
+	{
+		_float4 Target;
+		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+	
+	}
 }
 
 void CHero_Calibretto::MovingAnimControl(_double TimeDelta)

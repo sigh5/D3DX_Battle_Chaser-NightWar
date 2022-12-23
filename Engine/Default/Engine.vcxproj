@@ -238,6 +238,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Player.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\Public\Status.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
@@ -290,6 +291,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\Private\Status.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />

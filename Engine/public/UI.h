@@ -1,6 +1,10 @@
 #pragma once
 #include "GameObject.h"
 
+
+
+
+
 BEGIN(Engine)
 
 
@@ -36,13 +40,15 @@ public:
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag) {}
 
 public:
-	virtual void Set_ParentLoad(CUI * pUI);
-
-
+	virtual void	 Set_ParentLoad(CUI * pUI);
+	
+#ifdef _DEBUG
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
 	virtual void	Set_parentName(_uint iCulLevel, const _tchar* pParentTag);
 	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc) {};
+
+#endif
 protected:
 	virtual HRESULT SetUp_UI()sealed;
 

@@ -9,6 +9,7 @@ class CRenderer;
 class CModel;
 class CCollider;
 class CNavigation;
+class CStatus;
 END
 
 BEGIN(Client)
@@ -91,9 +92,10 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
-	class CAnimFsm*				m_pAnimFsm = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
+	CStatus*				m_pStatusCom[MAPTYPE_END] = {nullptr,nullptr};
 
+	class CAnimFsm*				m_pAnimFsm = nullptr;
 private:
 	vector<CGameObject*>	m_PlayerParts;
 
@@ -101,7 +103,7 @@ private:
 	HRESULT		SetUp_Components();
 	HRESULT		SetUp_ShaderResources();
 	HRESULT		Combat_Init();
-	HRESULT		Ready_Parts();
+	HRESULT		Ready_CombatParts();
 public:
 	static CHero_Garrison* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
@@ -121,9 +123,9 @@ private:
 	
 
 
-	_float		m_SpeedRatio = 8.f;
+	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;
-	_float		m_ReturnDistance = 0.4f;
+	_float		m_ReturnDistance = 0.1f;
 	_float		m_setTickForSecond = 0.9f;
 };
 

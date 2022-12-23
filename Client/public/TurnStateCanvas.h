@@ -19,9 +19,6 @@ BEGIN(Client)
 
 class CTurnStateCanvas final: public CCanvas
 {
-public:
-	
-
 private:
 	CTurnStateCanvas(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CTurnStateCanvas(const CTurnStateCanvas& rhs);
