@@ -14,6 +14,11 @@ protected:
 public:
 	virtual		_bool	IsCollMouse() = 0;
 
+	const _uint		Get_HitNum()const {return m_iHitNum;}
+	const _bool		Get_IsBuff()const { return m_isBuff; }
+	void			Set_Me_HitPlayer(CGameObject* pHiter) { m_pMeHit_Player = pHiter; }
+
+
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -28,6 +33,11 @@ public: /*For.Imgui*/
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;
+
+protected:
+	_uint			m_iHitNum = 0;
+	_bool			m_isBuff = false;
+	CGameObject*	m_pMeHit_Player = nullptr;
 };
 
 END

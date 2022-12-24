@@ -19,6 +19,9 @@ protected:
 	virtual ~CStatus() = default;
 
 public:
+	_float			Get_CurStatusHpRatio();
+	_float			Get_CurStatusMpRatio();
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
 	virtual	void	Final_Update()override {}

@@ -11,6 +11,16 @@ CStatus::CStatus(const CStatus & rhs)
 {
 }
 
+_float CStatus::Get_CurStatusHpRatio()
+{
+	return (_float)(m_StatusDesc.iHp) / (_float)(m_iMaxHp);
+}
+
+_float CStatus::Get_CurStatusMpRatio()
+{
+	return	 (_float)(m_StatusDesc.iMp) / (_float)(m_iMaxMp);
+}
+
 HRESULT CStatus::Initialize_Prototype()
 {
 	return S_OK;

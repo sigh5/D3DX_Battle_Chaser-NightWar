@@ -18,6 +18,7 @@ class CGameObject;
 class CPlayer;
 class CMonster;
 class CCanvas;
+class CStatus;
 END
 
 BEGIN(Client)
@@ -34,17 +35,29 @@ public:
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	
+	 
+	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
+
 public:  /*Combat Logic*/
 	HRESULT Initialize(_uint iLevel);
 	HRESULT Late_Init();
+	
+	
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
+	void	Status_CanvasInit();
+	
+
 	
 public:
 	void	Refresh_CurActor();
 
+
+
 public:
 	void	Active_Fsm();
 	void	ResetState();
+
+
 
 
 private:
@@ -52,6 +65,7 @@ private:
 	void	MonsterSetTarget();
 	
 	void	Collison_Event();
+	void	Cal_HitPlayerTarget();
 
 
 	// 선 상태 설정 후 몬스터 설정
@@ -78,12 +92,17 @@ private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
 	//vector<CGameObject*>	m_CombatActors;	// 전체적인 흐름담당
 	map<const wstring,  CGameObject*> m_CurActorMap;
+	map<const wstring, CStatus*>	  m_ActorsStatusMap;
+
 
 	CGameObject*			m_pCurentActor = nullptr;		// 현재 순서인놈
 	CGameObject*			m_pHitActor =	nullptr;		// 맞은놈
 
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
+
+
+
 private:
 	_bool					m_bCombatIntro = false;
 	_bool					m_bLateInit = false;
@@ -95,9 +114,16 @@ private:
 	_float					m_fHitTimer = 0.0f;
 	_float					m_fHitRecoverTime = 0.05f;		// 가리손 궁일때 뭔가 특단의 조치가 필요
 
+	_bool					m_bMonsterSelect_Target = false;			
+
+	_uint					m_iMonster_Player_Option=0;
+
 private:
 	HRESULT					Set_CurrentActor();
+	HRESULT					Set_ActorsStatus();
+	
 	CGameObject*			Find_CurActor(const wstring& pNameTag);
+	CStatus*				Find_CurStatus(const wstring& pNameTag);
 
 
 public:

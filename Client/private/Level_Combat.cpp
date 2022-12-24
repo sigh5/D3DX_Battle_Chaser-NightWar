@@ -156,8 +156,9 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 	pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
 	pGameInstance->Load_Object(TEXT("UISave"), LEVEL_COMBAT);
 	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
+	pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas"), LEVEL_COMBAT);
 
-
+	
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

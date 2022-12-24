@@ -27,6 +27,8 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 
+	virtual void	Set_RenderActive(_bool bTrue)override;
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -40,6 +42,7 @@ private:
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
+
 
 public:
 	static CHpMpBuffCanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

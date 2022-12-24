@@ -166,6 +166,9 @@ void CHero_Knolan::Intro_Exit()
 {
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
+	CCombatController::GetInstance()->Status_CanvasInit();
+	
+
 }
 
 
@@ -224,7 +227,7 @@ HRESULT CHero_Knolan::Combat_Initialize()
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-4.f, 0.f, 22.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-2.f, 0.f, 26.f, 1.f));
 
 	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;

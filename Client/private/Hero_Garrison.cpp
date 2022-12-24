@@ -394,7 +394,7 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_pAnimFsm = CAnimFsm::Create(this, ANIM_CHAR2);
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 16.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 16.f, 1.f));
 
 
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);

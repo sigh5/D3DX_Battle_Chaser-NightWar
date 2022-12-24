@@ -62,7 +62,7 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(27.f, 0.f, -4.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(27.f, 0.f, -3.5f, 1.f));
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -243,6 +243,15 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 250;
+	StatusDesc.iMp = 125;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom, &StatusDesc)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -348,12 +357,14 @@ void CSkeleton_Naked::Anim_Buff()
 
 void CSkeleton_Naked::Anim_Light_Hit()
 {
+	++m_iHitNum;
 	m_CurAnimqeue.push({ 7, 1.f });	 
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSkeleton_Naked::Anim_Heavy_Hit()
 {
+	++m_iHitNum;
 	m_CurAnimqeue.push({ 6, 1.f });	 
 	Set_CombatAnim_Index(m_pModelCom);
 }

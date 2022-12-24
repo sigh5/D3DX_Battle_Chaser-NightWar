@@ -62,7 +62,7 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 	
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.f, 0.f, -10.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(29.f, 0.f, -13.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
 	if (FAILED(Ready_Parts()))
@@ -244,6 +244,14 @@ HRESULT CSlimeKing::SetUp_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 200;
+	StatusDesc.iMp = 105;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;
 
 

@@ -227,7 +227,7 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 30.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 32.f, 1.f));
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
 	if (FAILED(Ready_Parts_Combat()))

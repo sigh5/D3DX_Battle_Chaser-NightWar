@@ -62,8 +62,8 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(38.f, 0.f, -9.f, 1.f));
-	m_pModelCom->Set_AnimIndex(0);
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(37.f, 0.f,-8.f, 1.f));
+	m_pModelCom->Set_AnimIndex(0);	
 
 	if (FAILED(Ready_Parts()))
 		return E_FAIL;
@@ -245,6 +245,14 @@ HRESULT CSpider_Mana::SetUp_Components()
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Status */
+	CStatus::StatusDesc			StatusDesc;
+	StatusDesc.iHp = 150;
+	StatusDesc.iMp = 150;
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
+		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;
 
 

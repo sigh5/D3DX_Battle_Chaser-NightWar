@@ -58,7 +58,10 @@ HRESULT CHpMpBuffCanvas::Last_Initialize()
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
-
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(false);
+	}
 
 	RELEASE_INSTANCE(CGameInstance);
 	m_bLast_Initlize = true;
@@ -90,6 +93,14 @@ HRESULT CHpMpBuffCanvas::Render()
 	//m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	//m_pVIBufferCom->Render();
 	return S_OK;
+}
+
+void CHpMpBuffCanvas::Set_RenderActive(_bool bTrue)
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(bTrue);
+	}
 }
 
 HRESULT CHpMpBuffCanvas::SetUp_Components()

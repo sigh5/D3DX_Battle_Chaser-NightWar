@@ -8,7 +8,7 @@ class CShader;
 class CRenderer;
 class CModel;
 class CCollider;
-
+class CStatus;
 END
 
 BEGIN(Client)
@@ -47,6 +47,7 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
+	CStatus*				m_pStatusCom = nullptr;
 	class CMonsterFsm*		m_pFsmCom = nullptr;
 
 private:

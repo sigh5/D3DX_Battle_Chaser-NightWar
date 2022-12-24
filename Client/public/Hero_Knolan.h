@@ -98,6 +98,8 @@ public:
 	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
+
+
 private:
 	_uint iTestNum = 0;
 	_double TEst = 0.0;
