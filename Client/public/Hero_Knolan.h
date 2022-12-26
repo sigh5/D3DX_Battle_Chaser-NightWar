@@ -55,7 +55,7 @@ private:
 	CModel*					m_pModelCom =  nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
-	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr, };
+	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
 
 	class CAnimFsm*			m_pFsmCom = nullptr;
 	

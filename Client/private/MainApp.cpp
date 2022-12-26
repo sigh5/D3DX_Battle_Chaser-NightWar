@@ -308,13 +308,18 @@ CMainApp * CMainApp::Create()
 
 void CMainApp::Free()
 {
+	CCombatController::DestroyInstance();
+	CPlayerController::DestroyInstance();
+	CToolManager::DestroyInstance();
+
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
 
-	CCombatController::DestroyInstance();
-	CPlayerController::DestroyInstance();
-	CToolManager::DestroyInstance();
 	CGameInstance::Release_Engine();
+
+
+	
+
 }

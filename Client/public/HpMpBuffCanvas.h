@@ -20,6 +20,11 @@ private:
 	virtual ~CHpMpBuffCanvas() = default;
 
 public:
+	void	Set_StatusHpMpBar(map<const wstring, CStatus*>& StatusMap);
+
+	void	Set_HitEvent(CGameObject* pHiter,_bool bHit);
+	void	Set_MpEvent( _bool bHit);
+public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
 	virtual HRESULT Last_Initialize()override;
@@ -28,7 +33,7 @@ public:
 	virtual HRESULT Render()override;
 
 	virtual void	Set_RenderActive(_bool bTrue)override;
-
+	
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -38,11 +43,13 @@ private:
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
-
+private:
+	CStatus*		Find_Status(const wstring& pNameTag);
+	CUI*			Find_UI(const  _tchar* pNameTag);
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
-
+	map<const wstring, CStatus*>	 m_StatusMap;
 
 public:
 	static CHpMpBuffCanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

@@ -353,6 +353,17 @@ _bool CModel::Control_KeyFrame(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
 	return false;
 }
 
+_bool CModel::Control_KeyFrame_Collision(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
+{
+	_uint	iFrameIndex = m_Animations[iAnimIndex]->Get_Key_Frame();
+
+	if (iFrameIndex >= KeyBegin  && KeyEnd >= iFrameIndex)
+	{
+		return true;
+	}
+	return false;
+}
+
 void CModel::Imgui_RenderProperty()
 {
 	ImGui::Begin("Why??");

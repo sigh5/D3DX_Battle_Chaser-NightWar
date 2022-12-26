@@ -33,7 +33,12 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 		return false;
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 
-	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
+	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
+	{
+		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		return true;
+	}
+	return false;
 }
 
 HRESULT CHero_Knolan::Initialize_Prototype()
@@ -354,6 +359,7 @@ void CHero_Knolan::Anim_Intro()
 
 void CHero_Knolan::AnimNormalAttack()
 {
+	m_iStateDamage = 30;
 	//_uint iHitRand = rand() % 4 + 13;
 	m_CurAnimqeue.push({ 7, 1.f }); //7 21(제자리),24(골프샷),25(뒤로점프샷)
 	m_CurAnimqeue.push({ 1, 1.f });
@@ -362,6 +368,8 @@ void CHero_Knolan::AnimNormalAttack()
 
 void CHero_Knolan::Anim_Skill1_Attack()
 {
+	m_iStateDamage = 40;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -369,6 +377,8 @@ void CHero_Knolan::Anim_Skill1_Attack()
 
 void CHero_Knolan::Anim_Skill2_Attack()
 {
+	m_iStateDamage = 40;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 19, 1.f }); // fireStorm
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -376,6 +386,7 @@ void CHero_Knolan::Anim_Skill2_Attack()
 
 void CHero_Knolan::Anim_Uitimate()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_CurAnimqeue.push({ 28, 1.f }); // 28 전체공격력 업
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -383,6 +394,7 @@ void CHero_Knolan::Anim_Uitimate()
 
 void CHero_Knolan::Anim_Buff()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 26, 1.f });	// 자 버프 
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -390,6 +402,7 @@ void CHero_Knolan::Anim_Buff()
 
 void CHero_Knolan::Anim_WideAreaBuff()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(60);
 	m_CurAnimqeue.push({ 27, 1.f });	// 마나 채워주기
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);

@@ -13,6 +13,7 @@ CWeapon::CWeapon(const CWeapon & rhs)
 {
 }
 
+
 HRESULT CWeapon::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -45,12 +46,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 
 void CWeapon::Tick(_double TimeDelta)
 {
-	__super::Tick(TimeDelta);
-
-
-
-	
-	
+	__super::Tick(TimeDelta);	
 }
 
 void CWeapon::Late_Tick(_double TimeDelta)
@@ -69,18 +65,11 @@ void CWeapon::Late_Tick(_double TimeDelta)
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
 
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	Render();
 }
 
 HRESULT CWeapon::Render()
 {
-	if (FAILED(__super::Render()))
-		return E_FAIL;
-
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
-
 
 #ifdef _DEBUG
 	m_pColliderCom->Render();
@@ -96,11 +85,6 @@ HRESULT CWeapon::Last_Initialize()
 
 HRESULT CWeapon::SetUp_Components()
 {
-	/* For.Com_Renderer */
-	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
-		(CComponent**)&m_pRendererCom)))
-		return E_FAIL;
-
 	/* For.Com_Collider */
 	CCollider::COLLIDERDESC			ColliderDesc;
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
@@ -156,6 +140,5 @@ void CWeapon::Free()
 
 	
 	Safe_Release(m_pColliderCom);
-	Safe_Release(m_pRendererCom);
 
 }

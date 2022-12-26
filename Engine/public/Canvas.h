@@ -8,7 +8,7 @@ class ENGINE_DLL CCanvas abstract :public CUI
 public:
 	typedef struct tag_CanvasDesc : public UIDESC
 	{
-
+		UIDESC		UiDesc;
 	}CANVASDESC;
 
 

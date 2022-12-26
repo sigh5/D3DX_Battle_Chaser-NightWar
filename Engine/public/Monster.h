@@ -12,7 +12,12 @@ protected:
 	virtual ~CMonster() = default;
 
 public:
+	_bool		IsHaveUlitmate()const { return m_bHaveUltimate; }
+	_bool		IsHaveSkill2() const{ return m_bHaveSkill2; }
+	_bool		IsHaveDefence()const {return m_bDefence;}
+public:
 	virtual		_bool	IsCollMouse() = 0;
+
 
 	const _uint		Get_HitNum()const {return m_iHitNum;}
 	const _bool		Get_IsBuff()const { return m_isBuff; }
@@ -38,6 +43,9 @@ protected:
 	_uint			m_iHitNum = 0;
 	_bool			m_isBuff = false;
 	CGameObject*	m_pMeHit_Player = nullptr;
+	_bool			m_bHaveUltimate = false;
+	_bool			m_bHaveSkill2 = false;
+	_bool			m_bDefence = false;
 };
 
 END

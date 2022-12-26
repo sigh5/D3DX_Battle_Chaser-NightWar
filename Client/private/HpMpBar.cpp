@@ -2,6 +2,8 @@
 #include "..\public\HpMpBar.h"
 #include "GameInstance.h"
 
+
+
 CHpMpBar::CHpMpBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice, pContext)
 {
@@ -9,7 +11,24 @@ CHpMpBar::CHpMpBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CHpMpBar::CHpMpBar(const CHpMpBar & rhs)
 	:CUI(rhs)
+	,m_iOption(rhs.m_iOption)
 {
+}
+
+void CHpMpBar::Set_HpBarStatus(CStatus * pStatus)
+{
+	assert(pStatus != nullptr && "Set_HpBarStatus");
+
+	m_pTaskStatus = pStatus;
+	m_iOption = 0;
+}
+
+void CHpMpBar::Set_MpBarStatus(CStatus * pStatus)
+{
+	assert(pStatus != nullptr && "Set_MpBarStatus");
+
+	m_pTaskStatus = pStatus;
+	m_iOption = 1;
 }
 
 HRESULT CHpMpBar::Initialize_Prototype()
@@ -50,9 +69,19 @@ HRESULT CHpMpBar::Initialize(void * pArg)
 
 HRESULT CHpMpBar::Last_Initialize()
 {
-	
 	if (m_bLast_Initlize)
 		return S_OK;
+	m_fRatio = 1.f;
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	m_fX = vPos.x;
+	m_fY = vPos.y;
+	_float3 vScale;
+	vScale = m_pTransformCom->Get_Scaled();
+
+	m_fSizeX = vScale.x;
+	m_fSizeY = vScale.y;
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -62,6 +91,34 @@ void CHpMpBar::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+	
+	
+	if (m_pTaskStatus != nullptr && m_bHit)
+	{
+		if (m_iOption == 0)
+		{
+			m_fRatio = m_pTaskStatus->Get_CurStatusHpRatio();
+			
+			m_fRatioX = m_fSizeX - (m_fRatio*m_fSizeX);
+		
+		}
+		else
+		{
+			m_fRatio = m_pTaskStatus->Get_CurStatusMpRatio();
+			m_fRatioX = m_fSizeX - (m_fRatio*m_fSizeX);
+		}
+	
+
+		if (m_fRatio != 1)
+		{
+			m_pTransformCom->Set_Scaled(_float3(m_fSizeX*m_fRatio, m_fSizeY, 1.f));
+			_float4 vPos;
+			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - (m_fRatioX*0.5f), vPos.y, 0.1f, 1.f));
+		}
+
+		m_bHit = false;
+	}
 	
 
 }
@@ -146,6 +203,9 @@ HRESULT CHpMpBar::SetUp_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Set_RawValue("g_Ratio", &m_fRatio, sizeof(_float))))
 		return E_FAIL;
 
 

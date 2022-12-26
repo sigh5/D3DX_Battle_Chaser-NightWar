@@ -56,12 +56,14 @@ protected:
 	_uint							m_bFinishOption = 0;
 	_uint							m_iOldAnim = 0;
 	_uint							m_iAnimIndex = 0;
+	_uint							m_iStateDamage = 0;		// 어떤 공격인지에 따라 데미지가 다름
+	
 	_bool							m_bIsCombatScene = false;
 	_bool							m_bIsCombatLastInit = false;
 	_bool							m_bIsCombatAndAnimSequnce = false;
 	_double							m_NormalTikcPerSecond = 1.0;
 	_double							m_IntroTimer = 0.7;
-
+	_uint							m_iHitCount = 0;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

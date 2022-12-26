@@ -38,7 +38,7 @@ HRESULT CLevel_Combat::Initialize()
 	if (FAILED(Ready_Layer_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
 	
-	m_pCombatController->Initialize(LEVEL_COMBAT);
+	
 
 	return S_OK;
 }
@@ -159,6 +159,8 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 	pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas"), LEVEL_COMBAT);
 
 	
+	m_pCombatController->Initialize(LEVEL_COMBAT);
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

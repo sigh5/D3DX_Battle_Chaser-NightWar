@@ -120,7 +120,8 @@ private:
 
 	_uint iTestNum = 0;
 	_double TEst = 0.0;
-	
+	WeaponType		m_eWeaponType = WEAPON_SWORD;
+
 
 
 	_float		m_SpeedRatio = 7.f;

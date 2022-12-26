@@ -67,6 +67,7 @@ public: /*For.Animation*/
 	void	InitChannel();
 	_bool	Control_KeyFrame(_uint iAnimIndex,_uint KeyBegin, _uint KeyEnd);
 
+	_bool	Control_KeyFrame_Collision(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd);
 
 
 private:

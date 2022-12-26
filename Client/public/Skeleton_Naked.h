@@ -37,8 +37,7 @@ public:
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
-	
-	
+
 
 
 private:
@@ -72,10 +71,11 @@ private:
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
-	_float					m_LimitDistance = 8.f;
+	_float					m_LimitDistance = 6.f;
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
 
+	
 
 public:
 	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// ≈œ¡¶

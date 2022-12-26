@@ -21,6 +21,11 @@ protected:
 public:
 	_float			Get_CurStatusHpRatio();
 	_float			Get_CurStatusMpRatio();
+
+	void			Take_Damage(_uint iDamgae);
+	
+	void			Use_SkillMp(_uint iMp);
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

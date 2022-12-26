@@ -9,6 +9,7 @@ class CShader;
 class CRenderer;
 class CVIBuffer_Rect;
 class CTexture;
+class CStatus;
 END
 
 
@@ -21,6 +22,10 @@ private:
 	CHpMpBar(const CHpMpBar& rhs);
 	virtual ~CHpMpBar() = default;
 
+public:
+	void		Set_HpBarStatus(CStatus* pStatus) ;
+	void		Set_MpBarStatus(CStatus* pStatus) ;
+	void		Set_Hit(_bool bHit) { m_bHit = bHit; }
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -40,8 +45,12 @@ private:
 private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-
-
+	CStatus*				m_pTaskStatus = nullptr;
+	_bool					m_bHit = false;
+	_uint					m_iOption = 999;		// 0 HP, 1 MP
+	
+	_float					m_fRatio = 1.f;
+	_float					m_fRatioX = 0.f;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

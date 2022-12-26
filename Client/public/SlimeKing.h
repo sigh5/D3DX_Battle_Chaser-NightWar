@@ -78,7 +78,7 @@ public:
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
-	_float					m_LimitDistance = 8.f;
+	_float					m_LimitDistance = 6.f;
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
 

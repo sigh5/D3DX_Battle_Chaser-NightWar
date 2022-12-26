@@ -50,7 +50,7 @@ public:  /*Combat Logic*/
 	
 public:
 	void	Refresh_CurActor();
-
+	void	Mana_Refresh();
 
 
 public:
@@ -67,7 +67,7 @@ private:
 	void	Collison_Event();
 	void	Cal_HitPlayerTarget();
 
-
+	void	Set_Player_StateCanvas();
 	// 선 상태 설정 후 몬스터 설정
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
@@ -112,12 +112,19 @@ private:
 	_bool					m_bisHitTimer_Alive = false;
 
 	_float					m_fHitTimer = 0.0f;
-	_float					m_fHitRecoverTime = 0.05f;		// 가리손 궁일때 뭔가 특단의 조치가 필요
+	_float					m_fHitRecoverTime =0.5f;		// 모든 연속공격일때 특단의 조치가 필요
 
 	_bool					m_bMonsterSelect_Target = false;			
 
+	
 	_uint					m_iMonster_Player_Option=0;
+	_bool					m_bIsPlayer = false;
+	_bool					m_bMonsterTurnEnd = false;
 
+
+
+
+	_uint					m_iHitNum = 0;
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();
@@ -130,7 +137,7 @@ public:
 	virtual void	Free()override;
 
 
-#ifndef DEBUG
+#ifdef _DEBUG
 public: /*For_Imgui*/
 	void	Imgui_CharAnim();
 #endif // !DEBUG

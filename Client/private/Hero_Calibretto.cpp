@@ -24,7 +24,11 @@ CGameObject * CHero_Calibretto::Get_Weapon_Or_SkillBody()
 	for (auto& pParts : m_PlayerParts)
 	{
 		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		{
+			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
+		}
 	}
 
 	return nullptr;
@@ -38,7 +42,12 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		return false;
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 
-	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
+	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
+	{
+		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		return true;
+	}
+	return false;
 }
 
 HRESULT CHero_Calibretto::Initialize_Prototype()
@@ -71,7 +80,7 @@ HRESULT CHero_Calibretto::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-	
+
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -121,7 +130,7 @@ HRESULT CHero_Calibretto::Render()
 
 	if (m_bIsCombatScene)
 		m_pModelCom->Set_NoRenderMeshIndex(10);	//  º£ÀÌ½º¹«±â  ±×¸®Áö¸»±â
-	
+
 	else
 		m_pModelCom->Set_NoRenderMeshIndex(2);
 
@@ -131,7 +140,7 @@ HRESULT CHero_Calibretto::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
-	
+
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
@@ -215,7 +224,7 @@ void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-	
+
 }
 
 HRESULT CHero_Calibretto::Combat_Initialize()
@@ -254,10 +263,6 @@ void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
 	}
-	
-
-	
-	
 }
 
 
@@ -406,8 +411,9 @@ void CHero_Calibretto::Anim_Intro()
 
 void CHero_Calibretto::AnimNormalAttack()
 {
+	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
-
+	m_iStateDamage = 30;
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 3,	 1.f });
 	m_CurAnimqeue.push({ 16, 1.f });
@@ -419,6 +425,8 @@ void CHero_Calibretto::AnimNormalAttack()
 
 void CHero_Calibretto::Anim_Skill1_Attack()
 {
+	m_iStateDamage = 20;			// 20*2 
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 8, 1.f });		//¸ÖÆ¼ ¼¦	
 	m_CurAnimqeue.push({ 1,	 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -426,6 +434,8 @@ void CHero_Calibretto::Anim_Skill1_Attack()
 
 void CHero_Calibretto::Anim_Skill2_Attack()
 {
+	m_iStateDamage = 20;			// 20*2 
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 20, 1.f });		// Âð °ø°Ý±Ã Brust??
 	m_CurAnimqeue.push({ 1, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -433,6 +443,8 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 
 void CHero_Calibretto::Anim_Uitimate()
 {
+	m_iStateDamage = 50;			// 20*2 
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
 	m_CurAnimqeue.push({ 46, 1.f }); // À§¿¡¼­ ·ÎÄÏ½î±â
 	m_CurAnimqeue.push({ 1, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -440,6 +452,7 @@ void CHero_Calibretto::Anim_Uitimate()
 
 void CHero_Calibretto::Anim_Buff()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 7,  1.f });
 	m_CurAnimqeue.push({ 1, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -447,6 +460,7 @@ void CHero_Calibretto::Anim_Buff()
 
 void CHero_Calibretto::Anim_WideAreaBuff()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_CurAnimqeue.push({ 40, 1.f });		// ÆÀ¿ø ´ëÆøÈú										
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -519,12 +533,14 @@ void CHero_Calibretto::Free()
 {
 	__super::Free();
 
+
 	for (auto& pPart : m_PlayerParts)
 		Safe_Release(pPart);
 	m_PlayerParts.clear();
 
 	for (_uint i = 0; i < MAPTYPE_END; ++i)
 		Safe_Release(m_pStatusCom[i]);
+
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
@@ -576,7 +592,7 @@ void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-	
+
 	}
 }
 
@@ -612,7 +628,7 @@ void CHero_Calibretto::Fsm_Exit()
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
-	
+
 }
 
 void CHero_Calibretto::Intro_Exit()

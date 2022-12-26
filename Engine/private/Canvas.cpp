@@ -1,5 +1,5 @@
 #include "..\public\Canvas.h"
-
+#include "UI.h"
 
 CCanvas::CCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CUI(pDevice,pContext)
@@ -26,7 +26,8 @@ HRESULT CCanvas::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_CanvasDesc, pArg, sizeof(m_CanvasDesc));
 
-	if (FAILED(__super::Initialize(&m_CanvasDesc.m_pTextureTag)))
+	
+	if (FAILED(__super::Initialize(&m_CanvasDesc.UiDesc)))
 		return E_FAIL;
 
 	return S_OK;

@@ -22,7 +22,11 @@ CGameObject * CSlimeKing::Get_Weapon_Or_SkillBody()
 	for (auto& pParts : m_MonsterParts)
 	{
 		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		{
+			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
+		}
 	}
 
 	return nullptr;
@@ -36,7 +40,13 @@ _bool CSlimeKing::Calculator_HitColl(CGameObject * pWeapon)
 		return false;
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 
-	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
+	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
+	{
+		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		return true;
+	}
+
+	return false;
 }
 
 HRESULT CSlimeKing::Initialize_Prototype()
@@ -65,9 +75,11 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(29.f, 0.f, -13.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
-	if (FAILED(Ready_Parts()))
-		return E_FAIL;
 	
+	m_bHaveSkill2 = false;
+	m_bHaveUltimate = true;
+	m_bDefence = false;
+	m_isBuff = true;
 	return S_OK;
 }
 
@@ -79,6 +91,9 @@ HRESULT CSlimeKing::Last_Initialize()
 	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR1);
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
+
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -88,16 +103,13 @@ void CSlimeKing::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+
+	for (auto &pParts : m_MonsterParts)
+		pParts->Tick(TimeDelta);
+
+
 	m_pFsmCom->Tick(TimeDelta);
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-
-	/*ImGui::Text("SlimeKing");
-	ImGui::InputFloat("SlimeKing_SpeedRatio", &m_SpeedRatio);
-	ImGui::InputFloat("SlimeKing_LimitDistance", &m_LimitDistance);
-	ImGui::InputFloat("SlimeKing_ReturnDistance", &m_ReturnDistance);
-	ImGui::InputFloat("SlimeKing_setTickForSecond", &m_setTickForSecond);
-	ImGui::NewLine();
-*/
 
 	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
@@ -107,11 +119,9 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
-
-	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
-	{
-		m_MonsterParts[i]->Late_Tick(TimeDelta);
-	}
+	
+	for (auto &pParts : m_MonsterParts)
+		pParts->Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -151,10 +161,6 @@ void CSlimeKing::Combat_Tick(_double TimeDelta)
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 
-	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
-	{
-		m_MonsterParts[i]->Tick(TimeDelta);
-	}
 }
 
 _int CSlimeKing::Is_MovingAnim()
@@ -211,6 +217,7 @@ void CSlimeKing::Fsm_Exit()
 
 	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
 	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 }
 
 _bool CSlimeKing::IsCollMouse()
@@ -332,6 +339,9 @@ void CSlimeKing::Anim_Intro()
 
 void CSlimeKing::AnimNormalAttack()
 {
+	m_iStateDamage = 30;
+	m_iHitCount = 1;
+	m_pStatusCom->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
 	m_CurAnimqeue.push({ 10,1.f });
@@ -342,6 +352,8 @@ void CSlimeKing::AnimNormalAttack()
 
 void CSlimeKing::Anim_Skill1_Attack()
 {
+	m_iStateDamage = 40;
+	m_pStatusCom->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 16,1.f }); // 브레쓰
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -355,18 +367,22 @@ void CSlimeKing::Anim_Uitimate()
 
 void CSlimeKing::Anim_Buff()
 {
-	m_CurAnimqeue.push({ 3,1.f });
+
+	m_pStatusCom->Use_SkillMp(10);
+	m_CurAnimqeue.push({ 3, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSlimeKing::Anim_Light_Hit()
 {
+	++m_iHitNum;
 	m_CurAnimqeue.push({ 7,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSlimeKing::Anim_Heavy_Hit()
 {
+	++m_iHitNum;
 	m_CurAnimqeue.push({ 6,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -414,8 +430,9 @@ void CSlimeKing::Free()
 
 	for (auto& pPart : m_MonsterParts)
 		Safe_Release(pPart);
-	m_MonsterParts.clear();
-
+	m_MonsterParts.clear();	
+	
+	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);

@@ -41,7 +41,6 @@ public:
 	virtual		void	Fsm_Exit()override;
 	
 
-
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -58,6 +57,7 @@ private:
 
 private:
 	_int					m_iMovingDir = ANIM_EMD;
+
 
 public:
 	void					Anim_Idle();
@@ -84,6 +84,7 @@ private:
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
 
+	
 
 
 public:

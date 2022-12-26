@@ -79,6 +79,7 @@ public:
 
 protected:
 	CGameObject*			m_pParentObject = nullptr;
+	_bool					m_bClone = false;
 
 protected:
 	ID3D11Device*			m_pDevice = nullptr;

@@ -32,6 +32,14 @@ private:
 public:
 	CCollider*		Get_Colider() { return m_pColliderCom; }
 	WeaponType		Get_Type()const { return m_WeaponDesc.eType; }
+
+	void			Set_WeaponDamage(_uint iDamage) { m_iWeaponDamage = iDamage; }
+	_uint			Get_WeaponDamage()const { return m_iWeaponDamage; }
+
+	void			Set_HitNum(_uint iHitNum) { m_iHitNum = iHitNum; }
+	_uint			Get_HitNum()const { return m_iHitNum; }
+
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -42,12 +50,13 @@ public:
 
 private:
 	CCollider*				m_pColliderCom = nullptr;
-	CRenderer*				m_pRendererCom = nullptr;
 	WEAPONDESC				m_WeaponDesc;
 
 	_float4x4				m_SocketMatrix;
 	_bool					m_isCloned = false;
 
+	_uint					m_iWeaponDamage = 0;
+	_uint					m_iHitNum = 0;
 
 private:
 	HRESULT SetUp_Components();

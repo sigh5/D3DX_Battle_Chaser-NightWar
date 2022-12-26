@@ -24,8 +24,12 @@ CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_PlayerParts)
 	{
-		if (dynamic_cast<CWeapon*>(pParts) != nullptr)
+		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		{
+			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
+		}
 	}
 
 	return nullptr;
@@ -39,7 +43,12 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 		return false;
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 
-	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
+	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
+	{
+		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		return true;
+	}
+	return false;
 }
 
 HRESULT CHero_Garrison::Initialize_Prototype()
@@ -423,6 +432,7 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -2.f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f,0.f));
+	WeaponDesc.eType = WEAPON_SWORD;
 
 	Safe_AddRef(WeaponDesc.pSocket);
 	Safe_AddRef(m_pTransformCom);
@@ -476,9 +486,12 @@ void CHero_Garrison::Free()
 {
 	__super::Free();
 
+
 	for (auto& pPart : m_PlayerParts)
 		Safe_Release(pPart);
 	m_PlayerParts.clear();
+
+
 
 	for (_uint i = 0; i < MAPTYPE_END; ++i)
 		Safe_Release(m_pStatusCom[i]);
@@ -577,6 +590,9 @@ void CHero_Garrison::Anim_Intro()
 
 void CHero_Garrison::AnimNormalAttack()
 {
+	m_eWeaponType = WEAPON_SWORD;
+	m_iStateDamage = 30;
+	m_iHitCount = 1;
 	m_SpeedRatio = 7.f;
 	m_LimitDistance = 10.f;
 	m_ReturnDistance = 0.1f;
@@ -592,6 +608,10 @@ void CHero_Garrison::AnimNormalAttack()
 
 void CHero_Garrison::Anim_Skill1_Attack()
 {
+	m_iHitCount = 1;
+	m_eWeaponType = WEAPON_SWORD;
+	m_iStateDamage = 40;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_SpeedRatio = 7.f;
 	m_LimitDistance = 10.f;
 	m_ReturnDistance = 0.1f;
@@ -608,6 +628,10 @@ void CHero_Garrison::Anim_Skill1_Attack()
 
 void CHero_Garrison::Anim_Skill2_Attack()
 {
+	m_eWeaponType = WEAPON_SWORD;
+	m_iStateDamage = 50;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
+	m_iHitCount = 1;
 	m_LimitDistance = 12.f;
 	m_SpeedRatio = 6.f;
 	m_ReturnDistance = 0.5f;
@@ -624,6 +648,10 @@ void CHero_Garrison::Anim_Skill2_Attack()
 
 void CHero_Garrison::Anim_Uitimate()
 {	
+	m_eWeaponType = WEAPON_SWORD;
+	m_iStateDamage = 20;			//20*6
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
+
 	m_LimitDistance = 12.f;
 	m_SpeedRatio = 6.f;
 	m_ReturnDistance = 0.5f;
@@ -638,6 +666,7 @@ void CHero_Garrison::Anim_Uitimate()
 
 void CHero_Garrison::Anim_Buff()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 8,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -654,6 +683,7 @@ void CHero_Garrison::Anim_Use_Item()
 
 void CHero_Garrison::Anim_Defence()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 32,   1.f });
 	m_CurAnimqeue.push({ 1,    1.f });
 	Set_CombatAnim_Index(m_pModelCom);

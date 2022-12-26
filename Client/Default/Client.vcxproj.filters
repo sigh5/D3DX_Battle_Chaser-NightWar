@@ -294,7 +294,9 @@
     <ClInclude Include="..\Public\HpMpBuffCanvas.h">
       <Filter>02.GameObjects\UI\TrunBattle\HPMpCanvas</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Buff_Image.h" />
+    <ClInclude Include="..\Public\Buff_Image.h">
+      <Filter>02.GameObjects\UI\TrunBattle\Buff_Image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -429,7 +431,9 @@
     <ClCompile Include="..\Private\HpMpBuffCanvas.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\HPMpCanvas</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Buff_Image.cpp" />
+    <ClCompile Include="..\Private\Buff_Image.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\Buff_Image</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

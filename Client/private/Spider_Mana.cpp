@@ -22,7 +22,11 @@ CGameObject * CSpider_Mana::Get_Weapon_Or_SkillBody()
 	for (auto& pParts : m_MonsterParts)
 	{
 		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		{
+			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
+		}
 	}
 
 	return nullptr;
@@ -36,7 +40,12 @@ _bool CSpider_Mana::Calculator_HitColl(CGameObject * pWeapon)
 		return false;
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 
-	return pCurActorWepon->Get_Colider()->Collision(m_pColliderCom);
+	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
+	{
+		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		return true;
+	}
+	return false;
 }
 
 HRESULT CSpider_Mana::Initialize_Prototype()
@@ -62,12 +71,12 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(37.f, 0.f,-8.f, 1.f));
-	m_pModelCom->Set_AnimIndex(0);	
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(37.f, 0.f, -8.f, 1.f));
+	m_pModelCom->Set_AnimIndex(0);
 
-	if (FAILED(Ready_Parts()))
-		return E_FAIL;
-
+	m_bHaveSkill2 = true;
+	m_bHaveUltimate = false;
+	m_bDefence = false;
 	return S_OK;
 }
 
@@ -79,6 +88,8 @@ HRESULT CSpider_Mana::Last_Initialize()
 	m_pFsmCom = CMonsterFsm::Create(this, ANIM_CHAR3);
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
+	if (FAILED(Ready_Parts()))
+		return E_FAIL;
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -89,12 +100,9 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	//ImGui::Text("Spider_Mana");
-	//ImGui::InputFloat("Spider_Mana_SpeedRatio", &m_SpeedRatio);
-	//ImGui::InputFloat("Spider_Mana_LimitDistance", &m_LimitDistance);
-	//ImGui::InputFloat("Spider_Mana_ReturnDistance", &m_ReturnDistance);
-	//ImGui::InputFloat("Spider_Mana_setTickForSecond", &m_setTickForSecond);
-	//ImGui::NewLine();
+
+	for (auto &pParts : m_MonsterParts)
+		pParts->Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
 
@@ -105,13 +113,11 @@ void CSpider_Mana::Tick(_double TimeDelta)
 void CSpider_Mana::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-	
+
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
-	{
-		m_MonsterParts[i]->Late_Tick(TimeDelta);
-	}
+	for (auto &pParts : m_MonsterParts)
+		pParts->Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -149,19 +155,13 @@ void CSpider_Mana::Combat_Tick(_double TimeDelta)
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-
-	for (_uint i = 0; i < m_MonsterParts.size(); ++i)
-	{
-		m_MonsterParts[i]->Tick(TimeDelta);
-	}
-
 }
 
 _int CSpider_Mana::Is_MovingAnim()
 {
-	if (m_pModelCom->Get_AnimIndex() == 9 )
+	if (m_pModelCom->Get_AnimIndex() == 9)
 		m_iMovingDir = ANIM_DIR_STRAIGHT;
-	else if  (m_pModelCom->Get_AnimIndex() == 13)
+	else if (m_pModelCom->Get_AnimIndex() == 13)
 		m_iMovingDir = ANIM_DIR_STRAIGHT;
 	else if (m_pModelCom->Get_AnimIndex() == 4)
 		m_iMovingDir = ANIM_DIR_BACK;
@@ -214,6 +214,7 @@ void CSpider_Mana::Fsm_Exit()
 
 	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
 	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 }
 
 _bool CSpider_Mana::IsCollMouse()
@@ -322,7 +323,7 @@ HRESULT CSpider_Mana::Ready_Parts()
 
 	//이놈은 아마 2개써야될듯 ?
 
-		Safe_AddRef(WeaponDesc.pSocket);
+	Safe_AddRef(WeaponDesc.pSocket);
 	Safe_AddRef(m_pTransformCom);
 
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
@@ -362,8 +363,8 @@ HRESULT CSpider_Mana::Ready_Parts()
 	if (nullptr == pPartObject)
 		return E_FAIL;
 	m_MonsterParts.push_back(pPartObject);
-	
-	
+
+
 	matScale = XMMatrixScaling(1.f, 1.5f, 1.f);
 
 	matRotX = XMMatrixRotationX(XMConvertToRadians(0.f));
@@ -372,12 +373,9 @@ HRESULT CSpider_Mana::Ready_Parts()
 	matTrans = XMMatrixTranslation(-0.3f, 0.8f, -0.7f);
 
 	m_matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
-	
+
 	XMStoreFloat4x4(&WorldMat, m_matWorld);
 	pPartObject->Get_Transform()->Set_WorldMatrix(WorldMat);
-
-
-
 
 
 
@@ -402,6 +400,8 @@ void CSpider_Mana::Anim_Intro()
 void CSpider_Mana::Anim_NormalAttack()
 {
 	m_eWeaponType = WEAPON_HAND;
+	m_iHitCount = 1;
+	m_iStateDamage = 30;
 	m_CurAnimqeue.push({ 8, 1.f });
 	m_CurAnimqeue.push({ 9, m_setTickForSecond });
 	m_CurAnimqeue.push({ 10, 1.f });
@@ -413,6 +413,9 @@ void CSpider_Mana::Anim_NormalAttack()
 void CSpider_Mana::Anim_Skill1_Attack()
 {
 	m_eWeaponType = WEAPON_HEAD;
+	m_iHitCount = 1;
+	m_iStateDamage = 40;
+	m_pStatusCom->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 13, m_setTickForSecond });	//깨물기
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
@@ -422,31 +425,38 @@ void CSpider_Mana::Anim_Skill1_Attack()
 
 void CSpider_Mana::Anim_Skill2_Attack()
 {
+	m_iStateDamage = 40;
+	m_iHitCount = 1;
+	m_pStatusCom->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 15, 0.8f });	// 거미줄 발사
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSpider_Mana::Anim_Buff()
 {
-	m_CurAnimqeue.push({ 3, 0.7f });	
+	m_isBuff = true;
+	m_pStatusCom->Use_SkillMp(40);
+	m_CurAnimqeue.push({ 3, 0.7f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSpider_Mana::Anim_Light_Hit()
 {
-	m_CurAnimqeue.push({ 1, 1.f });	
+	++m_iHitNum;
+	m_CurAnimqeue.push({ 1, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSpider_Mana::Anim_Heavy_Hit()
 {
-	m_CurAnimqeue.push({ 6,1.f });	
+	++m_iHitNum;
+	m_CurAnimqeue.push({ 6,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSpider_Mana::Anim_Die()
 {
-	m_CurAnimqeue.push({ 2,1.f });	
+	m_CurAnimqeue.push({ 2,1.f });
 	m_CurAnimqeue.push({ 19,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -493,7 +503,7 @@ void CSpider_Mana::Free()
 		Safe_Release(pPart);
 	m_MonsterParts.clear();
 
-
+	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);

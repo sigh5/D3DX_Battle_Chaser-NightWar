@@ -21,6 +21,16 @@ _float CStatus::Get_CurStatusMpRatio()
 	return	 (_float)(m_StatusDesc.iMp) / (_float)(m_iMaxMp);
 }
 
+void CStatus::Take_Damage(_uint iDamgae)
+{
+	m_StatusDesc.iHp -= iDamgae;
+}
+
+void CStatus::Use_SkillMp(_uint iMp)
+{
+	m_StatusDesc.iMp -= iMp;
+}
+
 HRESULT CStatus::Initialize_Prototype()
 {
 	return S_OK;
