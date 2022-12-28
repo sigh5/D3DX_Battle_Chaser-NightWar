@@ -17,7 +17,7 @@ BEGIN(Client)
 class CTurnCharcterUI final : public CUI
 {
 public:
-	enum UI_POS { UI_POS_TOP , UI_POS_NORMAL, UI_POS_DOWN, UI_POS_ALL ,UI_POS_END, };
+	enum UI_POS { UI_POS_TOP , UI_POS_NORMAL, UI_POS_DOWN, UI_POS_ALL , UI_POS_QUICK,UI_POS_END, };
 
 private:
 	CTurnCharcterUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -28,6 +28,9 @@ public:
 	void Set_Top_BottomYPos(_float& fTopY, _float& fBottomY) {m_fTopY = fTopY; m_fBottomY = fBottomY;}
 	const UI_REPRESENT Get_Represent_Char()const { return m_iRepresent_Char; }
 
+	void	Set_LimitYPos_Float(_float fLimitPos);
+	void	Set_LimitYPos(_int iLimitPosRatio);
+	const _float	Get_LimitYPos()const { return m_vLimitPos.y; }
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -42,6 +45,8 @@ public: /*Observer Pattern*/
 	void	Top_Move();
 	void	Bottom_Move() ;
 	void	Normal_Move();
+	void	Quick_Move();
+
 	void	Shake_Move();
 
 	void	MoveControl(_uint iOption);

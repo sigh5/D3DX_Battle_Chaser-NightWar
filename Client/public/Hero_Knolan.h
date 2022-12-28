@@ -46,8 +46,10 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	virtual	  _bool	  Is_Dead()override;
+	void			 Combat_DeadTick(_double TimeDelta);
 	
+	virtual	  _bool	  Is_Dead()override;
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -95,14 +97,13 @@ public:
 public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
 
-	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;
+	BaseDelegater<UI_REPRESENT , _uint> m_Hero_CombatTurnDelegeter;
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
 
-
 private:
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
+	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	UI_REPRESENT	m_Represnt = REPRESENT_KNOLAN;
 };
 
 END

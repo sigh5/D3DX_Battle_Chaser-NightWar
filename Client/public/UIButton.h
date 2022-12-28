@@ -46,6 +46,9 @@ public:
 	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc)override;
 	virtual void	Set_ParentLoad(CUI * pUI)override;
 	virtual  void	Set_RenderActive(_bool bActive)override;
+	void			Change_ButtonIcon(const wstring& TextureTag);
+
+
 private:
 	void			FirstDungeonUIInit();
 

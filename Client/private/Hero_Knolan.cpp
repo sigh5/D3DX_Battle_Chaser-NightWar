@@ -94,8 +94,11 @@ void CHero_Knolan::Tick(_double TimeDelta)
 		m_pFsmCom->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead()&& !m_bIsDead)
+		{
+			m_bIsDead = true;
+		}
 	}
-	
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -159,12 +162,10 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 
 void CHero_Knolan::Fsm_Exit()
 {
-	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
-
-
 }
 
 void CHero_Knolan::Intro_Exit()
@@ -172,11 +173,7 @@ void CHero_Knolan::Intro_Exit()
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	CCombatController::GetInstance()->Status_CanvasInit();
-	
-
 }
-
-
 
 _uint CHero_Knolan::Get_AnimationIndex()
 {
@@ -244,11 +241,11 @@ HRESULT CHero_Knolan::Combat_Initialize()
 void CHero_Knolan::Combat_Tick(_double TimeDelta)
 {
 	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+}
 
-	_float4 vRight, vUp, vLook;
-	XMStoreFloat4(&vRight, m_pTransformCom->Get_State(CTransform::STATE_RIGHT));
-	XMStoreFloat4(&vUp, m_pTransformCom->Get_State(CTransform::STATE_UP));
-	XMStoreFloat4(&vLook, m_pTransformCom->Get_State(CTransform::STATE_LOOK));
+void CHero_Knolan::Combat_DeadTick(_double TimeDelta)
+{
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 }
 
 
@@ -445,14 +442,17 @@ void CHero_Knolan::Anim_Flee()
 
 void CHero_Knolan::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 5,  1.f });
 	m_CurAnimqeue.push({ 23, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	
 }
 
 void CHero_Knolan::Anim_Viroty()
 {
-	Is_Dead();
+	//Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -498,16 +498,22 @@ void CHero_Knolan::Free()
 
 _bool CHero_Knolan::Is_Dead()
 {
-	/* 플레이가 죽었을때랑 살았을때 구분해서 쓰기*/
-	/*살았을때*/
-	m_CurAnimqeue.push({ 13 ,	1.f });
-	m_CurAnimqeue.push({ 36,	1.f });
+	if (__super::Is_Dead())
+	{
+		Anim_Die();
+		return true;
+	}
 
-	/* 죽었을때*/
-	//m_CurAnimqeue.push({ 33 ,0.1f });
-	//m_CurAnimqeue.push({ 13,0.1f });
-	//m_CurAnimqeue.push({ 36,0.1f });
-	return _bool();
+	return false;
 }
 
 
+/* 플레이가 죽었을때랑 살았을때 구분해서 쓰기*/
+///*살았을때*/
+//m_CurAnimqeue.push({ 13 ,	1.f });
+//m_CurAnimqeue.push({ 36,	1.f });
+
+///* 죽었을때*/
+////m_CurAnimqeue.push({ 33 ,0.1f });
+////m_CurAnimqeue.push({ 13,0.1f });
+////m_CurAnimqeue.push({ 36,0.1f });

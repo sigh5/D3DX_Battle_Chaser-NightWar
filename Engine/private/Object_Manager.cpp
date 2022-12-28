@@ -9,7 +9,7 @@
 #include "Camera.h"
 #include "Environment_Object.h"
 #include <utility>
-
+#include "Texture.h"
 
 
 IMPLEMENT_SINGLETON(CObject_Manager)
@@ -169,11 +169,14 @@ CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag , 
 	_tchar* szObjectName= new _tchar[MAX_PATH];
 	m_vecNameArray.push_back(szObjectName);
 
-	lstrcpy(szObjectName, pGameObject->Get_ObjectName());
-	lstrcat(szObjectName, TEXT("1"));
-	
-	pCloneGameObject->Set_ObjectName(szObjectName);
+	static _int iNum = 20;
 
+	lstrcpy(szObjectName, pGameObject->Get_ObjectName());
+	lstrcat(szObjectName, std::to_wstring(iNum++).c_str());
+	CTexture* pOriginObjectTexture = static_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
+
+	pCloneGameObject->Set_ObjectName(szObjectName);
+	static_cast<CTexture*>(pCloneGameObject->Get_Component(TEXT("Com_Texture")))->Set_SelectTextureIndex(pOriginObjectTexture->Get_SelectTextureIndex());
 	pCloneGameObject->Set_ProtoName(pGameObject->Get_ProtoName());
 	pCloneGameObject->Set_parent(pGameObject->Get_parentName());
 
@@ -184,8 +187,7 @@ CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag , 
 
 	pLayer->Add_GameObject(pCloneGameObject);
 
-
-	pCloneGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-100.f, 50.f, 0.f, 1.f));
+	pCloneGameObject->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, -500.f, 0.f, 1.f));
 
 	return pCloneGameObject;
 }
@@ -602,6 +604,8 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 
 			CGameObject* pGameObject = nullptr;
 			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &UIDesc);
+			if (pGameObject == nullptr)
+				assert(!"????");
 			(pGameObject)->Set_ProtoName(ProtoName);
 			(pGameObject)->Set_ObjectName(ObjectName);
 			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);

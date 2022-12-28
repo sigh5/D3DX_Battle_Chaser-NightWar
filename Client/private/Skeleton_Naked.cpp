@@ -105,11 +105,15 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
-
 	for (auto &pParts : m_MonsterParts)
 		pParts->Tick(TimeDelta);
-
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
+	if (m_pStatusCom->Get_Dead() && !m_bIsDead)
+	{
+		m_bIsDead = true;
+	}
+
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
@@ -211,10 +215,7 @@ void CSkeleton_Naked::MovingAnimControl(_double TimeDelta)
 
 void CSkeleton_Naked::Fsm_Exit()
 {
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
-
-	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 }
@@ -332,7 +333,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 30;
+	m_iStateDamage = 160;//30;
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// ÇÑ´ëÅö
 	m_CurAnimqeue.push({ 9, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
@@ -344,7 +345,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 20;			// 20*2 
+	m_iStateDamage = 80;			// 20*2 
 	m_pStatusCom->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2´ë Åö
 	m_CurAnimqeue.push({ 15, 1.f });
@@ -384,6 +385,8 @@ void CSkeleton_Naked::Anim_Heavy_Hit()
 
 void CSkeleton_Naked::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2, 1.f });
 	m_CurAnimqeue.push({ 18, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);

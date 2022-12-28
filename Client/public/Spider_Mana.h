@@ -72,12 +72,14 @@ public:
 	void					Anim_Viroty();
 
 public:
-	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// 턴제
-
+	BaseDelegater<UI_REPRESENT, _uint> m_Monster_CombatTurnDelegeter;	// 턴제
+	
 private:
 	vector<CGameObject*>	m_MonsterParts;
 	WeaponType		m_eWeaponType = WEAPON_END;
 
+	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	UI_REPRESENT	m_Represnt = REPRESENT_SPIDER_MANA;
 private:
 	_float					m_SpeedRatio = 6.f;
 	_float					m_LimitDistance = 6.f;

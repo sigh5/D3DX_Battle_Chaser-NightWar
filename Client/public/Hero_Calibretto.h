@@ -83,23 +83,27 @@ private:
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();
+	
 	void					AnimNormalAttack();
+	void					Anim_Flee();
+
 	void					Anim_Skill1_Attack();
 	void					Anim_Skill2_Attack();
 	void					Anim_Uitimate();
 	void					Anim_Buff();
 	void					Anim_WideAreaBuff();
+
 	void					Anim_Use_Item();
+	
 	void					Anim_Light_Hit();
 	void					Anim_Heavy_Hit();
-	void					Anim_Flee();
 	void					Anim_Die();
 	void					Anim_Viroty();
 
 
 private:
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
+	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	UI_REPRESENT	m_Represnt = REPRESENT_CALIBRETTO;
 	_uint	m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
 
 public:
@@ -110,7 +114,7 @@ public:
 public:
 	BaseDelegater<HIGHLIGHT_UIDESC> m_Hero_DungeonUIDelegeter;
 	
-	BaseDelegater<_double, _uint> m_Hero_CombatTurnDelegeter;			//옆에 턴 넘기는것
+	BaseDelegater<UI_REPRESENT, _uint> m_Hero_CombatTurnDelegeter;		//옆에 턴넘기는거
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
 private:

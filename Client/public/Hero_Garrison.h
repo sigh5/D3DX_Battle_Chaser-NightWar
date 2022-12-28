@@ -70,13 +70,15 @@ public:
 	void				Anim_Idle();
 	void				Anim_Intro();
 	void				AnimNormalAttack();
+	void				Anim_Defence();
+
 	void				Anim_Skill1_Attack();
 	void				Anim_Skill2_Attack();
 	void				Anim_Uitimate();
 	void				Anim_Buff();
 
 	void				Anim_Use_Item();
-	void				Anim_Defence();
+
 	void				Anim_Light_Hit();
 	void				Anim_Heavy_Hit();
 	void				Anim_Flee();
@@ -111,15 +113,14 @@ public:
 
 public:
 	BaseDelegater<Tag_HighLightUIDesc> m_Hero_DungeonUIDelegeter;
-	BaseDelegater<_double, _uint>	  m_Hero_CombatTurnDelegeter;
+	BaseDelegater<UI_REPRESENT, _uint> m_Hero_CombatTurnDelegeter;
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
 private:
 	//queue<pair<_uint, _double>>	m_CurAnimqeue;
 private:
-
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
+	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	UI_REPRESENT	m_Represnt = REPRESENT_GARRISON;
 	WeaponType		m_eWeaponType = WEAPON_SWORD;
 
 

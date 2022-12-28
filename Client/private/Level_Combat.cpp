@@ -158,7 +158,6 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
 	pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas"), LEVEL_COMBAT);
 
-	
 	m_pCombatController->Initialize(LEVEL_COMBAT);
 
 	RELEASE_INSTANCE(CGameInstance);

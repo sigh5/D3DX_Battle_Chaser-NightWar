@@ -8,6 +8,8 @@
 #include "Hero_Calibretto.h"
 #include "Hero_Garrison.h"
 
+
+
 CTurnStateCanvas::CTurnStateCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
 {
@@ -21,6 +23,7 @@ CTurnStateCanvas::CTurnStateCanvas(const CTurnStateCanvas & rhs)
 void CTurnStateCanvas::Set_RenderActive(_bool bActive)
 {
 	Control_ChildRender(bActive);
+	_bool b = false;
 }
 
 HRESULT CTurnStateCanvas::Initialize_Prototype()
@@ -92,16 +95,12 @@ void CTurnStateCanvas::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (ImGui::IsMouseClicked(1))			// 플레이어 차례때 렌더 오픈해야한다.
-	{
-		Control_ChildRender(true);
-	}
+	RELEASE_INSTANCE(CGameInstance);
 
 
 	PickingChild();
-	//CurState_Image_Change();
-
 }
 
 void CTurnStateCanvas::Late_Tick(_double TimeDelta)
@@ -114,7 +113,18 @@ void CTurnStateCanvas::Late_Tick(_double TimeDelta)
 
 HRESULT CTurnStateCanvas::Render()
 {
-	/* 렌더안할거임*/
+	
+	//if (FAILED(__super::Render()))
+	//	return E_FAIL;
+
+	//if (FAILED(SetUp_ShaderResources()))
+	//	return E_FAIL;
+
+
+	//m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
+	//m_pVIBufferCom->Render();
+
+
 	return S_OK;
 }
 
@@ -157,8 +167,6 @@ void CTurnStateCanvas::PickingChild()
 	}
 
 
-
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -190,7 +198,38 @@ void CTurnStateCanvas::CurState_Fsm_ButtonClick()
 		return;
 
 	m_ButtonFsmType = static_cast<CUIButton*>(pCurPickingButton)->Get_ButtonFsmState();
+}
 
+void CTurnStateCanvas::CurState_Fsm_ButtonICon()
+{
+	CGameObject* pCurActor = CCombatController::GetInstance()->Get_CurActor();
+
+	if (pCurActor == nullptr)
+		return;
+	wstring pCurName = pCurActor->Get_ObjectName();
+
+	wstring CurTexturTag = L"";
+	if (pCurName == TEXT("Hero_Alumon"))
+		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Garrison");
+	else if (pCurName == TEXT("Hero_Calibretto"))
+		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Calibretto");
+	else if (pCurName == TEXT("Hero_Gully"))
+		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Knolan");
+	else
+		return;		// 몬스터가 현재 턴일때
+
+	for (auto& pFsmButton : m_pCurFsmButton)
+	{
+		static_cast<CUIButton*>(pFsmButton)->Change_ButtonIcon(CurTexturTag);
+	}
+}
+
+void CTurnStateCanvas::Player_SceneChane(_bool bEvent)
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(bEvent);
+	}
 
 }
 
@@ -198,8 +237,25 @@ void CTurnStateCanvas::Control_ChildRender(_bool bRenderActive)
 {
 	for (auto& pChild : m_ChildrenVec)
 	{
+		/*if (dynamic_cast<CUIButton*>(pChild) != nullptr)
+			continue;*/
 		pChild->Set_RenderActive(bRenderActive);
 	}
+	
+	for (auto& pState : m_pCurState)
+	{
+		pState.second->Set_RenderActive(bRenderActive);
+	}
+
+
+	for (auto& pFsmBtn : m_pCurFsmButton)
+	{
+		pFsmBtn->Set_RenderActive(false);
+	}
+
+	CurState_Fsm_ButtonICon();
+
+
 }
 
 void CTurnStateCanvas::StateButton_Child()
@@ -232,10 +288,7 @@ void CTurnStateCanvas::StateButton_Child()
 		{
 			static_cast<CUIButton*>(pStateButton.second)->Set_ChildFsmButton(static_cast<CUIButton*>(m_pCurFsmButton[i]));
 		}
-
 	}
-
-
 }
 
 HRESULT CTurnStateCanvas::SetUp_Components()
@@ -248,19 +301,14 @@ HRESULT CTurnStateCanvas::SetUp_Components()
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Shader_VtxTex"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_VIBuffer_Rect"), TEXT("Com_VIBuffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
-
-
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_CanvasDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
-
-
 	return S_OK;
 }
 
@@ -290,8 +338,6 @@ HRESULT CTurnStateCanvas::SetUp_ShaderResources()
 
 	return S_OK;
 }
-
-
 
 CTurnStateCanvas * CTurnStateCanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
@@ -325,5 +371,4 @@ void CTurnStateCanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
 }

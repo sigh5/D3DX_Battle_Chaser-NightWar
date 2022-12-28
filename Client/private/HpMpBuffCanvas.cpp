@@ -143,7 +143,7 @@ HRESULT CHpMpBuffCanvas::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	Set_RenderActive(true);
+	
 
 	return S_OK;
 }
@@ -169,6 +169,7 @@ void CHpMpBuffCanvas::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+
 }
 
 void CHpMpBuffCanvas::Late_Tick(_double TimeDelta)

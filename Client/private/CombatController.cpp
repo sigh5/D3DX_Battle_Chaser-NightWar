@@ -109,7 +109,6 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	{
 		Late_Init();
 		m_bCombatIntro = false;
-
 	}
 	else
 	{
@@ -262,7 +261,6 @@ void CCombatController::Set_Player_StateCanvas()
 	if (m_iMonster_Player_Option == 1 && m_bIsPlayer == true)
 	{
 		m_pTurnStateButtonCanvas->Set_RenderActive(true);
-		
 	}
 
 }
@@ -292,8 +290,8 @@ void CCombatController::Mana_Refresh()
 
 void CCombatController::Active_Fsm()
 {
-	if (m_pHitActor == nullptr)
-		return;
+	/*if (m_pHitActor == nullptr)
+		return;*/
 	
 	To_Idle();
 	To_Intro();
@@ -301,15 +299,19 @@ void CCombatController::Active_Fsm()
 	To_Skill1_Attack();
 	To_Skill2_Attack();
 	To_Uitimate();
+	
 	To_Buff();
 	To_WideAreaBuff();
 	To_Use_Item();
 	To_Defence();
+	To_Flee();
+	To_Viroty();
+
 	To_Light_Hit();
 	To_Heavy_Hit();
-	To_Flee();
+
 	To_Die();
-	To_Viroty();	
+	
 }
 
 void CCombatController::ResetState()
@@ -439,21 +441,6 @@ HRESULT CCombatController::Set_ActorsStatus()
 #ifdef _DEBUG
 void CCombatController::Imgui_CharAnim()
 {
-	//static int CharIndex = 0;
-	//static int Type_Num = 0;
-
-	//ImGui::RadioButton("Garrison", &CharIndex, 0);
-	//ImGui::RadioButton("Knolan", &CharIndex, 1);
-	//ImGui::RadioButton("Calibreotto", &CharIndex, 2);
-	//ImGui::RadioButton("Slime", &CharIndex, 3);
-	//ImGui::RadioButton("Skeleton_Naked", &CharIndex, 4);
-	//ImGui::RadioButton("Spider_Mana", &CharIndex, 5);
-
-	//ImGui::InputInt("Anim Type MAX=10", &Type_Num);
-
-	//if (Type_Num >= 14)
-	//	Type_Num = 0;
-	//ImGui::Text(str[Type_Num].c_str());
 }
 
 #endif // !DEBUG
@@ -481,7 +468,7 @@ _bool CCombatController::To_Intro()
 
 void CCombatController::To_Normal_Attack()
 {
-	if (nullptr == m_pHitActor	 && m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (nullptr == m_pHitActor	|| m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		return;
 
 	if (m_iMonster_Player_Option == 0 &&
@@ -504,7 +491,7 @@ void CCombatController::To_Normal_Attack()
 
 void CCombatController::To_Skill1_Attack()
 {
-	if (nullptr == m_pHitActor	 && m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (nullptr == m_pHitActor || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		return;
 
 	if (m_iMonster_Player_Option == 0 &&
@@ -528,7 +515,7 @@ void CCombatController::To_Skill1_Attack()
 
 void CCombatController::To_Skill2_Attack()
 {
-	if (nullptr == m_pHitActor	 && m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (nullptr == m_pHitActor || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		return;
 
 	if (m_iMonster_Player_Option == 0 &&
@@ -553,7 +540,7 @@ void CCombatController::To_Skill2_Attack()
 
 void CCombatController::To_Uitimate()
 {
-	if (nullptr == m_pHitActor	 && m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (nullptr == m_pHitActor || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		return;
 
 	if (m_iMonster_Player_Option == 0 &&
@@ -578,12 +565,12 @@ void CCombatController::To_Uitimate()
 
 void CCombatController::To_Buff()
 {
-	if (m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		assert(!"CCombatController::To_Normal_Attack_Issue");
 
 	if (m_iMonster_Player_Option == 0 &&
-		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ACTION//수정필요
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_NORMALATTACK)//수정필요
+		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY
+		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_BUFF)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Buff);
 
@@ -603,13 +590,15 @@ void CCombatController::To_Buff()
 
 void CCombatController::To_WideAreaBuff()
 {
-	if (m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		assert(!"CCombatController::To_Normal_Attack_Issue");
 
 	if (m_iMonster_Player_Option == 0 &&
-		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ACTION//수정필요
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_NORMALATTACK)//수정필요
+		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY//수정필요
+		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_WIDEBUFF)//수정필요
 	{
+		//if(static_cast<CCombatActors*>(m_pCurentActor)->)
+
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_WideAreaBuff);
 
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
@@ -629,12 +618,12 @@ void CCombatController::To_WideAreaBuff()
 	
 void CCombatController::To_Use_Item()
 {
-	if (m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		assert(!"CCombatController::To_Normal_Attack_Issue");
 
 	if (m_iMonster_Player_Option == 0 &&
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USEITEM)
+		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_HP_ITEM)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
 
@@ -642,6 +631,12 @@ void CCombatController::To_Use_Item()
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
 	}
+	else if (m_iMonster_Player_Option == 0 &&
+			m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
+			&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
+		{
+			
+		}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
@@ -655,12 +650,12 @@ void CCombatController::To_Use_Item()
 void CCombatController::To_Defence()		
 {
 	/*어쩃든 턴을 쓴거니까*/
-	if (m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		assert(!"CCombatController::To_Normal_Attack_Issue");
 
 	if (m_iMonster_Player_Option == 0 &&
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ACTION//수정필요
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_NORMALATTACK)//수정필요
+		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_DEFENCE)//수정필요
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Defence);
 
@@ -681,6 +676,8 @@ void CCombatController::To_Defence()
 
 void CCombatController::To_Light_Hit()
 {
+	if (m_pHitActor == nullptr)
+		return;
 	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
 	if (m_bIsHiterhit)
 	{
@@ -692,6 +689,7 @@ void CCombatController::To_Light_Hit()
 			if (dynamic_cast<CHpMpBuffCanvas*>(Canvas) != nullptr)
 			{
 				static_cast<CHpMpBuffCanvas*>(Canvas)->Set_HitEvent(m_pHitActor,true);
+				static_cast<CHpMpBuffCanvas*>(Canvas)->Set_MpEvent(true);
 			}
 		}
 	}
@@ -701,6 +699,8 @@ void CCombatController::To_Light_Hit()
 
 void CCombatController::To_Heavy_Hit()
 {
+	if (m_pHitActor == nullptr)
+		return;
 	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
 	if (m_pGameInstace->Key_Down(DIK_I))
 	{
@@ -715,10 +715,10 @@ void CCombatController::To_Heavy_Hit()
 
 void CCombatController::To_Flee()
 {
-	if (m_pTurnStateButtonCanvas == nullptr && m_pTurnCanvas == nullptr)
+	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		assert(!"CCombatController::To_Normal_Attack_Issue");
 
-	if (m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_FSM_USEITEM
+	if (m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_FLEE)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Flee);
@@ -732,8 +732,8 @@ void CCombatController::To_Flee()
 
 void CCombatController::To_Die()
 {
-	if (m_pGameInstace->Key_Down(DIK_U))
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Die);
+	/*if (static_cast<CCombatActors*>(m_pHitActor)->Is_Dead())
+		m_pHitActor->Set_FsmState(true, CGameObject::m_Die);*/
 }
 
 void CCombatController::To_Viroty()

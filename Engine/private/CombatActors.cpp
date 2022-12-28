@@ -89,7 +89,6 @@ void CCombatActors::Set_CombatAnim_Index(CModel * pModel)
 
 	pModel->Set_PlayTime(pModel->Get_AnimIndex());
 	pModel->InitChannel();
-	//	pModel->Set_Lerp(pModel->Get_AnimIndex(), m_CurAnimqeue.front().first);
 	pModel->Set_AnimIndex(m_CurAnimqeue.front().first);
 	pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
 	m_bIsIdle = false;
@@ -108,26 +107,6 @@ void CCombatActors::Fsm_Exit()
 
 _bool CCombatActors::Calculator_HitColl(CGameObject * pWeapon)
 {
-	//if (nullptr == pWeapon)
-	//	return;//assert(!" CCombatActors::Calculator_HitColl");
-
-	//CCollider* pWeaponCollider = dynamic_cast<CCollider*>(Get_Component(L"Com_AABB"));
-	//if (pWeaponCollider == nullptr)
-	//{
-	//	pWeaponCollider = dynamic_cast<CCollider*>(Get_Component(L"Com_OBB"));
-	//	if()
-
-	//	assert(pWeaponCollider != nullptr &&  "CCombatActors::Calculator_HitColl issue");
-	//}
-
-	//CCollider* pHiterColider = dynamic_cast<CCollider*>(Get_Component(L"Com_AABB"));
-	//if (pHiterColider == nullptr)
-	//{
-	//	pHiterColider = dynamic_cast<CCollider*>(Get_Component(L"Com_OBB"));
-	//	assert(pHiterColider != nullptr &&  "CCombatActors::Calculator_HitColl issue");
-	//}
-
-	//return pHiterColider->Collision(pWeaponCollider);
 	return false;
 }
 

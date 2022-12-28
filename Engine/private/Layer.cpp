@@ -44,7 +44,7 @@ void CLayer::Delete_GameObject(CGameObject *& pObject)
 	{
 		Safe_Release(pObject);
 		m_GameObjects.remove(pObject);
-		bool b = false;
+		
 	}
 }
 

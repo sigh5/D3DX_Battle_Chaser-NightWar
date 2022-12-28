@@ -29,7 +29,7 @@ public:
 	HRESULT Add_Prototype(const wstring& pPrototypeTag, class CGameObject* pPrototype);
 	HRESULT Clone_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pPrototypeTag, void* pArg = nullptr);
 	CGameObject* Clone_GameObject(const _tchar * pPrototypeTag, void * pArg);
-	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject);
+	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject); 	// UI_TurnCanvas  Àü¿ë
 
 
 	void	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);

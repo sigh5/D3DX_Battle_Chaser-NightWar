@@ -28,7 +28,6 @@ HRESULT CMyImage::Initialize(void * pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
@@ -99,7 +98,12 @@ void CMyImage::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
-		assert("CTurnCharcterUI Change_Texture");
+		assert(! "CTurnCharcterUI Change_Texture");
+}
+
+void CMyImage::Set_RenderActive(_bool bRenderActive)
+{
+	__super::Set_RenderActive(bRenderActive);
 }
 
 HRESULT CMyImage::SetUp_Components()

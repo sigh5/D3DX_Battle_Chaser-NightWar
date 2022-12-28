@@ -247,7 +247,12 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},1))
+			
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("LightHit To Die"), [this]()
+			{
+				return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+			},0))
 
 		.AddState(L"Heavy_Hit")
 			.OnStart([this]()
@@ -261,7 +266,11 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},1))
+				.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("HeavyHit To Die"), [this]()
+			{
+				return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+			}, 0))
 
 		.AddState(L"Flee")
 			.OnStart([this]()
@@ -284,12 +293,12 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 			.Tick([this](_double TimeDelta)
 			{
-				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
+				static_cast<CHero_Knolan*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 			})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		/*	.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
 			{
 				return m_pCombatController->To_Idle();
-			}))
+			}))*/
 
 		.AddState(L"Viroty")
 			.OnStart([this]()
@@ -429,7 +438,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.AddState(L"Buff")
 			.OnStart([this]()
 		{
-			static_cast<CHero_Garrison*>(m_pTarget)->Anim_Uitimate();
+			static_cast<CHero_Garrison*>(m_pTarget)->Anim_Buff();
 		})
 			.Tick([this](_double TimeDelta)
 		{
@@ -491,10 +500,14 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Light_Hit To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},1))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Light_Hit To Die"), [this]()
+		{
+			return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		}, 0))
 
 		.AddState(L"Heavy_Hit")
 			.OnStart([this]()
@@ -505,10 +518,14 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			{
 				static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},1))
+				.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
+			{
+				return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+			}, 0))
 
 		.AddState(L"Flee")
 			.OnStart([this]()
@@ -533,10 +550,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			{
 				static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-			{
-				return m_pCombatController->To_Idle();	// ¾ê´Â Á×´Â°Å
-			}))
+		//.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		//	{
+		//		return m_pCombatController->To_Idle();	// ¾ê´Â Á×´Â°Å
+		//	}))
 
 		.AddState(L"Viroty")
 			.OnStart([this]()
@@ -680,7 +697,7 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		.AddState(L"Buff")
 			.OnStart([this]()
 		{
-			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Uitimate();
+			static_cast<CHero_Calibretto*>(m_pTarget)->Anim_Buff();
 		})
 			.Tick([this](_double TimeDelta)
 		{
@@ -740,10 +757,14 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Light_Hit To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},1))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Light_Hit To Die"), [this]()
+		{
+			return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		}, 0))
 
 		.AddState(L"Heavy_Hit")
 			.OnStart([this]()
@@ -754,10 +775,14 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},1))
+			.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
+		{
+			return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		}, 0))
 
 		.AddState(L"Flee")
 			.OnStart([this]()

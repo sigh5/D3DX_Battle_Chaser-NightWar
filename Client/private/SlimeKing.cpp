@@ -107,9 +107,13 @@ void CSlimeKing::Tick(_double TimeDelta)
 	for (auto &pParts : m_MonsterParts)
 		pParts->Tick(TimeDelta);
 
-
 	m_pFsmCom->Tick(TimeDelta);
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
+	if (m_pStatusCom->Get_Dead() && !m_bIsDead)
+	{
+		m_bIsDead = true;
+	}
 
 	m_pModelCom->Play_Animation(TimeDelta,true);	// 몬스터들은 다 컴뱃씬에만있으니까
 }
@@ -212,10 +216,7 @@ void CSlimeKing::MovingAnimControl(_double TimeDelta)
 
 void CSlimeKing::Fsm_Exit()
 {
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
-
-	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 }
@@ -389,6 +390,8 @@ void CSlimeKing::Anim_Heavy_Hit()
 
 void CSlimeKing::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2,1.f });
 	m_CurAnimqeue.push({ 17,1.f });
 	Set_CombatAnim_Index(m_pModelCom);

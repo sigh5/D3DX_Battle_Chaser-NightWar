@@ -35,6 +35,8 @@ using namespace DirectX;
 #include <functional>
 #include <set>
 #include <queue>
+#include <string>
+#include <string.h>
 using namespace std;
 
 #include "imgui.h"

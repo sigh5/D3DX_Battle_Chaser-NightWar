@@ -17,8 +17,10 @@ protected:
 public:
 	const   _bool	Get_IsIdle()const { return m_bIsIdle; }
 	void			Set_HitTarget(CGameObject* pGameObject) { m_pHitTarget = pGameObject; }
-	virtual _bool	Is_Dead() { return m_bDead; }	// 나중에 죽었을때
 	virtual  CGameObject*	 Get_Weapon_Or_SkillBody();
+	virtual	  _bool	  Is_Dead() {return m_bIsDead;}
+
+
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -50,7 +52,8 @@ protected:
 
 protected:
 	_bool							m_bIsIdle = false;;
-	_bool							m_bDead = false;
+	_bool							m_bIsDead = false;
+	_bool							m_bDeadEvent = false;
 	_bool							m_bCombatChaseTarget = false;
 protected:
 	_uint							m_bFinishOption = 0;

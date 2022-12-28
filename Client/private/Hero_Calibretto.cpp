@@ -98,6 +98,11 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		Combat_Initialize();
 		m_pFsmCom->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+	
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
+		{
+			m_bIsDead = true;
+		}
 	}
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -413,7 +418,7 @@ void CHero_Calibretto::AnimNormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
-	m_iStateDamage = 30;
+	m_iStateDamage = 350;
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 3,	 1.f });
 	m_CurAnimqeue.push({ 16, 1.f });
@@ -494,6 +499,8 @@ void CHero_Calibretto::Anim_Flee()
 
 void CHero_Calibretto::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 6,  1.f });
 	m_CurAnimqeue.push({ 35, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -623,7 +630,7 @@ void CHero_Calibretto::MovingAnimControl(_double TimeDelta)
 
 void CHero_Calibretto::Fsm_Exit()
 {
-	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);

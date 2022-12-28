@@ -83,12 +83,14 @@ private:
 	_float					m_setTickForSecond = 1.f;
 
 public:
-	BaseDelegater<_double, _uint> m_Monster_CombatTurnDelegeter;	// 턴제
+	BaseDelegater<UI_REPRESENT, _uint> m_Monster_CombatTurnDelegeter;	// 턴제
 
 private:
 	vector<CGameObject*>	m_MonsterParts;
 	WeaponType		m_eWeaponType = WEAPON_HEAD;
 
+	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	UI_REPRESENT	m_Represnt = REPRESENT_SLIMEKING;
 
 public:
 	static CSlimeKing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

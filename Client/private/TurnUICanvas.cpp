@@ -62,9 +62,6 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -93,7 +90,6 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
 	SetUp_ChildrenPosition();
-	SetUp_MatchingOption();
 	RELEASE_INSTANCE(CGameInstance);
 
 	m_bLast_Initlize = true;
@@ -105,7 +101,20 @@ void CTurnUICanvas::Tick(_double TimeDelta)
 {
 
 	Last_Initialize();
+
 	__super::Tick(TimeDelta);
+
+	/*static int i = 0;
+	static UI_REPRESENT TempNum = REPRESENT_END;
+
+	ImGui::InputInt("RepresentNum", &i);
+
+	if(ImGui::Button("TestDelete"))
+	{
+		DeleteCharUI(UI_REPRESENT(i));
+	}*/
+
+
 }
 
 void CTurnUICanvas::Late_Tick(_double TimeDelta)
@@ -118,18 +127,15 @@ void CTurnUICanvas::Late_Tick(_double TimeDelta)
 
 HRESULT CTurnUICanvas::Render()
 {
-	if (FAILED(__super::Render()))
-		return E_FAIL;
 
-	if (FAILED(SetUp_ShaderResources()))
-		return E_FAIL;
+	//if (FAILED(__super::Render()))
+	//	return E_FAIL;
 
-	CUI::Begin_UI();
+	//if (FAILED(SetUp_ShaderResources()))
+	//	return E_FAIL;
 
-	m_pShaderCom->Begin(1);
-	m_pVIBufferCom->Render();
-
-	CUI::End_UI();
+	//m_pShaderCom->Begin(1);
+	//m_pVIBufferCom->Render();
 
 	return S_OK;
 
@@ -198,11 +204,7 @@ HRESULT CTurnUICanvas::SetUp_ChildrenPosition()
 	return S_OK;
 }
 
-HRESULT CTurnUICanvas::SetUp_MatchingOption()
-{
-	/* 나중에 삭제할때를 위해서 일단 UI들당 각자에 맞는 캐릭터들에 매칭시켜야됌*/
-	return S_OK;
-}
+
 
 void CTurnUICanvas::Move_Children()
 {
@@ -228,9 +230,12 @@ void CTurnUICanvas::Move_Children()
 
 }
 
-void CTurnUICanvas::ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed)
+void CTurnUICanvas::ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton)
 {
-	Move_Children();
+	if (iOpiton == 0)
+		Move_Children();
+	else
+		DeleteCharUI(iRepesentNum);
 }
 
 void CTurnUICanvas::ChildrenShakingCheck(_uint iShakingTime)
@@ -242,50 +247,70 @@ void CTurnUICanvas::ChildrenShakingCheck(_uint iShakingTime)
 
 }
  
-void CTurnUICanvas::DeleteCharUI(const wstring&  pNametag)
+void CTurnUICanvas::DeleteCharUI(UI_REPRESENT UiRepresentNum)
 {
-	/* 나중에 죽었을떄 이 이벤트를 받아야됌*/
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	vector<CUI*> OldCharImage;
 	
-	_float Temp = 0;
-
-	CUI*	pUI = nullptr;
-
-	int  iRandomNum =	rand()	%(m_ChildrenVec.size()-2);
-
 	for (auto iter = m_ChildrenVec.begin(); iter != m_ChildrenVec.end(); )
 	{
-		if (!lstrcmp((*iter)->Get_ObjectName(),pNametag.c_str()) )
+		if (nullptr == dynamic_cast<CTurnCharcterUI*>(*iter))
+			continue;
+
+		if (static_cast<CTurnCharcterUI*>(*iter)->Get_Represent_Char() == UiRepresentNum)
 		{
-			Temp = dynamic_cast<CTurnCharcterUI*>(*iter)->Get_PosY();
+			OldCharImage.push_back(*iter);
 			Safe_Release(*iter);
-			pGameInstance->DeleteGameObject(LEVEL_GAMEPLAY,pNametag);
 			iter = m_ChildrenVec.erase(iter);
-			pUI = *(iter+iRandomNum);
 		}
 		else
 		{
-			iter++;
-		}		
+			++iter;
+		}
 	}
 
-	for (auto &pUI : m_ChildrenVec)
+	size_t OldCharVecSize = OldCharImage.size();
+	for (auto iter = m_ChildrenVec.begin(); iter != m_ChildrenVec.end();)
 	{
-		if (Temp > dynamic_cast<CTurnCharcterUI*>(pUI)->Get_PosY())
-			dynamic_cast<CTurnCharcterUI*>(pUI)->MoveControl(1);
+		_int iLimitCount = 0;
+		for (size_t i = 0; i < OldCharVecSize; ++i)
+		{
+			if (static_cast<CTurnCharcterUI*>(OldCharImage[i])->Get_PosY() > 
+				static_cast<CTurnCharcterUI*>(*iter)->Get_PosY())
+			{
+				++iLimitCount;
+			}
+			static_cast<CTurnCharcterUI*>(*iter)->MoveControl(CTurnCharcterUI::UI_POS_QUICK);
+			static_cast<CTurnCharcterUI*>(*iter)->Set_LimitYPos(iLimitCount);
+		}
+		++iter;
 	}
 
-	
-	if (nullptr != pUI)
+	_float fBackLimitYPos = -250.f;
+
+	_float fSmallY = 0.f;
+	for (size_t i = 0; i < OldCharVecSize; ++i)
 	{
-		Add_ChildUI(static_cast<CUI*>(pGameInstance->Clone_UI(LEVEL_GAMEPLAY, TEXT("Layer_UI"), (pUI))));
-		size_t iNumber =	m_ChildrenVec.size();
+		_uint iRandomNum = rand() % m_ChildrenVec.size();
+
+		CTurnCharcterUI* pNewUI = static_cast<CTurnCharcterUI*>(pGameInstance->
+			Clone_UI(pGameInstance->GetCurLevelIdx(), LAYER_UI, m_ChildrenVec[iRandomNum]));
 		
-		dynamic_cast<CTurnCharcterUI*>(m_ChildrenVec[iNumber-1])->RightMove();
+		//_float fBackLimitYPos= static_cast<CTurnCharcterUI*>(m_ChildrenVec.back())->Get_LimitYPos();
+		pNewUI->MoveControl(CTurnCharcterUI::UI_POS_QUICK);
+		pNewUI->Set_LimitYPos_Float(_float(fBackLimitYPos));
+		m_ChildrenVec.push_back(pNewUI);
+		Safe_AddRef(pNewUI);
+		fBackLimitYPos += 50.f;
 	}
+
+	for (auto iter : OldCharImage)
+	{
+		pGameInstance->DeleteGameObject(pGameInstance->GetCurLevelIdx(), (iter)->Get_ObjectName());
+	}
+	OldCharImage.clear();
 
 	RELEASE_INSTANCE(CGameInstance);	
-
 }
 
 CTurnUICanvas * CTurnUICanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

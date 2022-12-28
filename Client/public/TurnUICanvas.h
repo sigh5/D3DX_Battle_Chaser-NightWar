@@ -35,9 +35,9 @@ public:
 	virtual HRESULT Render()override;
 
 public:
-	void	ChildrenMoveCheck(_double TimeDelta, _uint iMoveSpeed); // Obsever
+	void	ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton); // iOption == 0,1,2,3,4,5 RepesetOption
 	void	ChildrenShakingCheck(_uint CoolTime);
-	void	DeleteCharUI(const wstring& pNametag);		// Obsever
+	void	DeleteCharUI(UI_REPRESENT UiRepresentNum);		// Obsever
 	void	Move_Children(); /*logic*/
 
 
@@ -53,7 +53,6 @@ private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();	
 	HRESULT SetUp_ChildrenPosition();
-	HRESULT SetUp_MatchingOption();
 
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;

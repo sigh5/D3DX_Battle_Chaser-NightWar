@@ -46,11 +46,7 @@ HRESULT CPlayer::Last_Initialize()
 
 void CPlayer::Tick(_double TimeDelta)
 {
-
-	/* 수정 필요*/
 	LookAtTarget(TimeDelta);
-	//ChaseTarget(TimeDelta);
-
 }
 
 void CPlayer::Late_Tick(_double TimeDelta)
@@ -78,12 +74,7 @@ void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 		m_pCaptinPlayer = nullptr;
 		HighLightChar();
 	}
-	
 }
-
-
-
-
 
 void CPlayer::LookAtTarget(_double TimeDelta)
 {

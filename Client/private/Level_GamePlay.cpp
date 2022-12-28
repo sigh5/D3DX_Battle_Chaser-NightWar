@@ -162,6 +162,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 
 	//pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 
+	//pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_GAMEPLAY);
+
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

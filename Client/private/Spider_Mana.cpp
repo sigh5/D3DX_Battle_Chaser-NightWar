@@ -105,8 +105,11 @@ void CSpider_Mana::Tick(_double TimeDelta)
 		pParts->Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
-
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
+	if (m_pStatusCom->Get_Dead() && !m_bIsDead)
+		m_bIsDead = true;
+	
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
@@ -209,10 +212,7 @@ void CSpider_Mana::MovingAnimControl(_double TimeDelta)
 
 void CSpider_Mana::Fsm_Exit()
 {
-	_uint iTestNum = 0;
-	_double TEst = 0.0;
-
-	m_Monster_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 }
@@ -456,6 +456,8 @@ void CSpider_Mana::Anim_Heavy_Hit()
 
 void CSpider_Mana::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2,1.f });
 	m_CurAnimqeue.push({ 19,1.f });
 	Set_CombatAnim_Index(m_pModelCom);

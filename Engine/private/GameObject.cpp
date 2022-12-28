@@ -158,11 +158,11 @@ HRESULT CGameObject::Remove_component(const wstring & pComponentTag)
 		return false;
 	});
 	
-	if (iter == m_Components.end())
-		return S_OK;
-
-	Safe_Release(iter->second);
-	m_Components.erase(iter);
+	if (iter != m_Components.end())
+	{
+		Safe_Release(iter->second);
+		m_Components.erase(iter);
+	}
 
 	return S_OK;
 }

@@ -14,6 +14,16 @@ CTurnCharcterUI::CTurnCharcterUI(const CTurnCharcterUI & rhs)
 
 }
 
+void CTurnCharcterUI::Set_LimitYPos_Float(_float fLimitPos)
+{
+	m_vLimitPos.y = fLimitPos;
+}
+
+void CTurnCharcterUI::Set_LimitYPos(_int iLimitPosRatio)
+{
+	m_vLimitPos.y += 50* iLimitPosRatio;
+}
+
 HRESULT CTurnCharcterUI::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -90,6 +100,7 @@ HRESULT CTurnCharcterUI::Render()
 		return E_FAIL;
 
 
+
 	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
@@ -158,6 +169,20 @@ void CTurnCharcterUI::Normal_Move()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 }
 
+void CTurnCharcterUI::Quick_Move()
+{
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y += _float(CClient_Manager::TimeDelta * +200.f);
+
+	if (vPos.y >= m_vLimitPos.y)
+	{
+		vPos.y = m_vLimitPos.y;
+		m_bMove = false;
+	}
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+}
+
 void CTurnCharcterUI::Shake_Move()
 {
 	_float4		vPos;
@@ -213,7 +238,12 @@ void CTurnCharcterUI::MoveControl(_uint iOption)
 		m_vLimitPos.y += 50;
 		m_Movefun = std::bind(&CTurnCharcterUI::Normal_Move, this);
 	}
-
+	else if (iOption == UI_POS_QUICK) // Normal
+	{
+		m_Movefun = std::bind(&CTurnCharcterUI::Quick_Move, this);
+	}
+	else
+		assert(!" MoveControl_ISsue");
 
 
 }

@@ -47,6 +47,8 @@ public:
 private:
 	void					CurState_Image_Change();
 	void					CurState_Fsm_ButtonClick();
+	void					CurState_Fsm_ButtonICon();
+	void					Player_SceneChane(_bool bEvent);
 
 private:
 	void					Control_ChildRender(_bool bRenderActive);
@@ -71,6 +73,8 @@ private:
 	BUTTON_STATE			m_StateType = BUTTON_STATE_END;
 	BUTTON_FSM_STATE		m_ButtonFsmType = BUTTON_FSM_STATE_END;
 
+
+	_uint					iTestIConNum = 0;
 
 
 private:

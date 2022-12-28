@@ -435,14 +435,14 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_Calibretto"),
 		CTexture::Create(m_pDevice, m_pContext, 
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Calibretto/Ability_Calibretto%d.png"), 
-			CTexture::TYPE_END, 20))))	//¸¶Áö¸·Àº ±Ã
+			CTexture::TYPE_END, 10))))	//¸¶Áö¸·Àº ±Ã
 		return E_FAIL;
 
 	/* For.Prototype_Component_Texture_UI_State_Icon_Garrison */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_Garrison"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Garrison/Ability_Garrison%d.png"),
-			CTexture::TYPE_END, 17))))	//¸¶Áö¸·Àº ±Ã
+			CTexture::TYPE_END, 10))))	//¸¶Áö¸·Àº ±Ã
 		return E_FAIL;
 
 	/* For.Prototype_Component_Texture_UI_State_Icon_Garrison */
@@ -453,7 +453,7 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 		return E_FAIL;
 
 	/* For.Prototype_Component_Texture_UI_State_Icon_Item */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_Item"),
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_State"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Common/Common_Icon%d.png"),
 			CTexture::TYPE_END, 3))))	

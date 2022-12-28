@@ -18,17 +18,23 @@ _float CStatus::Get_CurStatusHpRatio()
 
 _float CStatus::Get_CurStatusMpRatio()
 {
-	return	 (_float)(m_StatusDesc.iMp) / (_float)(m_iMaxMp);
+	return	(_float)(m_StatusDesc.iMp) / (_float)(m_iMaxMp);
 }
 
-void CStatus::Take_Damage(_uint iDamgae)
+void CStatus::Take_Damage(_int iDamgae)
 {
 	m_StatusDesc.iHp -= iDamgae;
+
+	if (m_StatusDesc.iHp <= 0)
+		m_StatusDesc.iHp = 0;
+
 }
 
-void CStatus::Use_SkillMp(_uint iMp)
+void CStatus::Use_SkillMp(_int iMp)
 {
 	m_StatusDesc.iMp -= iMp;
+	if (m_StatusDesc.iMp <= 0)
+		m_StatusDesc.iMp = 0;
 }
 
 HRESULT CStatus::Initialize_Prototype()
@@ -50,6 +56,15 @@ HRESULT CStatus::Initialize(void * pArg)
 		MSG_BOX("??");
 
 	return S_OK;
+}
+
+void CStatus::Final_Update()
+{
+	if (m_StatusDesc.iHp <= 0)
+	{
+		m_bDead = true;
+		m_StatusDesc.iMp = 0;
+	}
 }
 
 CStatus * CStatus::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

@@ -98,6 +98,9 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		Combat_Init();
 		m_pAnimFsm->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+		
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
+			m_bIsDead = true;
 	}
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -268,7 +271,7 @@ void CHero_Garrison::Fsm_Exit()
 {
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
-	m_Hero_CombatTurnDelegeter.broadcast(TEst, iTestNum);
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 }
 
@@ -591,7 +594,7 @@ void CHero_Garrison::Anim_Intro()
 void CHero_Garrison::AnimNormalAttack()
 {
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 30;
+	m_iStateDamage = 400;
 	m_iHitCount = 1;
 	m_SpeedRatio = 7.f;
 	m_LimitDistance = 10.f;
@@ -713,6 +716,8 @@ void CHero_Garrison::Anim_Flee()
 
 void CHero_Garrison::Anim_Die()
 {
+	m_iTurnCanvasOption = 1;
+	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 7,  1.f });
 	m_CurAnimqeue.push({ 33,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);

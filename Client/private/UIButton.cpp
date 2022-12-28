@@ -56,10 +56,27 @@ HRESULT CUIButton::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
+	m_bRenderActive = false;
 	return S_OK;
 }
 
+HRESULT CUIButton::Last_Initialize()
+{
+	if (m_bLast_Initlize)
+		return S_OK;
 
+	if (!lstrcmp(m_ObjectName, TEXT("UIButton3")))
+	{
+		FirstDungeonUIInit();
+		m_bRenderActive = true;
+	}
+
+	Button_RenderSetActive(m_bRenderActive);
+
+
+	m_bLast_Initlize = true;
+	return S_OK;
+}
 
 void CUIButton::Tick(_double TimeDelta)
 {
@@ -143,6 +160,8 @@ void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 
 	for (size_t i = 0; i < ChildFsmButtonSize; ++i)
 	{
+		m_ChildFsmButton[i]->Set_RenderActive(true);
+		
 		if(eType == BUTTON_STATE_ACTION)
 			 m_ChildFsmButton[i]->Change_ICON_Active();
 		else if (eType == BUTTON_STATE_ABLILTY)
@@ -161,7 +180,7 @@ void CUIButton::Change_ICON_Active()
 
 	if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button0")))
 	{
-		pTexture->Set_SelectTextureIndex(1);
+		pTexture->Set_SelectTextureIndex(0);
 		m_eFsmState = BUTTON_FSM_NORMALATTACK;
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
@@ -169,11 +188,8 @@ void CUIButton::Change_ICON_Active()
 		pTexture->Set_SelectTextureIndex(1);
 		m_eFsmState = BUTTON_FSM_DEFENCE;
 	}
-	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
-	{
-		/*아마 렌더 취소?*/
-		pTexture->Set_SelectTextureIndex(1);
-	}
+	else
+		Set_RenderActive(false);;
 
 }
 
@@ -189,14 +205,27 @@ void CUIButton::Change_ICON_Ablity()
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
-		pTexture->Set_SelectTextureIndex(2);
+		pTexture->Set_SelectTextureIndex(3);
 		m_eFsmState = BUTTON_FSM_SKILL2;
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
 	{
-		pTexture->Set_SelectTextureIndex(2);		
+		pTexture->Set_SelectTextureIndex(4);
 		m_eFsmState = BUTTON_FSM_ULTIMATE;
 	}
+	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button3")))
+	{
+		pTexture->Set_SelectTextureIndex(5);
+		m_eFsmState = BUTTON_FSM_BUFF;
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button4")))
+	{
+		pTexture->Set_SelectTextureIndex(6);
+		m_eFsmState = BUTTON_FSM_WIDEBUFF;
+	}
+	else
+		return;
+
 
 	// 아마여기에 많이 추개해서 버프랑 와이드 버프 넣어야함
 }
@@ -207,20 +236,22 @@ void CUIButton::Change_ICON_Item()
 	CTexture* pTexture = static_cast<CTexture*>(m_pButtonImage->Get_Component(TEXT("Com_Texture")));
 	if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button0")))
 	{
-		pTexture->Set_SelectTextureIndex(3);
-		m_eFsmState = BUTTON_FSM_USEITEM;		// 체력
+		pTexture->Set_SelectTextureIndex(7);
+		m_eFsmState = BUTTON_FSM_USE_HP_ITEM;		// 체력
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
-		pTexture->Set_SelectTextureIndex(3);
-		m_eFsmState = BUTTON_FSM_USEITEM;		// 마나
-		
+		pTexture->Set_SelectTextureIndex(8);
+		m_eFsmState = BUTTON_FSM_USE_MP_ITEM;		// 마나
+
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
-	{
-		pTexture->Set_SelectTextureIndex(3);
+	{						//도망
+		pTexture->Set_SelectTextureIndex(9);
 		m_eFsmState = BUTTON_FSM_FLEE;
 	}
+	else
+		Set_RenderActive(false);;
 }
 
 _bool CUIButton::Click_This_Button()
@@ -239,7 +270,6 @@ _bool CUIButton::Click_This_Button()
 	_float4	vPos;
 
 	memcpy(&vPos, &m_pTransformCom->Get_WorldMatrix().r[3], sizeof(_float4));
-
 
 	_float3 vScale;
 	XMStoreFloat3(&vScale, XMLoadFloat3(&m_pTransformCom->Get_Scaled()));
@@ -280,9 +310,6 @@ void CUIButton::Shaking()
 	//m_iSwitching *= -1;
 
 	//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
-
-	
-
 }
 
 void CUIButton::Button_RenderSetActive(_bool bRenderActive)
@@ -321,24 +348,19 @@ HRESULT CUIButton::SetUp_ShaderResources()
 		return E_FAIL;
 
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-
-
+	
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
-
+	
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
-
-
+	
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
-
 	return S_OK;
 }
 
@@ -366,6 +388,30 @@ CGameObject * CUIButton::Clone(void * pArg)
 	return pInstance;
 }
 
+void CUIButton::Set_ParentLoad(CUI * pUI)
+{
+	Set_ButtonImage(pUI);
+}
+
+void CUIButton::Set_RenderActive(_bool bActive)
+{
+	m_bRenderActive = bActive;
+
+	if (nullptr != m_pButtonImage)
+		m_pButtonImage->Set_RenderActive(bActive);
+	else
+		return;
+}
+
+void CUIButton::Change_ButtonIcon(const wstring & TextureTag)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	m_pButtonImage->Change_Texture(LEVEL_GAMEPLAY, TextureTag);	//GamePlayerLoader
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CUIButton::Free()
 {
 	__super::Free();
@@ -374,35 +420,4 @@ void CUIButton::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-}
-
-void CUIButton::Set_ParentLoad(CUI * pUI)
-{
-	Set_ButtonImage(pUI);
-}
-
-void CUIButton::Set_RenderActive(_bool bActive)
-{
-	__super::Set_RenderActive(bActive);
-
-	if (nullptr != m_pButtonImage)
-		m_pButtonImage->Set_RenderActive(bActive);
-}
-
-HRESULT CUIButton::Last_Initialize()
-{
-	if (m_bLast_Initlize)
-		return S_OK;
-
-	if (!lstrcmp(m_ObjectName, TEXT("UIButton3")))
-	{
-		FirstDungeonUIInit();
-		m_bRenderActive = true;
-	}
-	
-	Button_RenderSetActive(m_bRenderActive);
-
-
-	m_bLast_Initlize = true;
-	return S_OK;
 }
