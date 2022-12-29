@@ -203,6 +203,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GameUtils.h" />
     <ClInclude Include="..\public\Graphic_Device.h" />
+    <ClInclude Include="..\Public\HitBoxObject.h" />
     <ClInclude Include="..\public\ImguiObject.h" />
     <ClInclude Include="..\public\Imgui\dirent.h" />
     <ClInclude Include="..\public\Imgui\GraphEditor.h" />
@@ -273,6 +274,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\GameUtils.cpp" />
     <ClCompile Include="..\private\Graphic_Device.cpp" />
+    <ClCompile Include="..\Private\HitBoxObject.cpp" />
     <ClCompile Include="..\private\ImguiObject.cpp" />
     <ClCompile Include="..\private\Imgui_Manager.cpp" />
     <ClCompile Include="..\private\Imgui_PropertyEditor.cpp" />

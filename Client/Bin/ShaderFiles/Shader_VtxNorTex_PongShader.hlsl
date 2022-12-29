@@ -133,7 +133,7 @@ PS_OUT PS_MAIN(PS_IN In)
 		vUV.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fBrushRange)) / (2.f * g_fBrushRange);
 		vUV.y = ((g_vBrushPos.z + g_fBrushRange) - In.vWorldPos.z) / (2.f * g_fBrushRange);
 
-		vBrush = g_BrushTexture.Sample(LinearSampler, vUV);
+		//vBrush = g_BrushTexture.Sample(LinearSampler, vUV);
 	}
 
 	vector		vMtrlDiffuse = vSourDiffuse * vFilter.r +

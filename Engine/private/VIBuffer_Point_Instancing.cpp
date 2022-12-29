@@ -49,7 +49,7 @@ HRESULT CVIBuffer_Point_Instancing::Initialize_Prototype(_uint iNumInstance)
 	ZeroMemory(pVertices, sizeof(VTXPOINTINSTANCING));
 
 	pVertices->vPosition = _float3(0.0f, 0.0f, 0.0f);		// 처음에 다 원점으로 고정
-	pVertices->vPSize = _float2(0.2f, 0.2f);				// 지름이라고 생각하면 편함 실제 전체사이즈의크기
+	pVertices->vPSize = _float2(4.f, 4.f);				// 지름이라고 생각하면 편함 실제 전체사이즈의크기
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
 	m_SubResourceData.pSysMem = pVertices;

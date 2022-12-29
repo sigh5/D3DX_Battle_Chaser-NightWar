@@ -2,6 +2,8 @@
 #include "..\public\UIButton.h"
 
 #include "GameInstance.h"
+#include "CombatController.h"
+#include "CombatActors.h"
 
 CUIButton::CUIButton(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CUI(pDevice, pContext)
@@ -162,12 +164,14 @@ void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 	{
 		m_ChildFsmButton[i]->Set_RenderActive(true);
 		
-		if(eType == BUTTON_STATE_ACTION)
-			 m_ChildFsmButton[i]->Change_ICON_Active();
+		if (eType == BUTTON_STATE_ACTION)
+			m_ChildFsmButton[i]->Change_ICON_Active();
 		else if (eType == BUTTON_STATE_ABLILTY)
 			m_ChildFsmButton[i]->Change_ICON_Ablity();
 		else if (eType == BUTTON_STATE_ITEM)
 			m_ChildFsmButton[i]->Change_ICON_Item();
+		else
+			return;
 	}
 
 
@@ -185,8 +189,13 @@ void CUIButton::Change_ICON_Active()
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
-		pTexture->Set_SelectTextureIndex(1);
-		m_eFsmState = BUTTON_FSM_DEFENCE;
+		if (static_cast<CCombatActors*>(CCombatController::GetInstance()->Get_CurActor())->IsHaveDefence())
+		{
+			pTexture->Set_SelectTextureIndex(1);
+			m_eFsmState = BUTTON_FSM_DEFENCE;
+		}
+		else
+			Set_RenderActive(false);;
 	}
 	else
 		Set_RenderActive(false);;
@@ -220,8 +229,14 @@ void CUIButton::Change_ICON_Ablity()
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button4")))
 	{
-		pTexture->Set_SelectTextureIndex(6);
-		m_eFsmState = BUTTON_FSM_WIDEBUFF;
+		if (static_cast<CCombatActors*>(CCombatController::GetInstance()->Get_CurActor())->Get_IsWideBuff())
+		{
+			pTexture->Set_SelectTextureIndex(6);
+			m_eFsmState = BUTTON_FSM_WIDEBUFF;
+		}
+		else
+			Set_RenderActive(false);
+
 	}
 	else
 		return;

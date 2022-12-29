@@ -65,6 +65,8 @@ void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter,_bool bHit)
 			{
 				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar2")))->Set_Hit(bHit);
 			}
+			else
+				continue;
 		}
 	
 
@@ -82,7 +84,11 @@ void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter,_bool bHit)
 			{
 				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_Hit(bHit);
 			}
+			else
+				continue;
 		}
+		else
+			continue;
 	}
 }
 
@@ -107,6 +113,8 @@ void CHpMpBuffCanvas::Set_MpEvent(_bool bMp)
 			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_Hit(bMp);
 			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_Hit(bMp);
 		}
+		else
+			continue;
 	}
 }
 

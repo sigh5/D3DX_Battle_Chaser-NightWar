@@ -312,6 +312,26 @@ _bool CTransform::CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _flo
 	return true;		//거리에 도착했을 경우 트루 반환
 }
 
+void CTransform::Chase_Rising(_fvector vTargetPos, _double TimeDelta, _float fLimit)
+{
+	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vDir = vTargetPos - vPosition;
+	_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
+
+	if (fDistance > fLimit)
+	{
+		vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec*2.f *  (_float)TimeDelta;
+		
+		_float4		vYPos;
+		XMStoreFloat4(&vYPos, vPosition);
+		vYPos.y += 6.f* (_float)TimeDelta;
+
+		Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vYPos));
+	}
+
+
+}
+
 void CTransform::Go_Up(_double TimeDelta)
 {
 	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);

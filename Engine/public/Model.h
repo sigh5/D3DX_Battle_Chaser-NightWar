@@ -69,6 +69,7 @@ public: /*For.Animation*/
 
 	_bool	Control_KeyFrame_Collision(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd);
 
+	_bool	Control_KeyFrame_Create(_uint iAnimIndex, _uint KeyFrame);
 
 private:
 	LOAD_TYPE							m_eType = TYPE_END;

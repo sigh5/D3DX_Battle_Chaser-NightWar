@@ -74,7 +74,7 @@ HRESULT CNoneAnim_BG::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0);
 	}
 
-	m_pVIBufferCom->Render();
+	//m_pVIBufferCom->Render();
 	return S_OK;
 }
 

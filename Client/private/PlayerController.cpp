@@ -104,10 +104,12 @@ void CPlayerController::Change_Scene(_uint	iLevelIndex)
 			pPlayer->Set_FollowTarget(nullptr);
 		}
 	}
-	else if(iLevelIndex == LEVEL_GAMEPLAY)
+	else if (iLevelIndex == LEVEL_GAMEPLAY)
 	{
 		Initialize(LEVEL_GAMEPLAY);
 	}
+	else
+		return;
 }
 
 _bool CPlayerController::CombatScene()

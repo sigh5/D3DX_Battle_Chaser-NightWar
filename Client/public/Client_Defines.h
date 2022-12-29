@@ -39,11 +39,7 @@ namespace Client
 		,BUTTON_FSM_STATE_END,
 	};
 
-	enum		WeaponType {
-		WEAPON_SWORD, WEAPON_SKILL, WEAPON_HAND,
-		WEAPON_GUN, WEAPON_HEAD, WEAPON_END,	//생각나느거 있으면 더추가
-
-	};
+	
 
 }
 

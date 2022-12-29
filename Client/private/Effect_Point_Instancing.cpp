@@ -22,6 +22,8 @@ HRESULT CEffect_Point_Instancing::Initialize_Prototype()
 
 HRESULT CEffect_Point_Instancing::Initialize(void * pArg)
 {
+
+	m_ObjectName = TEXT("TT222");
 	CGameObject::GAMEOBJECTDESC		GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
 

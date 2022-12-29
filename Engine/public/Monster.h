@@ -14,7 +14,7 @@ protected:
 public:
 	_bool		IsHaveUlitmate()const { return m_bHaveUltimate; }
 	_bool		IsHaveSkill2() const{ return m_bHaveSkill2; }
-	_bool		IsHaveDefence()const {return m_bDefence;}
+	
 public:
 	virtual		_bool	IsCollMouse() = 0;
 
@@ -45,7 +45,7 @@ protected:
 	CGameObject*	m_pMeHit_Player = nullptr;
 	_bool			m_bHaveUltimate = false;
 	_bool			m_bHaveSkill2 = false;
-	_bool			m_bDefence = false;
+
 };
 
 END

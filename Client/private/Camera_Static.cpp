@@ -33,7 +33,7 @@ HRESULT CCamera_Static::Initialize(void * pArg)
 		memcpy(&CameraDesc, pArg, sizeof(CAMERADESC));
 	else
 	{
-		CameraDesc.vEye = _float4(0.f, 15.f, -8.f, 1.f);
+		CameraDesc.vEye = _float4(0.f, 1.5f, -1.f, 1.f);
 		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
 		CameraDesc.fMouse_sensitivity = 0.1f;

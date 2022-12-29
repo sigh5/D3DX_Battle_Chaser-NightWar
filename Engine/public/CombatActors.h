@@ -20,8 +20,8 @@ public:
 	virtual  CGameObject*	 Get_Weapon_Or_SkillBody();
 	virtual	  _bool	  Is_Dead() {return m_bIsDead;}
 
-
-
+	_bool			IsHaveDefence()const { return m_bDefence; }
+	const _bool		Get_IsWideBuff()const { return m_isWideBuff; }
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -67,6 +67,10 @@ protected:
 	_double							m_NormalTikcPerSecond = 1.0;
 	_double							m_IntroTimer = 0.7;
 	_uint							m_iHitCount = 0;
+
+protected:
+	_bool			m_bDefence = false;
+	_bool			m_isWideBuff = false;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

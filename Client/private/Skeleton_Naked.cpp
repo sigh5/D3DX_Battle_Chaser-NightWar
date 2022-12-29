@@ -21,11 +21,11 @@ CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_MonsterParts)
 	{
-		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
 			
-			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
-			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
+			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
 		}
 	}
@@ -35,7 +35,7 @@ CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
 
 _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 {
-	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
 	if (nullptr == pCurActorWepon)		//나중에 아래것으로
 		return false;
@@ -192,6 +192,8 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 	}
+	else
+		return;
 }
 
 void CSkeleton_Naked::MovingAnimControl(_double TimeDelta)

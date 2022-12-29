@@ -28,6 +28,9 @@ public:
 	virtual ~CCollider() = default;
 
 public:
+	const _bool		Get_Coll()const { return m_isColl; }
+
+public:
 	virtual HRESULT Initialize_Prototype(TYPE eType);
 	virtual HRESULT Initialize(void* pArg);
 

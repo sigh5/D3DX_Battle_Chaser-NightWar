@@ -190,6 +190,8 @@ void CTurnStateCanvas::CurState_Image_Change()
 		m_StateType = BUTTON_STATE_ITEM;
 		static_cast<CUIButton*>(pCurPickingState)->State_Image_Change(BUTTON_STATE_ITEM);
 	}
+	else
+		return;
 }
 
 void CTurnStateCanvas::CurState_Fsm_ButtonClick()
@@ -200,20 +202,15 @@ void CTurnStateCanvas::CurState_Fsm_ButtonClick()
 	m_ButtonFsmType = static_cast<CUIButton*>(pCurPickingButton)->Get_ButtonFsmState();
 }
 
-void CTurnStateCanvas::CurState_Fsm_ButtonICon()
+void CTurnStateCanvas::CurState_Fsm_ButtonICon(const wstring& NameTag)
 {
-	CGameObject* pCurActor = CCombatController::GetInstance()->Get_CurActor();
-
-	if (pCurActor == nullptr)
-		return;
-	wstring pCurName = pCurActor->Get_ObjectName();
 
 	wstring CurTexturTag = L"";
-	if (pCurName == TEXT("Hero_Alumon"))
+	if (NameTag == TEXT("Hero_Alumon"))
 		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Garrison");
-	else if (pCurName == TEXT("Hero_Calibretto"))
+	else if (NameTag == TEXT("Hero_Calibretto"))
 		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Calibretto");
-	else if (pCurName == TEXT("Hero_Gully"))
+	else if (NameTag == TEXT("Hero_Gully"))
 		CurTexturTag = TEXT("Prototype_Component_Texture_UI_State_Icon_Knolan");
 	else
 		return;		// 몬스터가 현재 턴일때
@@ -235,6 +232,8 @@ void CTurnStateCanvas::Player_SceneChane(_bool bEvent)
 
 void CTurnStateCanvas::Control_ChildRender(_bool bRenderActive)
 {
+
+
 	for (auto& pChild : m_ChildrenVec)
 	{
 		/*if (dynamic_cast<CUIButton*>(pChild) != nullptr)
@@ -253,7 +252,7 @@ void CTurnStateCanvas::Control_ChildRender(_bool bRenderActive)
 		pFsmBtn->Set_RenderActive(false);
 	}
 
-	CurState_Fsm_ButtonICon();
+	
 
 
 }
@@ -278,6 +277,8 @@ void CTurnStateCanvas::StateButton_Child()
 		{
 			m_pCurFsmButton.push_back(pChild);
 		}
+		else
+			continue;
 	}
 
 	size_t iFsmButtonSize = m_pCurFsmButton.size();

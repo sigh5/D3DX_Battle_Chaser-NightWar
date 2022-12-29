@@ -548,7 +548,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			})
 			.Tick([this](_double TimeDelta)
 			{
-				static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
+				static_cast<CHero_Garrison*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 			})
 		//.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		//	{
@@ -805,12 +805,12 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		})
 			.Tick([this](_double TimeDelta)
 		{
-			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
+			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			/*.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return m_pCombatController->To_Idle();
-		}))
+		}))*/
 
 		.AddState(L"Viroty")
 			.OnStart([this]()

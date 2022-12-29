@@ -48,6 +48,7 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
+	void			  Combat_DeadTick(_double TimeDelta);
 	virtual	  _bool	  Is_Dead()override;
 	
 	_int	  Is_MovingAnim();

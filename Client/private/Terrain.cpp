@@ -274,26 +274,30 @@ void CTerrain::DeleteNavi()
 
 void CTerrain::Create_NaviMap(_float4 vPos)
 {
+	int temp = m_vNaviPosVec.size();
+
+	ImGui::Text("찍은 숫자 %d", temp);
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
 
+	_float4 Dest = vPos;
 	for (auto PrevPos : m_vecAllNavi)
 	{
-		_vector vPrevPos = XMVectorSetW(XMLoadFloat3(&PrevPos), 1.f);
+		_vector		vPrevPos = XMVectorSetW(XMLoadFloat3(&PrevPos), 1.f);;
 		_vector		vDir = XMLoadFloat4(&vPos) - vPrevPos;
 		_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
 
-		if (fDistance < 2.f)
+		if (fDistance <= 0.1f)
 		{
-			XMStoreFloat4(&vPos, vPrevPos);
-			break;
+			XMStoreFloat4(&Dest, vPrevPos);
 		}
 	}
 
 	_float3		vRealPos;
-	vRealPos.x = vPos.x;
-	vRealPos.y = 0;			// 일단은 0
-	vRealPos.z = vPos.z;
+	vRealPos.x = Dest.x;
+	vRealPos.y = Dest.y;			// 일단은 0
+	vRealPos.z = Dest.z;
 	m_vNaviPosVec.push_back(vRealPos);
 
 
@@ -309,76 +313,44 @@ void CTerrain::Create_NaviMap(_float4 vPos)
 
 void CTerrain::Create_Cells()
 {
-	if (FLOAT_EQ(m_vNaviPosVec[0].z, m_vNaviPosVec[1].z) && FLOAT_EQ(m_vNaviPosVec[1].z, m_vNaviPosVec[2].z))
+	_float3		vFirst, vSecond, vThird;
+
+	// 나중에 수정할것임 벡터 외적을 통한 값으로 비교할것임
+	_vector vPointa = XMLoadFloat3(&m_vNaviPosVec[0]);
+	_vector vPointb = XMLoadFloat3(&m_vNaviPosVec[1]);
+	_vector vPointc = XMLoadFloat3(&m_vNaviPosVec[2]);
+
+	_vector vAtoB = vPointb - vPointa;
+	_vector vBtoC = vPointc - vPointb;
+
+	_vector vDir = XMVector3Cross(vAtoB, vBtoC);
+
+	_vector vUp = { 0.f, 1.f, 0.f };
+
+	//외적한 방향이 +y축을 가리키면 ccw, 아니면 cw
+	if (XMVectorGetX(XMVector3Dot(XMVector3Normalize(vDir), vUp)) > 0.f)
 	{
-		m_vNaviPosVec.clear();		// 있을수 없는 경우
-		return;
+		XMStoreFloat3(&vFirst, vPointa);
+		XMStoreFloat3(&vSecond, vPointb);
+		XMStoreFloat3(&vThird, vPointc);
 	}
-	else   // 3개 다 다를경우
+	else
 	{
-		if ((m_vNaviPosVec[0].z >= m_vNaviPosVec[1].z) && (m_vNaviPosVec[0].z >= m_vNaviPosVec[2].z))
-		{
-			m_vecSortNavi.push_back(m_vNaviPosVec[0]);
-
-			if (m_vNaviPosVec[1].x >= m_vNaviPosVec[2].x)
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
-			}
-			else
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
-			}
-
-		}
-		else if ((m_vNaviPosVec[1].z > m_vNaviPosVec[0].z) && (m_vNaviPosVec[1].z >= m_vNaviPosVec[2].z))
-		{
-			m_vecSortNavi.push_back(m_vNaviPosVec[1]);
-
-			if (m_vNaviPosVec[0].x >= m_vNaviPosVec[2].x)
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
-			}
-			else
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[2]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
-			}
-		}
-
-		else if ((m_vNaviPosVec[2].z > m_vNaviPosVec[0].z) && (m_vNaviPosVec[2].z > m_vNaviPosVec[1].z))
-		{
-			m_vecSortNavi.push_back(m_vNaviPosVec[2]);
-
-			if (m_vNaviPosVec[0].x >= m_vNaviPosVec[1].x)
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
-			}
-			else
-			{
-				m_vecSortNavi.push_back(m_vNaviPosVec[1]);
-				m_vecSortNavi.push_back(m_vNaviPosVec[0]);
-			}
-		}
+		XMStoreFloat3(&vFirst, vPointa);
+		XMStoreFloat3(&vSecond, vPointc);
+		XMStoreFloat3(&vThird, vPointb);
 	}
-
-	m_vNaviPosVec.clear();
-
-
-	_float3 Temp[3] = { m_vecSortNavi[0],m_vecSortNavi[1],m_vecSortNavi[2] };
+	
+	_float3 Temp[3] = { vFirst,vSecond,vThird };
 
 	m_pNavigationCom->AddCell(Temp);
 
 	for (_uint i = 0; i < 3; ++i)
 	{
-		m_vecAllNavi.push_back(m_vecSortNavi[i]);
+		m_vecAllNavi.push_back(Temp[i]);
 	}
 	
-	m_vecSortNavi.clear();
-
+	m_vNaviPosVec.clear();
 }
 
 

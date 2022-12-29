@@ -40,14 +40,15 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-
+	
 
 public:
 	void					PickingChild();
+	void					CurState_Fsm_ButtonICon(const wstring& NameTag );
 private:
 	void					CurState_Image_Change();
 	void					CurState_Fsm_ButtonClick();
-	void					CurState_Fsm_ButtonICon();
+	
 	void					Player_SceneChane(_bool bEvent);
 
 private:

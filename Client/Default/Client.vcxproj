@@ -183,6 +183,7 @@
     <ClInclude Include="..\Public\CombatMap.h" />
     <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
+    <ClInclude Include="..\Public\EffectFrame.h" />
     <ClInclude Include="..\Public\Effect_Point_Instancing.h" />
     <ClInclude Include="..\Public\Effect_Rect_Instancing.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
@@ -199,11 +200,13 @@
     <ClInclude Include="..\Public\LoadingImage.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
+    <ClInclude Include="..\Public\MapOne2D.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
     <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
+    <ClInclude Include="..\Public\Skill_Object.h" />
     <ClInclude Include="..\Public\SkyBox.h" />
     <ClInclude Include="..\Public\SlimeKing.h" />
     <ClInclude Include="..\Public\Spider_Mana.h" />
@@ -233,6 +236,7 @@
     <ClCompile Include="..\Private\CombatMap.cpp" />
     <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
+    <ClCompile Include="..\Private\EffectFrame.cpp" />
     <ClCompile Include="..\Private\Effect_Point_Instancing.cpp" />
     <ClCompile Include="..\Private\Effect_Rect_Instancing.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
@@ -248,11 +252,13 @@
     <ClCompile Include="..\Private\LoadingImage.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
+    <ClCompile Include="..\Private\MapOne2D.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
     <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
+    <ClCompile Include="..\Private\Skill_Object.cpp" />
     <ClCompile Include="..\Private\SkyBox.cpp" />
     <ClCompile Include="..\Private\SlimeKing.cpp" />
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
@@ -289,6 +295,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTexIncCount.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

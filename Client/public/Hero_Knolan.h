@@ -1,6 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Player.h"
+#include "Skill_Object.h"
 
 BEGIN(Engine)
 class CShader;
@@ -23,6 +24,8 @@ protected:
 public:
 	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
+	virtual	  _bool	  Is_Dead()override;
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -46,10 +49,13 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	void			 Combat_DeadTick(_double TimeDelta);
+	void			  Combat_DeadTick(_double TimeDelta);
+	void			  Create_SkillFire();
+	void			  Create_Skill_Stop_Fire();
+	void			  Create_Skill_Meteo();
 	
-	virtual	  _bool	  Is_Dead()override;
-
+	
+	void			  Anim_Frame_Create_Control();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -63,6 +69,7 @@ private:
 	
 private:
 	_bool					m_bCombat_LastInit = false;
+
 
 private:
 	HRESULT					SetUp_Components();
@@ -104,6 +111,22 @@ public:
 private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_KNOLAN;
+	WeaponType		m_eWeaponType = WEAPON_SKILL;
+	_bool			m_bOnceCreate = false;
+
+	_float3			m_vSkill_Scale;
+	_float4			m_vSkill_Pos;
+	CSkill_Object::Skill_DIR	m_SkillDir = CSkill_Object::Skill_DIR_END;
+
+private:
+	vector<CGameObject*>	m_PlayerParts;
+
+	
+	_float3					m_vTestPos;
+	_float3					m_vTestScale;
+	 float Temp[3];
+	 float Sour[3];
+
 };
 
 END

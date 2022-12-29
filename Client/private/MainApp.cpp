@@ -15,6 +15,7 @@ CMainApp::CMainApp()
 	, m_pToolManager(CToolManager::GetInstance())
 
 {
+	
 	Safe_AddRef(m_pGameInstance);
 }
 

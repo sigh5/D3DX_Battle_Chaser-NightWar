@@ -289,10 +289,15 @@ void CTurnUICanvas::DeleteCharUI(UI_REPRESENT UiRepresentNum)
 	_float fBackLimitYPos = -250.f;
 
 	_float fSmallY = 0.f;
+	_uint iRandomNum = 999;
 	for (size_t i = 0; i < OldCharVecSize; ++i)
 	{
-		_uint iRandomNum = rand() % m_ChildrenVec.size();
-
+		_uint iTemp = rand() % m_ChildrenVec.size();
+		while (iRandomNum != iTemp)
+		{
+			iTemp = rand() % m_ChildrenVec.size();
+			iRandomNum = iTemp;
+		}
 		CTurnCharcterUI* pNewUI = static_cast<CTurnCharcterUI*>(pGameInstance->
 			Clone_UI(pGameInstance->GetCurLevelIdx(), LAYER_UI, m_ChildrenVec[iRandomNum]));
 		

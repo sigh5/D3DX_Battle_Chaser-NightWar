@@ -48,6 +48,8 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_Ultimate(_double TimeDelta);
+	void			  Combat_DeadTick(_double TimeDelta);
+	
 	virtual   void	  Combat_BlendAnimTick(_double TimeDelta);
 	virtual		void	Fsm_Exit()override;
 

@@ -142,6 +142,12 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\HPMpCanvas">
       <UniqueIdentifier>{8becbaea-0735-4140-8b63-6d8c6d868d41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Player\Skill">
+      <UniqueIdentifier>{94bcd0f0-bf2e-4c16-9f1f-e0ac094aff55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect_">
+      <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -297,6 +303,13 @@
     <ClInclude Include="..\Public\Buff_Image.h">
       <Filter>02.GameObjects\UI\TrunBattle\Buff_Image</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Skill_Object.h">
+      <Filter>02.GameObjects\Player\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EffectFrame.h">
+      <Filter>02.GameObjects\Effect_</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapOne2D.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -434,6 +447,13 @@
     <ClCompile Include="..\Private\Buff_Image.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\Buff_Image</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Skill_Object.cpp">
+      <Filter>02.GameObjects\Player\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EffectFrame.cpp">
+      <Filter>02.GameObjects\Effect_</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapOne2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -474,6 +494,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTexIncCount.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

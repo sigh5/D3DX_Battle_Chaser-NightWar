@@ -24,10 +24,10 @@ CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_PlayerParts)
 	{
-		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
-			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
-			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
+			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
 		}
 	}
@@ -37,7 +37,7 @@ CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
 
 _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 {
-	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
 	if (nullptr == pCurActorWepon)		//나중에 아래것으로
 		return false;
@@ -46,6 +46,10 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
 		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
+			m_bIsHeavyHit = true;
+
 		return true;
 	}
 	return false;
@@ -65,7 +69,7 @@ HRESULT CHero_Garrison::Initialize(void * pArg)
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
 
-	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 1.5f;
 	GameObjectDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -81,7 +85,8 @@ HRESULT CHero_Garrison::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-	
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.21f, 0.f, 0.21f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -92,7 +97,11 @@ void CHero_Garrison::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	if (m_bIsCombatScene == false)
+	{
 		Dungeon_Tick(TimeDelta);
+		m_pNavigationCom->isMove_OnNavigation(m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	}	
 	else
 	{
 		Combat_Init();
@@ -170,9 +179,9 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 
 		m_bIsCombatScene = true;
 		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
-
-		
 	}
+	else
+		return;
 	// maybe 다른씬?
 
 
@@ -258,6 +267,11 @@ void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
 	}
+}
+
+void CHero_Garrison::Combat_DeadTick(_double TimeDelta)
+{
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 }
 
 void CHero_Garrison::Combat_BlendAnimTick(_double TimeDelta)
@@ -411,11 +425,11 @@ HRESULT CHero_Garrison::Combat_Init()
 
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
-	//m_CurAnimqeue.push({ 0,1.f });
-	//Set_CombatAnim_Index(m_pModelCom);
-
 	if (FAILED(Ready_CombatParts()))
 		return E_FAIL;
+
+	m_bDefence = true;
+	m_isWideBuff = false;
 
 	m_bCombatInit = true;
 	return S_OK;
@@ -573,12 +587,14 @@ void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)
 		m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 	else if (bResult == ANIM_DIR_BACK)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, 6.f);
-
+	else
+		return;
 }
 
 
 void CHero_Garrison::Anim_Idle()
 {
+
 	m_CurAnimqeue.push({ 2,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -663,7 +679,7 @@ void CHero_Garrison::Anim_Uitimate()
 	m_CurAnimqeue.push({ 30,  1.f });	// Key프레임 (뛰는 것)하나 찾기 83~94 는 움직여야함 
 	m_CurAnimqeue.push({ 11,  m_setTickForSecond });
 	m_CurAnimqeue.push({ 12,  1.f });
-	m_CurAnimqeue.push({ 1,   1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -680,7 +696,7 @@ void CHero_Garrison::Anim_Buff()
 void CHero_Garrison::Anim_Use_Item()
 {
 	m_CurAnimqeue.push({ 23,  1.f });
-	m_CurAnimqeue.push({ 1,   1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -688,14 +704,23 @@ void CHero_Garrison::Anim_Defence()
 {
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 32,   1.f });
-	m_CurAnimqeue.push({ 1,    1.f });
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Garrison::Anim_Light_Hit()
 {
-	m_CurAnimqeue.push({ 26, 1.f });
-	m_CurAnimqeue.push({ 1,  1.f });
+	if (m_bIsHeavyHit)
+	{
+		_uint iHitRand = rand() % 4 + 13;
+		m_CurAnimqeue.push({ iHitRand ,  1.f });
+	}
+	else
+	{
+		m_CurAnimqeue.push({ 26, 1.f });
+		m_CurAnimqeue.push({ 1,  1.f });
+	}
+	
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -703,7 +728,7 @@ void CHero_Garrison::Anim_Heavy_Hit()
 {
 	_uint iHitRand = rand() % 4 + 13;
 	m_CurAnimqeue.push({ iHitRand ,  1.f });
-	m_CurAnimqeue.push({ 1,  1.f });
+	
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -725,18 +750,18 @@ void CHero_Garrison::Anim_Die()
 
 void CHero_Garrison::Anim_Viroty()
 {
-	Is_Dead();
+	//Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 _bool CHero_Garrison::Is_Dead()
 {
 	
-	//ToDo .. 다른 애님 추가
-	/* if 플레이어 죽음 아니면 살음*/
-	m_CurAnimqeue.push({ 22 ,1.f });
-	m_CurAnimqeue.push({ 43,1.f });
-	
+	if (__super::Is_Dead())
+	{
+		//Anim_Die();
+		return true;
+	}
 
-	return true;
+	return false;
 }

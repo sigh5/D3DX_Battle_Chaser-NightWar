@@ -28,6 +28,10 @@ protected:
 	virtual ~CTransform() = default;
 
 public:
+	void	Set_TransfromDesc(_float Speed, _float Rotaiton) { m_TransformDesc.fSpeedPerSec = Speed;
+	m_TransformDesc.fRotationPerSec = Rotaiton;
+	}
+
 	_matrix Get_WorldMatrix_Inverse() { //부모가 없으면 월드 있으면 로컬임
 		
 		if(nullptr == m_pParentTransfrom)
@@ -100,6 +104,9 @@ public:
 
 	_bool	CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f,_float fSpeedMultiple=2.f);
 
+	void	Chase_Rising(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+
+
 
 public: /* for_UI*/
 	void Go_Up(_double TimeDelta);
@@ -114,7 +121,8 @@ private:
 	TRANSFORMDESC			m_TransformDesc;
 
 	std::queue<_vector>		m_pTargetPosQueue;
-	_float					m_fChaseLerpFixTimer = 0.1f;
+	
+	_float					m_fChaseLerpFixTimer = 0.2f;
 	_float					m_fChaseLerpTimer = 0.0f;
 private:
 	CTransform*				m_pParentTransfrom = nullptr;

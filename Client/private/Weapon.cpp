@@ -4,12 +4,12 @@
 #include "Bone.h"
 
 CWeapon::CWeapon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	: CGameObject(pDevice, pContext), m_isCloned(false)
+	: CHitBoxObject(pDevice, pContext)
 {
 }
 
 CWeapon::CWeapon(const CWeapon & rhs)
-	: CGameObject(rhs), m_isCloned(true)
+	: CHitBoxObject(rhs)
 {
 }
 
@@ -65,11 +65,13 @@ void CWeapon::Late_Tick(_double TimeDelta)
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
 
-	Render();
+	if (nullptr != m_pRendererCom)
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
 HRESULT CWeapon::Render()
 {
+	
 
 #ifdef _DEBUG
 	m_pColliderCom->Render();
@@ -85,6 +87,10 @@ HRESULT CWeapon::Last_Initialize()
 
 HRESULT CWeapon::SetUp_Components()
 {
+	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
+		(CComponent**)&m_pRendererCom)))
+		return E_FAIL;
+
 	/* For.Com_Collider */
 	CCollider::COLLIDERDESC			ColliderDesc;
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
@@ -138,7 +144,7 @@ void CWeapon::Free()
 		Safe_Release(m_WeaponDesc.pTargetTransform);
 	}
 
-	
+	Safe_Release(m_pRendererCom);
 	Safe_Release(m_pColliderCom);
 
 }

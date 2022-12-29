@@ -23,10 +23,10 @@ CGameObject * CHero_Calibretto::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_PlayerParts)
 	{
-		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
-			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
-			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
+			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
 		}
 	}
@@ -36,7 +36,7 @@ CGameObject * CHero_Calibretto::Get_Weapon_Or_SkillBody()
 
 _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 {
-	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
 	if (nullptr == pCurActorWepon)		//³ªÁß¿¡ ¾Æ·¡°ÍÀ¸·Î
 		return false;
@@ -45,6 +45,9 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
 		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
+			m_bIsHeavyHit = true;
+
 		return true;
 	}
 	return false;
@@ -64,7 +67,7 @@ HRESULT CHero_Calibretto::Initialize(void * pArg)
 
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
-	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
+	GameObjectDesc.TransformDesc.fSpeedPerSec = 1.5f;
 	GameObjectDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(__super::Initialize(&GameObjectDesc)))
@@ -80,8 +83,8 @@ HRESULT CHero_Calibretto::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-
-
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.18f, 0.f, 0.18f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -92,7 +95,12 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	if (m_bIsCombatScene == false)
+	{
+		m_pNavigationCom->isMove_OnNavigation(m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
 		Dungeon_Tick(TimeDelta);
+	}
+		
 	else
 	{
 		Combat_Initialize();
@@ -180,7 +188,8 @@ void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
 		m_bIsCombatScene = true;
 		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
 	}
-	// maybe ´Ù¸¥¾À?
+	else
+		return;
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -248,6 +257,9 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return E_FAIL;
 
 
+	m_bDefence = false;
+	m_isWideBuff = true;
+
 	m_bCombat_LastInit = true;
 	return S_OK;
 }
@@ -268,6 +280,11 @@ void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
 	}
+}
+
+void CHero_Calibretto::Combat_DeadTick(_double TimeDelta)
+{
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 }
 
 
@@ -386,7 +403,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 350;
+	StatusDesc.iHp = 100;
 	StatusDesc.iMp = 125;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
@@ -410,12 +427,16 @@ void CHero_Calibretto::Anim_Intro()
 {
 	m_iNonRenderMeshIndex = 0;
 	m_CurAnimqeue.push({ 17, m_IntroTimer });
-	m_CurAnimqeue.push({ 1,	 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::AnimNormalAttack()
 {
+	m_SpeedRatio = 8.f;
+	m_LimitDistance = 12.f;
+	m_ReturnDistance = 0.4f;
+	m_setTickForSecond = 0.9f;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
 	m_iStateDamage = 350;
@@ -424,25 +445,44 @@ void CHero_Calibretto::AnimNormalAttack()
 	m_CurAnimqeue.push({ 16, 1.f });
 	m_CurAnimqeue.push({ 9,  1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
-	m_CurAnimqeue.push({ 1,	 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_Skill1_Attack()
 {
-	m_iStateDamage = 20;			// 20*2 
+	m_iStateDamage = 20;			// ÆÝÄ¡ÇÏ°í ÃÑ°¥±â±â
+	m_SpeedRatio = 6.f;
+	m_LimitDistance = 8.f;
+	m_ReturnDistance = 0.4f;
+	m_setTickForSecond = 0.9f;
+	m_iHitCount = 1;
+	m_eWeaponType = WEAPON_HAND;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
-	m_CurAnimqeue.push({ 8, 1.f });		//¸ÖÆ¼ ¼¦	
-	m_CurAnimqeue.push({ 1,	 1.f });
+	m_CurAnimqeue.push({ 15, 1.f });
+	m_CurAnimqeue.push({ 3,	 1.f });
+	m_CurAnimqeue.push({ 25, 1.f });		
+	m_CurAnimqeue.push({ 9,  1.f });
+	m_CurAnimqeue.push({ 10, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_Skill2_Attack()
 {
+	m_SpeedRatio = 8.f;
+	m_LimitDistance = 15.f;
+	m_ReturnDistance = 0.4f;
+	m_setTickForSecond = 0.9f;
 	m_iStateDamage = 20;			// 20*2 
+	
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
+	m_CurAnimqeue.push({ 15, 1.f });
+	m_CurAnimqeue.push({ 3,	 1.f });
 	m_CurAnimqeue.push({ 20, 1.f });		// Âð °ø°Ý±Ã Brust??
-	m_CurAnimqeue.push({ 1, 1.f });
+	m_CurAnimqeue.push({ 9,  1.f });
+	m_CurAnimqeue.push({ 10, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -451,7 +491,7 @@ void CHero_Calibretto::Anim_Uitimate()
 	m_iStateDamage = 50;			// 20*2 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
 	m_CurAnimqeue.push({ 46, 1.f }); // À§¿¡¼­ ·ÎÄÏ½î±â
-	m_CurAnimqeue.push({ 1, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -459,34 +499,44 @@ void CHero_Calibretto::Anim_Buff()
 {
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 7,  1.f });
-	m_CurAnimqeue.push({ 1, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_WideAreaBuff()
 {
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
-	m_CurAnimqeue.push({ 40, 1.f });		// ÆÀ¿ø ´ëÆøÈú										
+	m_CurAnimqeue.push({ 40, 1.f });		// ÆÀ¿ø ´ëÆøÈú			
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_Use_Item()
 {
 	m_CurAnimqeue.push({ 19, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_Light_Hit()
 {
-	m_CurAnimqeue.push({ 4 , 1.f });		// 4 or 5
-	m_CurAnimqeue.push({ 1, 1.f });
+	if (m_bIsHeavyHit)
+	{
+		m_CurAnimqeue.push({ 11, 1.f }); //,10
+	}
+	else 
+	{
+		m_CurAnimqeue.push({ 4 , 1.f });		// 4 or 5
+		m_CurAnimqeue.push({ 1,  1.f });
+	}
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Anim_Heavy_Hit()
 {
 	m_CurAnimqeue.push({ 11, 1.f });		// 11,12,13,14
-	m_CurAnimqeue.push({ 1, 1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -508,7 +558,7 @@ void CHero_Calibretto::Anim_Die()
 
 void CHero_Calibretto::Anim_Viroty()
 {
-	Is_Dead();
+	//Is_Dead();
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -560,15 +610,12 @@ void CHero_Calibretto::Free()
 
 _bool CHero_Calibretto::Is_Dead()
 {
-	/* ÀÌ°åÀ» °æ¿ì*/
-	m_CurAnimqeue.push({ 6 ,	1.f });
-	m_CurAnimqeue.push({ 35,	1.f });
+	if (__super::Is_Dead())
+	{
+		//Anim_Die();
+		return true;
+	}
 
-	/*Á×¾ú´Ù°¡ ÀÌ°åÀ» °æ¿ì*/
-	/*m_CurAnimqeue.push({ 38 ,	0.1f });
-	m_CurAnimqeue.push({ 1,	0.1f });
-	m_CurAnimqeue.push({ 30,	0.1f });
-	m_CurAnimqeue.push({ 36,	0.1f });*/
 	return false;
 }
 
@@ -601,6 +648,8 @@ void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 
 	}
+	else
+		return;
 }
 
 void CHero_Calibretto::MovingAnimControl(_double TimeDelta)

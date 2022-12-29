@@ -74,4 +74,11 @@ namespace Engine
 	}
 
 	enum e_ANIM_CONTROL { ANIM_CONTROL_SEQUNCE, ANIM_CONTROL_NEXT, ANIM_CONTROL_END };
+	enum		WeaponType {
+		WEAPON_SWORD, WEAPON_SKILL, WEAPON_HAND,
+		WEAPON_GUN, WEAPON_HEAD, WEAPON_END,	//생각나느거 있으면 더추가
+
+	};
+
+
 }

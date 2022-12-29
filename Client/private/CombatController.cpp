@@ -165,13 +165,13 @@ void CCombatController::Cal_HitPlayerTarget()
 			_float CurPlayerHPRatio =	Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusHpRatio();
 			_float CurPlayerMPRatio = Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusMpRatio();
 
-			if (CurPlayerHPRatio <= MinPlayerHPRatio)
+			if (CurPlayerHPRatio <= MinPlayerHPRatio && CurPlayerHPRatio > 0.f)
 			{
 				MinPlayerHPRatio = CurPlayerHPRatio;
 				m_pHitActor = pPlayer.second;
 			}
 			
-			if (CurPlayerMPRatio <= MinPlayerMPRatio)
+			if (CurPlayerMPRatio <= MinPlayerMPRatio  && CurPlayerMPRatio > 0.f)
 			{
 				MinPlayerMPRatio = CurPlayerMPRatio;
 				//pHitTargetMp = pPlayer.second;
@@ -204,10 +204,10 @@ void CCombatController::Cal_HitPlayerTarget()
 		{
 			To_Skill1_Attack();
 		}
-		else if(fCurActorMpRatio >=0.5f)
-		{
+		else		{
 			To_Normal_Attack();
 		}
+		
 	}
 	else   // 본인 피가 절반 이하다.
 	{
@@ -258,7 +258,7 @@ void CCombatController::Cal_HitPlayerTarget()
 
 void CCombatController::Set_Player_StateCanvas()
 {
-	if (m_iMonster_Player_Option == 1 && m_bIsPlayer == true)
+	if (m_bIsPlayer == true)
 	{
 		m_pTurnStateButtonCanvas->Set_RenderActive(true);
 	}
@@ -274,6 +274,7 @@ void CCombatController::Refresh_CurActor()
 	m_fHitTimer = 0.0f;
 	m_iHitNum = 0;
 
+	
 	Set_Player_StateCanvas();
 }
 
@@ -336,12 +337,13 @@ void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 
 		if (static_cast<CMonster*>(pMonster.second)->IsCollMouse())
 		{
-			m_iMonster_Player_Option = 0;
 			m_pHitActor = pMonster.second;
+			m_iMonster_Player_Option = 0;
 			static_cast<CPlayer*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
 			static_cast<CMonster*>(m_pHitActor)->Set_Me_HitPlayer(m_pCurentActor);
 			break;
 		}
+		
 	}
 }
 
@@ -375,7 +377,7 @@ void CCombatController::Collison_Event()
 	if (pWeapon == nullptr)
 		return;
 
-	if (static_cast<CWeapon*>(pWeapon)->Get_HitNum() >m_iHitNum && static_cast<CCombatActors*>(m_pHitActor)->Calculator_HitColl(pWeapon))
+	if (static_cast<CHitBoxObject*>(pWeapon)->Get_HitNum() >m_iHitNum && static_cast<CCombatActors*>(m_pHitActor)->Calculator_HitColl(pWeapon))
 	{
 		m_bIsHiterhit = true;
 		m_bisHitTimer_Alive = true;
@@ -394,25 +396,34 @@ HRESULT CCombatController::Set_CurrentActor()
 	case Client::REPRESENT_KNOLAN:
 		m_pCurentActor = Find_CurActor(TEXT("Hero_Gully"));
 		m_bIsPlayer = true;
+		m_pTurnStateButtonCanvas->CurState_Fsm_ButtonICon(TEXT("Hero_Gully"));
+		m_iMonster_Player_Option = 0;
 		break;
 	case Client::REPRESENT_GARRISON:
 		m_pCurentActor = Find_CurActor(TEXT("Hero_Alumon"));
 		m_bIsPlayer = true;
+		m_pTurnStateButtonCanvas->CurState_Fsm_ButtonICon(TEXT("Hero_Alumon"));
+		m_iMonster_Player_Option = 0;
 		break;
 	case Client::REPRESENT_CALIBRETTO:
 		m_pCurentActor = Find_CurActor(TEXT("Hero_Calibretto"));
+		m_pTurnStateButtonCanvas->CurState_Fsm_ButtonICon(TEXT("Hero_Calibretto"));
+		m_iMonster_Player_Option = 0;
 		m_bIsPlayer = true;
 		break;
 	case Client::REPRESENT_SKELTON_NAKED:
 		m_pCurentActor = Find_CurActor(TEXT("Skeleton_Naked"));
+		m_iMonster_Player_Option = 1;
 		m_bIsPlayer = false;
 		break;
 	case Client::REPRESENT_SLIMEKING:
 		m_pCurentActor = Find_CurActor(TEXT("Monster_SlimeKing"));
+		m_iMonster_Player_Option = 1;
 		m_bIsPlayer = false;
 		break;
 	case Client::REPRESENT_SPIDER_MANA:
 		m_pCurentActor = Find_CurActor(TEXT("Spider_Mana"));
+		m_iMonster_Player_Option = 1;
 		m_bIsPlayer = false;
 		break;
 	case Client::REPRESENT_END:

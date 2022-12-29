@@ -62,7 +62,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
+	/*if (GetKeyState(VK_SPACE) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 		Safe_AddRef(pGameInstance);
@@ -71,7 +71,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 			return;
 
 		Safe_Release(pGameInstance);
-	}
+	}*/
 
 }
 
@@ -133,6 +133,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 
 	//pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
 
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_2D_MapOne"))))
+		return E_FAIL;
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -141,7 +144,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EffectFrame"))))
+		return E_FAIL;
+*/
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
 		return E_FAIL;
 

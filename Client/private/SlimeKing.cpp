@@ -21,10 +21,10 @@ CGameObject * CSlimeKing::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_MonsterParts)
 	{
-		if (dynamic_cast<CWeapon*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CWeapon*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
-			static_cast<CWeapon*>(pParts)->Set_WeaponDamage(m_iStateDamage);
-			static_cast<CWeapon*>(pParts)->Set_HitNum(m_iHitCount);
+			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
+			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
 		}
 	}
@@ -34,7 +34,7 @@ CGameObject * CSlimeKing::Get_Weapon_Or_SkillBody()
 
 _bool CSlimeKing::Calculator_HitColl(CGameObject * pWeapon)
 {
-	CWeapon* pCurActorWepon = static_cast<CWeapon*>(pWeapon);
+	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
 	if (nullptr == pCurActorWepon)		//나중에 아래것으로
 		return false;
@@ -193,6 +193,8 @@ void CSlimeKing::CombatAnim_Move(_double TImeDelta)
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
 	}
+	else
+		return;
 }
 
 void CSlimeKing::MovingAnimControl(_double TimeDelta)
@@ -340,6 +342,11 @@ void CSlimeKing::Anim_Intro()
 
 void CSlimeKing::AnimNormalAttack()
 {
+	m_SpeedRatio = 6.f;
+	m_LimitDistance = 6.f;
+	m_ReturnDistance = 0.1f;
+	m_setTickForSecond = 1.f;
+
 	m_iStateDamage = 30;
 	m_iHitCount = 1;
 	m_pStatusCom->Use_SkillMp(30);
@@ -353,16 +360,34 @@ void CSlimeKing::AnimNormalAttack()
 
 void CSlimeKing::Anim_Skill1_Attack()
 {
+	m_SpeedRatio = 6.f;
+	m_LimitDistance = 10.f;
+	m_ReturnDistance = 0.1f;
+	m_setTickForSecond = 1.f;
 	m_iStateDamage = 40;
 	m_pStatusCom->Use_SkillMp(40);
+	m_CurAnimqeue.push({ 8,1.f });
+	m_CurAnimqeue.push({ 9,1.f });
 	m_CurAnimqeue.push({ 16,1.f }); // 브레쓰
+	m_CurAnimqeue.push({ 4,1.f });
+	m_CurAnimqeue.push({ 5,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CSlimeKing::Anim_Uitimate()
 {
+
+	m_SpeedRatio = 6.f;
+	m_LimitDistance = 15.f;
+	m_ReturnDistance = 0.1f;
+	m_setTickForSecond = 1.f;
+
+	m_CurAnimqeue.push({ 8,1.f });
+	m_CurAnimqeue.push({ 9,1.f });
 	m_CurAnimqeue.push({ 14,1.f });  // 몸커지기 
 	m_CurAnimqeue.push({ 15,1.f }); 
+	m_CurAnimqeue.push({ 4,1.f });
+	m_CurAnimqeue.push({ 5,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

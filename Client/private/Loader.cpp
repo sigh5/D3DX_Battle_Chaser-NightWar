@@ -8,6 +8,7 @@
 #include "Level_GamePlayPreHeader.h"
 #include "Effect_Point_Instancing.h"
 #include "MyImage.h"
+#include "EffectFrame.h"
 
 /* For.CombatScene*/
 #include "SlimeKing.h"
@@ -19,10 +20,12 @@
 #include "HpMpBar.h"
 #include "CombatMap.h"
 #include "Buff_Image.h"
-
+#include "MapOne2D.h"
 
 #include "Camera_Combat.h"
+
 #include "Weapon.h"
+#include "Skill_Object.h"
 
 #include "HpMpBuffCanvas.h"
 
@@ -146,6 +149,17 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
+
+	/* For.Prototype_Component_Texture_FireTexture*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireTexture"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/FireTexture/fire_loop_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+
+
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 	/* For.Prototype_Component_VIBuffer_Terrain */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
@@ -159,6 +173,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 	/* For.Prototype_Component_VIBuffer_Rect_Instancing */					
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Instancing"),
 		CVIBuffer_Rect_Instancing::Create(m_pDevice, m_pContext, 30))))	//여기서 숫자 결정
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Rect_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Single"),
+		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 1))))	//여기서 숫자 결정
 		return E_FAIL;
 
 	/* For.Prototype_Component_VIBuffer_Point_Instancing */
@@ -178,11 +197,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CStatus::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-
+	//
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
+
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
+
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
 	/* ~Model */
@@ -219,7 +242,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CTerrain::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
-	///* For.Prototype_GameObject_Hero_Gully */
+	/////* For.Prototype_GameObject_Hero_Gully */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
 		CHero_Knolan::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -258,6 +281,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMaps"),
 		CDungeonMaps::Create(m_pDevice, m_pContext))))
 		return E_FAIL;*/
+
+		/* For.Prototype_GameObject_EffectFrame */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EffectFrame"),
+		CEffectFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	/* For.Prototype_GameObject_NoneAnim */
@@ -309,6 +337,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CBuff_Image::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_2D_MapOne"),
+		CMapOne2D::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
@@ -363,9 +395,14 @@ HRESULT CLoader::Loading_Combat()
 		CWeapon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* For.Prototype_GameObject_Skill_Obj */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Obj"),
+		CSkill_Object::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
-	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
+
+	lstrcpy(m_szLoadingText, TEXT("로딩끝."));
 
 	m_isFinished = true;
 
@@ -491,6 +528,12 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 	/* For.Prototype_Component_Shader_VtxPointInstance */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxPointInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPointInstance.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
+	/* For.Prototype_Component_Shader_VtxPointInstance */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Shader_VtxTexIncCount"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTexIncCount.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 	return S_OK;

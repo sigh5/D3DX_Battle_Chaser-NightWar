@@ -69,7 +69,7 @@ private: /* for_ FilterMap*/
 	std::set<_ulong>			m_FilterIndexSet;
 
 	vector<_float3>				m_vNaviPosVec;
-	vector<_float3>				m_vecSortNavi;
+	
 
 public:
 	vector<_float3>				m_vecAllNavi;

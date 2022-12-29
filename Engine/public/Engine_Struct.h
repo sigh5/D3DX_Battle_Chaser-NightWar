@@ -79,6 +79,14 @@ namespace Engine
 		XMFLOAT3	vPosition;
 	}KEYFRAME;
 
+	typedef struct tagParticleVtx
+	{
+		XMFLOAT3	vPosition;
+		XMFLOAT2	vTexUV;
+		XMFLOAT4	vColor;
+	} VTXUVPARTICLE;
+
+
 
 
 	typedef struct tagVertexPointInstancing

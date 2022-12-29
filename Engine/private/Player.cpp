@@ -100,14 +100,14 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 	if (m_bIsSwap == true)
 		return;
 	else if (!m_bIsSwap && !m_isStop)
-		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 3.f);
+		m_isStop = m_pTransformCom->JudgeChaseState(vTargetPos, 0.2f);
 
 	if (m_isStop)
 	{
 		if(static_cast<CPlayer*>(m_pCaptinPlayer)->m_bIsWalk)
-			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 2.5f);
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 0.4f);
 		else
-			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.f, 2.5f);
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.05f, 0.3f);
 	}	
 	else
 		m_iAnimIndex = 0;
@@ -195,7 +195,7 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 			m_iAnimIndex = 1;
 			m_fMoveSpeedRatio = 0.5f;	
 			m_bIsWalk = true;
-		}
+		}									// nullptr, pNavigation
 		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, pNavigation);
 
 		return true;
