@@ -13,6 +13,8 @@
 #include "VIBuffer_Rect_Instancing.h"
 #include "VIBuffer_Point_Instancing.h"
 #include "Status.h"
+#include "Model_Instancing.h"
+
 
 #include "Collider.h"
 

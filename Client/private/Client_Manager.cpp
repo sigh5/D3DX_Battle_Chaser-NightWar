@@ -9,6 +9,8 @@
 #include <string>
 #include "PlayerController.h"
 
+#include "Model_Instancing.h"
+
 _double CClient_Manager::TimeDelta = 0;
 
 void CClient_Manager::Client_Manager_Update()
@@ -79,6 +81,55 @@ void CClient_Manager::Model_Load(ID3D11Device*	m_pDevice, ID3D11DeviceContext*	m
 	CloseHandle(hFile);
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CClient_Manager::Model_Load_2(ID3D11Device * m_pDevice, ID3D11DeviceContext * m_pDeviceContext, _tchar * pDataFileName, _uint iLevel)
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	_tchar szPath[MAX_PATH] = TEXT("../../Data/");
+
+	lstrcat(szPath, pDataFileName);
+	lstrcat(szPath, TEXT(".dat"));
+
+	HANDLE      hFile = CreateFile(szPath,
+		GENERIC_READ,
+		NULL,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		return;
+	}
+
+	_tchar ProtoName[MAX_PATH] = TEXT("");
+	char	szModelPath[MAX_PATH] = "";
+	_float4x4	PivotMatrix;
+	XMStoreFloat4x4(&PivotMatrix, XMMatrixIdentity());
+	_uint	iAnimType = 0;
+
+
+	while (true)
+	{
+		DWORD   dwByte = 0;
+		ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, szModelPath, MAX_PATH, &dwByte, nullptr);
+		ReadFile(hFile, &PivotMatrix, sizeof(_float4x4), &dwByte, nullptr);
+		ReadFile(hFile, &iAnimType, sizeof(_uint), &dwByte, nullptr);
+
+		if (0 == dwByte)
+			break;
+
+		if (FAILED(pGameInstance->Add_Prototype(iLevel, ProtoName,
+			CModel_Instancing::Create(m_pDevice, m_pDeviceContext, szModelPath, XMLoadFloat4x4(&PivotMatrix), hFile))))
+			assert(!"issue");
+	}
+
+	CloseHandle(hFile);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CClient_Manager::CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform)

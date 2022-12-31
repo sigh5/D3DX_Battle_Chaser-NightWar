@@ -201,6 +201,8 @@
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\Public\MapOne2D.h" />
+    <ClInclude Include="..\Public\MapOneTree.h" />
+    <ClInclude Include="..\Public\MapTile.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
     <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
@@ -253,6 +255,8 @@
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\MapOne2D.cpp" />
+    <ClCompile Include="..\Private\MapOneTree.cpp" />
+    <ClCompile Include="..\Private\MapTile.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
     <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
@@ -289,8 +293,10 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimModel.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCubeTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModel.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_TerrainTile.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />

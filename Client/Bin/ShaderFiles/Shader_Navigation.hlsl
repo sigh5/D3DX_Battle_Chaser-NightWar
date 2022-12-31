@@ -3,6 +3,7 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 vector			g_vColor = (vector)1.f;
 float			g_fHeight = 0.f;
 
+
 sampler LinearSampler = sampler_state
 {
 	filter = min_mag_mip_linear;

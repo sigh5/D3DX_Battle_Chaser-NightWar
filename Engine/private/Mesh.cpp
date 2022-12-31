@@ -107,8 +107,6 @@ void CMesh::LoadFile(HANDLE hFile,CModel* pModel)
 		if (nullptr == pBone)
 			assert("CMesh::LoadFile");
 		
-		
-
 		_float4x4 OffSetMatrix;
 		ReadFile(hFile, &OffSetMatrix, sizeof(_float4x4), &dwByte, nullptr);
 		pBone->Set_OffsetMatrix(OffSetMatrix);

@@ -49,8 +49,7 @@ HRESULT CTerrain::Last_Initialize()
 
 	/*For.Imgui */
 	m_pNavigationCom->Set_SaveSort_NavigatorVector(&m_vecAllNavi);
-
-
+	
 	m_bLast_Initlize = true;
 
 
@@ -60,6 +59,12 @@ HRESULT CTerrain::Last_Initialize()
 void CTerrain::Tick(_double TimeDelta)
 {
 	Last_Initialize();
+
+	if (ImGui::Button("New_WorldMatrix_VIBUFFer"))
+	{
+		m_pVIBufferCom->initialize_World(m_pTransformCom);
+	}
+
 
 	__super::Tick(TimeDelta);
 }
@@ -132,7 +137,7 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 
 	if (ImGui::IsMouseDragging(0) && ptoolManager->Get_RadioButtonValue() == 1)
 	{
-		if (m_pVIBufferCom->PickingRetrunIndex(g_hWnd, m_pTransformCom, iIndex))
+		if (m_pVIBufferCom->PickingRetrunIndex_scale(g_hWnd, m_pTransformCom, iIndex))
 		{
 			m_FilterIndexSet.insert(_ulong(iIndex.x));
 			m_FilterIndexSet.insert(_ulong(iIndex.y));
@@ -171,7 +176,6 @@ HRESULT CTerrain::Ready_BufferLock_UnLock()
 		memcpy(SubResource.pData, m_pPixel, (sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height));
 
 		m_pContext->Unmap(pTexture2D, 0);
-
 
 		Safe_Release(m_pTextureCom[TYPE_FILTER]);
 		Remove_component(TEXT("Com_Filter"));
@@ -262,7 +266,6 @@ void CTerrain::Get_PickingPos()
 void CTerrain::DeleteNavi()
 {
 	m_pNavigationCom->Delete_Navi();
-
 	size_t size_Num = m_vecAllNavi.size()-3;
 	
 	_uint i = 0;
@@ -274,10 +277,6 @@ void CTerrain::DeleteNavi()
 
 void CTerrain::Create_NaviMap(_float4 vPos)
 {
-	int temp = m_vNaviPosVec.size();
-
-	ImGui::Text("ÂïÀº ¼ýÀÚ %d", temp);
-
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
 

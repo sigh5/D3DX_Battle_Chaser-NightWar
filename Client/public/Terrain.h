@@ -3,6 +3,7 @@
 #include "Client_Defines.h"
 #include "GameObject.h"
 #include <set>
+
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -62,10 +63,9 @@ private: /* for_ FilterMap*/
 	HRESULT	Ready_FilterBuffer();
 	HRESULT	Ready_BufferLock_UnLock();
 
-	_ulong*		m_pPixel= nullptr;
+	_ulong*						m_pPixel= nullptr;
 	ID3D11Texture2D*			pTexture2D = nullptr;
 	D3D11_TEXTURE2D_DESC		TextureDesc;
-
 	std::set<_ulong>			m_FilterIndexSet;
 
 	vector<_float3>				m_vNaviPosVec;

@@ -1,50 +1,41 @@
 #include "stdafx.h"
-#include "..\public\MapOne2D.h"
+#include "..\public\MapOneTree.h"
 #include "GameInstance.h"
 
-CMapOne2D::CMapOne2D(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMapOneTree::CMapOneTree(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CEnvironment_Object(pDevice, pContext)
 {
 }
 
-CMapOne2D::CMapOne2D(const CMapOne2D & rhs)
+CMapOneTree::CMapOneTree(const CMapOneTree & rhs)
 	: CEnvironment_Object(rhs)
 {
 }
 
-HRESULT CMapOne2D::Initialize_Prototype()
+HRESULT CMapOneTree::Initialize_Prototype()
 {
-	
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CMapOne2D::Initialize(void * pArg)
+HRESULT CMapOneTree::Initialize(void * pArg)
 {
-	m_ObjectName = TEXT("Map_One2D");
+	m_ObjectName = TEXT("Map_Tree");
 	m_ProtoName = TEXT("Prototype_GameObject_2D_MapOne");
-	CEnvironment_Object::ENVIRONMENTDESC Desc;
-
-	ZeroMemory(&Desc, sizeof(Desc));
-	lstrcpy(Desc.m_pModelTag, TEXT("Prototype_Component_MapOne"));
-
-	if (FAILED(__super::Initialize(&Desc)))
+	
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-	
 
-	
-
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(7.6f, -4.38f, 17.f,1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, -0.f, 0.f, 1.f));
 	return S_OK;
-
 }
 
-HRESULT CMapOne2D::Last_Initialize()
+HRESULT CMapOneTree::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
@@ -54,21 +45,15 @@ HRESULT CMapOne2D::Last_Initialize()
 	return S_OK;
 }
 
-void CMapOne2D::Tick(_double TimeDelta)
+void CMapOneTree::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	if (GetKeyState('Z') & 0x8000)
-	{
-		m_bRenderActive = false;
-	}
-	if (GetKeyState('X') & 0x8000)
-	{
-		m_bRenderActive = true;
-	}
+	Save_TreePos();
+	Load_TreePos();
 }
 
-void CMapOne2D::Late_Tick(_double TimeDelta)
+void CMapOneTree::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
@@ -76,10 +61,8 @@ void CMapOne2D::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
-HRESULT CMapOne2D::Render()
+HRESULT CMapOneTree::Render()
 {
-	if (m_bRenderActive)
-		return S_OK;
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
@@ -87,7 +70,7 @@ HRESULT CMapOne2D::Render()
 		return E_FAIL;
 
 	_uint		iNumMeshes = m_pModelCom->Get_NumMeshes();
-
+	
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
@@ -97,12 +80,35 @@ HRESULT CMapOne2D::Render()
 	return S_OK;
 }
 
-_bool CMapOne2D::Piciking_GameObject()
+_bool CMapOneTree::Piciking_GameObject()
 {
 	return false;
 }
 
-HRESULT CMapOne2D::SetUp_Components()
+void CMapOneTree::Picking_pos(_float4 vPos)
+{
+	static _uint i = 1;
+
+	m_pModelCom->Add_IncreasePosition(vPos, ++i);
+}
+
+void CMapOneTree::Save_TreePos()
+{
+	if (ImGui::Button("TreePos Save"))
+	{
+		m_pModelCom->Save_TreePos();
+	}
+}
+
+void CMapOneTree::Load_TreePos()
+{
+	if (ImGui::Button("TreePos Load"))
+	{
+		m_pModelCom->Load_TreePos();
+	}
+}
+
+HRESULT CMapOneTree::SetUp_Components()
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
@@ -110,18 +116,18 @@ HRESULT CMapOne2D::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Shader */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel"), TEXT("Com_Shader"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel_Instance"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,TEXT("Prototype_Component_MAP_Tree_Cluster_Birch_A"), TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	return S_OK;
 }
 
-HRESULT CMapOne2D::SetUp_ShaderResources()
+HRESULT CMapOneTree::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -140,9 +146,9 @@ HRESULT CMapOne2D::SetUp_ShaderResources()
 	return S_OK;
 }
 
-CMapOne2D * CMapOne2D::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CMapOneTree * CMapOneTree::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CMapOne2D*		pInstance = new CMapOne2D(pDevice, pContext);
+	CMapOneTree*		pInstance = new CMapOneTree(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
@@ -152,19 +158,19 @@ CMapOne2D * CMapOne2D::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pCon
 	return pInstance;
 }
 
-CGameObject * CMapOne2D::Clone(void * pArg)
+CGameObject * CMapOneTree::Clone(void * pArg)
 {
-	CMapOne2D*		pInstance = new CMapOne2D(*this);
+	CMapOneTree*		pInstance = new CMapOneTree(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CMapOne2D");
+		MSG_BOX("Failed to Cloned : CMapOneTree");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CMapOne2D::Free()
+void CMapOneTree::Free()
 {
 	__super::Free();
 

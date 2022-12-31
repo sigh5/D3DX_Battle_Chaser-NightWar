@@ -67,7 +67,6 @@ HRESULT CEffect_Rect_Instancing::Render()
 		return E_FAIL;
 
 	m_pShaderCom->Begin(0);
-
 	m_pVIBufferCom->Render();
 
 	return S_OK;

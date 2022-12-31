@@ -9,6 +9,8 @@
 #include "Effect_Point_Instancing.h"
 #include "MyImage.h"
 #include "EffectFrame.h"
+#include "MapOneTree.h"
+
 
 /* For.CombatScene*/
 #include "SlimeKing.h"
@@ -28,7 +30,7 @@
 #include "Skill_Object.h"
 
 #include "HpMpBuffCanvas.h"
-
+#include "MapTile.h"
 
 /* For.CombatScene*/
 
@@ -165,6 +167,15 @@ HRESULT CLoader::Loading_ForGamePlay()
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
 		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Ground/Ground9nmp.bmp")))))
 		return E_FAIL;
+	
+	/* For.Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_TerrainTile"),
+		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/MAP_Terrain_Grass_Yellow_A.bmp")))))
+		return E_FAIL;
+
+
+
+	
 	/* For.Prototype_Component_VIBuffer_Cube */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
 		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
@@ -199,12 +210,24 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	//
 
+	/* For.Prototype_Component_Shader_VtxModel_Instance */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel_Instance"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), VTXMODEL_INSTAICING_DECLARATION::Elements, VTXMODEL_INSTAICING_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
 
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
+	
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
+
+
+	CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
+
 
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
 	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
@@ -225,6 +248,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
+
+
+	
+
 
 	if (FAILED(ForGamePlay_Shader(pGameInstance)))
 		return E_FAIL;
@@ -337,11 +364,19 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CBuff_Image::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapTile"),
+		CMapTile::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_2D_MapOne"),
 		CMapOne2D::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tree_Instatincing"),
+		CMapOneTree::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -417,6 +452,23 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), CTexture::TYPE_DIFFUSE, 4))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Diffuse"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/TextureMap_1/MAP_Terrain_%d.dds"), CTexture::TYPE_DIFFUSE, 35))))
+		return E_FAIL;
+	
+	
+	
+	/* For.Prototype_Component_Texture_Filter */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_FilterCanvas"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_2.dds"), CTexture::TYPE_FILTER, 1))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Texture_Filter */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_%d.dds"), CTexture::TYPE_FILTER, 3))))
+		return E_FAIL;
+
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/MAP_Terrain_%d.dds"), CTexture::TYPE_DIFFUSE, 4))))
@@ -507,6 +559,12 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNormalTex_Phong"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_PongShader.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_TerrainTile"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_TerrainTile.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxCubeTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCubeTex.hlsl"), VTXCUBETEX_DECLARATION::Elements, VTXCUBETEX_DECLARATION::iNumElements))))
 		return E_FAIL;
@@ -532,9 +590,13 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 
 
 	/* For.Prototype_Component_Shader_VtxPointInstance */
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Shader_VtxTexIncCount"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTexIncCount.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
 		return E_FAIL;
+
+
+
 
 	return S_OK;
 }

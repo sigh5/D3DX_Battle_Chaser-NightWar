@@ -590,6 +590,8 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 			lstrcpy(Desc.m_pTextureTag, TextureName);
 			CGameObject* pGameObject = nullptr;
 			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &Desc);
+			if (pGameObject == nullptr)
+				assert(!"????");
 			(pGameObject)->Set_ProtoName(ProtoName);
 			(pGameObject)->Set_ObjectName(ObjectName);
 			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);

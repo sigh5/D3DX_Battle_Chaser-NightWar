@@ -1,7 +1,7 @@
 #include "..\public\Navigation.h"
 #include "Cell.h"
 #include "Shader.h"
-
+#include "Texture.h"
 
 
 CNavigation::CNavigation(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -151,6 +151,8 @@ HRESULT CNavigation::Render(_uint iShaderPass)
 		fHeight = 0.3f;
 		HRESULT hr = m_pShader->Set_RawValue("g_fHeight", &fHeight, sizeof(_float));
 		m_pShader->Set_RawValue("g_vColor", &_float4(1.f, 0.f, 0.f, 1.f), sizeof(_float4));
+
+	
 
 		m_Cells[m_NaviDesc.iCurrentIndex]->Render(m_pShader);
 

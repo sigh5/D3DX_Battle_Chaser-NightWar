@@ -145,8 +145,17 @@
     <Filter Include="02.GameObjects\Player\Skill">
       <UniqueIdentifier>{94bcd0f0-bf2e-4c16-9f1f-e0ac094aff55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Effect_">
+    <Filter Include="02.GameObjects\MapOne">
+      <UniqueIdentifier>{3861e60d-1768-4a69-b6c5-c737a880638b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Effect_">
       <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Terrain\MapOneTile">
+      <UniqueIdentifier>{3264df53-88d2-4978-a6fc-1a4ba76b4388}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MapOne\MapOneTree">
+      <UniqueIdentifier>{0b37f63b-c8d9-4061-9260-e717aee6c304}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -307,9 +316,17 @@
       <Filter>02.GameObjects\Player\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EffectFrame.h">
-      <Filter>02.GameObjects\Effect_</Filter>
+      <Filter>02.GameObjects\Effect\Effect_</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MapOne2D.h" />
+    <ClInclude Include="..\Public\MapOne2D.h">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapTile.h">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MapOneTree.h">
+      <Filter>02.GameObjects\Terrain\MapOneTile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -451,9 +468,17 @@
       <Filter>02.GameObjects\Player\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EffectFrame.cpp">
-      <Filter>02.GameObjects\Effect_</Filter>
+      <Filter>02.GameObjects\Effect\Effect_</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MapOne2D.cpp" />
+    <ClCompile Include="..\Private\MapOne2D.cpp">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapTile.cpp">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MapOneTree.cpp">
+      <Filter>02.GameObjects\Terrain\MapOneTile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -497,6 +522,12 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTexIncCount.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_TerrainTile.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

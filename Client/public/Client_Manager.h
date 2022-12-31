@@ -53,6 +53,9 @@ public:
 	static _double	 TimeDelta;
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
 
+
+	static  void    Model_Load_2(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName, _uint iLevel);
+
 public: /* For_Player */
 	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
 

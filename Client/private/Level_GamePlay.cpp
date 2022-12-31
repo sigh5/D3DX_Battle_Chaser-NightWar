@@ -54,7 +54,7 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 		
-	Dungeon_Controll_Tick(TimeDelta);
+	//Dungeon_Controll_Tick(TimeDelta);
 
 }
 
@@ -100,8 +100,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
 		return E_FAIL;
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
+	//	return E_FAIL;
 
 	
 	Safe_Release(pGameInstance);
@@ -133,7 +133,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 
 	//pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
 
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Tree_Instatincing"))))
+			return E_FAIL;
+
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_2D_MapOne"))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -147,14 +153,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EffectFrame"))))
 		return E_FAIL;
 */
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Garrison"))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	RELEASE_INSTANCE(CGameInstance);
 

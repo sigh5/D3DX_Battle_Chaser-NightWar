@@ -267,6 +267,7 @@ void CToolManager::Imgui_Create_Object()
 			CEnvironment_Object::ENVIRONMENTDESC Desc;
 			ZeroMemory(&Desc, sizeof(CEnvironment_Object::ENVIRONMENTDESC));
 			lstrcpy(Desc.m_pModelTag, szModelName);
+			lstrcpy(Desc.m_pTextureTag, szTextureName);
 			Desc.m_iShaderPass = m_iShaderPass;
 
 			pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &Desc);

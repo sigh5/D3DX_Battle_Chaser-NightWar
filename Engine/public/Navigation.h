@@ -28,6 +28,7 @@ public:
 public:
 	_bool isMove_OnNavigation(_fvector TargetPos);
 
+	
 public:	/*For.Tool*/
 	void	AddCell(_float3* vPoints);
 	void	Delete_Navi();
@@ -51,7 +52,7 @@ private:
 	class CShader*			m_pShader = nullptr;
 #endif // _DEBUG
 
-
+	
 
 public:
 	static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationDataFilePath);

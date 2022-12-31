@@ -55,9 +55,6 @@
     <Filter Include="01.Utility\03.Components\02.VIBuffer\Rect">
       <UniqueIdentifier>{155aa2d8-e968-410c-810a-ef705b1d4c5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.Components\03.Shader">
-      <UniqueIdentifier>{11f01796-9cbe-4ede-89af-4018c042c5a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.Components\04.Transform">
       <UniqueIdentifier>{4fb7e495-bad9-43ad-91ea-a194005e192c}</UniqueIdentifier>
     </Filter>
@@ -178,6 +175,21 @@
     <Filter Include="01.Utility\03.Components\02.VIBuffer\RCEffect">
       <UniqueIdentifier>{570cc1e5-0582-4ae9-b386-a286a24b00e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Components\07.Colider\03.Shader">
+      <UniqueIdentifier>{11f01796-9cbe-4ede-89af-4018c042c5a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\02.VIBuffer\Instancing\Model">
+      <UniqueIdentifier>{dd68f3fb-28c6-46b3-a753-5eb0a481b7d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Mesh\MeshInstancing">
+      <UniqueIdentifier>{9e7afb08-0bdc-4e00-99ba-a4fe3d0ca22d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\ModelInstancing">
+      <UniqueIdentifier>{8db5ada3-9bc5-4c18-a172-90473be98cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\08.Model\Mesh\MeshInstancing\CBoneInstacing">
+      <UniqueIdentifier>{407e8d91-a7d6-41c8-965b-cdf738795096}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -238,7 +250,7 @@
       <Filter>01.Utility\03.Components\02.VIBuffer\Rect</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Shader.h">
-      <Filter>01.Utility\03.Components\03.Shader</Filter>
+      <Filter>01.Utility\03.Components\07.Colider\03.Shader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Transform.h">
       <Filter>01.Utility\03.Components\04.Transform</Filter>
@@ -345,9 +357,6 @@
     <ClInclude Include="..\Public\Calculator.h">
       <Filter>81.Utils\07.Calculator</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Model.h">
-      <Filter>01.Utility\03.Components\08.Model</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Mesh.h">
       <Filter>01.Utility\03.Components\08.Model\Mesh</Filter>
     </ClInclude>
@@ -405,6 +414,18 @@
     <ClInclude Include="..\Public\HitBoxObject.h">
       <Filter>01.Utility\02.GameObject\HitBoxObject</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MeshInstancing.h">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model_Instancing.h">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bone_Instacing.h">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing\CBoneInstacing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Model.h">
+      <Filter>01.Utility\03.Components\08.Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -450,7 +471,7 @@
       <Filter>01.Utility\03.Components\02.VIBuffer\Rect</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Shader.cpp">
-      <Filter>01.Utility\03.Components\03.Shader</Filter>
+      <Filter>01.Utility\03.Components\07.Colider\03.Shader</Filter>
     </ClCompile>
     <ClCompile Include="..\public\Engine_Struct.cpp">
       <Filter>99.Defines</Filter>
@@ -604,6 +625,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\HitBoxObject.cpp">
       <Filter>01.Utility\02.GameObject\HitBoxObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshInstancing.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model_Instancing.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bone_Instacing.cpp">
+      <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing\CBoneInstacing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

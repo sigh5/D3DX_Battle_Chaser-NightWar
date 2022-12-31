@@ -47,6 +47,8 @@ namespace Engine
 		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
 	}VTXPOS_DECLARATION;
 
+
+
 	typedef struct tagModelMaterial
 	{
 		class CTexture*		pTexture[AI_TEXTURE_TYPE_MAX]; // texture 도 diffuse , normal .. 등등등  어싱크가 필요한 타입이 많다.
@@ -114,6 +116,12 @@ namespace Engine
 		unsigned long			_0, _1, _2;
 	}FACEINDICES32;
 
+	typedef struct tagFaceIndices64
+	{
+		unsigned long long			_0, _1, _2;
+	}FACEINDICES64;
+
+
 	typedef struct tagVertexPositionTexture
 	{
 		XMFLOAT3		vPosition;
@@ -154,23 +162,6 @@ namespace Engine
 	}VTXNORTEX_DECLARATION;
 
 
-	/* 인스턴싱을 위한 */
-	typedef struct tagVertexMatrix
-	{
-		XMFLOAT4			vRight;
-		XMFLOAT4			vUp;
-		XMFLOAT4			vLook;
-		XMFLOAT4			vPosition;
-	}VTXMATRIX;
-
-	typedef struct ENGINE_DLL tagVertexRectInstance_Declaration
-	{
-		static const unsigned int		iNumElements = 6;
-		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
-	}VTXRECTINSTANCE_DECLARATION;
-
-
-
 
 	typedef struct tagVertexModel
 	{
@@ -185,6 +176,31 @@ namespace Engine
 		static const unsigned int		iNumElements = 4;
 		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
 	}VTXMODEL_DECLARATION;
+
+
+	/* 인스턴싱을 위한 */
+	typedef struct tagVertexMatrix
+	{
+		XMFLOAT4			vRight;
+		XMFLOAT4			vUp;
+		XMFLOAT4			vLook;
+		XMFLOAT4			vPosition;
+	}VTXMATRIX;
+
+	typedef struct ENGINE_DLL tagVertexRectInstance_Declaration
+	{
+		static const unsigned int			iNumElements = 6;
+		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
+	}VTXRECTINSTANCE_DECLARATION;
+
+
+	typedef struct ENGINE_DLL tagVertexModel_Instancing_Declaration
+	{
+		static const unsigned int			iNumElements = 8;
+		static D3D11_INPUT_ELEMENT_DESC		Elements[iNumElements];
+
+	}VTXMODEL_INSTAICING_DECLARATION;
+
 
 	typedef struct tagVertexAnimModel
 	{

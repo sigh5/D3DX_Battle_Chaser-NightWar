@@ -15,8 +15,14 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype(const wstring& terrainFilePath);
+	
 	virtual HRESULT Initialize(void* pArg);
 
+	HRESULT			initialize_World(class CTransform* pTransform);
+
+
+
+public:
 	_float4				PickingTerrain(HWND hWnd, class CTransform * pCubeTransCom);
 	virtual		void	Final_Update()override {}
 	
@@ -24,7 +30,13 @@ public:
 	
 
 	_bool				PickingRetrunIndex(HWND hWnd, class CTransform * pCubeTransCom, _float4& fIndexs);
-			
+	_bool				PickingRetrunIndex_scale(HWND hWnd, class CTransform * pCubeTransCom, _float4& fIndexs) ;
+	
+	_bool				PickingRetrunIndex_scale_Test(HWND hWnd, class CTransform * pCubeTransCom, _float4& vRightPos);
+
+
+
+
 
 	virtual  _bool		PickingNavi(HWND hWnd, class CTransform * pCubeTransCom, _float4& vPosition);
 
@@ -35,7 +47,7 @@ private:
 	_uint		m_iNumVerticesX = 0;
 	_uint		m_iNumVerticesZ = 0;
 	_float4*	m_pVtx = nullptr;
-
+	_float4*	m_pWorldVtx = nullptr;
 
 public:
 	static CVI_Buffer_Terrain* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const wstring& terrainFilePath);
