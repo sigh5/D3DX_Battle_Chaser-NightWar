@@ -27,7 +27,7 @@ public:
 
 public: /* Imgui */
 	virtual _bool	Piciking_GameObject()override;
-	void	Picking_pos(_float4 vPos);
+	void	Picking_pos();
 
 	void	Save_TreePos();
 	void	Load_TreePos();
@@ -37,6 +37,9 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel_Instancing*		m_pModelCom = nullptr;
 
+
+	int						m_iCreateRadioButton = 0;
+	char					szName[MAX_PATH] = "";
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

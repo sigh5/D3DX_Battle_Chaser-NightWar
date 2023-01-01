@@ -16,6 +16,8 @@ public:
 public:
 	void	Set_SaveSort_NavigatorVector(vector<_float3>* SortVec);
 
+	void	Set_OldPos(_float4 vPos) { m_vOldPos = vPos; }
+
 private:
 	CNavigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CNavigation(const CNavigation& rhs);
@@ -27,8 +29,9 @@ public:
 
 public:
 	_bool isMove_OnNavigation(_fvector TargetPos);
-
 	
+	_bool isMove_OnNavigation_test(_float4& TargetPos);
+
 public:	/*For.Tool*/
 	void	AddCell(_float3* vPoints);
 	void	Delete_Navi();
@@ -42,6 +45,8 @@ public:
 private:
 	vector<class CCell*>	m_Cells;
 	NAVIDESC				m_NaviDesc;
+
+	_float4					m_vOldPos;
 
 private:
 	HRESULT	Ready_Neighbor();

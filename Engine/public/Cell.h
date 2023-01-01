@@ -28,7 +28,8 @@ public:
 public:
 	_bool Compare_Points(const _float3& SourPoint, const _float3& DestPoint);
 	_bool isIn(_fvector vTargetPos, _int* pNeighborIndex);
-
+	_bool isIn(_fvector vTargetPos, _float4* vOldPos, _int * pNeghborIndex);
+	
 #ifdef _DEBUG
 public:
 	HRESULT Render(class CShader* pShader, _uint iShaderPass=0);

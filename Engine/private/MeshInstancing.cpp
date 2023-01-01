@@ -24,8 +24,21 @@ CMeshInstancing::CMeshInstancing(const CMeshInstancing & rhs)
 void CMeshInstancing::Add_Position(_float4 vPos,_uint iIndex)
 {
 	m_pPosition.push_back(vPos);
-
 	Map_UnMapViBuffer(iIndex);
+}
+
+void CMeshInstancing::Set_Position(vector<_float4>& vTreePos)
+{
+	m_pPosition.clear();
+
+	_uint iSize = (_uint)vTreePos.size();
+	
+	for (_uint i = 0; i < iSize; ++i)
+	{
+		m_pPosition.push_back(vTreePos[i]);
+	}
+	
+	Map_UnMapViBuffer(iSize);
 }
 
 HRESULT CMeshInstancing::Initialize_Prototype(CModel_Instancing* pModel, HANDLE hFile, _uint iNumInstance)
@@ -33,7 +46,7 @@ HRESULT CMeshInstancing::Initialize_Prototype(CModel_Instancing* pModel, HANDLE 
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
-	m_pPosition.push_back(_float4(0.f, 0.f, 0.f, 0.f));
+	m_pPosition.push_back(_float4(0.f, 0.f, 0.f, 1.f));
 
 	DWORD   dwByte = 0;
 	_uint	iType = 0;
@@ -256,7 +269,8 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 버퍼 하나의 행렬을 만들어서 쉐이더에게 전달해줘야한다.
 		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
 		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
-		pInstanceVertices[i].vPosition = m_pPosition[i];		// 나중에 인스터닝을 할때 이포지션을 움직일 수 있게 락 언락구조를 짜야한다.
+		pInstanceVertices[i].vPosition = m_pPosition[i];
+		//pInstanceVertices[i].vPosition = _float4(m_pPosition[i].x+ 0.5f, m_pPosition[i].y  , m_pPosition[i].z+ 0.4f,1.f);		// 나중에 인스터닝을 할때 이포지션을 움직일 수 있게 락 언락구조를 짜야한다.
 	}
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
@@ -371,11 +385,13 @@ void CMeshInstancing::Free()
 {
 	__super::Free();
 
-	if (m_bClone == false)
-	{
-		Safe_Delete_Array(m_pVertices);
-		Safe_Delete_Array(m_pIndices);
-		
-	}
+	for (auto& pBone : m_Bones)
+		Safe_Release(pBone);
+	m_Bones.clear();
+
+	Safe_Delete_Array(m_pVertices);
+	Safe_Delete_Array(m_pIndices);	
+
+	m_pPosition.clear();
 		
 }

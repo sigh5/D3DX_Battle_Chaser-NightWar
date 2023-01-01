@@ -41,12 +41,12 @@ public:
 
 public:
 	virtual void	 Set_ParentLoad(CUI * pUI);
-	
+	virtual void	Set_parentName(_uint iCulLevel, const _tchar* pParentTag);
+	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc) {};
 #ifdef _DEBUG
 public: /* Imgui */
 	virtual _bool Piciking_GameObject()override { return false; }
-	virtual void	Set_parentName(_uint iCulLevel, const _tchar* pParentTag);
-	virtual void	Set_HighRightUIDesc(HIGHLIGHT_UIDESC& UIDesc) {};
+
 
 #endif
 protected:

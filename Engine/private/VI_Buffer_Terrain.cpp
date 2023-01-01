@@ -604,7 +604,7 @@ _bool CVI_Buffer_Terrain::PickingRetrunIndex_scale(HWND hWnd, CTransform * pCube
 	return false;
 }
 
-_bool CVI_Buffer_Terrain::PickingRetrunIndex_scale_Test(HWND hWnd, class CTransform * pCubeTransCom, _float4& vRightPos)
+_bool CVI_Buffer_Terrain::PickingRetrunIndex_scale_Test(HWND hWnd, CTransform * pCubeTransCom, _float4& vRightPos)
 {
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
 

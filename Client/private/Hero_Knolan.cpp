@@ -80,6 +80,7 @@ HRESULT CHero_Knolan::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
+	
 	m_pModelCom->Set_AnimIndex(0);
 	return S_OK;
 }
@@ -93,7 +94,9 @@ HRESULT CHero_Knolan::Last_Initialize()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.23f, 0.f, 0.23f, 1.f));
 
 	m_pTransformCom->Set_Scaled(_float3(0.1f,0.1f,0.1f));
-
+	_float4 vPos;
+	XMStoreFloat4(&vPos, XMVectorSet(0.23f, 0.f, 0.23f, 1.f));
+	m_pNavigationCom->Set_OldPos(vPos);
 	m_bLast_Initlize = true;
 	return S_OK;
 }

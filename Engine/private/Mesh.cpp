@@ -236,7 +236,6 @@ void CMesh::Free()
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);
-
 	m_Bones.clear();
 
 	Safe_Delete_Array(m_pVertices);

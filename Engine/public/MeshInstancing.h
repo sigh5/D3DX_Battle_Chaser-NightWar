@@ -17,7 +17,7 @@ public:
 	}
 
 	void	Add_Position(_float4 vPos, _uint iIndex);
-
+	void	Set_Position(vector<_float4>& vTreePos);
 
 public:
 	virtual HRESULT Initialize_Prototype(class CModel_Instancing* pModel, HANDLE hFile, _uint iNumInstance);
@@ -52,7 +52,7 @@ private:
 	HRESULT Ready_VertexBuffer_NonAnimModel(HANDLE hFile, class CModel_Instancing* pModel);
 
 public:
-	static CMeshInstancing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, class CModel_Instancing* pModel, HANDLE hFile, _uint iNumInstance =2);
+	static CMeshInstancing* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, class CModel_Instancing* pModel, HANDLE hFile, _uint iNumInstance =1);
 	virtual CComponent* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };

@@ -76,7 +76,7 @@ private:
 
 	int							m_iTerrainPickingRadioButton = 0;
 	int							m_iCameraRadioButton = 0;
-private:
+public:
 	void wc2c(const wchar_t* szWchar, char* szChar)
 	{
 		_int len;

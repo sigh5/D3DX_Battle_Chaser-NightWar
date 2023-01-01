@@ -218,8 +218,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	/* Model */
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
 
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
 	
@@ -373,7 +373,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Tree_Instatincing"),
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapOneTree"),
 		CMapOneTree::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	

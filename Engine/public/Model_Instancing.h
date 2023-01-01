@@ -34,8 +34,8 @@ public:
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 
 	void	Add_IncreasePosition(_float4 vPos, _uint iIndex);
-	void	Save_TreePos();
-	void	Load_TreePos();
+	void	Save_TreePos(const _tchar* pFileName);
+	void	Load_TreePos(const _tchar* pFileName);
 
 private:
 	_uint								m_iNumMeshes = 0;

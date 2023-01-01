@@ -172,8 +172,16 @@ void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio, CNavigation*
 		Set_State(CTransform::STATE_TRANSLATION, vPosition);
 	else
 	{
-		if (true == pNaviCom->isMove_OnNavigation(vPosition))
-			Set_State(CTransform::STATE_TRANSLATION, vPosition);
+		_float4 vPos; 
+		XMStoreFloat4(&vPos, vPosition);
+
+	/*	if (true == pNaviCom->isMove_OnNavigation(vPosition))
+			Set_State(CTransform::STATE_TRANSLATION, vPosition);*/
+		//else
+
+		if(true==pNaviCom->isMove_OnNavigation_test(vPos))
+			Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+
 	}
 }
 

@@ -108,6 +108,63 @@ HRESULT CCell::Render(CShader * pShader,_uint iShaderPass)
 }
 #endif // _DEBUG
 
+
+_bool CCell::isIn(_fvector vTargetPos, _float4* vOldPos, _int * pNeghborIndex)
+{
+	for (_uint i = 0; i < NEIGHBOR_END; ++i)
+	{
+		/* 삼각형의 변 */
+		_vector vLine = XMLoadFloat3(&m_vPoints[(i + 1) % NEIGHBOR_END]) - XMLoadFloat3(&m_vPoints[i]);
+
+		/* 변의 법선 */
+		_vector   vNormal = XMVector3Normalize(XMVectorSet(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine), 0.f));
+
+		/* 꼭지점에서 타겟위치로 향하는 벡터 */
+		_vector vDir = XMVector3Normalize(vTargetPos - XMLoadFloat3(&m_vPoints[i]));
+
+		/* 0 ~ 90 혹은 270 ~ 360 사이의 각도라면 cos은 양수이다. 즉, 해당 선분 밖으로 벗어났다. */
+		if (0 < XMVectorGetX(XMVector3Dot(vNormal, vDir)))
+		{
+			*pNeghborIndex = m_iNeighborIndices[i];
+
+			/* 만약 이웃이 없다면 슬라이딩 벡터를 구한다. */
+			if (-1 == m_iNeighborIndices[i])
+			{
+				_vector vOld = XMLoadFloat4(vOldPos);
+				_vector vPosDir = vTargetPos - vOld;
+				_float   fDot = abs(XMVectorGetX(XMVector3Dot(vPosDir, vNormal)));
+				_vector   vSliding = vPosDir - fDot*vNormal;
+
+				_vector vOrigin = vOld;
+				vOld += vSliding;
+
+				/* 이 슬라이딩의 결과가 cell을 벗어나서는 안됨... */
+				_float fLength = XMVectorGetX(XMVector3Length(vLine));
+				_float fLength1 = XMVectorGetX(XMVector3Length(vOld - XMLoadFloat3(&m_vPoints[i])));
+				_float fLength2 = XMVectorGetX(XMVector3Length(vOld - XMLoadFloat3(&m_vPoints[(i + 1) % NEIGHBOR_END])));
+
+				if (fLength < fLength1 || fLength < fLength2) // i+1지점 밖이다.
+					vOld = vOrigin;
+
+				XMStoreFloat4(vOldPos, vOld);
+			}
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
 CCell * CCell::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _float3 * pPoints, _int iIndex)
 {
 	CCell*		pInstance = new CCell(pDevice, pContext);

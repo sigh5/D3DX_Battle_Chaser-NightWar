@@ -71,6 +71,11 @@ HRESULT CNavigation::Initialize(void * pArg)
 		memcpy(&m_NaviDesc, pArg, sizeof(NAVIDESC));
 	}
 
+	
+	/*m_vOldPos.x = m_Cells[0]->Get_Point(CCell::POINT_A).x;
+	m_vOldPos.y = m_Cells[0]->Get_Point(CCell::POINT_A).y;
+	m_vOldPos.z = m_Cells[0]->Get_Point(CCell::POINT_A).z;
+	m_vOldPos.w = 1.f;*/
 	return S_OK;
 }
 
@@ -82,9 +87,10 @@ _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 	_int		iNeighborIndex = -1;
 
 	/* 움직이고 난 결과위치가 쎌 안에 있다면.  */
-	if (true == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(TargetPos, &iNeighborIndex))
+	if (true == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(TargetPos, &m_vOldPos, &iNeighborIndex))
+	{
 		return true; // 움직여. 
-					 /* 움직이고 난 결과위치가 이쎌을 벗어난다면. */
+	}				 /* 움직이고 난 결과위치가 이쎌을 벗어난다면. */
 	else
 	{
 		/* 나간방향으로 이웃이 있었다면ㄴ. */
@@ -97,7 +103,7 @@ _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 					return false;
 				}
 
-				if (true == m_Cells[iNeighborIndex]->isIn(TargetPos, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->isIn(TargetPos, &m_vOldPos, &iNeighborIndex))
 				{
 					// m_NaviDesc.iCurrentIndex = 이웃의 인덱스;
 					m_NaviDesc.iCurrentIndex = iNeighborIndex;
@@ -113,6 +119,62 @@ _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 	}
 
 }
+
+_bool CNavigation::isMove_OnNavigation_test(_float4& TargetPos)
+{
+	if (-1 == m_NaviDesc.iCurrentIndex)
+		return false;
+
+	_int		iNeighborIndex = -1;
+
+	/* 움직이고 난 결과위치가 쎌 안에 있다면.  */
+	if (true == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(XMLoadFloat4(&TargetPos), &m_vOldPos, &iNeighborIndex))
+	{
+		m_vOldPos = TargetPos;
+		return true; // 움직여. 
+	}				 /* 움직이고 난 결과위치가 이쎌을 벗어난다면. */
+	else
+	{
+		/* 나간방향으로 이웃이 있었다면ㄴ. */
+		if (-1 != iNeighborIndex)
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+				{
+					return false;
+				}
+				
+
+				if (true == m_Cells[iNeighborIndex]->isIn(XMLoadFloat4(&TargetPos), &m_vOldPos, &iNeighborIndex))
+				{
+					// m_NaviDesc.iCurrentIndex = 이웃의 인덱스;
+					m_vOldPos = TargetPos;
+					m_NaviDesc.iCurrentIndex = iNeighborIndex;
+					return true;
+				}
+				
+				
+			}
+		}
+		/* 나간방향으로 이웃이 없었다면 */
+		else
+		{
+			if (false == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(XMLoadFloat4(&TargetPos), &m_vOldPos, &iNeighborIndex))
+			{
+			
+				XMStoreFloat4(&TargetPos, XMLoadFloat4(&m_vOldPos));
+
+				return true;
+			}
+
+
+			return false;
+		}
+	}
+}
+
+
 
 void CNavigation::AddCell(_float3* vPoints)
 {

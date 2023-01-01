@@ -41,8 +41,8 @@ private: /* for_ FilterMap*/
 private: /* for_ Brush*/
 	_float4						m_vBrushPos;
 	
-
-	void						Test_Instancing();
+public:
+	_bool						Tree_Instancing(_float4 &vPos);
 
 private:
 	CShader*				m_pShaderCom = nullptr;

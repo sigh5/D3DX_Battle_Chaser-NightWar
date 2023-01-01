@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "..\public\MapOneTree.h"
 #include "GameInstance.h"
+#include "ToolManager.h"
+#include "MapTile.h"
 
 CMapOneTree::CMapOneTree(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CEnvironment_Object(pDevice, pContext)
@@ -22,8 +24,8 @@ HRESULT CMapOneTree::Initialize_Prototype()
 
 HRESULT CMapOneTree::Initialize(void * pArg)
 {
-	m_ObjectName = TEXT("Map_Tree");
-	m_ProtoName = TEXT("Prototype_GameObject_2D_MapOne");
+	/*m_ObjectName = TEXT("Map_Tree");
+	m_ProtoName = TEXT("Prototype_GameObject_2D_MapOne");*/
 	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -31,7 +33,12 @@ HRESULT CMapOneTree::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, -0.f, 0.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+	
+	
+
+
+	
 	return S_OK;
 }
 
@@ -40,6 +47,24 @@ HRESULT CMapOneTree::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+
+	if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Birch_A")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Birch_A"));
+	}
+
+	if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Mid_A"));
+	}
+
+	/*if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Front_A")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Front_A"));
+	}*/
+
+	
+
 	m_bLast_Initlize = true;
 
 	return S_OK;
@@ -47,10 +72,32 @@ HRESULT CMapOneTree::Last_Initialize()
 
 void CMapOneTree::Tick(_double TimeDelta)
 {
+	Last_Initialize();
 	__super::Tick(TimeDelta);
+	
+	/*static char Name[MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, m_ObjectName, MAX_PATH, Name, MAX_PATH, NULL, NULL);
 
-	Save_TreePos();
-	Load_TreePos();
+	if (lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Birch_A")) && lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A")))
+	{
+
+		ImGui::Text("%s", Name);
+
+		if (m_iCreateRadioButton == 1)
+		{
+			ImGui::InputText("Text", szName, MAX_PATH);
+
+			Save_TreePos();
+			Load_TreePos();
+		}
+
+
+		ImGui::RadioButton("None_Create_PickPos", &m_iCreateRadioButton, 0);
+		ImGui::RadioButton("Create_PickPos", &m_iCreateRadioButton, 1);
+
+		Picking_pos();
+	}*/
+
 }
 
 void CMapOneTree::Late_Tick(_double TimeDelta)
@@ -85,26 +132,61 @@ _bool CMapOneTree::Piciking_GameObject()
 	return false;
 }
 
-void CMapOneTree::Picking_pos(_float4 vPos)
+void CMapOneTree::Picking_pos()
 {
-	static _uint i = 1;
+	
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	m_pModelCom->Add_IncreasePosition(vPos, ++i);
+	if (m_iCreateRadioButton == 1)
+	{
+		CMapTile* pTile	=	dynamic_cast<CMapTile*>(pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, LAYER_ENVIRONMENT, TEXT("MapTile_MapOne")));
+	
+		if (pTile == nullptr)
+			assert(!"ERror");
+		_float4 vPos;
+		if (pTile->Tree_Instancing(vPos))
+		{
+			static _uint i = 1;
+			m_pModelCom->Add_IncreasePosition(vPos, ++i);
+		}
+
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+	
 }
 
 void CMapOneTree::Save_TreePos()
 {
+	if (m_iCreateRadioButton == 0)
+		return;
+	
+
+
 	if (ImGui::Button("TreePos Save"))
 	{
-		m_pModelCom->Save_TreePos();
+		_tchar szFileName[MAX_PATH] = TEXT("");
+
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szName, MAX_PATH, szFileName, 256);
+
+		m_pModelCom->Save_TreePos(szFileName);
 	}
 }
 
 void CMapOneTree::Load_TreePos()
 {
+	if (m_iCreateRadioButton == 0)
+		return;
+
+
+
 	if (ImGui::Button("TreePos Load"))
 	{
-		m_pModelCom->Load_TreePos();
+		_tchar szFileName[MAX_PATH] = TEXT("");
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, szName, MAX_PATH, szFileName, 256);
+		m_pModelCom->Load_TreePos(szFileName);
 	}
 }
 
@@ -121,7 +203,7 @@ HRESULT CMapOneTree::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY,TEXT("Prototype_Component_MAP_Tree_Cluster_Birch_A"), TEXT("Com_Model"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 	return S_OK;
@@ -131,6 +213,7 @@ HRESULT CMapOneTree::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
+
 
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;

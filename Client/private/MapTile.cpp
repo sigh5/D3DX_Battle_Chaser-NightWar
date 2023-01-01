@@ -62,128 +62,127 @@ void CMapTile::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
-	if(ImGui::Button("Pixel Save"))
-	{
-		_tchar szName[MAX_PATH] = TEXT("../../Data/PixelData_Ground.dat") ;
+	//if(ImGui::Button("Pixel Save"))
+	//{
+	//	_tchar szName[MAX_PATH] = TEXT("../../Data/PixelData_Ground.dat") ;
 
-		HANDLE      hFile = CreateFile(szName,
-			GENERIC_WRITE,
-			NULL,
-			NULL,
-			CREATE_ALWAYS,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-	
-		if (INVALID_HANDLE_VALUE == hFile)
-		{
-			return;
-		}
-		DWORD   dwByte = 0;
-	
-		WriteFile(hFile, m_pPixel, sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height, &dwByte, nullptr);
-		CloseHandle(hFile);
-		MSG_BOX("Save_Complete");
-	}
-
-
-	if (ImGui::Button("Pixel LOAD"))
-	{
-		_tchar szName[MAX_PATH] = TEXT("../../Data/PixelData_Ground.dat");
-
-		HANDLE      hFile = CreateFile(szName,
-			GENERIC_READ,
-			NULL,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
-
-		if (INVALID_HANDLE_VALUE == hFile)
-		{
-			return;
-		}
-		DWORD   dwByte = 0;
-
-		ReadFile(hFile, m_pPixel, sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height, &dwByte, nullptr);
-		
-		for (_uint i = 0; i < 512; ++i)
-		{
-			for (_uint j = 0; j < 512; ++j)
-			{
-				_uint iIndex = i * 512 + j;
-
-				if (m_pPixel[iIndex] == D3DCOLOR_ARGB(255, 0, 0, 0))
-				{
-					m_FilterIndexSet.insert(_ulong(iIndex));
-				}
-			}
-		}
-
-		TextureDesc.Width = 512;		// 2의 배수로 맞춰야됀다.
-		TextureDesc.Height = 512;		// 2의 배수로 맞춰야됀다.
-		TextureDesc.MipLevels = 1;
-		TextureDesc.ArraySize = 1;
-		TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		TextureDesc.SampleDesc.Quality = 0;
-		TextureDesc.SampleDesc.Count = 1;
-
-		TextureDesc.Usage = D3D11_USAGE_DYNAMIC;	// 동적으로 만들어야지 락 언락가능
-		TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// CPU는 동적할때 무조건
-		TextureDesc.MiscFlags = 0;
-
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pTexture2D)))
-			
-
-		for (auto iter = m_FilterIndexSet.begin(); iter != m_FilterIndexSet.end(); ++iter)
-		{
-			m_pPixel[(*iter)] = D3DCOLOR_ARGB(255, 0, 0, 0);
-		}
-
-		D3D11_MAPPED_SUBRESOURCE		SubResource;
-		ZeroMemory(&SubResource, sizeof SubResource);
-
-		m_pContext->Map(pTexture2D, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);  //DX_9 Lock ==Map
-
-		memcpy(SubResource.pData, m_pPixel, (sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height));
-
-		m_pContext->Unmap(pTexture2D, 0);
-
-		Safe_Release(m_pTextureCom[TYPE_FILTER]);
-		Remove_component(TEXT("Com_Filter"));
-
-		 DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures2D/Filter_2.dds"));
-
-		Safe_Release(pTexture2D);
-
-		pGameInstance->Remove_ProtoComponent(pGameInstance->GetCurLevelIdx(), TEXT("Prototype_Component_Texture_MapOneTile_Filter"));
-
-		(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"),
-			CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_%d.dds"), CTexture::TYPE_FILTER, 3)));
-
-		__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"), TEXT("Com_Filter"),
-			(CComponent**)&m_pTextureCom[TYPE_FILTER]);
-
-		RELEASE_INSTANCE(CGameInstance);
-
-		
-		
-		CloseHandle(hFile);
-		MSG_BOX("Load_Complete");
-	}
+	//	HANDLE      hFile = CreateFile(szName,
+	//		GENERIC_WRITE,
+	//		NULL,
+	//		NULL,
+	//		CREATE_ALWAYS,
+	//		FILE_ATTRIBUTE_NORMAL,
+	//		NULL);
+	//
+	//	if (INVALID_HANDLE_VALUE == hFile)
+	//	{
+	//		return;
+	//	}
+	//	DWORD   dwByte = 0;
+	//
+	//	WriteFile(hFile, m_pPixel, sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height, &dwByte, nullptr);
+	//	CloseHandle(hFile);
+	//	MSG_BOX("Save_Complete");
+	//}
 
 
-	static float VBrushPos[4] = { 0.f,0.f,0.f,1.f };
-	ImGui::InputFloat4("BrushPos", VBrushPos);
+	//if (ImGui::Button("Pixel LOAD"))
+	//{
+	//	_tchar szName[MAX_PATH] = TEXT("../../Data/PixelData_Ground.dat");
 
-	m_vBrushPos.x = VBrushPos[0];
-	m_vBrushPos.y = VBrushPos[1];
-	m_vBrushPos.z = VBrushPos[2];
-	m_vBrushPos.w = VBrushPos[3];
+	//	HANDLE      hFile = CreateFile(szName,
+	//		GENERIC_READ,
+	//		NULL,
+	//		NULL,
+	//		OPEN_EXISTING,
+	//		FILE_ATTRIBUTE_NORMAL,
+	//		NULL);
+
+	//	if (INVALID_HANDLE_VALUE == hFile)
+	//	{
+	//		return;
+	//	}
+	//	DWORD   dwByte = 0;
+
+	//	ReadFile(hFile, m_pPixel, sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height, &dwByte, nullptr);
+	//	
+	//	for (_uint i = 0; i < 512; ++i)
+	//	{
+	//		for (_uint j = 0; j < 512; ++j)
+	//		{
+	//			_uint iIndex = i * 512 + j;
+
+	//			if (m_pPixel[iIndex] == D3DCOLOR_ARGB(255, 0, 0, 0))
+	//			{
+	//				m_FilterIndexSet.insert(_ulong(iIndex));
+	//			}
+	//		}
+	//	}
+
+	//	TextureDesc.Width = 512;		// 2의 배수로 맞춰야됀다.
+	//	TextureDesc.Height = 512;		// 2의 배수로 맞춰야됀다.
+	//	TextureDesc.MipLevels = 1;
+	//	TextureDesc.ArraySize = 1;
+	//	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	//	TextureDesc.SampleDesc.Quality = 0;
+	//	TextureDesc.SampleDesc.Count = 1;
+
+	//	TextureDesc.Usage = D3D11_USAGE_DYNAMIC;	// 동적으로 만들어야지 락 언락가능
+	//	TextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	//	TextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// CPU는 동적할때 무조건
+	//	TextureDesc.MiscFlags = 0;
+
+	//	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pTexture2D)))
+	//		
+
+	//	for (auto iter = m_FilterIndexSet.begin(); iter != m_FilterIndexSet.end(); ++iter)
+	//	{
+	//		m_pPixel[(*iter)] = D3DCOLOR_ARGB(255, 0, 0, 0);
+	//	}
+
+	//	D3D11_MAPPED_SUBRESOURCE		SubResource;
+	//	ZeroMemory(&SubResource, sizeof SubResource);
+
+	//	m_pContext->Map(pTexture2D, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);  //DX_9 Lock ==Map
+
+	//	memcpy(SubResource.pData, m_pPixel, (sizeof(_ulong) *TextureDesc.Width * TextureDesc.Height));
+
+	//	m_pContext->Unmap(pTexture2D, 0);
+
+	//	Safe_Release(m_pTextureCom[TYPE_FILTER]);
+	//	Remove_component(TEXT("Com_Filter"));
+
+	//	 DirectX::SaveDDSTextureToFile(m_pContext, pTexture2D, TEXT("../Bin/Resources/Textures2D/Filter_2.dds"));
+
+	//	Safe_Release(pTexture2D);
+
+	//	pGameInstance->Remove_ProtoComponent(pGameInstance->GetCurLevelIdx(), TEXT("Prototype_Component_Texture_MapOneTile_Filter"));
+
+	//	(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"),
+	//		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_%d.dds"), CTexture::TYPE_FILTER, 3)));
+
+	//	__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"), TEXT("Com_Filter"),
+	//		(CComponent**)&m_pTextureCom[TYPE_FILTER]);
+
+	//	RELEASE_INSTANCE(CGameInstance);
+
+	//	
+	//	
+	//	CloseHandle(hFile);
+	//	MSG_BOX("Load_Complete");
+	//}
 
 
-	Test_Instancing();
+	//static float VBrushPos[4] = { 0.f,0.f,0.f,1.f };
+	//ImGui::InputFloat4("BrushPos", VBrushPos);
+
+	//m_vBrushPos.x = VBrushPos[0];
+	//m_vBrushPos.y = VBrushPos[1];
+	//m_vBrushPos.z = VBrushPos[2];
+	//m_vBrushPos.w = VBrushPos[3];
+
+
 
 	__super::Tick(TimeDelta);
 }
@@ -315,12 +314,8 @@ HRESULT CMapTile::Ready_BufferLock_UnLock()
 	return S_OK;
 }
 
-void CMapTile::Test_Instancing()
+_bool CMapTile::Tree_Instancing(_float4 &vPos)
 {
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	CGameObject * pTree = pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, LAYER_ENVIRONMENT, TEXT("Map_Tree"));
 
 	if (ImGui::IsMouseClicked(0))
 	{
@@ -328,12 +323,12 @@ void CMapTile::Test_Instancing()
 		
 		if (m_pVIBufferCom->PickingRetrunIndex_scale_Test(g_hWnd, m_pTransformCom, vRightPos))
 		{
-			static_cast<CMapOneTree*>(pTree)->Picking_pos(vRightPos);
+			vPos = vRightPos;
+			return true;
 		}
-
 	}
 
-	RELEASE_INSTANCE(CGameInstance);
+	return false;
 }
 
 

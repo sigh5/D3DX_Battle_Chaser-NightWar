@@ -27,6 +27,7 @@ CModel_Instancing::CModel_Instancing(const CModel_Instancing & rhs)
 	, m_iNumMaterials(rhs.m_iNumMaterials)
 	, m_Bones(rhs.m_Bones)
 	, m_iNumBones(rhs.m_iNumBones)
+	, m_PivotMatrix(rhs.m_PivotMatrix)
 {
 	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
 
@@ -143,9 +144,12 @@ void CModel_Instancing::Add_IncreasePosition(_float4 vPos, _uint iIndex)
 
 }
 
-void CModel_Instancing::Save_TreePos()
+void CModel_Instancing::Save_TreePos(const _tchar* pFileName)
 {
-	_tchar szName[MAX_PATH] = TEXT("../../Data/TreePos.dat");
+	_tchar szName[MAX_PATH] = TEXT("../../Data/");
+
+	lstrcat(szName, pFileName);
+	lstrcat(szName, TEXT(".dat"));
 
 	HANDLE      hFile = CreateFile(szName,
 		GENERIC_WRITE,
@@ -163,11 +167,12 @@ void CModel_Instancing::Save_TreePos()
 
 	vector<_float4> vTreePosSize = m_Meshes[0]->Get_vPos();
 
-	_uint iTreeSize = vTreePosSize.size();
+	_uint iTreeSize =(_uint)(vTreePosSize.size());
 
 	WriteFile(hFile, &iTreeSize, sizeof(_uint), &dwByte, nullptr);
 	for (_uint i = 0; i < iTreeSize; ++i)
 	{
+		
 		WriteFile(hFile, &vTreePosSize[i], sizeof(_float4), &dwByte, nullptr);
 	}
 
@@ -177,9 +182,12 @@ void CModel_Instancing::Save_TreePos()
 
 }
 
-void CModel_Instancing::Load_TreePos()
+void CModel_Instancing::Load_TreePos(const _tchar* pFileName)
 {
-	_tchar szName[MAX_PATH] = TEXT("../../Data/TreePos.dat");
+	_tchar szName[MAX_PATH] = TEXT("../../Data/");
+
+	lstrcat(szName, pFileName);
+	lstrcat(szName, TEXT(".dat"));
 
 	HANDLE      hFile = CreateFile(szName,
 		GENERIC_READ,
@@ -208,10 +216,15 @@ void CModel_Instancing::Load_TreePos()
 			break;
 		vTreePosSize.push_back(temp);
 	}
+
 	
-	
-	MSG_BOX("LoadClear");
 	CloseHandle(hFile);
+
+	for (_uint i = 0; i < m_iNumMeshes; ++i)
+	{
+		m_Meshes[i]->Set_Position(vTreePosSize);
+	}
+
 }
 
 HRESULT CModel_Instancing::Ready_Bones(HANDLE hFile, CBone_Instacing * pParent)
