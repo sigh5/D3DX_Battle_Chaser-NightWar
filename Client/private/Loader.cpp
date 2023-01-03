@@ -234,7 +234,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 	CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
 
 
-	
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
 	/* ~Model */
 
 	lstrcpy(m_szLoadingText, TEXT("콜라이더를 로딩중입니다. "));
@@ -419,7 +419,7 @@ HRESULT CLoader::Loading_Combat()
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 	
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
+	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 

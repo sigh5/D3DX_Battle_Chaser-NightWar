@@ -20,6 +20,8 @@ public:
 	void Tick(_double TimeDelta);
 	void Late_Tick(_double TimeDelta);
 	HRESULT Render();
+	void	Scene_Change();
+
 
 	_uint GetCurLevelIdx() const { return m_iLevelIndex; }
 

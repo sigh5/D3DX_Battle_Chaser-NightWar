@@ -73,6 +73,17 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 		Safe_Release(pGameInstance);
 	}*/
 
+	if (m_bSceneChange)
+	{
+		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+		Safe_AddRef(pGameInstance);
+
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
+			return;
+
+		Safe_Release(pGameInstance);
+	}
+
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -212,6 +223,11 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CLevel_GamePlay::Scene_Change()
+{
+	m_bSceneChange = true;
 }
 
 CLevel_GamePlay * CLevel_GamePlay::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

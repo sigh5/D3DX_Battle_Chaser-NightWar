@@ -26,6 +26,10 @@ HRESULT CLevel::Render()
 	return S_OK;
 }
 
+void CLevel::Scene_Change()
+{
+}
+
 
 
 void CLevel::Free()

@@ -65,6 +65,12 @@ HRESULT CLevel_Manager::Render()
 	return m_pCurrentLevel->Render();
 }
 
+void CLevel_Manager::Scene_Change()
+{
+	
+	 m_pCurrentLevel->Scene_Change();
+}
+
 void CLevel_Manager::Free()
 {
 	Safe_Release(m_pCurrentLevel);

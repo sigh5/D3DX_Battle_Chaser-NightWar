@@ -53,7 +53,7 @@ public: /* For.Level_Manager */
 	HRESULT Open_Level(_uint iLevelIndex, class CLevel* pNewLevel,_bool bCopy=false);
 	HRESULT Render_Level();
 	_uint GetCurLevelIdx() const;
-
+	void	Scene_Change();
 
 public: /* For.Object_Manager */
 	class CComponent* Get_ComponentPtr(_uint iLevelIndex, const _tchar* pLayerTag, const _tchar* pComponentTag, _uint iIndex = 0);

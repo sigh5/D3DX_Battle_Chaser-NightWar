@@ -16,7 +16,7 @@ public:
 	virtual void Tick(_double TimeDelta) override;
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
-
+	virtual void	Scene_Change()override;
 private:
 	void	Dungeon_Controll_Tick(_double TimeDelta);
 
@@ -30,6 +30,9 @@ private:
 	HRESULT Ready_Lights();
 
 	
+private:
+	_bool		m_bSceneChange = false;
+
 
 private:
 	class CPlayerController*		m_pPlayerController = nullptr; // Dungeon

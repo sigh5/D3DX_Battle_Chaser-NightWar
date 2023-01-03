@@ -3,6 +3,8 @@
 #include "GameInstance.h"
 #include "PlayerController.h"
 #include "UI.h"
+
+
 CMap_3D_UI::CMap_3D_UI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CEnvironment_Object(pDevice, pContext)
 {
@@ -70,6 +72,19 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 		ImGui::InputFloat("SizeY", &m_FontSizeY);
 	}
 
+
+	if (m_bOnce )
+	{
+		m_SceneChaneTimer += (_float)(TimeDelta);
+	}
+
+	if (m_SceneChaneTimer >=1.f)
+	{
+		CGameInstance::GetInstance()->Scene_Change();
+	}
+
+
+
 }
 
 void CMap_3D_UI::Late_Tick(_double TimeDelta)
@@ -121,6 +136,9 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 
 			CUI*pCanvas  =static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
+
+
+
 
 		}
 		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce)

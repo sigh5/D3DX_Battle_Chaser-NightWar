@@ -247,6 +247,11 @@ _uint CGameInstance::GetCurLevelIdx() const
 	return m_pLevel_Manager->GetCurLevelIdx();
 }
 
+void CGameInstance::Scene_Change()
+{
+	return m_pLevel_Manager->Scene_Change();
+}
+
 CComponent * CGameInstance::Get_ComponentPtr(_uint iLevelIndex, const _tchar * pLayerTag, const _tchar * pComponentTag, _uint iIndex)
 {
 	if (nullptr == m_pObject_Manager)

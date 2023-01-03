@@ -52,6 +52,10 @@ private:
 
 	_float					m_FontSizeX = 1.f;
 	_float					m_FontSizeY = 1.f;
+
+	_float					m_SceneChaneTimer = 0.f;
+
+
 public:
 	static CMap_3D_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

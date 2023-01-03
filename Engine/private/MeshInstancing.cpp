@@ -77,10 +77,10 @@ HRESULT CMeshInstancing::Initialize_Prototype(CModel_Instancing* pModel, HANDLE 
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	m_BufferDesc.StructureByteStride = 0;
-	m_BufferDesc.CPUAccessFlags = 0;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	m_BufferDesc.MiscFlags = 0;
 
 	 m_pIndices = new FACEINDICES32[m_iOriginNumPrimitive];
@@ -208,14 +208,14 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 	m_iNumPrimitive = m_iOriginNumPrimitive * m_iNumInstance;
 	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	/*ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
-	m_BufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	m_BufferDesc.StructureByteStride = 0;
-	m_BufferDesc.CPUAccessFlags = 0;
-	m_BufferDesc.MiscFlags = 0;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_BufferDesc.MiscFlags = 0;*/
 
 	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
 	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
@@ -241,14 +241,12 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 
 	}
 
-	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-	m_SubResourceData.pSysMem = pIndices;
+	D3D11_MAPPED_SUBRESOURCE		SubResources;
+	ZeroMemory(&SubResources, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResources);
+	memcpy(SubResources.pData, pIndices, sizeof(FACEINDICES32) * iNumFaces);
+	m_pContext->Unmap(m_pIB, 0);
 
-	Safe_Release(m_pIB);
-	m_pIB = nullptr;
-	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pIB);
-
-	
 	Safe_Delete_Array(pIndices);
 
 
@@ -262,7 +260,7 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 	m_BufferDesc.MiscFlags = 0;
 
 	VTXMATRIX* pInstanceVertices = new VTXMATRIX[m_iNumInstance];
-	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
+	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX)* m_iNumInstance);
 
 	for (_uint i = 0; i < m_iNumInstance; ++i)
 	{
@@ -272,17 +270,14 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 		pInstanceVertices[i].vPosition = m_pPosition[i];
 		//pInstanceVertices[i].vPosition = _float4(m_pPosition[i].x+ 0.5f, m_pPosition[i].y  , m_pPosition[i].z+ 0.4f,1.f);		// 나중에 인스터닝을 할때 이포지션을 움직일 수 있게 락 언락구조를 짜야한다.
 	}
+	
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
 	m_SubResourceData.pSysMem = pInstanceVertices;
-
-	
 	Safe_Release(m_pInstanceBuffer);
 	m_pInstanceBuffer = nullptr;
 	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
 	Safe_Delete_Array(pInstanceVertices);
-	
-
 }
 
 void CMeshInstancing::LoadFile(HANDLE hFile, CModel_Instancing* pModel)

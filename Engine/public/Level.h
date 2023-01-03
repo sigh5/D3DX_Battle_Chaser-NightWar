@@ -20,7 +20,7 @@ public:
 	virtual void Tick(_double TimeDelta);
 	virtual void Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
+	virtual		 void Scene_Change();
 
 protected:
 	ID3D11Device*				m_pDevice = nullptr;
