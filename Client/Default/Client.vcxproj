@@ -105,7 +105,8 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>../Public/;../../Reference/Headers/;../../Reference/Headers/Imgui;../../Reference/Headers/DirectXTK</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Public/;../../Reference/Headers/;../../Reference/Headers/Imgui</AdditionalIncludeDirectories>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -216,6 +217,7 @@
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\Public\Trun_BattleStart_UI.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
     <ClInclude Include="..\Public\TurnStateCanvas.h" />
     <ClInclude Include="..\Public\TurnUICanvas.h" />
@@ -272,6 +274,7 @@
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />
     <ClCompile Include="..\Private\TurnStateCanvas.cpp" />
     <ClCompile Include="..\Private\TurnUICanvas.cpp" />

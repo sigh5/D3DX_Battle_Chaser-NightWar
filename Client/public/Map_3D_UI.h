@@ -28,6 +28,10 @@ public:
 	virtual HRESULT Render();
 
 private:
+	void			Coll_CaptinPlayer();
+
+
+private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CVIBuffer_Rect*			m_pVIBufferCom = nullptr;
@@ -40,6 +44,14 @@ private:
 private:
 	_float					m_fMoveTimer = 0.f;
 	_int					m_iLeft_Right = -1;
+	_bool					m_bRenderFont = false;
+	_bool					m_bOnce = false;
+
+	_float					m_FontPosX = 0.f;
+	_float					m_FontPosY = 0.f;
+
+	_float					m_FontSizeX = 1.f;
+	_float					m_FontSizeY = 1.f;
 public:
 	static CMap_3D_UI* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

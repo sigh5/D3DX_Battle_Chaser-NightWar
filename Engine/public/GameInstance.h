@@ -107,6 +107,11 @@ public:/* For.Light_Manager */
 	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;
 	HRESULT				Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
 
+public: /* For.Font_Manager */
+	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);
+	HRESULT Render_Font(const _tchar* pFontTag, const _tchar* pText, const _float2& vPos, _float fRadian, _float2 vScale, _fvector vColor = XMVectorSet(1.f, 0.f, 0.f, 1.f));
+
+
 
 private:
 	static				_uint		m_iStaticLevelIndex;
@@ -121,7 +126,7 @@ private:
 	class CPipeLine*				m_pPipeLine				= nullptr;
 	class CTimer_Manager*			m_pTimer_Manager		= nullptr;
 	class CLight_Manager*			m_pLight_Manager		= nullptr;
-
+	class CFont_Manager*			m_pFont_Manager			= nullptr;
 
 
 public:

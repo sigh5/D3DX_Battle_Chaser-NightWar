@@ -42,6 +42,10 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_Component()))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Font(m_pDevice, m_pContext, TEXT("Font_Comic"), TEXT("../Bin/Resources/fonts/131.SpriteFont"))))
+		return E_FAIL;
+
+
 	if (FAILED(Ready_Prototype_GameObject()))
 		return E_FAIL;
 
@@ -50,6 +54,8 @@ HRESULT CMainApp::Initialize()
 
 
 	srand((unsigned int)time(NULL));
+
+	
 
 
 	return S_OK;
@@ -63,7 +69,6 @@ HRESULT CMainApp::LastInitalize()
 
 	
 
-
 	m_bLastUpdate = true;
 
 	return S_OK;
@@ -76,15 +81,15 @@ void CMainApp::Tick(_double TimeDelta)
 	if (nullptr == m_pGameInstance)
 		return;
 
+	LastInitalize();
+
 	CClient_Manager::TimeDelta = TimeDelta;
 	
-	
+#ifdef _DEBUG
+	m_TimeAcc += TimeDelta;
+#endif 
 
 	m_pGameInstance->Tick_Engine(TimeDelta);
-	
-
-
-
 	m_pToolManager->Imgui_SelectParentViewer();
 
 	
@@ -98,16 +103,26 @@ HRESULT CMainApp::Render()
 
 
 	m_pGameInstance->Render_ImGui();
-
 	m_pGameInstance->Clear_Graphic_Device(&_float4(0.5f, 0.5f, 0.5f, 1.f));
-
 	m_pRenderer->Draw_RenderGroup();
-
 	m_pGameInstance->Render_Update_ImGui();
-
 	m_pGameInstance->Render_Level();
-
 	m_pGameInstance->Present();
+
+
+
+	/*++m_iNumCallDraw;
+
+	if (m_TimeAcc >= 1.f)
+	{
+		wsprintf(m_szFPS, TEXT("fps : %d"), m_iNumCallDraw);
+
+
+		m_iNumCallDraw = 0;
+		m_TimeAcc = 0.f;
+	}
+
+	m_pGameInstance->Render_Font(TEXT("Font_Comic"), m_szFPS, _float2(100.f, 0.f), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 0.f, 0.f, 1.f));*/
 
 	return S_OK;
 }
@@ -207,6 +222,8 @@ HRESULT CMainApp::Ready_Prototype_Component()
 	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingImage"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LoadingImage/LoadScreen%d.png"),CTexture::TYPE_END,6))))
 		return E_FAIL;
+
+	
 
 
 

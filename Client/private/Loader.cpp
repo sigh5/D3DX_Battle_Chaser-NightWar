@@ -34,6 +34,8 @@
 
 #include "ChestBox.h"
 #include "Map_3D_UI.h"
+#include "Trun_BattleStart_UI.h"
+
 /* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -151,9 +153,6 @@ HRESULT CLoader::Loading_ForGamePlay()
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CharState/CharState%d.png"),
 			CTexture::TYPE_END, 11))))
 		return E_FAIL;
-
-
-
 	/* For.Prototype_Component_Texture_FireTexture*/
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireTexture"),
 		CTexture::Create(m_pDevice, m_pContext,
@@ -162,6 +161,13 @@ HRESULT CLoader::Loading_ForGamePlay()
 		return E_FAIL;
 
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TrunBattle_Start"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/BattleStart/TrunBattleStart_%d.png"),
+			CTexture::TYPE_END, 10))))
+		return E_FAIL;
+
+	//러버덕
 
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
@@ -228,8 +234,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 	CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
 
 
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_C"), LEVEL_GAMEPLAY);
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Map_NESW_A"), LEVEL_GAMEPLAY);
+	
 	/* ~Model */
 
 	lstrcpy(m_szLoadingText, TEXT("콜라이더를 로딩중입니다. "));
@@ -382,6 +387,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Map_3D_UI"),
 		CMap_3D_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnBattleStart_UI"),
+		CTrun_BattleStart_UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

@@ -5,6 +5,7 @@
 #include "Imgui_Manager.h"
 #include "Timer_Manager.h"
 #include "Light_Manager.h"
+#include "Font_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -22,7 +23,9 @@ CGameInstance::CGameInstance()
 	, m_pPipeLine(CPipeLine::GetInstance())
 	, m_pTimer_Manager(CTimer_Manager::GetInstance())
 	, m_pLight_Manager(CLight_Manager::GetInstance())
+	, m_pFont_Manager(CFont_Manager::GetInstance())
 {
+	Safe_AddRef(m_pFont_Manager);
 	Safe_AddRef(m_pLight_Manager);
 	Safe_AddRef(m_pTimer_Manager);
 	Safe_AddRef(m_pPipeLine);
@@ -505,6 +508,23 @@ HRESULT CGameInstance::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * p
 	return m_pLight_Manager->Add_Light(pDevice,pContext,LightDesc);
 }
 
+HRESULT CGameInstance::Add_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)
+{
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+	return m_pFont_Manager->Add_Font(pDevice, pContext, pFontTag, pFontFilePath);
+}
+
+HRESULT CGameInstance::Render_Font(const _tchar * pFontTag, const _tchar * pText, const _float2 & vPos, _float fRadian, _float2 vScale, _fvector vColor)
+{
+	if (nullptr == m_pFont_Manager)
+		return E_FAIL;
+
+	return m_pFont_Manager->Render_Font(pFontTag, pText, vPos, fRadian, vScale, vColor);
+}
+
+
 void CGameInstance::Release_Engine()
 {
 	CTimer_Manager::GetInstance()->DestroyInstance();
@@ -523,6 +543,8 @@ void CGameInstance::Release_Engine()
 
 	CLight_Manager::GetInstance()->DestroyInstance();
 
+	CFont_Manager::GetInstance()->DestroyInstance();
+
 	CInput_Device::GetInstance()->DestroyInstance();
 
 	CGraphic_Device::GetInstance()->DestroyInstance();
@@ -530,6 +552,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pPipeLine);

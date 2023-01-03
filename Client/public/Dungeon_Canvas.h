@@ -40,9 +40,10 @@ private:
 
 public:
 	void					Change_UITexture(HIGHLIGHT_UIDESC Desc);
+	virtual		void	Set_RenderActive(_bool bActive)override;
 
-
-
+private:
+	void					Control_ChildRender(_bool bRenderActive);
 
 
 

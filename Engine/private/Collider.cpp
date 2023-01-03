@@ -323,6 +323,8 @@ _bool CCollider::Collision_Mouse(HWND hWnd)
 #ifdef _DEBUG
 HRESULT CCollider::Render()
 {
+	m_pContext->GSSetShader(nullptr, nullptr, 0);
+
 	m_vColor = m_isColl == true ? _float4(1.f, 0.f, 0.f, 1.f) : _float4(0.f, 1.f, 0.f, 1.f);
 
 	m_pEffect->SetWorld(XMMatrixIdentity());

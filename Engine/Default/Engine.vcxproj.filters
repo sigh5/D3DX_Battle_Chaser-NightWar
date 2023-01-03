@@ -190,6 +190,12 @@
     <Filter Include="01.Utility\03.Components\08.Model\Mesh\MeshInstancing\CBoneInstacing">
       <UniqueIdentifier>{407e8d91-a7d6-41c8-965b-cdf738795096}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\07.Fonts">
+      <UniqueIdentifier>{b726e9b1-667b-4d65-8d76-dda4411c4024}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.Fonts\Manager">
+      <UniqueIdentifier>{de6474db-83b6-472c-a70c-df4d055f0570}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -426,6 +432,12 @@
     <ClInclude Include="..\Public\Model.h">
       <Filter>01.Utility\03.Components\08.Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CustomFont.h">
+      <Filter>01.Utility\07.Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Font_Manager.h">
+      <Filter>01.Utility\07.Fonts\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -634,6 +646,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Bone_Instacing.cpp">
       <Filter>01.Utility\03.Components\08.Model\Mesh\MeshInstancing\CBoneInstacing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomFont.cpp">
+      <Filter>01.Utility\07.Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Font_Manager.cpp">
+      <Filter>01.Utility\07.Fonts\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

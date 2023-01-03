@@ -97,6 +97,9 @@ void CDungeon_Canvas::Late_Tick(_double TimeDelta)
 
 HRESULT CDungeon_Canvas::Render()
 {
+	if (!m_bRenderActive)
+		return S_OK;
+
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
@@ -185,14 +188,23 @@ void CDungeon_Canvas::Change_UITexture(HIGHLIGHT_UIDESC Desc)
 			pChildUI->Set_HighRightUIDesc(Desc);
 			break;
 		}
-
-
 	}
 }
 
+void CDungeon_Canvas::Set_RenderActive(_bool bActive)
+{
+	m_bRenderActive = bActive;
 
+	Control_ChildRender(bActive);
+}
 
-
+void CDungeon_Canvas::Control_ChildRender(_bool bRenderActive)
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(bRenderActive);
+	}
+}
 
 CDungeon_Canvas * CDungeon_Canvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {

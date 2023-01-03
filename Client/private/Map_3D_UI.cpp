@@ -2,7 +2,7 @@
 #include "..\public\Map_3D_UI.h"
 #include "GameInstance.h"
 #include "PlayerController.h"
-
+#include "UI.h"
 CMap_3D_UI::CMap_3D_UI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CEnvironment_Object(pDevice, pContext)
 {
@@ -37,7 +37,7 @@ HRESULT CMap_3D_UI::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	//m_ObjectName = TEXT("3DUI");
+	m_pTransformCom->Set_TransfromDesc(0.5f, 90.f);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -50,18 +50,25 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
-	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
-	CCollider* pCaptinColl = static_cast<CCollider*>(pPlayerController->Get_Captin()->Get_Component(L"Com_OBB"));
+	Coll_CaptinPlayer();
 
-	if (m_pColliderCom->Collision(pCaptinColl))
+	m_fMoveTimer += _float(TimeDelta);
+
+	if (m_fMoveTimer >= 1.f)
 	{
-		_bool b = false;
-		//MSG_BOX("Cheking");
+		m_iLeft_Right *= -1;
+		m_fMoveTimer = 0;
+		m_pTransformCom->Set_TransfromDesc(0.1f*m_iLeft_Right, 90.f);
 	}
-
-
-
-	RELEASE_INSTANCE(CPlayerController);
+	
+	m_pTransformCom->Go_Left(TimeDelta);
+	if (m_bRenderFont)
+	{
+		ImGui::InputFloat("PosX", &m_FontPosX);
+		ImGui::InputFloat("PosY", &m_FontPosY);
+		ImGui::InputFloat("SizeX", &m_FontSizeX);
+		ImGui::InputFloat("SizeY", &m_FontSizeY);
+	}
 
 }
 
@@ -87,7 +94,70 @@ HRESULT CMap_3D_UI::Render()
 	m_pColliderCom->Render();
 
 #endif // !_DEBUG
+
+	if (m_bRenderFont)
+	{
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT("전투 시작!"), _float2(560.f, 90.f), 0.f, _float2(m_FontSizeX, m_FontSizeY), XMVectorSet(1.f, 0.f, 0.f, 1.f));
+		RELEASE_INSTANCE(CGameInstance);
+
+	}
 	return S_OK;
+}
+
+void CMap_3D_UI::Coll_CaptinPlayer()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
+	CCollider* pCaptinColl = static_cast<CCollider*>(pPlayerController->Get_Captin()->Get_Component(L"Com_OBB"));
+
+	if (m_pColliderCom->Collision(pCaptinColl))
+	{
+		if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI0")) && !m_bOnce)
+		{
+			pGameInstance->Load_Object(TEXT("OneMonsterStart"), LEVEL_GAMEPLAY);
+			m_bOnce = true;
+			m_bRenderFont = true;
+
+			CUI*pCanvas  =static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+			pCanvas->Set_RenderActive(false);
+
+		}
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce)
+		{
+			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
+			m_bOnce = true;
+			m_bRenderFont = true;
+			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+			pCanvas->Set_RenderActive(false);
+		}
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI2")) && !m_bOnce)
+		{
+			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
+			m_bOnce = true;
+			m_bRenderFont = true;
+			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+			pCanvas->Set_RenderActive(false);
+		}
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && !m_bOnce)
+		{
+			pGameInstance->Load_Object(TEXT("ThirdMonsterStart"), LEVEL_GAMEPLAY);
+			m_bOnce = true;
+			m_bRenderFont = true;
+			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+			pCanvas->Set_RenderActive(false);
+		}
+	}
+
+	if (ImGui::IsMouseClicked(1))
+	{
+		CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+		pCanvas->Set_RenderActive(true);
+	}
+
+
+	RELEASE_INSTANCE(CPlayerController);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CMap_3D_UI::SetUp_Components()

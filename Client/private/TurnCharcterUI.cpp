@@ -93,6 +93,9 @@ void CTurnCharcterUI::Late_Tick(_double TimeDelta)
 
 HRESULT CTurnCharcterUI::Render()
 {
+	if (!m_bRenderActive)
+		return S_OK;
+
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 

@@ -184,6 +184,10 @@ HRESULT CHero_Knolan::Render()
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
 	if (m_bIsCombatScene)
 		m_pColliderCom->Render();
+
+	
+	
+
 #endif
 	return S_OK;
 }
