@@ -12,7 +12,7 @@
 #include "Skill_Object.h"
 #include "Bone.h"
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CPlayer(pDevice,pContext)
+	:CPlayer(pDevice, pContext)
 {
 }
 
@@ -46,13 +46,16 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
-		
+		if (m_bUseDefence == true)
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(pCurActorWepon->Get_WeaponDamage()*0.5));
+		else
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 		{
 			m_bIsHeavyHit = true;
 		}
-		
+
 		return true;
 	}
 	return false;
@@ -80,7 +83,7 @@ HRESULT CHero_Knolan::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
-	
+
 	m_pModelCom->Set_AnimIndex(0);
 	return S_OK;
 }
@@ -93,7 +96,7 @@ HRESULT CHero_Knolan::Last_Initialize()
 	m_bControlKeyInput = true;
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.23f, 0.f, 0.23f, 1.f));
 
-	m_pTransformCom->Set_Scaled(_float3(0.1f,0.1f,0.1f));
+	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(0.23f, 0.f, 0.23f, 1.f));
 	m_pNavigationCom->Set_OldPos(vPos);
@@ -120,8 +123,8 @@ void CHero_Knolan::Tick(_double TimeDelta)
 
 	if (m_bIsCombatScene == false)
 	{
+		LookAtTarget(TimeDelta, m_pNavigationCom);
 		Dungeon_Tick(TimeDelta);
-		m_pNavigationCom->isMove_OnNavigation(m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	}
 	else
 	{
@@ -129,11 +132,11 @@ void CHero_Knolan::Tick(_double TimeDelta)
 		m_pFsmCom->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
-		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead()&& !m_bIsDead)
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
 		{
 			m_bIsDead = true;
 		}
-		
+
 	}
 
 
@@ -143,10 +146,10 @@ void CHero_Knolan::Tick(_double TimeDelta)
 void CHero_Knolan::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-	
+
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	for(auto iter = m_PlayerParts.begin(); iter != m_PlayerParts.end();)
+	for (auto iter = m_PlayerParts.begin(); iter != m_PlayerParts.end();)
 	{
 		(*iter)->Late_Tick(TimeDelta);
 
@@ -228,6 +231,21 @@ void CHero_Knolan::Intro_Exit()
 	CCombatController::GetInstance()->Status_CanvasInit();
 }
 
+void CHero_Knolan::Defence_Exit()
+{
+	if (false == m_bIsDefenceTimer)
+		return;
+
+	m_fDefencTimer += (_float)(CClient_Manager::TimeDelta);
+
+	if (m_fDefencTimer >= 1.f)
+	{
+		Fsm_Exit();
+		m_bIsDefenceTimer = false;
+	}
+
+}
+
 _uint CHero_Knolan::Get_AnimationIndex()
 {
 	return m_pModelCom->Get_AnimIndex();
@@ -267,7 +285,7 @@ void CHero_Knolan::NormalLightCharUI()
 
 void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta,m_pNavigationCom))
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -302,7 +320,7 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 	Anim_Frame_Create_Control();
 
 	size_t PartSize = m_PlayerParts.size();
-	for (size_t i = 0; i <PartSize; ++i)
+	for (size_t i = 0; i < PartSize; ++i)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
 
@@ -325,23 +343,23 @@ void CHero_Knolan::Create_SkillFire()
 	CGameObject* pSkillParts = nullptr;
 
 	CSkill_Object::SKILL_OBJ_DESC			SkillDesc;
-ZeroMemory(&SkillDesc, sizeof(CSkill_Object::SKILL_OBJ_DESC));
+	ZeroMemory(&SkillDesc, sizeof(CSkill_Object::SKILL_OBJ_DESC));
 
-XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
-SkillDesc.ParentTransform = m_pTransformCom;
-SkillDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Staff_Classic");
-SkillDesc.eType = WEAPON_SKILL;
-lstrcpy(SkillDesc.pModelTag, TEXT("Prototype_Component_FireBall"));
-SkillDesc.pTraget = m_pHitTarget->Get_Transform();
-SkillDesc.eDir = m_SkillDir;
-SkillDesc.vPosition = m_vSkill_Pos;
-SkillDesc.vAngle = 90.f;
+	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
+	SkillDesc.ParentTransform = m_pTransformCom;
+	SkillDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Staff_Classic");
+	SkillDesc.eType = WEAPON_SKILL;
+	lstrcpy(SkillDesc.pModelTag, TEXT("Prototype_Component_FireBall"));
+	SkillDesc.pTraget = m_pHitTarget->Get_Transform();
+	SkillDesc.eDir = m_SkillDir;
+	SkillDesc.vPosition = m_vSkill_Pos;
+	SkillDesc.vAngle = 90.f;
 
-pSkillParts = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Obj"), &SkillDesc);
-assert(pSkillParts != nullptr && "Create_SkillFire");
-m_PlayerParts.push_back(pSkillParts);
+	pSkillParts = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Obj"), &SkillDesc);
+	assert(pSkillParts != nullptr && "Create_SkillFire");
+	m_PlayerParts.push_back(pSkillParts);
 
-RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CHero_Knolan::Create_Skill_Stop_Fire()
@@ -511,7 +529,7 @@ HRESULT CHero_Knolan::SetUp_ShaderResources()
 
 
 
-	
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -532,7 +550,7 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 
 void CHero_Knolan::Anim_Idle()
 {
-	
+
 	m_CurAnimqeue.push({ 2,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -626,6 +644,7 @@ void CHero_Knolan::Anim_Use_Item()
 void CHero_Knolan::Anim_Defence()
 {
 	m_CurAnimqeue.push({ 6,  1.f });
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -642,7 +661,7 @@ void CHero_Knolan::Anim_Light_Hit()
 	}
 	Set_CombatAnim_Index(m_pModelCom);
 }
-		
+
 void CHero_Knolan::Anim_Heavy_Hit()
 {
 	m_CurAnimqeue.push({ 8,  1.f });	// 8,9,10
@@ -663,7 +682,7 @@ void CHero_Knolan::Anim_Die()
 	m_CurAnimqeue.push({ 5,  1.f });
 	m_CurAnimqeue.push({ 23, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	
+
 }
 
 void CHero_Knolan::Anim_Viroty()

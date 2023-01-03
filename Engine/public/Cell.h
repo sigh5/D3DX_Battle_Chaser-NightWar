@@ -30,6 +30,8 @@ public:
 	_bool isIn(_fvector vTargetPos, _int* pNeighborIndex);
 	_bool isIn(_fvector vTargetPos, _float4* vOldPos, _int * pNeghborIndex);
 	
+
+
 #ifdef _DEBUG
 public:
 	HRESULT Render(class CShader* pShader, _uint iShaderPass=0);

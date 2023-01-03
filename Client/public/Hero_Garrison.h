@@ -52,6 +52,7 @@ public:  /*For.Combat*/
 	
 	virtual   void	  Combat_BlendAnimTick(_double TimeDelta);
 	virtual		void	Fsm_Exit()override;
+	virtual		void	Defence_Exit()override;
 
 
 	void			 MovingAnimControl(_double TimeDelta);

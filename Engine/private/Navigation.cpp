@@ -79,6 +79,8 @@ HRESULT CNavigation::Initialize(void * pArg)
 	return S_OK;
 }
 
+
+
 _bool CNavigation::isMove_OnNavigation(_fvector TargetPos)
 {
 	if (-1 == m_NaviDesc.iCurrentIndex)
@@ -162,9 +164,7 @@ _bool CNavigation::isMove_OnNavigation_test(_float4& TargetPos)
 		{
 			if (false == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(XMLoadFloat4(&TargetPos), &m_vOldPos, &iNeighborIndex))
 			{
-			
 				XMStoreFloat4(&TargetPos, XMLoadFloat4(&m_vOldPos));
-
 				return true;
 			}
 
@@ -174,6 +174,57 @@ _bool CNavigation::isMove_OnNavigation_test(_float4& TargetPos)
 	}
 }
 
+_bool CNavigation::isMove_OnNavigation_Chase(_float4 & TargetPos)
+{
+	if (-1 == m_NaviDesc.iCurrentIndex)
+		return false;
+
+	_int		iNeighborIndex = -1;
+
+	/* 움직이고 난 결과위치가 쎌 안에 있다면.  */
+	if (true == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(XMLoadFloat4(&TargetPos), &iNeighborIndex))
+	{
+		return true; // 움직여. 
+	}				 /* 움직이고 난 결과위치가 이쎌을 벗어난다면. */
+	else
+	{
+		/* 나간방향으로 이웃이 있었다면ㄴ. */
+		if (-1 != iNeighborIndex)
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+				{
+					return false;
+				}
+
+				if (true == m_Cells[iNeighborIndex]->isIn(XMLoadFloat4(&TargetPos), &iNeighborIndex))
+				{
+					// m_NaviDesc.iCurrentIndex = 이웃의 인덱스;
+					m_NaviDesc.iCurrentIndex = iNeighborIndex;
+					return true;
+				}
+			}
+		}
+		/* 나간방향으로 이웃이 없었다면 */
+		else
+		{
+			if (false == m_Cells[m_NaviDesc.iCurrentIndex]->isIn(XMLoadFloat4(&TargetPos), &iNeighborIndex))
+			{
+				XMStoreFloat4(&TargetPos, XMLoadFloat4(&m_vOldPos));
+				return true;
+			}
+			return false;
+		}
+	}
+}
+
+void CNavigation::Update_OldPos()
+{
+	m_vOldPos.x = (m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_A).x + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_B).x  + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_C).x )/3.f;
+	m_vOldPos.y = (m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_A).y + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_B).y + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_C).y) / 3.f;
+	m_vOldPos.z = (m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_A).z + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_B).z + m_Cells[m_NaviDesc.iCurrentIndex]->Get_Point(CCell::POINT_C).z) / 3.f;
+}
 
 
 void CNavigation::AddCell(_float3* vPoints)
@@ -308,5 +359,12 @@ void CNavigation::Set_SaveSort_NavigatorVector(vector<_float3>* SortVec)
 			SortVec->push_back(pCell->Get_Point(CCell::POINT(i)));
 		}
 	}
+
+}
+
+void CNavigation::Set_OldPos(_float4 vPos)
+{
+	m_vOldPos = vPos;
+
 
 }

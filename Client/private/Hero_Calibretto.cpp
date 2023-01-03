@@ -85,6 +85,10 @@ HRESULT CHero_Calibretto::Last_Initialize()
 		return S_OK;
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.18f, 0.f, 0.18f, 1.f));
 	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
+	
+	_float4 vPos;
+	XMStoreFloat4(&vPos, XMVectorSet(0.18f, 0.f, 0.18f, 1.f));
+	m_pNavigationCom->Set_OldPos(vPos);
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -96,8 +100,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 
 	if (m_bIsCombatScene == false)
 	{
-		m_pNavigationCom->isMove_OnNavigation(m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
+		LookAtTarget(TimeDelta, m_pNavigationCom);
 		Dungeon_Tick(TimeDelta);
 	}
 		
@@ -252,6 +255,8 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 32.f, 1.f));
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
+
 
 	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;

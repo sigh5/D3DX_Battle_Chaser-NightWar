@@ -74,6 +74,14 @@ HRESULT CUIButton::Last_Initialize()
 	}
 
 	Button_RenderSetActive(m_bRenderActive);
+	
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->GetCurLevelIdx() == LEVEL_GAMEPLAY)
+	{
+		m_bRenderActive = true;
+	}
+	RELEASE_INSTANCE(CGameInstance);
 
 
 	m_bLast_Initlize = true;

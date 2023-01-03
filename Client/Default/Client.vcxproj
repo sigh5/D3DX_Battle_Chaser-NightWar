@@ -176,6 +176,7 @@
     <ClInclude Include="..\Public\Camera_Combat.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Camera_Static.h" />
+    <ClInclude Include="..\Public\ChestBox.h" />
     <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
@@ -203,6 +204,7 @@
     <ClInclude Include="..\Public\MapOne2D.h" />
     <ClInclude Include="..\Public\MapOneTree.h" />
     <ClInclude Include="..\Public\MapTile.h" />
+    <ClInclude Include="..\Public\Map_3D_UI.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
     <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
@@ -232,6 +234,7 @@
     <ClCompile Include="..\private\Camera_Combat.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Camera_Static.cpp" />
+    <ClCompile Include="..\Private\ChestBox.cpp" />
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
@@ -257,6 +260,7 @@
     <ClCompile Include="..\Private\MapOne2D.cpp" />
     <ClCompile Include="..\Private\MapOneTree.cpp" />
     <ClCompile Include="..\Private\MapTile.cpp" />
+    <ClCompile Include="..\Private\Map_3D_UI.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
     <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />

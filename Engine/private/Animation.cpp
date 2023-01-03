@@ -104,6 +104,31 @@ void CAnimation::Update_Bones_Blend(_double TimeDelta, _bool IsCombat, _float fB
 	}
 }
 
+void CAnimation::Normal_Update_Bones(_double TimeDelta)
+{
+	if (true == m_isFinished)
+	{
+		return;
+	}
+
+	m_PlayTime += m_TickPerSecond * TimeDelta;
+
+	if (m_PlayTime >= m_Duration)
+	{
+		m_PlayTime = 0.0;
+		m_isFinished = true;
+	}
+
+	for (_uint i = 0; i < m_iNumChannels; ++i)
+	{
+		/*	if (true == m_isFinished)
+				m_Channels[i]->Reset_KeyFrameIndex();*/
+
+		m_Channels[i]->Update_TransformMatrix(m_PlayTime);
+	}
+
+}
+
 void CAnimation::InitChannel()
 {
 	for (_uint i = 0; i < m_iNumChannels; ++i)

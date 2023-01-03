@@ -13,6 +13,7 @@ CCombatActors::CCombatActors(const CCombatActors & rhs)
 {
 }
 
+
 HRESULT CCombatActors::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -65,6 +66,7 @@ void CCombatActors::CurAnimQueue_Play_Tick(_double Time, CModel * pModel)
 			m_bIsCombatAndAnimSequnce = true;
 		}
 	}
+	Defence_Exit();
 }
 
 void CCombatActors::CurAnimQueue_Play_LateTick(CModel * pModel)
@@ -75,11 +77,13 @@ void CCombatActors::CurAnimQueue_Play_LateTick(CModel * pModel)
 		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
 		m_bIsIdle = false;
 	}
+	
 	if (m_bIsCombatAndAnimSequnce && m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
 	{
 		pModel->Set_PlayTime(pModel->Get_AnimIndex());
-		m_bIsIdle = true;
+		m_bIsIdle = true;	
 	}
+
 }
 
 void CCombatActors::Set_CombatAnim_Index(CModel * pModel)
@@ -114,6 +118,10 @@ void CCombatActors::HitActor_LoseHP(CGameObject * pCurActor)
 {
 	// 데미지로직짜기
 	_bool b = false;
+}
+
+void CCombatActors::Defence_Exit()
+{
 }
 
 void CCombatActors::Free()

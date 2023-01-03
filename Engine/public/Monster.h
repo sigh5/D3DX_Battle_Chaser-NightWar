@@ -22,7 +22,7 @@ public:
 	const _uint		Get_HitNum()const {return m_iHitNum;}
 	const _bool		Get_IsBuff()const { return m_isBuff; }
 	void			Set_Me_HitPlayer(CGameObject* pHiter) { m_pMeHit_Player = pHiter; }
-
+	CGameObject*	Get_Me_hitPlayer() { return m_pMeHit_Player; }
 
 public:
 	virtual HRESULT Initialize_Prototype()override;

@@ -25,6 +25,8 @@ public:
 	void    Update_Bones(_double TimeDelta, _bool IsCombat);
 	void	 Update_Bones_Blend(_double TimeDelta,_bool IsCombat ,_float fBlendRatio);
 
+	void	Normal_Update_Bones(_double TimeDelta);
+
 public:
 	void		Set_TickPerSecond(_double TickPerSecond) {m_TickPerSecond = TickPerSecond;}
 	_double		Get_TickPerSecond()const { return m_TickPerSecond; }

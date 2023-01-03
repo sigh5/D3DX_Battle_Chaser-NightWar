@@ -39,6 +39,8 @@ public:
 	void	 Play_Animation(_double TimeDelta,_bool IsCombat=false);
 	void	 Play_BlendAnimation(_double TimeDelta, _bool IsCombat = false);
 
+	void	Play_Animation_2(_double TimeDelta);
+
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 	

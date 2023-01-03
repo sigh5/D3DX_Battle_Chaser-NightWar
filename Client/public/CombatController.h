@@ -31,34 +31,23 @@ public:
 	virtual ~CCombatController() = default;
 public:
 	 CGameObject*		Get_CurActor()const { return m_pCurentActor; }
-	
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
-	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	
-	 
+	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
 
 public:  /*Combat Logic*/
 	HRESULT Initialize(_uint iLevel);
 	HRESULT Late_Init();
-	
-	
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	void	Status_CanvasInit();
-	
-
 	
 public:
 	void	Refresh_CurActor();
 	void	Mana_Refresh();
-
-
 public:
 	void	Active_Fsm();
 	void	ResetState();
-
-
-
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
@@ -115,13 +104,9 @@ private:
 	_float					m_fHitRecoverTime =0.2f;		// 모든 연속공격일때 특단의 조치가 필요
 
 	_bool					m_bMonsterSelect_Target = false;			
-
-	
 	_uint					m_iMonster_Player_Option=0;
 	_bool					m_bIsPlayer = false;
 	_bool					m_bMonsterTurnEnd = false;
-
-
 
 
 	_uint					m_iHitNum = 0;

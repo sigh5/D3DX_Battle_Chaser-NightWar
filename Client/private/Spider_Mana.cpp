@@ -189,6 +189,13 @@ void CSpider_Mana::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+		if (m_bCombatChaseTarget == true)
+		{
+			if (static_cast<CCombatActors*>(m_pHitTarget)->Get_UseDeffece())
+			{
+				m_pHitTarget->Set_FsmState(true, CGameObject::m_Defence);
+			}
+		}
 	}
 	else
 		return;
@@ -410,6 +417,7 @@ void CSpider_Mana::Anim_NormalAttack()
 	m_CurAnimqeue.push({ 4, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	m_pMeHit_Player = nullptr;
 }
 
 void CSpider_Mana::Anim_Skill1_Attack()
@@ -423,6 +431,7 @@ void CSpider_Mana::Anim_Skill1_Attack()
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	m_pMeHit_Player = nullptr;
 }
 
 void CSpider_Mana::Anim_Skill2_Attack()
@@ -436,6 +445,7 @@ void CSpider_Mana::Anim_Skill2_Attack()
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	m_pMeHit_Player = nullptr;
 }
 
 void CSpider_Mana::Anim_Buff()

@@ -157,14 +157,6 @@ _bool CCell::isIn(_fvector vTargetPos, _float4* vOldPos, _int * pNeghborIndex)
 }
 
 
-
-
-
-
-
-
-
-
 CCell * CCell::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _float3 * pPoints, _int iIndex)
 {
 	CCell*		pInstance = new CCell(pDevice, pContext);

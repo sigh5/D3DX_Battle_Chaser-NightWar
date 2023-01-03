@@ -191,6 +191,14 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+		if (m_bCombatChaseTarget == true)
+		{
+			if (static_cast<CCombatActors*>(m_pHitTarget)->Get_UseDeffece())
+			{
+				m_pHitTarget->Set_FsmState(true, CGameObject::m_Defence);
+			}
+		}
+	
 	}
 	else
 		return;
@@ -336,6 +344,8 @@ void CSkeleton_Naked::Anim_NormalAttack()
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
 	m_iStateDamage = 160;//30;
+	m_pMeHit_Player = nullptr;
+
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// ÇÑ´ëÅö
 	m_CurAnimqeue.push({ 9, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
@@ -349,6 +359,8 @@ void CSkeleton_Naked::Anim_Skill1_Attack()
 	m_iHitCount = 2;
 	m_iStateDamage = 80;			// 20*2 
 	m_pStatusCom->Use_SkillMp(30);
+	m_pMeHit_Player = nullptr;
+
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2´ë Åö
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 16, 0.5f });

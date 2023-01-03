@@ -472,7 +472,7 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 		}))
 
 
-			.AddState(L"Defence")
+		.AddState(L"Defence")
 			.OnStart([this]()
 		{
 			static_cast<CHero_Garrison*>(m_pTarget)->Anim_Defence();

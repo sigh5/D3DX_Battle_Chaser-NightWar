@@ -2,7 +2,7 @@
 
 #include "Input_Device.h"
 #include "Model.h"
-
+#include "Navigation.h"
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCombatActors(pDevice, pContext)
 {
@@ -46,7 +46,7 @@ HRESULT CPlayer::Last_Initialize()
 
 void CPlayer::Tick(_double TimeDelta)
 {
-	LookAtTarget(TimeDelta);
+	//LookAtTarget(TimeDelta);
 }
 
 void CPlayer::Late_Tick(_double TimeDelta)
@@ -76,7 +76,7 @@ void CPlayer::Set_FollowTarget(CGameObject * pPlayer)
 	}
 }
 
-void CPlayer::LookAtTarget(_double TimeDelta)
+void CPlayer::LookAtTarget(_double TimeDelta, CNavigation* pNavigation)
 {
 	if (m_pCaptinPlayer == nullptr )
 		return;
@@ -104,13 +104,26 @@ void CPlayer::LookAtTarget(_double TimeDelta)
 
 	if (m_isStop)
 	{
-		if(static_cast<CPlayer*>(m_pCaptinPlayer)->m_bIsWalk)
-			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 0.4f);
+		if (static_cast<CPlayer*>(m_pCaptinPlayer)->m_bIsWalk)
+		{
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 0.5f, 0.4f, pNavigation);
+		}
 		else
-			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.05f, 0.3f);
-	}	
+		{
+			m_pTransformCom->Chase_Speed(vTargetPos, TimeDelta, 1.05f, 0.3f, pNavigation);
+		}
+	}
 	else
 		m_iAnimIndex = 0;
+
+	if (m_pCaptinPlayer != nullptr)
+	{
+		CNavigation* pCaptinNavi = static_cast<CNavigation*>(m_pCaptinPlayer->Get_Component(TEXT("Com_Navigation")));
+		pNavigation->Set_OldPos(pCaptinNavi->Get_Navi_OldPos());
+		pNavigation->Set_NaviCurrentIndex(pCaptinNavi->GetCurrent_NaviIndex());
+	}
+
+
 }
 
 _bool CPlayer::IsCaptin()

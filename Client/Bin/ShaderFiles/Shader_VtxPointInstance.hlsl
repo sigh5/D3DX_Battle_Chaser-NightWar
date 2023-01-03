@@ -25,7 +25,7 @@ struct VS_OUT
 VS_OUT VS_MAIN(VS_IN In)
 {
 	VS_OUT		Out = (VS_OUT)0;
-
+	
 	vector		vPosition = mul(float4(In.vPosition, 1.f), In.Matrix);
 
 	Out.vPosition = mul(vPosition, g_WorldMatrix).xyz;

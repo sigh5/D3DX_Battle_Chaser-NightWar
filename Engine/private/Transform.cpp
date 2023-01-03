@@ -175,10 +175,6 @@ void CTransform::Go_Straight(_double TimeDelta, _float fSpeedRatio, CNavigation*
 		_float4 vPos; 
 		XMStoreFloat4(&vPos, vPosition);
 
-	/*	if (true == pNaviCom->isMove_OnNavigation(vPosition))
-			Set_State(CTransform::STATE_TRANSLATION, vPosition);*/
-		//else
-
 		if(true==pNaviCom->isMove_OnNavigation_test(vPos))
 			Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 
@@ -286,21 +282,20 @@ _bool CTransform::JudgeChaseState(_fvector vTargetPos, _float fLimit)
 	return false;
 }
 
-void CTransform::Chase_Speed(_fvector vTargetPos, _double TimeDelta, _float fSpeedRatio, _float fLimit)
+void CTransform::Chase_Speed(_fvector vTargetPos, _double TimeDelta, _float fSpeedRatio, _float fLimit,CNavigation* pNaviCom)
 {
+	if (nullptr == pNaviCom)
+		return ;
 
 	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
 	_vector		vDir = vTargetPos - vPosition;
 
 	_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
-
+	vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
 	if (fDistance > fLimit)
 	{
-		vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec*fSpeedRatio *  (_float)TimeDelta;
 		Set_State(CTransform::STATE_TRANSLATION, vPosition);
 	}
-	
-
 }
 
 _bool CTransform::CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _float fLimit,  _float fSpeedMultiple )

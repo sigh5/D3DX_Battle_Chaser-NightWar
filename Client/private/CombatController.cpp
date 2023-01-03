@@ -19,18 +19,7 @@
 #include "HpMpBuffCanvas.h"
 #include <string>
 
-#ifdef _DEBUG
-
-//static string str[14] = { { "STATE_INTRO" },{ "STATE_NORMAL_ATTACK" },{ "STATE_SKILL_ATTACK1" },
-//{ "STATE_SKILL_ATTACK2" },{ "STATE_UlTIMATE" },{ "STATE_BUFF" },
-//{ "STATE_WIDEAREA_BUFF" },{ "STATE_USE_ITEM" },{ "STATE_DEFENCE" },
-//{ "STATE_LIGHT_HIT" },{ "STATE_HEAVY_HIT" },{ "STATE_FLEE" },
-//{ "STATE_DIE" },{ "STATE_VITORY" } };
-
-#endif // !_DEBUG
-
 IMPLEMENT_SINGLETON(CCombatController);
-
 
 CCombatController::CCombatController()
 	:m_pGameInstace{ CGameInstance::GetInstance() }
@@ -150,7 +139,7 @@ void CCombatController::Cal_HitPlayerTarget()
 	m_iMonster_Player_Option = 1; 
 	m_bMonsterTurnEnd = false;
 	/*
-		공격 우선순위 1) 피가 제일 작은 놈 ,2) 마나가 적은놈 3) 나를 때린 놈
+		공격 우선순위 1) 나를 때린 놈 2) 피가 제일 작은 놈 ,3) 마나가 적은놈 
 					수정필요
 	*/
 
@@ -158,28 +147,45 @@ void CCombatController::Cal_HitPlayerTarget()
 	_float MinPlayerMPRatio = 999.f;
 	//CGameObject* pHitTargetMp = nullptr;
 	//m_iMonster_Player_Option = 2;
-	for (auto& pPlayer : m_CurActorMap)
-	{
-		if (dynamic_cast<CPlayer*>(pPlayer.second) !=nullptr)
-		{
-			_float CurPlayerHPRatio =	Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusHpRatio();
-			_float CurPlayerMPRatio = Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusMpRatio();
 
-			if (CurPlayerHPRatio <= MinPlayerHPRatio && CurPlayerHPRatio > 0.f)
-			{
-				MinPlayerHPRatio = CurPlayerHPRatio;
-				m_pHitActor = pPlayer.second;
-			}
-			
-			if (CurPlayerMPRatio <= MinPlayerMPRatio  && CurPlayerMPRatio > 0.f)
-			{
-				MinPlayerMPRatio = CurPlayerMPRatio;
-				//pHitTargetMp = pPlayer.second;
-			}
+	CGameObject* pMeHit_Player = static_cast<CMonster*>(m_pCurentActor)->Get_Me_hitPlayer();
+	if (pMeHit_Player != nullptr)
+	{
+		m_pHitActor = pMeHit_Player;
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(pMeHit_Player);
+	
+		CStatus* pStatus = Find_CurStatus(m_pHitActor->Get_ObjectName());
+		_float CurPlayer_HPRatio = pStatus->Get_CurStatusHpRatio();
+		if (CurPlayer_HPRatio <= 0.f)
+		{
+			pMeHit_Player = nullptr;
 		}
 	}
-	static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
+	
+	if(pMeHit_Player == nullptr)
+	{
+		for (auto& pPlayer : m_CurActorMap)
+		{
+			if (dynamic_cast<CPlayer*>(pPlayer.second) != nullptr)
+			{
+				_float CurPlayerHPRatio = Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusHpRatio();
+				_float CurPlayerMPRatio = Find_CurStatus(pPlayer.second->Get_ObjectName())->Get_CurStatusMpRatio();
 
+				if (CurPlayerHPRatio <= MinPlayerHPRatio && CurPlayerHPRatio > 0.f)
+				{
+					MinPlayerHPRatio = CurPlayerHPRatio;
+					m_pHitActor = pPlayer.second;
+				}
+
+				if (CurPlayerMPRatio <= MinPlayerMPRatio  && CurPlayerMPRatio > 0.f)
+				{
+					MinPlayerMPRatio = CurPlayerMPRatio;
+					//pHitTargetMp = pPlayer.second;
+				}
+			}
+		}
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_HitTarget(m_pHitActor);
+	}
 
 	/*
 		행동 우선순위 1) 본인 피가 절반이하일때 방어, 또는 버프 ,절반 이상일때 공격
@@ -311,7 +317,7 @@ void CCombatController::Active_Fsm()
 	To_Light_Hit();
 	To_Heavy_Hit();
 
-	To_Die();
+	//To_Die();
 	
 }
 
@@ -377,7 +383,7 @@ void CCombatController::Collison_Event()
 	if (pWeapon == nullptr)
 		return;
 
-	if (static_cast<CHitBoxObject*>(pWeapon)->Get_HitNum() >m_iHitNum && static_cast<CCombatActors*>(m_pHitActor)->Calculator_HitColl(pWeapon))
+	if (static_cast<CHitBoxObject*>(pWeapon)->Get_HitNum() > m_iHitNum && static_cast<CCombatActors*>(m_pHitActor)->Calculator_HitColl(pWeapon))
 	{
 		m_bIsHiterhit = true;
 		m_bisHitTimer_Alive = true;
@@ -398,12 +404,14 @@ HRESULT CCombatController::Set_CurrentActor()
 		m_bIsPlayer = true;
 		m_pTurnStateButtonCanvas->CurState_Fsm_ButtonICon(TEXT("Hero_Gully"));
 		m_iMonster_Player_Option = 0;
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(false);
 		break;
 	case Client::REPRESENT_GARRISON:
 		m_pCurentActor = Find_CurActor(TEXT("Hero_Alumon"));
 		m_bIsPlayer = true;
 		m_pTurnStateButtonCanvas->CurState_Fsm_ButtonICon(TEXT("Hero_Alumon"));
 		m_iMonster_Player_Option = 0;
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(false);
 		break;
 	case Client::REPRESENT_CALIBRETTO:
 		m_pCurentActor = Find_CurActor(TEXT("Hero_Calibretto"));
@@ -430,7 +438,6 @@ HRESULT CCombatController::Set_CurrentActor()
 		break;
 	}
 
-
 	return S_OK;
 }
 
@@ -444,7 +451,6 @@ HRESULT CCombatController::Set_ActorsStatus()
 		Safe_AddRef(pStatus);
 		m_ActorsStatusMap.emplace(pActors.second->Get_ObjectName(), pStatus);
 	}
-
 
 	return S_OK;
 }
@@ -646,7 +652,7 @@ void CCombatController::To_Use_Item()
 			m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
 			&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
 		{
-			
+			return;
 		}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
@@ -668,16 +674,19 @@ void CCombatController::To_Defence()
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ACTION//수정필요
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_DEFENCE)//수정필요
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Defence);
+		//m_pCurentActor->Set_FsmState(true, CGameObject::CHAR_STATE_END);
 
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(true);
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Defence);
+		//static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(true);
+		m_pCurentActor->Set_FsmState(true, CGameObject::CHAR_STATE_END);
 		m_bMonsterTurnEnd = true;
 	}
 	else
@@ -692,9 +701,15 @@ void CCombatController::To_Light_Hit()
 	/* 맞는거는 히팅 되는 애들을 추적해야하는데 이걸할려면 피킹이 필요함*/
 	if (m_bIsHiterhit)
 	{
-		m_pHitActor->Set_FsmState(true, CGameObject::m_Light_Hit);
+		if (static_cast<CCombatActors*>(m_pHitActor)->Get_UseDeffece())
+		{
+			m_pHitActor->Set_FsmState(true, CGameObject::m_Defence);
+		}
+		else
+		{
+			m_pHitActor->Set_FsmState(true, CGameObject::m_Light_Hit);
+		}
 		m_bIsHiterhit = false;
-		
 		for (auto &Canvas : m_CanvasVec)
 		{
 			if (dynamic_cast<CHpMpBuffCanvas*>(Canvas) != nullptr)
@@ -789,17 +804,13 @@ CStatus * CCombatController::Find_CurStatus(const wstring & pNameTag)
 
 void CCombatController::Free()
 {
-	//
-
 	for (auto& pStatus : m_ActorsStatusMap)
 		Safe_Release(pStatus.second);
 	m_ActorsStatusMap.clear();
 
-
 	for (auto& pActor : m_CurActorMap)
 		Safe_Release(pActor.second);
 	m_CurActorMap.clear();
-
 
 	for (auto& pCanvas : m_CanvasVec)
 		Safe_Release(pCanvas);

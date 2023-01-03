@@ -79,7 +79,7 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 	m_bHaveSkill2 = false;
 	m_bHaveUltimate = true;
 	m_bDefence = false;
-	m_isBuff = true;
+	
 	return S_OK;
 }
 
@@ -192,6 +192,14 @@ void CSlimeKing::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+		if (m_bCombatChaseTarget == true)
+		{
+			if (static_cast<CCombatActors*>(m_pHitTarget)->Get_UseDeffece())
+			{
+				m_pHitTarget->Set_FsmState(true, CGameObject::m_Defence);
+			}
+		}
+	
 	}
 	else
 		return;
@@ -346,6 +354,7 @@ void CSlimeKing::AnimNormalAttack()
 	m_LimitDistance = 6.f;
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 1.f;
+	m_pMeHit_Player = nullptr;
 
 	m_iStateDamage = 30;
 	m_iHitCount = 1;
@@ -365,6 +374,8 @@ void CSlimeKing::Anim_Skill1_Attack()
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 1.f;
 	m_iStateDamage = 40;
+	m_pMeHit_Player = nullptr;
+
 	m_pStatusCom->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
@@ -381,6 +392,7 @@ void CSlimeKing::Anim_Uitimate()
 	m_LimitDistance = 15.f;
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 1.f;
+	m_pMeHit_Player = nullptr;
 
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
@@ -393,7 +405,7 @@ void CSlimeKing::Anim_Uitimate()
 
 void CSlimeKing::Anim_Buff()
 {
-
+	m_isBuff = true;
 	m_pStatusCom->Use_SkillMp(10);
 	m_CurAnimqeue.push({ 3, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -404,6 +416,7 @@ void CSlimeKing::Anim_Light_Hit()
 	++m_iHitNum;
 	m_CurAnimqeue.push({ 7,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	m_pMeHit_Player = nullptr;
 }
 
 void CSlimeKing::Anim_Heavy_Hit()
@@ -411,6 +424,7 @@ void CSlimeKing::Anim_Heavy_Hit()
 	++m_iHitNum;
 	m_CurAnimqeue.push({ 6,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	m_pMeHit_Player = nullptr;
 }
 
 void CSlimeKing::Anim_Die()
@@ -420,6 +434,7 @@ void CSlimeKing::Anim_Die()
 	m_CurAnimqeue.push({ 2,1.f });
 	m_CurAnimqeue.push({ 17,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
 }
 
 void CSlimeKing::Anim_Viroty()

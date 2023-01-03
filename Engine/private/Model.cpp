@@ -35,10 +35,9 @@ CModel::CModel(const CModel & rhs)
 	, m_pCameraBone(rhs.m_pCameraBone)
 
 {
-
 	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
 
-	//Test 얕은복사
+	//Test 얕은복사		// 깊은 복사 필요
 	for (auto& m_Bones : m_Bones)
 	{
 		Safe_AddRef(m_Bones);
@@ -116,6 +115,8 @@ HRESULT CModel::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
 
+
+
 	//#ifndef DEBUG
 	//	XMStoreFloat4x4(&m_ImguiPivotMatrix, XMMatrixIdentity());
 	//#endif // !DEBUG
@@ -164,6 +165,22 @@ void CModel::Play_BlendAnimation(_double TimeDelta, _bool IsCombat)
 		if (nullptr != pBone)
 			pBone->Compute_CombindTransformationMatrix();
 	}
+}
+
+void CModel::Play_Animation_2(_double TimeDelta)
+{
+	if (TYPE_NONANIM == m_eType)
+		return;
+
+	/* 현재 애니메이션에 맞는 뼈들의 TranformMAtrix를 갱신하낟. */
+	m_Animations[m_iCurrentAnimIndex]->Normal_Update_Bones(TimeDelta);
+
+	for (auto& pBone : m_Bones)
+	{
+		if (nullptr != pBone)
+			pBone->Compute_CombindTransformationMatrix();
+	}
+
 }
 
 HRESULT CModel::Bind_Material(CShader * pShader, _uint iMeshIndex, aiTextureType eType, const char * pConstantName)

@@ -60,8 +60,8 @@ protected: /*For.Dungeon*/
 public: /*For.Imgui*/
 	virtual _bool Piciking_GameObject() { return false; }
 
-private:
-	void	LookAtTarget(_double TimeDelta);
+public:
+	void	LookAtTarget(_double TimeDelta,class CNavigation* pNavigation);
 
 protected:
 	PLAYERDESC						m_PlayerDesc;

@@ -151,11 +151,14 @@
     <Filter Include="02.GameObjects\Effect\Effect_">
       <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Terrain\MapOneTile">
-      <UniqueIdentifier>{3264df53-88d2-4978-a6fc-1a4ba76b4388}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\MapOne\MapOneTree">
       <UniqueIdentifier>{0b37f63b-c8d9-4061-9260-e717aee6c304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MapOne\Chest">
+      <UniqueIdentifier>{80803b1d-1f3d-4a22-b0ff-694af821c8be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\MapOne\Collider_3DUI">
+      <UniqueIdentifier>{84cddc74-90ab-41c1-98af-7cec0fd90016}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -324,8 +327,14 @@
     <ClInclude Include="..\Public\MapTile.h">
       <Filter>02.GameObjects\MapOne</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\ChestBox.h">
+      <Filter>02.GameObjects\MapOne\Chest</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\MapOneTree.h">
-      <Filter>02.GameObjects\Terrain\MapOneTile</Filter>
+      <Filter>02.GameObjects\MapOne\MapOneTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_3D_UI.h">
+      <Filter>02.GameObjects\MapOne\Collider_3DUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -476,8 +485,14 @@
     <ClCompile Include="..\Private\MapTile.cpp">
       <Filter>02.GameObjects\MapOne</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\ChestBox.cpp">
+      <Filter>02.GameObjects\MapOne\Chest</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\MapOneTree.cpp">
-      <Filter>02.GameObjects\Terrain\MapOneTile</Filter>
+      <Filter>02.GameObjects\MapOne\MapOneTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_3D_UI.cpp">
+      <Filter>02.GameObjects\MapOne\Collider_3DUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

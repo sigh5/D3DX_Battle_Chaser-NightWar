@@ -22,6 +22,15 @@ public:
 
 	_bool			IsHaveDefence()const { return m_bDefence; }
 	const _bool		Get_IsWideBuff()const { return m_isWideBuff; }
+
+	void			Set_Defence_Timer(_bool bEvent) { m_bIsDefenceTimer = bEvent; }
+	const _bool		Get_UseDeffece()const { return m_bUseDefence; }
+	void			Set_UseDefence(_bool bUseDefence) {
+		m_bUseDefence = bUseDefence;
+		Set_Defence_Timer(bUseDefence);
+	}
+	
+
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -42,7 +51,7 @@ public:
 	virtual		void	Fsm_Exit();
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
 	virtual		void	HitActor_LoseHP(CGameObject* pCurActor);
-
+	virtual		 void	Defence_Exit();
 
 protected:
 	CGameObject*					m_pHitTarget = nullptr;		//Combat
@@ -55,6 +64,8 @@ protected:
 	_bool							m_bIsDead = false;
 	_bool							m_bDeadEvent = false;
 	_bool							m_bCombatChaseTarget = false;
+	_bool							m_bUseDefence = false;//디펜스를 사용할때
+	_bool							m_bIsDefenceTimer = false;
 protected:
 	_uint							m_bFinishOption = 0;
 	_uint							m_iOldAnim = 0;
@@ -68,8 +79,9 @@ protected:
 	_double							m_IntroTimer = 0.7;
 	_uint							m_iHitCount = 0;
 
+	_float							m_fDefencTimer = 0.f;
 protected:
-	_bool			m_bDefence = false;
+	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool			m_isWideBuff = false;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

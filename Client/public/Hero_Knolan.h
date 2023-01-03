@@ -38,6 +38,7 @@ public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 	virtual		void	Fsm_Exit()override;
 	void				Intro_Exit();			//얘가 인트로가 제일길어서 
+	virtual		void	Defence_Exit()override;
 
 public: /*For.Dungeon*/
 	virtual _uint		Get_AnimationIndex() override;

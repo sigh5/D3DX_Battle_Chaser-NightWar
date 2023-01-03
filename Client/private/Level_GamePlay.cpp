@@ -62,7 +62,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	/*if (GetKeyState(VK_SPACE) & 0x8000)
+	if (GetKeyState(VK_SPACE) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 		Safe_AddRef(pGameInstance);
@@ -71,7 +71,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 			return;
 
 		Safe_Release(pGameInstance);
-	}*/
+	}
 
 }
 
@@ -134,6 +134,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	//pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
 
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
+	
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Map_3D_UI"))))
+	//		return E_FAIL;
+	
+	
 	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Tree_Instatincing"))))
 	//	return E_FAIL;
 
@@ -152,8 +157,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EffectFrame"))))
-		return E_FAIL;
-		*/
+		return E_FAIL;*/
+		
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
 		return E_FAIL;
 
@@ -174,6 +179,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 
 	//pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_ChestBox"))))
+	//	return E_FAIL;
+
+	
 	//pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_GAMEPLAY);
 
 	RELEASE_INSTANCE(CGameInstance);

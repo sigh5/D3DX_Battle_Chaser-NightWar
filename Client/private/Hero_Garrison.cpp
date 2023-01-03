@@ -26,6 +26,7 @@ CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
 	{
 		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
+			
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
 			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
@@ -45,7 +46,11 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		if (m_bUseDefence == true)
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(pCurActorWepon->Get_WeaponDamage()*0.5));
+		else
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+	
 		
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
@@ -88,6 +93,10 @@ HRESULT CHero_Garrison::Last_Initialize()
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.21f, 0.f, 0.21f, 1.f));
 	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
 	m_bLast_Initlize = true;
+	
+	_float4 vPos;
+	XMStoreFloat4(&vPos, XMVectorSet(0.21f, 0.f, 0.21f, 1.f));
+	m_pNavigationCom->Set_OldPos(vPos);
 	return S_OK;
 }
 
@@ -98,9 +107,8 @@ void CHero_Garrison::Tick(_double TimeDelta)
 
 	if (m_bIsCombatScene == false)
 	{
+		LookAtTarget(TimeDelta, m_pNavigationCom);
 		Dungeon_Tick(TimeDelta);
-		m_pNavigationCom->isMove_OnNavigation(m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
 	}	
 	else
 	{
@@ -289,6 +297,21 @@ void CHero_Garrison::Fsm_Exit()
 	m_pHitTarget = nullptr;
 }
 
+void CHero_Garrison::Defence_Exit()
+{
+
+	if (false == m_bIsDefenceTimer)
+		return;
+
+	m_fDefencTimer += (_float)(CClient_Manager::TimeDelta);
+
+	if (m_fDefencTimer >= 1.f)
+	{
+		Fsm_Exit();
+		m_bIsDefenceTimer = false;
+	}
+}
+
 void CHero_Garrison::MovingAnimControl(_double TimeDelta)
 {
 	if (!m_CurAnimqeue.empty() && m_pModelCom->Get_Finished(m_pModelCom->Get_AnimIndex()))
@@ -421,6 +444,7 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 16.f, 1.f));
+	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 
 
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
@@ -704,7 +728,7 @@ void CHero_Garrison::Anim_Defence()
 {
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 32,   1.f });
-
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

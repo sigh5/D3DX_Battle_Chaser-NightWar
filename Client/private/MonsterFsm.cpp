@@ -134,7 +134,7 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 		.AddState(L"Buff")
 		.OnStart([this]()
 	{
-		static_cast<CSlimeKing*>(m_pTarget)->Anim_Uitimate();
+		static_cast<CSlimeKing*>(m_pTarget)->Anim_Buff();
 	})
 		.Tick([this](_double TimeDelta)
 	{

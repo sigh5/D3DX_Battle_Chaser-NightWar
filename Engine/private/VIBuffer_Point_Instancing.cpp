@@ -49,7 +49,7 @@ HRESULT CVIBuffer_Point_Instancing::Initialize_Prototype(_uint iNumInstance)
 	ZeroMemory(pVertices, sizeof(VTXPOINTINSTANCING));
 
 	pVertices->vPosition = _float3(0.0f, 0.0f, 0.0f);		// 처음에 다 원점으로 고정
-	pVertices->vPSize = _float2(4.f, 4.f);				// 지름이라고 생각하면 편함 실제 전체사이즈의크기
+	pVertices->vPSize = _float2(4.f, 4.f);					// 지름이라고 생각하면 편함 실제 전체사이즈의크기
 
 	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
 	m_SubResourceData.pSysMem = pVertices;
@@ -102,7 +102,7 @@ HRESULT CVIBuffer_Point_Instancing::Initialize_Prototype(_uint iNumInstance)
 
 	for (_uint i = 0; i < iNumInstance; ++i)
 	{
-		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);
+		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
 		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
 		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
 		pInstanceVertices[i].vPosition = _float4( _float(rand() % 5) , 3.0f, _float(rand() % 5), 1.f);

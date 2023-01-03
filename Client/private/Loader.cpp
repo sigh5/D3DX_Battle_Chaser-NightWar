@@ -32,6 +32,8 @@
 #include "HpMpBuffCanvas.h"
 #include "MapTile.h"
 
+#include "ChestBox.h"
+#include "Map_3D_UI.h"
 /* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -221,11 +223,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
 
+	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
 	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
-	
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
-
-
 	CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
 
 
@@ -377,6 +376,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CMapOneTree::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ChestBox"),
+		CChestBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Map_3D_UI"),
+		CMap_3D_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -435,6 +442,7 @@ HRESULT CLoader::Loading_Combat()
 		CSkill_Object::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	
 
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝."));
@@ -547,6 +555,16 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Common/Common_Icon%d.png"),
 			CTexture::TYPE_END, 3))))	
 		return E_FAIL;
+
+
+	/* For.Prototype_Component_Texture_UI_State_Icon_Item */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_3DUI_MapColl"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/MapColl/MapColl_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
