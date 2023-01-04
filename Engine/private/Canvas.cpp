@@ -57,6 +57,10 @@ HRESULT CCanvas::Render()
 	return S_OK;
 }
 
+void CCanvas::Delete_Delegate()
+{
+}
+
 HRESULT CCanvas::Add_ChildUI(CUI * pUI)
 {
 	if (nullptr == pUI)

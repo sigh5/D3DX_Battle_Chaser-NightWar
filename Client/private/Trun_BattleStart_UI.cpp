@@ -83,6 +83,10 @@ HRESULT CTrun_BattleStart_UI::Render()
 	m_pVIBufferCom->Render();
 
 
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT("전투 시작!"), _float2(560.f, 90.f), 0.f, _float2(m_FontSizeX, m_FontSizeY), XMVectorSet(1.f, 0.f, 0.f, 1.f));
+	RELEASE_INSTANCE(CGameInstance);
+
 	return S_OK;
 }
 

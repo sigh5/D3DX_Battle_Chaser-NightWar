@@ -25,9 +25,19 @@ public:
 
 	_uint GetCurLevelIdx() const { return m_iLevelIndex; }
 
+	void	Set_CopyIndexs(_uint iPrevIndex, _uint iCurIndex)
+	{
+		m_iPrevLevel = iPrevIndex;
+		m_iCurLevel = iCurIndex;
+	}
+
 private:
 	class CLevel*				m_pCurrentLevel = nullptr;
 	_uint						m_iLevelIndex = 0;
+
+	_uint						m_iPrevLevel =0;
+	_uint						m_iCurLevel = 0;
+
 
 public:
 	virtual void Free() override;

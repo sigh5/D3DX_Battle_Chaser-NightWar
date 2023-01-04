@@ -17,6 +17,9 @@ private:
 	CCamera_Static(const CCamera_Static& rhs);
 	virtual ~CCamera_Static() = default;
 
+public:
+	const _float	Get_CameraZ()const { return m_CameraEyeZ; }
+	void			Set_CameraZ(_float fCamZ) { m_CameraEyeZ = fCamZ; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -27,6 +30,7 @@ public:
 	virtual HRESULT Render() override;
 
 	virtual void	Set_CameraActive(_bool bCameraActive)override;
+	
 
 
 

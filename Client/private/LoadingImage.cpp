@@ -28,6 +28,9 @@ HRESULT CLoadingImage::Initialize_Prototype()
 HRESULT CLoadingImage::Initialize(void * pArg)
 {
 	m_iLoadingIndex++;
+	if (m_iLoadingIndex >= 5)
+		m_iLoadingIndex = 0;
+
 	m_ObjectName = TEXT("Loading_Images");
 
 	if (FAILED(CUI::Initialize(pArg)))

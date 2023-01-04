@@ -43,7 +43,7 @@ private:
 	_float4x4						m_TransformMatrix;
 	_float4x4						m_CombindTransformMatrix;
 	 CBone*					     	m_pParent = nullptr;
-
+	 _bool							m_bClone=false;
 public:
 	static CBone* Create(class CModel* pModel, HANDLE hFile);
 	virtual void Free() override;

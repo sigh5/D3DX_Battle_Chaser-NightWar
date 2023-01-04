@@ -1,5 +1,5 @@
 #include "..\public\VIBuffer_Instancing.h"
-
+#include "GameInstance.h"
 
 CVIBuffer_Instancing::CVIBuffer_Instancing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer(pDevice, pContext)
@@ -49,6 +49,7 @@ HRESULT CVIBuffer_Instancing::Render()
 		0,
 	};
 
+	CONTEXT_LOCK
 	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iStrides, iOffsets);
 
 	/*인덱스버퍼를 장치에 바인딩한다.(단일로 바인딩한다.)  */

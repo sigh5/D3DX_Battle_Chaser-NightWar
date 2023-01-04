@@ -54,7 +54,7 @@ private:
 private:
 	void					Control_ChildRender(_bool bRenderActive);
 	void					StateButton_Child();
-
+	virtual void			Delete_Delegate()override;
 
 private:
 	CShader*				m_pShaderCom = nullptr;

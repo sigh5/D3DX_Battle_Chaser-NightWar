@@ -10,9 +10,8 @@ CBone::CBone(const CBone & rhs)
 	: m_CombindTransformMatrix(rhs.m_CombindTransformMatrix)
 	, m_OffsetMatrix(rhs.m_OffsetMatrix)
 	, m_TransformMatrix(rhs.m_TransformMatrix)
-
 {
-	strcpy_s(m_szName, MAX_PATH, rhs.m_szName);
+	strcpy_s(m_szName, MAX_PATH,rhs.m_szName);
 	
 }
 
@@ -25,7 +24,6 @@ HRESULT CBone::Initialize(CModel* pModel, HANDLE hFile)
 	ReadFile(hFile, m_szName, MAX_PATH, &dwByte, nullptr);
 	ReadFile(hFile, &m_TransformMatrix, sizeof(_float4x4), &dwByte, nullptr);
 
-	
 	return S_OK;
 }
 

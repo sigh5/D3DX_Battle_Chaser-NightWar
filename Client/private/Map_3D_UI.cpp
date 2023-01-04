@@ -3,7 +3,7 @@
 #include "GameInstance.h"
 #include "PlayerController.h"
 #include "UI.h"
-
+#include "Client_Manager.h"
 
 CMap_3D_UI::CMap_3D_UI(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CEnvironment_Object(pDevice, pContext)
@@ -47,6 +47,8 @@ HRESULT CMap_3D_UI::Last_Initialize()
 
 void CMap_3D_UI::Tick(_double TimeDelta)
 {
+	
+
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
@@ -64,13 +66,6 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 	}
 	
 	m_pTransformCom->Go_Left(TimeDelta);
-	if (m_bRenderFont)
-	{
-		ImGui::InputFloat("PosX", &m_FontPosX);
-		ImGui::InputFloat("PosY", &m_FontPosY);
-		ImGui::InputFloat("SizeX", &m_FontSizeX);
-		ImGui::InputFloat("SizeY", &m_FontSizeY);
-	}
 
 
 	if (m_bOnce )
@@ -83,14 +78,16 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 		CGameInstance::GetInstance()->Scene_Change();
 	}
 
-
+	is_Cal_This_Delete();
 
 }
 
 void CMap_3D_UI::Late_Tick(_double TimeDelta)
 {
-	__super::Late_Tick(TimeDelta);
+	if (m_bRenderActive)
+		return;
 
+	__super::Late_Tick(TimeDelta);
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -109,14 +106,6 @@ HRESULT CMap_3D_UI::Render()
 	m_pColliderCom->Render();
 
 #endif // !_DEBUG
-
-	if (m_bRenderFont)
-	{
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT("전투 시작!"), _float2(560.f, 90.f), 0.f, _float2(m_FontSizeX, m_FontSizeY), XMVectorSet(1.f, 0.f, 0.f, 1.f));
-		RELEASE_INSTANCE(CGameInstance);
-
-	}
 	return S_OK;
 }
 
@@ -128,42 +117,46 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 
 	if (m_pColliderCom->Collision(pCaptinColl))
 	{
-		if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI0")) && !m_bOnce)
+		if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI0")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[0])
 		{
 			pGameInstance->Load_Object(TEXT("OneMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			m_bRenderFont = true;
 
 			CUI*pCanvas  =static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
-
-
-
+			pGameInstance->Setting_MonsterScene(0);
+			CClient_Manager::bIsCollPlayerTo3DUI[0] = true;
 
 		}
-		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce)
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[1])
 		{
 			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			m_bRenderFont = true;
+			
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
+			pGameInstance->Setting_MonsterScene(1);
+			CClient_Manager::bIsCollPlayerTo3DUI[1] = true;
 		}
-		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI2")) && !m_bOnce)
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI2")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[2])
 		{
 			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			m_bRenderFont = true;
+			
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
+			pGameInstance->Setting_MonsterScene(2);
+			CClient_Manager::bIsCollPlayerTo3DUI[2] = true;
 		}
-		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && !m_bOnce)
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && !m_bOnce &&  !CClient_Manager::bIsCollPlayerTo3DUI[3])
 		{
 			pGameInstance->Load_Object(TEXT("ThirdMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			m_bRenderFont = true;
+			
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
+			pGameInstance->Setting_MonsterScene(3);
+			CClient_Manager::bIsCollPlayerTo3DUI[3] = true;
 		}
 	}
 
@@ -176,6 +169,31 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 
 	RELEASE_INSTANCE(CPlayerController);
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CMap_3D_UI::is_Cal_This_Delete()
+{
+	CGameInstance*pGameInstace = GET_INSTANCE(CGameInstance);
+
+	if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI0")) && CClient_Manager::bIsCollPlayerTo3DUI[0])
+	{
+		m_bRenderActive = true;
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && CClient_Manager::bIsCollPlayerTo3DUI[1])
+	{
+		m_bRenderActive = true;
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI2")) && CClient_Manager::bIsCollPlayerTo3DUI[2])
+	{
+		m_bRenderActive = true;
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && CClient_Manager::bIsCollPlayerTo3DUI[3])
+	{
+		m_bRenderActive = true;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 HRESULT CMap_3D_UI::SetUp_Components()

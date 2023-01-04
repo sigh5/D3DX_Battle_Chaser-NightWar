@@ -70,7 +70,9 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 		return S_OK;
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+#ifdef NOMODLES
 
+#else
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.bind(this, &CTurnStateCanvas::Set_RenderActive);
 
@@ -82,6 +84,7 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 
 	Control_ChildRender(false);
 	StateButton_Child();
+#endif
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -292,6 +295,22 @@ void CTurnStateCanvas::StateButton_Child()
 	}
 }
 
+void CTurnStateCanvas::Delete_Delegate()
+{
+	//CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	//CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	//dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	//dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	//dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatStateCanvasDelegeter.unbind(this);
+
+	//RELEASE_INSTANCE(CGameInstance);
+}
+
 HRESULT CTurnStateCanvas::SetUp_Components()
 {
 	/*For.Com_Renderer */
@@ -372,4 +391,6 @@ void CTurnStateCanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+	
 }

@@ -14,7 +14,14 @@ CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * p
 
 CSkeleton_Naked::CSkeleton_Naked(const CSkeleton_Naked & rhs)
 	: CMonster(rhs)
+	, m_pShaderCom{ nullptr }
+	, m_pRendererCom{ nullptr }
+	,m_pModelCom{ nullptr }
+	,m_pColliderCom{ nullptr }
+	,m_pStatusCom{ nullptr }
+	, m_pFsmCom{ nullptr }
 {
+	m_MonsterParts.clear();
 }
 
 CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
@@ -93,7 +100,6 @@ HRESULT CSkeleton_Naked::Last_Initialize()
 
 	if (FAILED(Ready_Parts()))
 		return E_FAIL;
-
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -319,6 +325,8 @@ HRESULT CSkeleton_Naked::Ready_Parts()
 		return E_FAIL;
 
 	m_MonsterParts.push_back(pPartObject);
+	Safe_AddRef(WeaponDesc.pSocket);
+	Safe_AddRef(m_pTransformCom);
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -441,7 +449,6 @@ CGameObject * CSkeleton_Naked::Clone(void * pArg)
 void CSkeleton_Naked::Free()
 {
 	__super::Free();
-
 
 	for (auto& pPart : m_MonsterParts)
 		Safe_Release(pPart);

@@ -126,6 +126,23 @@ void CDungeon_Canvas::Change_Texture(_uint iLevel, const wstring & NewComPonentT
 
 }
 
+void CDungeon_Canvas::Delete_Delegate()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_DungeonUIDelegeter.unbind(this);
+
+	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_DungeonUIDelegeter.unbind(this);
+
+	pGameObject = pInstance->Get_GameObject(LEVEL_GAMEPLAY, TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_DungeonUIDelegeter.unbind(this);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
 HRESULT CDungeon_Canvas::SetUp_Components()
 {
 	/*For.Com_Renderer */

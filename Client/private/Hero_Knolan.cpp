@@ -185,9 +185,6 @@ HRESULT CHero_Knolan::Render()
 	if (m_bIsCombatScene)
 		m_pColliderCom->Render();
 
-	
-	
-
 #endif
 	return S_OK;
 }
@@ -200,6 +197,11 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 	Remove_component(TEXT("Com_Model"));
 	if (LEVEL_GAMEPLAY == iLevleIdx)
 	{
+		_float3 vScale = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonScale();
+		_float4 vPos = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonPos();
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+		m_pTransformCom->Set_Scaled(vScale);
+		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanDungeon"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert("Change_Level_Data : LEVEL_COMBAT ");
@@ -208,11 +210,26 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 	}
 	else if (LEVEL_COMBAT == iLevleIdx)
 	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		_float3 vScale = m_pTransformCom->Get_Scaled();
+		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
+		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
+
+
+		if (m_bCombat_LastInit)
+		{
+			vPos = m_pStatusCom[COMBAT_PLAYER]->Get_CombatPos();
+			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+			m_pTransformCom->Set_Scaled(vScale);
+		}
+
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert("Change_Level_Data : LEVEL_COMBAT ");
 		m_bIsCombatScene = true;
-		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
+		
 	}
 	else
 		return;
@@ -311,6 +328,12 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_bDefence = true;
 	m_isWideBuff = true;
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, XMVectorSet(-2.f, 0.f, 26.f, 1.f));
+	_float3 vScale = _float3(4.f, 4.f, 4.f);
+	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
+
 
 	m_bCombat_LastInit = true;
 	return S_OK;

@@ -1,5 +1,5 @@
 #include "..\public\VIBuffer_Rect_Instancing.h"
-
+#include "GameInstance.h"
 
 
 CVIBuffer_Rect_Instancing::CVIBuffer_Rect_Instancing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -159,7 +159,7 @@ HRESULT CVIBuffer_Rect_Instancing::Initialize(void * pArg)
 HRESULT CVIBuffer_Rect_Instancing::Tick(_double TimeDelta)
 {
 	// 여기서 인스턴스 버퍼의 락,언락하기
-
+	CONTEXT_LOCK;
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
 	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
@@ -199,7 +199,7 @@ HRESULT CVIBuffer_Rect_Instancing::Render()
 		0,
 		0,
 	};
-
+	CONTEXT_LOCK;
 	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iStrides, iOffsets);
 
 	/* 인덱스버퍼를 장치에 바인딩한다.(단일로 바인딩한다.)  */

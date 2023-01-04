@@ -12,6 +12,10 @@
 #include "Model_Instancing.h"
 
 _double CClient_Manager::TimeDelta = 0;
+_bool	CClient_Manager::bIsCollPlayerTo3DUI[20] = { false };
+_matrix	CClient_Manager::m_StaticCameraMatrix = XMMatrixIdentity();
+_float	CClient_Manager::m_CameraEye_Z = 0.f;
+
 
 void CClient_Manager::Client_Manager_Update()
 {
@@ -144,6 +148,8 @@ void CClient_Manager::CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCol
 	RELEASE_INSTANCE(CPlayerController);
 }
 
+
+
 #ifdef _DEBUG
 void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType)
 {
@@ -217,15 +223,13 @@ void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, An
 void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pColider)
 {
 	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
-	
-	if (pGameInstance->GetCurLevelIdx() == LEVEL_COMBAT)
+
+	if (pGameInstance->GetCurLevelIdx() != LEVEL_GAMEPLAY)
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return;
 	}
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
-
-
 	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
 	{
 		pColider->Render();
@@ -239,7 +243,7 @@ void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation *
 {
 	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (pGameInstance->GetCurLevelIdx() == LEVEL_COMBAT)
+	if (pGameInstance->GetCurLevelIdx() != LEVEL_GAMEPLAY)
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return;
@@ -255,7 +259,6 @@ void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation *
 	RELEASE_INSTANCE(CPlayerController);
 	RELEASE_INSTANCE(CGameInstance);
 }
-
 
 
 #endif

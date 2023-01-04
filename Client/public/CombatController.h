@@ -36,6 +36,10 @@ public:
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
 
+public:	/*For.Scene_Change*/
+	void				Scene_Chane_Safe_Release();
+	void				Reset_Timer();
+
 public:  /*Combat Logic*/
 	HRESULT Initialize(_uint iLevel);
 	HRESULT Late_Init();

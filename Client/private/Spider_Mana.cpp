@@ -14,7 +14,14 @@ CSpider_Mana::CSpider_Mana(ID3D11Device * pDevice, ID3D11DeviceContext * pContex
 
 CSpider_Mana::CSpider_Mana(const CSpider_Mana & rhs)
 	: CMonster(rhs)
+	, m_pShaderCom{nullptr}
+	, m_pRendererCom{ nullptr }
+	, m_pModelCom{ nullptr }
+	, m_pColliderCom{ nullptr }
+	, m_pStatusCom{ nullptr }
+	, m_pFsmCom{ nullptr }
 {
+	m_MonsterParts.clear();
 }
 
 CGameObject * CSpider_Mana::Get_Weapon_Or_SkillBody()
@@ -297,7 +304,6 @@ HRESULT CSpider_Mana::SetUp_ShaderResources()
 HRESULT CSpider_Mana::Ready_Parts()
 {
 	CGameObject*		pPartObject = nullptr;
-
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CWeapon::WEAPONDESC			WeaponDesc;
@@ -363,7 +369,6 @@ HRESULT CSpider_Mana::Ready_Parts()
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -0.f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.f, 1.f, 1.f, 0.f));
 	WeaponDesc.eType = WEAPON_HAND;
-
 
 	Safe_AddRef(WeaponDesc.pSocket);
 	Safe_AddRef(m_pTransformCom);

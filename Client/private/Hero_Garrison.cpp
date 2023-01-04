@@ -172,6 +172,12 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 	Remove_component(TEXT("Com_Model"));
 	if (LEVEL_GAMEPLAY == iLevleIdx)
 	{
+		_float3 vScale = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonScale();
+		_float4 vPos = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonPos();
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+		m_pTransformCom->Set_Scaled(vScale);
+		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
+
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
@@ -181,12 +187,28 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 	}
 	else if (LEVEL_COMBAT == iLevleIdx)
 	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		_float3 vScale = m_pTransformCom->Get_Scaled();
+		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
+		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
+
+
+		if (m_bCombatInit)
+		{
+			vPos = m_pStatusCom[COMBAT_PLAYER]->Get_CombatPos();
+			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+			m_pTransformCom->Set_Scaled(vScale);
+		}
+
+
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
 
 		m_bIsCombatScene = true;
-		m_pTransformCom->Set_Scaled(_float3(2.0f, 2.0f, 2.0f));
+		
 	}
 	else
 		return;
@@ -445,12 +467,16 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 16.f, 1.f));
 	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-
-
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
 	if (FAILED(Ready_CombatParts()))
 		return E_FAIL;
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, XMVectorSet(9.f, 0.f, 16.f, 1.f));
+	_float3 vScale = _float3(4.f, 4.f, 4.f);
+	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
+
 
 	m_bDefence = true;
 	m_isWideBuff = false;

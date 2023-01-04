@@ -39,6 +39,7 @@ using namespace DirectX;
 #include <queue>
 #include <string>
 #include <string.h>
+#include <mutex>
 using namespace std;
 
 #include "imgui.h"

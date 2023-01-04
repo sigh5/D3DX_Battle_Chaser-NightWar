@@ -1,6 +1,7 @@
 #include "..\public\MeshInstancing.h"
 #include "Model_Instancing.h"
 #include "Bone_Instacing.h"
+#include "GameInstance.h"
 
 CMeshInstancing::CMeshInstancing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CVIBuffer_Instancing(pDevice, pContext)
@@ -190,6 +191,7 @@ HRESULT CMeshInstancing::Render()
 		0,
 	};
 
+	CONTEXT_LOCK;
 	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iStrides, iOffsets);
 
 	/* 인덱스버퍼를 장치에 바인딩한다.(단일로 바인딩한다.)  */
@@ -204,18 +206,19 @@ HRESULT CMeshInstancing::Render()
 
 void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 {
+	CONTEXT_LOCK;
 	m_iNumInstance = iNumInstance;
 	m_iNumPrimitive = m_iOriginNumPrimitive * m_iNumInstance;
 	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
 
-	/*ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iIndicesSizePerPrimitive * m_iNumPrimitive;
 	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	m_BufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	m_BufferDesc.StructureByteStride = 0;
 	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	m_BufferDesc.MiscFlags = 0;*/
+	m_BufferDesc.MiscFlags = 0;
 
 	FACEINDICES32*		pIndices = new FACEINDICES32[m_iNumPrimitive];
 	ZeroMemory(pIndices, sizeof(FACEINDICES32) * m_iNumPrimitive);
@@ -241,17 +244,27 @@ void CMeshInstancing::Map_UnMapViBuffer(_uint iNumInstance)
 
 	}
 
-	D3D11_MAPPED_SUBRESOURCE		SubResources;
-	ZeroMemory(&SubResources, sizeof(D3D11_MAPPED_SUBRESOURCE));
-	m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResources);
-	memcpy(SubResources.pData, pIndices, sizeof(FACEINDICES32) * iNumFaces);
-	m_pContext->Unmap(m_pIB, 0);
 
+	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+	m_SubResourceData.pSysMem = pIndices;
+	Safe_Release(m_pIB);
+	m_pIB = nullptr;
+	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pIB);
 	Safe_Delete_Array(pIndices);
 
 
-	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+	//D3D11_MAPPED_SUBRESOURCE		SubResources;
+	//ZeroMemory(&SubResources, sizeof(D3D11_MAPPED_SUBRESOURCE));
+	//m_pContext->Map(m_pIB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResources);
+	//memcpy(SubResources.pData, pIndices, sizeof(FACEINDICES32) * iNumFaces);
+	//m_pContext->Unmap(m_pIB, 0);
+	//Safe_Delete_Array(pIndices);
 
+
+
+
+	
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 	m_BufferDesc.ByteWidth = m_iInstanceStride * m_iNumInstance;
 	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;					//Rock UnLock을 하겠다.
 	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;

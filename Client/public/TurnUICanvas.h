@@ -33,7 +33,7 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-
+	virtual void	Delete_Delegate()override;
 public:
 	void	ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton); // iOption == 0,1,2,3,4,5 RepesetOption
 	void	ChildrenShakingCheck(_uint CoolTime);

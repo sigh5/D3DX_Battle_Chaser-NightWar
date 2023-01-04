@@ -21,6 +21,8 @@ private:
 	void	Dungeon_Controll_Tick(_double TimeDelta);
 
 private:
+	HRESULT Ready_Change_SceneData();
+
 	HRESULT Ready_Layer_BackGround(const wstring& pLayerTag);
 	HRESULT Ready_Layer_Camera(const wstring& pLayerTag);
 	HRESULT Ready_Layer_Environment(const wstring& pLayerTag);
@@ -32,6 +34,13 @@ private:
 	
 private:
 	_bool		m_bSceneChange = false;
+
+
+private:
+	_tchar					m_szFPS[MAX_PATH] = TEXT("");
+	_uint					m_iNumCallDraw = 0;
+	_double					m_TimeAcc = 0.f;
+
 
 
 private:

@@ -69,8 +69,10 @@ public:/*For.Imgui_AnimTool*/
 	static void		Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom);
 
 
-	
-
+public:/*For.GameChange*/
+	static _bool			bIsCollPlayerTo3DUI[20];
+	static _matrix			m_StaticCameraMatrix;
+	static	_float			m_CameraEye_Z;
 };
 
 template<typename T>

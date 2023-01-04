@@ -1,4 +1,5 @@
 #include "..\public\Shader.h"
+#include "GameInstance.h"
 
 CShader::CShader(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -70,6 +71,7 @@ HRESULT CShader::Begin(_uint iPassIndex)
 		iPassIndex >= m_iNumPasses)
 		return E_FAIL;
 
+	CONTEXT_LOCK;
 	ID3DX11EffectTechnique*	pTechnique = m_pEffect->GetTechniqueByIndex(0);
 	if (nullptr == pTechnique)
 		return E_FAIL;

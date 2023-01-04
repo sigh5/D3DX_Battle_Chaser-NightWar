@@ -1,5 +1,5 @@
 #include "..\public\CustomFont.h"
-
+#include "GameInstance.h"
 CCustomFont::CCustomFont(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: m_pDevice(pDevice)
 	, m_pContext(pContext)
@@ -19,6 +19,8 @@ HRESULT CCustomFont::Initialize(const _tchar * pFontFilePath)
 
 HRESULT CCustomFont::Render(const _tchar* pText, const _float2& vPosition, _float fRadian, _float2 vScale, _fvector vColor)
 {
+	CONTEXT_LOCK;
+
 	m_pContext->GSSetShader(nullptr, nullptr, 0);
 
 	m_pBatch->Begin();

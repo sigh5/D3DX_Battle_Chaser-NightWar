@@ -2,7 +2,7 @@
 #include "VIBuffer_Cell.h"
 #include "Shader.h"
 #include "PipeLine.h"
-
+#include "GameInstance.h"
 CCell::CCell(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: m_pDevice(pDevice)
 	, m_pContext(pContext)
@@ -86,6 +86,7 @@ HRESULT CCell::Render(CShader * pShader,_uint iShaderPass)
 {
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
+
 
 	_float4x4		WorldMatrix;
 	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());

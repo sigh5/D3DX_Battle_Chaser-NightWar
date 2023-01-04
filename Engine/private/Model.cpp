@@ -32,24 +32,25 @@ CModel::CModel(const CModel & rhs)
 	, m_iNumAnimations(rhs.m_iNumAnimations)
 	, m_iCurrentAnimIndex(rhs.m_iCurrentAnimIndex)
 	, m_PivotMatrix(rhs.m_PivotMatrix)
-	, m_pCameraBone(rhs.m_pCameraBone)
-
+	, m_fBlendDuration(0.2f)
+	, m_fBlendCurTime(0.2f)
+	, m_iPreAnimIndex(0)
+	
 {
+	ZeroMemory(&m_ModelDesc, sizeof(m_ModelDesc));
+	memcpy(&m_ModelDesc, &rhs.m_ModelDesc, sizeof(m_ModelDesc));
+
 	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
 
 	//Test 얕은복사		// 깊은 복사 필요
-	for (auto& m_Bones : m_Bones)
+	for (auto& Bone : m_Bones)
 	{
-		Safe_AddRef(m_Bones);
+		Safe_AddRef(Bone);
 	}
-
 	for (auto& pAnimations : m_Animations)
 	{
 		Safe_AddRef(pAnimations);
 	}
-
-	strcpy_s(m_szModelPath, MAX_PATH, rhs.m_szModelPath);
-
 	for (auto& Material : m_Materials)
 	{
 		for (_uint i = 0; i < AI_TEXTURE_TYPE_MAX; ++i)
@@ -96,14 +97,8 @@ HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePat
 		pMesh->LoadFile(hFile, this);
 	}
 
-
 	if (FAILED(Ready_Animation(hFile)))		// 깊은 복사 필요
 		return E_FAIL;
-
-
-
-
-
 
 	return S_OK;
 }
@@ -112,16 +107,11 @@ HRESULT CModel::Initialize(void * pArg)
 {
 	ZeroMemory(&m_ModelDesc, sizeof(m_ModelDesc));
 
-	if (nullptr != pArg)
-		memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
+	//if (nullptr != pArg)
+	//	memcpy(&m_ModelDesc, pArg, sizeof(m_ModelDesc));
 
 
-
-	//#ifndef DEBUG
-	//	XMStoreFloat4x4(&m_ImguiPivotMatrix, XMMatrixIdentity());
-	//#endif // !DEBUG
-	//
-
+	
 
 	return S_OK;
 }
@@ -492,7 +482,7 @@ void CModel::Imgui_RenderProperty()
 		ImGui::TreePop();
 	}
 
-	Imgui_Gizmo_Bone();
+	//Imgui_Gizmo_Bone();
 
 	ImGui::End();
 
@@ -732,10 +722,6 @@ HRESULT CModel::Ready_Animation(HANDLE hFile)
 
 HRESULT CModel::Ready_CameraBone()
 {
-	m_pCameraBone = Get_BonePtr("Node_Camera");
-
-	if (nullptr != m_pCameraBone)
-		Safe_AddRef(m_pCameraBone);
 	return S_OK;
 }
 
@@ -768,7 +754,6 @@ void CModel::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pCameraBone);
 
 	for (auto& pBone : m_Bones)
 		Safe_Release(pBone);
@@ -788,4 +773,5 @@ void CModel::Free()
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 	m_Meshes.clear();
+
 }

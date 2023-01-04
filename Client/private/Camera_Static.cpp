@@ -3,6 +3,7 @@
 
 #include "GameInstance.h"
 #include "PlayerController.h"
+#include "Client_Manager.h"
 
 CCamera_Static::CCamera_Static(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CCamera(pDevice, pContext)
@@ -54,6 +55,7 @@ void CCamera_Static::Tick(_double TimeDelta)
 {
 	if (!m_bCameraActive)
 		return;
+	
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 	
@@ -75,19 +77,36 @@ HRESULT CCamera_Static::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	_bool m_bHavePosition = false;
+	for (_uint i = 0; i < 20; ++i)
+	{
+		if (CClient_Manager::bIsCollPlayerTo3DUI[i] == true)
+		{
+			m_bHavePosition = true;
+			break;
+		}
+	}
+
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
 	m_pCurTaget = pPlayerController->Get_Captin();
 
 	assert(m_pCurTaget != nullptr && " CCamera_Static::Last_Initialize");
 
 
-	_vector vTargetPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-	_vector vCamPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
-
-
-	m_CameraEyeZ = fabs(XMVectorGetZ(vTargetPos) - XMVectorGetZ(vCamPos));
-
-
+	if( false==m_bHavePosition )
+	{ 
+		_vector vTargetPos = m_pCurTaget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+		_vector vCamPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+		m_CameraEyeZ = fabs(XMVectorGetZ(vTargetPos) - XMVectorGetZ(vCamPos));
+	}
+	else
+	{
+		_float4x4 CamMatrix;
+		XMStoreFloat4x4(&CamMatrix, CClient_Manager::m_StaticCameraMatrix);
+		m_pTransformCom->Set_WorldMatrix(CamMatrix);
+		m_CameraEyeZ = CClient_Manager::m_CameraEye_Z;
+	}
+	
 	RELEASE_INSTANCE(CPlayerController);
 	m_bLast_Initlize = true;
 	
@@ -116,16 +135,12 @@ HRESULT CCamera_Static::SetUp_Components()
 HRESULT CCamera_Static::Update_CameraLookPos(_double TimeDelta)
 {
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
-	HRESULT hr = 0;
+	
 	CPlayer* pPlayer = pPlayerController->Get_Captin();
 
 	RELEASE_INSTANCE(CPlayerController);
 	
-	hr = FAILED(m_pCurTaget == nullptr);
-	if (hr == E_FAIL)
-		assert("Error");
-
-	ImGui::InputFloat("LerpTime", &m_fLerpTime);
+	assert(m_pCurTaget != nullptr && "CCamera_Static::Update_CameraLookPos");
 
 	if (lstrcmp(pPlayer->Get_ObjectName(), m_pCurTaget->Get_ObjectName()))
 	{

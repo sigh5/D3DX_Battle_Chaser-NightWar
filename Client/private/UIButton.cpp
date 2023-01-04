@@ -12,6 +12,7 @@ CUIButton::CUIButton(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 
 CUIButton::CUIButton(const CUIButton & rhs)
 	: CUI(rhs)
+	, m_pButtonImage(nullptr)
 {
 }
 
@@ -102,6 +103,11 @@ void CUIButton::Late_Tick(_double TimeDelta)
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+
+	if (nullptr != m_pButtonImage)
+		m_pButtonImage->Set_RenderActive(m_bRenderActive);
+	else
+		return;
 }
 
 HRESULT CUIButton::Render()
@@ -420,10 +426,7 @@ void CUIButton::Set_RenderActive(_bool bActive)
 {
 	m_bRenderActive = bActive;
 
-	if (nullptr != m_pButtonImage)
-		m_pButtonImage->Set_RenderActive(bActive);
-	else
-		return;
+	
 }
 
 void CUIButton::Change_ButtonIcon(const wstring & TextureTag)
@@ -443,4 +446,8 @@ void CUIButton::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+	m_pButtonImage = nullptr;
+
+	m_ChildFsmButton.clear();
+	
 }

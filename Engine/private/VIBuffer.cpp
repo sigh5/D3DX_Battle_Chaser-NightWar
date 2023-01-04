@@ -1,4 +1,5 @@
 #include "..\public\VIBuffer.h"
+#include "GameInstance.h"
 
 CVIBuffer::CVIBuffer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CComponent(pDevice, pContext)
@@ -58,6 +59,8 @@ HRESULT CVIBuffer::Render()
 	_uint					iOffsets[] = {
 		0, 
 	};
+
+	CONTEXT_LOCK;
 
 	m_pContext->IASetVertexBuffers(0, m_iNumVertexBuffers, pVertexBuffers, iStrides, iOffsets);
 

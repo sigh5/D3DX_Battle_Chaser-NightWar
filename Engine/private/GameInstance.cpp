@@ -11,7 +11,7 @@ IMPLEMENT_SINGLETON(CGameInstance)
 
 _uint			CGameInstance::m_iStaticLevelIndex = 0;
 const _tchar*	CGameInstance::m_pPrototypeTransformTag = TEXT("Prototype_Component_Transform");
-
+_bool			CGameInstance::m_bOnceCreatePlayer = false;
 
 CGameInstance::CGameInstance()
 	: m_pGraphic_Device(CGraphic_Device::GetInstance())
@@ -75,6 +75,8 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (FAILED(m_pPipeLine->Ready_PipeLine()))
 		return E_FAIL;
 
+
+	
 	
 	return S_OK;
 }
@@ -113,12 +115,12 @@ void CGameInstance::Clear_Level(_uint iLevelIndex)
 
 }
 
-void CGameInstance::Copy_Data(_uint iLevelIndex)
+void CGameInstance::Copy_Data(_uint iLevelPreIndex, _uint iLevelCur)
 {
 	if (nullptr == m_pObject_Manager)
 		return;
 
-	m_pObject_Manager->Copy_Data(iLevelIndex);
+	m_pObject_Manager->Copy_Data(iLevelPreIndex, iLevelCur);
 }
 
 HRESULT CGameInstance::Clear_Graphic_Device(const _float4 * pColor)
@@ -149,6 +151,11 @@ HRESULT CGameInstance::Update_SwapChain(HWND hWnd, _uint iWinCX, _uint iWinCY, _
 		return E_FAIL;
 
 	return m_pGraphic_Device->Update_SwapChain(hWnd, iWinCX, iWinCY, bIsFullScreen, bNeedUpdate);
+}
+
+mutex& CGameInstance::GetContextMtx() const
+{
+	return m_pGraphic_Device->GetContextMtx();
 }
 
 _byte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
@@ -252,6 +259,14 @@ void CGameInstance::Scene_Change()
 	return m_pLevel_Manager->Scene_Change();
 }
 
+void CGameInstance::Set_CopyIndexs(_uint iPrevIndex, _uint iCurIndex)
+{
+	if (nullptr == m_pLevel_Manager)
+		return;
+
+	return m_pLevel_Manager->Set_CopyIndexs(iPrevIndex,iCurIndex);
+}
+
 CComponent * CGameInstance::Get_ComponentPtr(_uint iLevelIndex, const _tchar * pLayerTag, const _tchar * pComponentTag, _uint iIndex)
 {
 	if (nullptr == m_pObject_Manager)
@@ -282,6 +297,14 @@ CGameObject * CGameInstance::Clone_GameObject(const _tchar * pPrototypeTag, void
 		return nullptr;
 
 	return m_pObject_Manager->Clone_GameObject(pPrototypeTag,pArg);
+}
+
+void CGameInstance::SceneChange_NameVectorClear()
+{
+	if (nullptr == m_pObject_Manager)
+		return;
+
+	return m_pObject_Manager->SceneChange_NameVectorClear();
 }
 
 HRESULT CGameInstance::Clone_GameObject_UseImgui(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pPrototypeTag, OUT CGameObject ** ppGameObject, void * pArg)

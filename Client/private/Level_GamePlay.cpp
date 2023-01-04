@@ -4,7 +4,7 @@
 
 #include "PlayerController.h"
 #include "Client_Manager.h"
-
+#include "Camera_Static.h"
 
 #include "Level_Loading.h"
 #include "UI.h"
@@ -18,6 +18,9 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * p
 HRESULT CLevel_GamePlay::Initialize()
 {
 	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Change_SceneData()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Lights()))
@@ -43,9 +46,7 @@ HRESULT CLevel_GamePlay::Initialize()
 	
 
 
-	m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
-
-
+	
 	return S_OK;
 
 }
@@ -54,29 +55,49 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 		
-	Dungeon_Controll_Tick(TimeDelta);
 
+	m_TimeAcc += TimeDelta;
+#ifdef NOMODLES
+
+
+#else
+	Dungeon_Controll_Tick(TimeDelta);
+#endif
 }
 
 void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	/*if (GetKeyState(VK_SPACE) & 0x8000)
-	{
-		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
-		Safe_AddRef(pGameInstance);
+	//if (GetKeyState(VK_SPACE) & 0x8000)
+	//{
+	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+	//	Safe_AddRef(pGameInstance);
+	//	pGameInstance->SceneChange_NameVectorClear();
+	//	pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
 
-		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT),true)))
-			return;
+	//	if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
+	//		return;
 
-		Safe_Release(pGameInstance);
-	}*/
+	//	Safe_Release(pGameInstance);
+	//}
+#ifdef NOMODLES
 
+
+#else
 	if (m_bSceneChange)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 		Safe_AddRef(pGameInstance);
+		
+		CGameObject* pCam = nullptr;
+
+		pCam = pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), TEXT("Layer_Camera"), TEXT("Static_Camera"));
+		CClient_Manager::m_StaticCameraMatrix =pCam->Get_Transform()->Get_WorldMatrix();
+		CClient_Manager::m_CameraEye_Z = static_cast<CCamera_Static*>(pCam)->Get_CameraZ();
+		
+		pGameInstance->SceneChange_NameVectorClear();
+		pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
 
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
 			return;
@@ -84,6 +105,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 		Safe_Release(pGameInstance);
 	}
 
+#endif
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -91,7 +113,18 @@ HRESULT CLevel_GamePlay::Render()
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
-	SetWindowText(g_hWnd, TEXT("Level : GAMEPLAY"));
+	++m_iNumCallDraw;
+
+	if (m_TimeAcc >= 1.f)
+	{
+		wsprintf(m_szFPS, TEXT("fps : %d"), m_iNumCallDraw);
+
+
+		m_iNumCallDraw = 0;
+		m_TimeAcc = 0.f;
+	}
+
+	SetWindowText(g_hWnd, m_szFPS);
 
 	return S_OK;
 }
@@ -101,6 +134,18 @@ void CLevel_GamePlay::Dungeon_Controll_Tick(_double TimeDelta)
 	m_pPlayerController->Set_CaptinPlayer();
 	m_pPlayerController->SyncAninmation();	//->여건 내가 맞춰야겠다.
 
+}
+
+HRESULT CLevel_GamePlay::Ready_Change_SceneData()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	pGameInstance->Change_Level(LEVEL_GAMEPLAY);
+
+	CPlayerController::GetInstance()->Change_Scene(LEVEL_GAMEPLAY);
+
+	RELEASE_INSTANCE(CGameInstance);
+	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
@@ -142,9 +187,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
-	//pGameInstance->Load_Object(TEXT("Map_CPos"), LEVEL_GAMEPLAY);
+#ifdef NOMODLES
 
+
+#else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
+#endif
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -154,17 +202,25 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_EffectFrame"))))
-		return E_FAIL;*/
-		
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
-		return E_FAIL;
+#ifdef NOMODLES
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Garrison"))))
-		return E_FAIL;
 
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
-		return E_FAIL;
+#else
+	if (pGameInstance->m_bOnceCreatePlayer == false)
+	{
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Gully"))))
+			return E_FAIL;
+
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Garrison"))))
+			return E_FAIL;
+
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
+			return E_FAIL;
+
+		pGameInstance->m_bOnceCreatePlayer = true;
+		m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
+	}
+#endif
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -175,13 +231,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+#ifdef NOMODLES
+
+
+#else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
+#endif
 
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_ChestBox"))))
-	//	return E_FAIL;
-
-	
-	//pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_GAMEPLAY);
 
 	RELEASE_INSTANCE(CGameInstance);
 

@@ -24,7 +24,31 @@ IMPLEMENT_SINGLETON(CCombatController);
 CCombatController::CCombatController()
 	:m_pGameInstace{ CGameInstance::GetInstance() }
 {
-	Safe_AddRef(m_pGameInstace);
+	//Safe_AddRef(m_pGameInstace);
+}
+
+void CCombatController::Scene_Chane_Safe_Release()
+{
+	for (auto& pStatus : m_ActorsStatusMap)
+		Safe_Release(pStatus.second);
+	m_ActorsStatusMap.clear();
+
+	for (auto& pActor : m_CurActorMap)
+		Safe_Release(pActor.second);
+	m_CurActorMap.clear();
+
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		pCanvas->Delete_Delegate();
+		Safe_Release(pCanvas);
+	}
+	m_CanvasVec.clear();
+	m_bLateInit = false;
+}
+
+void CCombatController::Reset_Timer()
+{
+	m_dIntroTimer = 0.0;
 }
 
 HRESULT CCombatController::Initialize(_uint iLevel)
@@ -816,6 +840,6 @@ void CCombatController::Free()
 		Safe_Release(pCanvas);
 	m_CanvasVec.clear();
 
-	Safe_Release(m_pGameInstace);
+	//Safe_Release(m_pGameInstace);
 
 }

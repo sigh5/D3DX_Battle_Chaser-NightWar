@@ -13,7 +13,6 @@ public:
 		_tchar* szProtoName = TEXT("");
 	}LOAD_MODELDESC;
 
-
 private:
 	CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CModel(const CModel& rhs);
@@ -110,7 +109,6 @@ private:
 	char								m_szModelPath[MAX_PATH] = "";
 	char								m_szNoRenderMeshName[MAX_PATH] = "";
 	
-	class CBone*						m_pCameraBone = nullptr;
 
 
 public:

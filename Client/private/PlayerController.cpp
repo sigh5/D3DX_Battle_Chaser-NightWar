@@ -98,11 +98,18 @@ void CPlayerController::Change_Scene(_uint	iLevelIndex)
 
 	if (iLevelIndex == LEVEL_COMBAT)
 	{
-		m_pCaptinPlayer = nullptr;
+		//m_pCaptinPlayer = nullptr;
 		for (auto& pPlayer : m_pPlayerVec)
 		{
 			pPlayer->Set_FollowTarget(nullptr);
 		}
+
+		for (auto& pPlayer : m_pPlayerVec)
+		{
+			Safe_Release(pPlayer);
+		}
+		m_pPlayerVec.clear();
+
 	}
 	else if (iLevelIndex == LEVEL_GAMEPLAY)
 	{

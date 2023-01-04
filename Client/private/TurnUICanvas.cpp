@@ -43,6 +43,8 @@ HRESULT CTurnUICanvas::Initialize(void * pArg)
 	CCanvas::CANVASDESC		CanvasDesc;
 	ZeroMemory(&CanvasDesc, sizeof(CanvasDesc));
 
+	lstrcpy(CanvasDesc.m_pTextureTag , TEXT("Prototype_Component_UI_Turn_canvas"));
+
 	if (nullptr != pArg)
 		memcpy(&CanvasDesc, pArg, sizeof(CanvasDesc));
 
@@ -69,7 +71,10 @@ HRESULT CTurnUICanvas::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
+#ifdef NOMODLES
 
+
+#else
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
@@ -83,14 +88,25 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Skeleton_Naked"));
 	dynamic_cast<CSkeleton_Naked*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
-	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Spider_Mana"));
-	dynamic_cast<CSpider_Mana*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	if (pInstance->Get_Setting_MonsterScene() == 2 || pInstance->Get_Setting_MonsterScene() == 1)
+	{
+		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Spider_Mana"));
+		dynamic_cast<CSpider_Mana*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
-	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Monster_SlimeKing"));
-	dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	}
+
+	if (pInstance->Get_Setting_MonsterScene() == 3)
+	{
+		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Monster_SlimeKing"));
+		dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	}
+	
+	
 
 	SetUp_ChildrenPosition();
 	RELEASE_INSTANCE(CGameInstance);
+
+#endif
 
 	m_bLast_Initlize = true;
 
@@ -127,18 +143,44 @@ void CTurnUICanvas::Late_Tick(_double TimeDelta)
 
 HRESULT CTurnUICanvas::Render()
 {
+#ifdef NOMODLES
 
-	//if (FAILED(__super::Render()))
-	//	return E_FAIL;
+#else
+	if (FAILED(__super::Render()))
+		return E_FAIL;
 
-	//if (FAILED(SetUp_ShaderResources()))
-	//	return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
 
-	//m_pShaderCom->Begin(1);
-	//m_pVIBufferCom->Render();
-
+	m_pShaderCom->Begin(1);
+	m_pVIBufferCom->Render();
+#endif
 	return S_OK;
 
+}
+
+void CTurnUICanvas::Delete_Delegate()
+{
+	//CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	//CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
+	//dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatTurnDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Calibretto"));
+	//dynamic_cast<CHero_Calibretto*>(pGameObject)->m_Hero_CombatTurnDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
+	//dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatTurnDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Skeleton_Naked"));
+	//dynamic_cast<CSkeleton_Naked*>(pGameObject)->m_Monster_CombatTurnDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Spider_Mana"));
+	//dynamic_cast<CSpider_Mana*>(pGameObject)->m_Monster_CombatTurnDelegeter.unbind(this);
+
+	//pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Monster_SlimeKing"));
+	//dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.unbind(this);
+
+	//RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CTurnUICanvas::SetUp_Components()
@@ -350,5 +392,4 @@ void CTurnUICanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
 }

@@ -31,14 +31,21 @@ void CHpMpBuffCanvas::Set_StatusHpMpBar(map<const wstring, CStatus*>& StatusMap)
 
 	if(static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
 	{
+		
 		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar3")))->Set_HpBarStatus(Find_Status(TEXT("Skeleton_Naked")));
 		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3")))->Set_MpBarStatus(Find_Status(TEXT("Skeleton_Naked")));
-
-		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_HpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
-		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_MpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
-
-		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_HpBarStatus(Find_Status(TEXT("Spider_Mana")));
-		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_MpBarStatus(Find_Status(TEXT("Spider_Mana")));
+		
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_HpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
+			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_MpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
+		}
+	
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_HpBarStatus(Find_Status(TEXT("Spider_Mana")));
+			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_MpBarStatus(Find_Status(TEXT("Spider_Mana")));
+		}
 	}
 
 	m_StatusMap.clear();
@@ -76,11 +83,13 @@ void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter,_bool bHit)
 			{
 				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar3")))->Set_Hit(bHit);
 			}
-			else if (!lstrcmp(pHiter->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+			else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr &&
+				!lstrcmp(pHiter->Get_ObjectName(), TEXT("Monster_SlimeKing")))
 			{
 				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_Hit(bHit);
 			}
-			else if (!lstrcmp(pHiter->Get_ObjectName(), TEXT("Spider_Mana")))
+			else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr &&
+				!lstrcmp(pHiter->Get_ObjectName(), TEXT("Spider_Mana")))
 			{
 				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_Hit(bHit);
 			}
@@ -110,8 +119,16 @@ void CHpMpBuffCanvas::Set_MpEvent(_bool bMp)
 		else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
 		{
 			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3")))->Set_Hit(bMp);
-			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_Hit(bMp);
-			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_Hit(bMp);
+			
+			if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
+			{
+				static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_Hit(bMp);
+			}
+		
+			if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
+			{
+				static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_Hit(bMp);
+			}
 		}
 		else
 			continue;
@@ -151,8 +168,6 @@ HRESULT CHpMpBuffCanvas::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-	
-
 	return S_OK;
 }
 
@@ -160,13 +175,20 @@ HRESULT CHpMpBuffCanvas::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
+#ifdef NOMODLES
+	for (auto& pChild : m_ChildrenVec)
+	{
+		pChild->Set_RenderActive(true);
+	}
+#else
 	for (auto& pChild : m_ChildrenVec)
 	{
 		pChild->Set_RenderActive(false);
 	}
+#endif
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	m_bLast_Initlize = true;
@@ -190,14 +212,18 @@ void CHpMpBuffCanvas::Late_Tick(_double TimeDelta)
 
 HRESULT CHpMpBuffCanvas::Render()
 {
-	//if (FAILED(__super::Render()))
-	//	return E_FAIL;
+#ifdef NOMODLES
+	if (FAILED(__super::Render()))
+		return E_FAIL;
 
-	//if (FAILED(SetUp_ShaderResources()))
-	//	return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
 
-	//m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
-	//m_pVIBufferCom->Render();
+	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
+	m_pVIBufferCom->Render();
+#else
+
+#endif
 	return S_OK;
 }
 
@@ -207,6 +233,10 @@ void CHpMpBuffCanvas::Set_RenderActive(_bool bTrue)
 	{
 		pChild->Set_RenderActive(bTrue);
 	}
+}
+
+void CHpMpBuffCanvas::Delete_Delegate()
+{
 }
 
 

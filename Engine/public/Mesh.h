@@ -21,7 +21,7 @@ public:
 	VTXMODEL*		Get_NonAnimVertex() { return m_pVertices; }
 	VTXANIMMODEL*	Get_AnimVertex() { return m_pAnimVertices; }
 	FACEINDICES32*	Get_ModelIndeices() { return m_pIndices; }
-	 _uint		Get_NumPrimitive() {return m_iNumPrimitive;}
+	 _uint			Get_NumPrimitive() {return m_iNumPrimitive;}
 
 
 public:

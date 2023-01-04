@@ -13,8 +13,15 @@ CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 }
 
 CSlimeKing::CSlimeKing(const CSlimeKing & rhs)
-	:CMonster(rhs)
+	: CMonster(rhs)
+	, m_pShaderCom {nullptr}
+	, m_pRendererCom{ nullptr }
+    , m_pModelCom{ nullptr }
+	, m_pColliderCom{ nullptr }
+	, m_pStatusCom{ nullptr }
+	, m_pFsmCom { nullptr }
 {
+	m_MonsterParts.clear();
 }
 
 CGameObject * CSlimeKing::Get_Weapon_Or_SkillBody()

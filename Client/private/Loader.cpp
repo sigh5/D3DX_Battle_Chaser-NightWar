@@ -47,11 +47,11 @@ CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 _uint APIENTRY LoadingThread(void* pArg)
-{	
+{
 	CLoader*		pLoader = (CLoader*)pArg;
 
 	EnterCriticalSection(&pLoader->Get_CriticalSection());
-	
+
 	switch (pLoader->Get_NextLevelID())
 	{
 	case LEVEL_LOGO:
@@ -64,7 +64,7 @@ _uint APIENTRY LoadingThread(void* pArg)
 		pLoader->Loading_Combat();
 		break;
 	}
-	
+
 	LeaveCriticalSection(&pLoader->Get_CriticalSection());
 
 	return 0;
@@ -90,27 +90,27 @@ HRESULT CLoader::Loading_ForLogo()
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));	
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_LogoBackGround"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Logo/LogoBackGround.dds")))))
 		return E_FAIL;
-	
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_Logo"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Logo/BattleChasersLogo.dds")))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
-	
+
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
-	
+
 
 	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
 
 	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
-	
+
 	/* For.Prototype_GameObject_BackGround */
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGround"),
 		CBackGround::Create(m_pDevice, m_pContext))))
@@ -122,7 +122,7 @@ HRESULT CLoader::Loading_ForLogo()
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
-	m_isFinished = true;	
+	m_isFinished = true;
 
 	Safe_Release(pGameInstance);
 
@@ -135,271 +135,42 @@ HRESULT CLoader::Loading_ForGamePlay()
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
+	if (false == pGameInstance->Get_IsProtoTypeCreate(LEVEL_GAMEPLAY))
+	{
+		lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
+		if (FAILED(ForGamePlay_Texture(pGameInstance)))
+			return E_FAIL;
+		if (FAILED(ForGamePlay_Components(pGameInstance)))
+			return E_FAIL;
+		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
+		/* Model */
+#ifdef NOMODLES
 
-	if (FAILED(ForGamePlay_Texture(pGameInstance)))
-		return E_FAIL;
+#else  
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
+		/* ~Model */
+#endif
 
-	/* For.Prototype_Component_Texture_UI_HPMPFillBar_BG */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_HPMPFillBar_BG"),
-		CTexture::Create(m_pDevice, m_pContext,
-			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/HP_MPFillBar/HP_MPFillBar%d.png"),
-			CTexture::TYPE_END, 6))))	
-		return E_FAIL;
+		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
+		if (FAILED(ForGamePlay_Shader(pGameInstance)))
+			return E_FAIL;
 
-	/* For.Prototype_Component_Texture_UI_CharState */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_CharState"),
-		CTexture::Create(m_pDevice, m_pContext,
-			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CharState/CharState%d.png"),
-			CTexture::TYPE_END, 11))))
-		return E_FAIL;
-	/* For.Prototype_Component_Texture_FireTexture*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireTexture"),
-		CTexture::Create(m_pDevice, m_pContext,
-			TEXT("../Bin/Resources/Textures2D/FireTexture/fire_loop_sheet.png"),
-			CTexture::TYPE_END, 1))))
-		return E_FAIL;
+		lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 
+		if (FAILED(ForGamePlay_GameObjects(pGameInstance)))
+			return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TrunBattle_Start"),
-		CTexture::Create(m_pDevice, m_pContext,
-			TEXT("../Bin/Resources/Textures2D/BattleStart/TrunBattleStart_%d.png"),
-			CTexture::TYPE_END, 10))))
-		return E_FAIL;
-
-	//러버덕
-
-
-	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
-	/* For.Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Ground/Ground9nmp.bmp")))))
-		return E_FAIL;
-	
-	/* For.Prototype_Component_VIBuffer_Terrain */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_TerrainTile"),
-		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/MAP_Terrain_Grass_Yellow_A.bmp")))))
-		return E_FAIL;
-
-
-
-	
-	/* For.Prototype_Component_VIBuffer_Cube */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
-		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_Component_VIBuffer_Rect_Instancing */					
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Instancing"),
-		CVIBuffer_Rect_Instancing::Create(m_pDevice, m_pContext, 30))))	//여기서 숫자 결정
-		return E_FAIL;
-
-	/* For.Prototype_Component_VIBuffer_Rect_Instancing */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Single"),
-		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 1))))	//여기서 숫자 결정
-		return E_FAIL;
-
-	/* For.Prototype_Component_VIBuffer_Point_Instancing */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Point_Instancing"),
-		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 30))))
-		return E_FAIL;
-
-	lstrcpy(m_szLoadingText, TEXT("네비게이션정보생성중"));
-	/* For.Prototype_Component_Navigation */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../Data/Navigation.dat")))))
-		return E_FAIL;
-	
-	lstrcpy(m_szLoadingText, TEXT("스테이터스생성중"));
-	/* For.Prototype_Component_Status */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"),
-		CStatus::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	//
-
-	/* For.Prototype_Component_Shader_VtxModel_Instance */
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel_Instance"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), VTXMODEL_INSTAICING_DECLARATION::Elements, VTXMODEL_INSTAICING_DECLARATION::iNumElements))))
-		return E_FAIL;
-
-
-	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
-	/* Model */
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
-
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
-	CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
-
-
-	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
-	/* ~Model */
-
-	lstrcpy(m_szLoadingText, TEXT("콜라이더를 로딩중입니다. "));
-	/* For.Prototype_Component_Collider_AABB*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
-		return E_FAIL;
-	/* For.Prototype_Component_Collider_OBB*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
-		return E_FAIL;
-	/* For.Prototype_Component_Collider_SPHERE*/
-	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"),
-		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
-		return E_FAIL;
-
-	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
-
-
-	
-
-
-	if (FAILED(ForGamePlay_Shader(pGameInstance)))
-		return E_FAIL;
-	
-	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
-	
-
-	/* For.Prototype_GameObject_NoneAnim */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_SkyBox"),
-		CSkyBox::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_GameObject_BackGround */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
-		CTerrain::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	
-	/////* For.Prototype_GameObject_Hero_Gully */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
-		CHero_Knolan::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Alumon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
-		CHero_Garrison::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_Hero_Calibretto */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
-		CHero_Calibretto::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	/* For.Prototype_GameObject_TurnCanvas_UI */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnCanvas_UI"),
-		CTurnUICanvas::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_TurnStateCanvas */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnStateCanvas"),
-		CTurnStateCanvas::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_DungeonCanvas  */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_DungeonCanvas"),
-		CDungeon_Canvas::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_CharUI */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CharUI"),
-		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	/* For.Prototype_GameObject_TurnStateButton */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIButton"),
-		CUIButton::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	/*if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMaps"),
-		CDungeonMaps::Create(m_pDevice, m_pContext))))
-		return E_FAIL;*/
-
-		/* For.Prototype_GameObject_EffectFrame */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EffectFrame"),
-		CEffectFrame::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	/* For.Prototype_GameObject_NoneAnim */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
-		CNoneAnim_BG::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_GameObject_NoneAnim */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMap"),
-		CDungeonMaps::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WaterTile"),
-		CWaterTile::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCamera_Static"),
-		CCamera_Static::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Rect_Instancing"),
-		CEffect_Rect_Instancing::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_GameObject_Effect_Point_Instancing */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Point_Instancing"),
-		CEffect_Point_Instancing::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCombatMap"),
-		CCombatMap::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MyImage"),
-		CMyImage::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_HpMpBars"),
-		CHpMpBar::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HPMPBUFFCanvas"),
-		CHpMpBuffCanvas::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BuffImage"),
-		CBuff_Image::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapTile"),
-		CMapTile::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_2D_MapOne"),
-		CMapOne2D::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapOneTree"),
-		CMapOneTree::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-	
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ChestBox"),
-		CChestBox::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Map_3D_UI"),
-		CMap_3D_UI::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnBattleStart_UI"),
-		CTrun_BattleStart_UI::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-
-	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
-
+		lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
+		pGameInstance->Set_ProtoTypeCreate(LEVEL_GAMEPLAY);
+	}
 	m_isFinished = true;
 
-	
+
 
 	Safe_Release(pGameInstance);
 
@@ -411,52 +182,51 @@ HRESULT CLoader::Loading_Combat()
 	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
+	if (false == pGameInstance->Get_IsProtoTypeCreate((_uint)LEVEL_COMBAT))
+	{
+		lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
 
+		lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
-	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
+		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
+		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
-	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
-	
-	//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
+		lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
 
-	lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_SlimeKing"),
+			CSlimeKing::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Skeleton_Naked"),
+			CSkeleton_Naked::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Spider_Mana"),
+			CSpider_Mana::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_SlimeKing"),
-		CSlimeKing::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CombatCamera"),
+			CCamera_Combat::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Skeleton_Naked"),
-		CSkeleton_Naked::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+		/* For.Prototype_GameObject_Weapon */
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
+			CWeapon::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Monster_Spider_Mana"),
-		CSpider_Mana::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+		/* For.Prototype_GameObject_Skill_Obj */
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Obj"),
+			CSkill_Object::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CombatCamera"),
-		CCamera_Combat::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_GameObject_Weapon */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Weapon"),
-		CWeapon::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	/* For.Prototype_GameObject_Skill_Obj */
-	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Obj"),
-		CSkill_Object::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
-
-	
-
-
-	lstrcpy(m_szLoadingText, TEXT("로딩끝."));
-
+		lstrcpy(m_szLoadingText, TEXT("로딩끝."));
+		pGameInstance->Set_ProtoTypeCreate(LEVEL_COMBAT);
+	}
+	else
+	{
+		CCombatController::GetInstance()->Reset_Timer();
+	}
 	m_isFinished = true;
 
 	Safe_Release(pGameInstance);
@@ -470,24 +240,17 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Sky"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), CTexture::TYPE_DIFFUSE, 4))))
 		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Diffuse"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/TextureMap_1/MAP_Terrain_%d.dds"), CTexture::TYPE_DIFFUSE, 35))))
 		return E_FAIL;
-	
-	
-	
 	/* For.Prototype_Component_Texture_Filter */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_FilterCanvas"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_2.dds"), CTexture::TYPE_FILTER, 1))))
 		return E_FAIL;
-
 	/* For.Prototype_Component_Texture_Filter */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_%d.dds"), CTexture::TYPE_FILTER, 3))))
 		return E_FAIL;
-
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Terrain"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/MAP_Terrain_%d.dds"), CTexture::TYPE_DIFFUSE, 4))))
 		return E_FAIL;
@@ -540,8 +303,8 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 
 	/* For.Prototype_Component_Texture_UI_State_Icon_Calibretto */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_Calibretto"),
-		CTexture::Create(m_pDevice, m_pContext, 
-			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Calibretto/Ability_Calibretto%d.png"), 
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Calibretto/Ability_Calibretto%d.png"),
 			CTexture::TYPE_END, 10))))	//마지막은 궁
 		return E_FAIL;
 
@@ -563,9 +326,8 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_State_Icon_State"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CombatState/StateIcon/Common/Common_Icon%d.png"),
-			CTexture::TYPE_END, 3))))	
+			CTexture::TYPE_END, 3))))
 		return E_FAIL;
-
 
 	/* For.Prototype_Component_Texture_UI_State_Icon_Item */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_3DUI_MapColl"),
@@ -574,6 +336,31 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			CTexture::TYPE_END, 2))))
 		return E_FAIL;
 
+	/* For.Prototype_Component_Texture_UI_HPMPFillBar_BG */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_HPMPFillBar_BG"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/HP_MPFillBar/HP_MPFillBar%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_Texture_UI_CharState */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UI_CharState"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/CharState/CharState%d.png"),
+			CTexture::TYPE_END, 11))))
+		return E_FAIL;
+	/* For.Prototype_Component_Texture_FireTexture*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireTexture"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/FireTexture/fire_loop_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TrunBattle_Start"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/BattleStart/TrunBattleStart_%d.png"),
+			CTexture::TYPE_END, 10))))
+		return E_FAIL;
 
 
 	return S_OK;
@@ -587,12 +374,9 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxNormalTex_Phong"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_PongShader.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_TerrainTile"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex_TerrainTile.hlsl"), VTXNORTEX_DECLARATION::Elements, VTXNORTEX_DECLARATION::iNumElements))))
 		return E_FAIL;
-
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxCubeTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCubeTex.hlsl"), VTXCUBETEX_DECLARATION::Elements, VTXCUBETEX_DECLARATION::iNumElements))))
 		return E_FAIL;
@@ -605,26 +389,200 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxAnimModel"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimModel.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
-
-	/* For.Prototype_Component_Shader_VtxRectInstance */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxRectInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxRectInstance.hlsl"), VTXRECTINSTANCE_DECLARATION::Elements, VTXRECTINSTANCE_DECLARATION::iNumElements))))
 		return E_FAIL;
-
-	/* For.Prototype_Component_Shader_VtxPointInstance */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxPointInstance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPointInstance.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
 		return E_FAIL;
-
-
-	/* For.Prototype_Component_Shader_VtxPointInstance */
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Shader_VtxTexIncCount"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTexIncCount.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
 		return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel_Instance"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), VTXMODEL_INSTAICING_DECLARATION::Elements, VTXMODEL_INSTAICING_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::ForGamePlay_Components(CGameInstance * pGameInstance)
+{
+	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
+	/* For.Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Terrain"),
+		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Ground/Ground9nmp.bmp")))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Terrain */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_TerrainTile"),
+		CVI_Buffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/MAP_Terrain_Grass_Yellow_A.bmp")))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Cube */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Rect_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Instancing"),
+		CVIBuffer_Rect_Instancing::Create(m_pDevice, m_pContext, 30))))	//여기서 숫자 결정
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Rect_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Rect_Single"),
+		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 1))))	//여기서 숫자 결정
+		return E_FAIL;
+
+	/* For.Prototype_Component_VIBuffer_Point_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Point_Instancing"),
+		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 30))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션정보생성중"));
+	/* For.Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(m_pDevice, m_pContext, TEXT("../../Data/Navigation.dat")))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("스테이터스생성중"));
+	/* For.Prototype_Component_Status */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"),
+		CStatus::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("콜라이더를 로딩중입니다. "));
+	/* For.Prototype_Component_Collider_AABB*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_AABB))))
+		return E_FAIL;
+	/* For.Prototype_Component_Collider_OBB*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_OBB))))
+		return E_FAIL;
+	/* For.Prototype_Component_Collider_SPHERE*/
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_SPHERE"),
+		CCollider::Create(m_pDevice, m_pContext, CCollider::TYPE_SPHERE))))
+		return E_FAIL;
 
 
+	return S_OK;
+}
 
+HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
+{
+	/* For.Prototype_GameObject_NoneAnim */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_SkyBox"),
+		CSkyBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_BackGround */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Terrain"),
+		CTerrain::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/////* For.Prototype_GameObject_Hero_Gully */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Gully"),
+		CHero_Knolan::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_Hero_Alumon */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Garrison"),
+		CHero_Garrison::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_Hero_Calibretto */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Hero_Calibretto"),
+		CHero_Calibretto::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_TurnCanvas_UI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnCanvas_UI"),
+		CTurnUICanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_TurnStateCanvas */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnStateCanvas"),
+		CTurnStateCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_DungeonCanvas  */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_DungeonCanvas"),
+		CDungeon_Canvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_CharUI */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CharUI"),
+		CTurnCharcterUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_TurnStateButton */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UIButton"),
+		CUIButton::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_EffectFrame */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_EffectFrame"),
+		CEffectFrame::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_NoneAnim */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NoneAnim"),
+		CNoneAnim_BG::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	/* For.Prototype_GameObject_NoneAnim */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DungeonMap"),
+		CDungeonMaps::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_WaterTile"),
+		CWaterTile::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCamera_Static"),
+		CCamera_Static::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Rect_Instancing"),
+		CEffect_Rect_Instancing::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	/* For.Prototype_GameObject_Effect_Point_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Effect_Point_Instancing"),
+		CEffect_Point_Instancing::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CCombatMap"),
+		CCombatMap::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MyImage"),
+		CMyImage::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_UI_HpMpBars"),
+		CHpMpBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_HPMPBUFFCanvas"),
+		CHpMpBuffCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BuffImage"),
+		CBuff_Image::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapTile"),
+		CMapTile::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_2D_MapOne"),
+		CMapOne2D::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MapOneTree"),
+		CMapOneTree::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_ChestBox"),
+		CChestBox::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Map_3D_UI"),
+		CMap_3D_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnBattleStart_UI"),
+		CTrun_BattleStart_UI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -645,11 +603,11 @@ CLoader * CLoader::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext
 
 void CLoader::Free()
 {
-	WaitForSingleObject(m_hThread, INFINITE);		
+	WaitForSingleObject(m_hThread, INFINITE);
 	CloseHandle(m_hThread);
 	DeleteObject(m_hThread);
 	DeleteCriticalSection(&m_Critical_Section);
 
 	Safe_Release(m_pDevice);
-	Safe_Release(m_pContext);	
+	Safe_Release(m_pContext);
 }

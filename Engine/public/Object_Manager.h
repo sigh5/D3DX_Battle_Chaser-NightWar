@@ -21,7 +21,7 @@ public:
 public:
 	HRESULT Reserve_Manager(_uint iNumLevels);
 	HRESULT Clear(_uint iLevelIndex);
-	HRESULT Copy_Data(_uint iLevelIndex);			// 씬전환시 데이터들을 카피한다.
+	HRESULT Copy_Data(_uint iLevelPreIndex,_uint iLevelCur);			// 씬전환시 데이터들을 카피한다.
 	HRESULT Loading_Objects();
 
 
@@ -33,7 +33,7 @@ public:
 
 
 	void	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);
-
+	void	SceneChange_NameVectorClear();
 
 public:
 	map<const wstring, class CGameObject*>*			Get_ProtoTypes() { return &m_Prototypes; }
@@ -94,7 +94,8 @@ private:
 	char						m_szObjectName[MAX_PATH] = "";
 
 	vector<_tchar*>				m_vecNameArray;
-	
+	vector<_tchar*>				m_vecNameArray2;
+
 	wstring						TextureOrModelName = TEXT("");
 
 

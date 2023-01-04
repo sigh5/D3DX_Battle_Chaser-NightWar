@@ -29,7 +29,7 @@ public:
 
 private:
 	void			Coll_CaptinPlayer();
-
+	void			is_Cal_This_Delete();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -43,15 +43,12 @@ private:
 
 private:
 	_float					m_fMoveTimer = 0.f;
+	_bool					m_bRenderActive = false;
 	_int					m_iLeft_Right = -1;
-	_bool					m_bRenderFont = false;
+
 	_bool					m_bOnce = false;
+	
 
-	_float					m_FontPosX = 0.f;
-	_float					m_FontPosY = 0.f;
-
-	_float					m_FontSizeX = 1.f;
-	_float					m_FontSizeY = 1.f;
 
 	_float					m_SceneChaneTimer = 0.f;
 

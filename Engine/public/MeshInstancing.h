@@ -32,7 +32,7 @@ public:
 
 public:
 	void	LoadFile(HANDLE hFile,class CModel_Instancing* pModel);
-	void SetUp_BoneMatrices(_float4x4* pBoneMatrices, _fmatrix PivotMatrix);
+	void	SetUp_BoneMatrices(_float4x4* pBoneMatrices, _fmatrix PivotMatrix);
 
 private:
 	char						m_szName[MAX_PATH] = "";

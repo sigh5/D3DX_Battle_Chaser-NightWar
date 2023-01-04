@@ -28,7 +28,7 @@ HRESULT CLevel_Manager::Open_Level(_uint iLevelIndex, CLevel * pNewLevel, _bool 
 	else
 	{
 		if (nullptr != m_pCurrentLevel)
-			pGameInstance->Copy_Data(m_iLevelIndex);
+			pGameInstance->Copy_Data(m_iPrevLevel,m_iCurLevel);
 
 		Safe_Release(m_pCurrentLevel);
 		m_pCurrentLevel = pNewLevel;

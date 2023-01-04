@@ -27,7 +27,7 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
-
+	virtual void	Delete_Delegate()override;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

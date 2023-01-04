@@ -37,6 +37,11 @@ private:
 private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+	_float					m_FontPosX = 0.f;
+	_float					m_FontPosY = 0.f;
+
+	_float					m_FontSizeX = 1.f;
+	_float					m_FontSizeY = 1.f;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

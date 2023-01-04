@@ -45,6 +45,8 @@ public:
 
 	HRESULT ForGamePlay_Texture(class CGameInstance* pGameInstance);
 	HRESULT ForGamePlay_Shader(class CGameInstance* pGameInstance);
+	HRESULT ForGamePlay_Components(class CGameInstance* pGameInstance);
+	HRESULT ForGamePlay_GameObjects(class CGameInstance* pGameInstance);
 
 
 private:

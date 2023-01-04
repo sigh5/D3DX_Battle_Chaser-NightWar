@@ -64,25 +64,25 @@ HRESULT CObject_Manager::Clear(_uint iLevelIndex)
 	return S_OK;
 }
 
-HRESULT CObject_Manager::Copy_Data(_uint iLevelIndex)
+HRESULT CObject_Manager::Copy_Data(_uint iLevelPreIndex, _uint iLevelCur)
 {
-	if (iLevelIndex >= m_iNumLevels)
+	if (iLevelCur >= m_iNumLevels)
 		return E_FAIL;
 
-	for (auto& Pair : m_pLayers[iLevelIndex])
+	for (auto& Pair : m_pLayers[iLevelPreIndex])
 	{
 		if (Pair.first == LAYER_PLAYER)
 		{
 			CLayer * pLayer = CLayer::Create();
 			pLayer->CopyData(Pair.second->GetGameObjects());
-			m_pLayers[iLevelIndex + 1].emplace(Pair.first, pLayer);
+			m_pLayers[iLevelCur].emplace(Pair.first, pLayer);
 		}
 	}
 
-	for (auto& Pair : m_pLayers[iLevelIndex])
+	for (auto& Pair : m_pLayers[iLevelPreIndex])
 		Safe_Release(Pair.second);
 
-	m_pLayers[iLevelIndex].clear();
+	m_pLayers[iLevelPreIndex].clear();
 	return S_OK;
 }
 
@@ -193,7 +193,7 @@ CGameObject* CObject_Manager::Clone_UI(_uint iLevel, const wstring& pLayerTag , 
 }
 
 
-CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring & pLayerTag, const wstring & pObjectNameTag)
+CGameObject * CObject_Manager::Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag)
 {
 	CLayer* pLayer = Find_Layer(iLevelIndex, pLayerTag);
 
@@ -540,21 +540,22 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 	while (true)
 	{
 		_float4x4 Worldmatrix = _float4x4();
-		_tchar* LayerTag = new _tchar[MAX_PATH];
-		_tchar* ProtoName = new _tchar[MAX_PATH];
-		_tchar* ParentName = new _tchar[MAX_PATH];
-		_tchar* TextureName = new _tchar[MAX_PATH];
-		_tchar *ObjectName = new _tchar[MAX_PATH];
-		_tchar *ModelName = new _tchar[MAX_PATH];
+		_tchar* LayerTag    = new _tchar[MAX_PATH];
+		_tchar* ProtoName  = new _tchar[MAX_PATH];
+		_tchar* ParentName  = new _tchar[MAX_PATH];
+		_tchar* TextureName  = new _tchar[MAX_PATH];
+		_tchar *ObjectName  = new _tchar[MAX_PATH];
+		_tchar *ModelName    = new _tchar[MAX_PATH];
 		_uint	iShaderPass = 0;
 		_uint	iTextureIndex = 0; // 일단 UI 한정
 
-		m_vecNameArray.push_back(ModelName);
-		m_vecNameArray.push_back(ObjectName);
-		m_vecNameArray.push_back(LayerTag);
-		m_vecNameArray.push_back(ProtoName);
-		m_vecNameArray.push_back(ParentName);
-		m_vecNameArray.push_back(TextureName);
+		m_vecNameArray2.push_back(ModelName);
+		m_vecNameArray2.push_back(ObjectName);
+		m_vecNameArray2.push_back(LayerTag);
+		m_vecNameArray2.push_back(ProtoName);
+		m_vecNameArray2.push_back(ParentName);
+		m_vecNameArray2.push_back(TextureName);
+
 
 
 		ReadFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
@@ -625,6 +626,15 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 
 	RELEASE_INSTANCE(CLevel_Manager);
 
+}
+
+void CObject_Manager::SceneChange_NameVectorClear()
+{
+	for (auto& iter : m_vecNameArray2)
+	{
+		Safe_Delete_Array(iter);
+	}
+	m_vecNameArray2.clear();
 }
 
 
@@ -734,6 +744,11 @@ CLayer * CObject_Manager::Find_Layer(_uint iLevelIndex, const wstring& pLayerTag
 
 void CObject_Manager::Free()
 {
+	for (auto& iter : m_vecNameArray2)
+	{
+		Safe_Delete_Array(iter);
+	}
+
 	for (auto& iter : m_vecNameArray)
 	{
 		Safe_Delete_Array(iter);

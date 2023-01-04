@@ -216,8 +216,6 @@ void CModel_Instancing::Load_TreePos(const _tchar* pFileName)
 			break;
 		vTreePosSize.push_back(temp);
 	}
-
-	
 	CloseHandle(hFile);
 
 	for (_uint i = 0; i < m_iNumMeshes; ++i)

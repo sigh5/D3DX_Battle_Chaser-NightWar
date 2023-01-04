@@ -9,8 +9,12 @@ class ENGINE_DLL CStatus final: public CComponent
 public:
 	typedef struct tag_StatusDesc
 	{
-		_int		iHp;	
-		_int		iMp;		//나중에 치명타 , 돈 이런거 넣기
+		_int				iHp;	
+		_int				iMp;		//나중에 치명타 , 돈 이런거 넣기
+		_float4				vDungeon_Pos;
+		_float3				vDungeon_Scale;
+		_float4				vCombat_Pos;
+		_float3				vCombat_Scale;
 	}StatusDesc;
 
 protected:
@@ -19,6 +23,27 @@ protected:
 	virtual ~CStatus() = default;
 
 public:
+	void		Set_Dungeon_PosScale(_float4 vPos, _float3 vScale)
+	{
+		m_StatusDesc.vDungeon_Pos = vPos;
+		m_StatusDesc.vDungeon_Scale = vScale;
+	}
+
+	void		Set_Combat_PosScale(_float4 vPos, _float3 vScale)
+	{
+		m_StatusDesc.vCombat_Pos = vPos;
+		m_StatusDesc.vCombat_Scale = vScale;
+	}
+
+	const _float4			Get_DungeonPos()const { return m_StatusDesc.vDungeon_Pos; }
+	const _float3			Get_DungeonScale()const { return m_StatusDesc.vDungeon_Scale; }
+
+	const _float4			Get_CombatPos()const { return m_StatusDesc.vCombat_Pos; }
+	const _float3			Get_CombatScale()const { return m_StatusDesc.vCombat_Scale; }
+
+
+
+
 	_float			Get_CurStatusHpRatio();
 	_float			Get_CurStatusMpRatio();
 

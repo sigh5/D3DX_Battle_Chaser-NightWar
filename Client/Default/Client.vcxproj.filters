@@ -160,11 +160,8 @@
     <Filter Include="02.GameObjects\MapOne\Collider_3DUI">
       <UniqueIdentifier>{84cddc74-90ab-41c1-98af-7cec0fd90016}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\TrunBattle\Trun_BattleStartUI">
-      <UniqueIdentifier>{aeedec66-4832-46a1-bbdc-513119e0583d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\UI\TrunBattle\Trun_BattleStartUI\Trun_BattleStartCanvas">
-      <UniqueIdentifier>{b8dd1895-f965-421b-ac5c-6feaebf05bed}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TrunStartUI">
+      <UniqueIdentifier>{c866b46b-8fe6-4908-bde4-2a7964f3c68b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -342,7 +339,9 @@
     <ClInclude Include="..\Public\Map_3D_UI.h">
       <Filter>02.GameObjects\MapOne\Collider_3DUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Trun_BattleStart_UI.h" />
+    <ClInclude Include="..\Public\Trun_BattleStart_UI.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -501,7 +500,9 @@
     <ClCompile Include="..\Private\Map_3D_UI.cpp">
       <Filter>02.GameObjects\MapOne\Collider_3DUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp" />
+    <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
