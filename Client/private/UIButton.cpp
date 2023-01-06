@@ -169,24 +169,40 @@ void CUIButton::FirstDungeonUIInit()
 void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 {
 	// 이미지랑 현재 상태만 설정한다.
-	size_t ChildFsmButtonSize = m_ChildFsmButton.size();
+	/*size_t ChildFsmButtonSize = m_ChildFsmButton.size();
 
 	if (ChildFsmButtonSize == 0)
-		return ;
+		return;*/
 
-	for (size_t i = 0; i < ChildFsmButtonSize; ++i)
+
+	for (auto pChildButton : m_ChildFsmButton)
 	{
-		m_ChildFsmButton[i]->Set_RenderActive(true);
-		
+		pChildButton->Set_RenderActive(true);
+
 		if (eType == BUTTON_STATE_ACTION)
-			m_ChildFsmButton[i]->Change_ICON_Active();
+			pChildButton->Change_ICON_Active();
 		else if (eType == BUTTON_STATE_ABLILTY)
-			m_ChildFsmButton[i]->Change_ICON_Ablity();
+			pChildButton->Change_ICON_Ablity();
 		else if (eType == BUTTON_STATE_ITEM)
-			m_ChildFsmButton[i]->Change_ICON_Item();
+			pChildButton->Change_ICON_Item();
 		else
-			return;
+			continue;
 	}
+
+
+	//for (size_t i = 0; i < ChildFsmButtonSize; ++i)
+	//{
+	//	m_ChildFsmButton[i]->Set_RenderActive(true);
+
+	//	if (eType == BUTTON_STATE_ACTION)
+	//		m_ChildFsmButton[i]->Change_ICON_Active();
+	//	else if (eType == BUTTON_STATE_ABLILTY)
+	//		m_ChildFsmButton[i]->Change_ICON_Ablity();
+	//	else if (eType == BUTTON_STATE_ITEM)
+	//		m_ChildFsmButton[i]->Change_ICON_Item();
+	//	else
+	//		return;
+	//}
 
 
 }

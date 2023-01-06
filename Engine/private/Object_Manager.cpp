@@ -10,7 +10,7 @@
 #include "Environment_Object.h"
 #include <utility>
 #include "Texture.h"
-
+#include "HitBoxObject.h"
 
 IMPLEMENT_SINGLETON(CObject_Manager)
 
@@ -45,6 +45,7 @@ HRESULT CObject_Manager::Reserve_Manager(_uint iNumLevels)
 	m_LayerName.push_back(LAYER_PLAYER);
 	m_LayerName.push_back(LAYER_Monster);
 	m_LayerName.push_back(LAYER_UI);
+	m_LayerName.push_back(LAYER_EFFECT);
 	// Todo  Layer는 상수로 추가했음
 
 
@@ -462,6 +463,7 @@ void CObject_Manager::Imgui_Save()
 						iTextureIndex = pTexture->Get_SelectTextureIndex();
 					}
 
+				
 					WriteFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
 					WriteFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
 					WriteFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
@@ -492,6 +494,114 @@ void CObject_Manager::Imgui_Save()
 
 
 
+}
+
+void CObject_Manager::Imgui_Save_Effect()
+{
+	if (ImGui::Button("Save_Scene_Effect"))
+	{
+		_tchar* szName = new _tchar[MAX_PATH];
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
+
+		_tchar szPath[MAX_PATH] = TEXT("../../Data/Skill_Effect/");
+
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+
+		HANDLE      hFile = CreateFile(szName,
+			GENERIC_WRITE,
+			NULL,
+			NULL,
+			CREATE_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL);
+
+		if (INVALID_HANDLE_VALUE == hFile)
+		{
+			return;
+		}
+
+		DWORD   dwByte = 0;
+
+		CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
+		_tchar *LayerTag = new _tchar[MAX_PATH];
+		_tchar *ProtoName = new _tchar[MAX_PATH];
+		_tchar *ParentName = new _tchar[MAX_PATH];
+		_tchar *TextureName = new _tchar[MAX_PATH];
+		_tchar *ModelName = new _tchar[MAX_PATH];
+		_tchar *ObjectName = new _tchar[MAX_PATH];
+		_uint	iShaderPass = 0;
+		_uint	iTextureIndex = 0; // 일단 Effect 한정
+		for (_uint i = 0; i < m_iNumLevels; ++i)
+		{
+			for (auto& Pair : m_pLayers[i])
+			{
+				lstrcpy(LayerTag, Pair.first.c_str());
+
+				if (!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+					continue;
+
+				for (auto& pObject : Pair.second->GetGameObjects())
+				{
+					_float4x4 Worldmatrix = _float4x4();
+					lstrcpy(ProtoName, pObject->Get_ProtoName());
+					lstrcpy(ObjectName, pObject->Get_ObjectName());
+					XMStoreFloat4x4(&Worldmatrix, pObject->Get_Transform()->Get_LocalMatrix());
+
+					if (Pair.first == LAYER_EFFECT)
+					{
+						CGameObject* pParent = pObject->Get_parentName();
+						if (nullptr != pParent)
+							lstrcpy(ParentName, pParent->Get_ObjectName());
+						else
+							lstrcpy(ParentName, TEXT("Nullptr"));
+
+						CHitBoxObject::HitBoxObject Desc;
+						Desc = dynamic_cast<CHitBoxObject*>(pObject)->Get_HitBoxDesc();
+
+						lstrcpy(TextureName, Desc.HitBoxOrigin_Desc.m_pTextureTag);
+						lstrcpy(ModelName, Desc.HitBoxOrigin_Desc.m_pModelTag);
+						iShaderPass = Desc.HitBoxOrigin_Desc.m_iShaderPass;
+
+						CTexture* pTexture = dynamic_cast<CTexture*>(pObject->Get_Component(TEXT("Com_Texture")));
+						iTextureIndex = pTexture->Get_SelectTextureIndex();
+
+						CVIBuffer_Point_Instancing::VIBUffer_Point_TextureDesc PointDesc = Desc.Poing_Desc;
+
+						_int iFrameCnt = PointDesc.m_iFrameCnt;
+						_float fTextureMax_Width_Cnt = PointDesc.m_iTextureMax_Width_Cnt;
+						_float fTextureMax_Height_Cnt = PointDesc.m_iTextureMax_Height_Cnt;
+
+						WriteFile(hFile, &iFrameCnt, sizeof(_int), &dwByte, nullptr);
+						WriteFile(hFile, &fTextureMax_Width_Cnt, sizeof(_float), &dwByte, nullptr);
+						WriteFile(hFile, &fTextureMax_Height_Cnt, sizeof(_float), &dwByte, nullptr);
+						WriteFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+						WriteFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+						WriteFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
+						WriteFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
+					}
+
+					
+				}
+			}
+		}
+		m_vecNameArray.push_back(ModelName);
+		m_vecNameArray.push_back(ObjectName);
+		m_vecNameArray.push_back(szName);
+		m_vecNameArray.push_back(LayerTag);
+		m_vecNameArray.push_back(ProtoName);
+		m_vecNameArray.push_back(ParentName);
+		m_vecNameArray.push_back(TextureName);
+		MSG_BOX("Save_Complete");
+		CloseHandle(hFile);
+		RELEASE_INSTANCE(CLevel_Manager);
+	}
 }
 
 void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
@@ -620,12 +730,143 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 				pGameObject->Set_parentName(iCurLevel,ParentName);
 		}
 
+
 	}
 
 	CloseHandle(hFile);
 
 	RELEASE_INSTANCE(CLevel_Manager);
 
+}
+
+CGameObject* CObject_Manager::Load_Effect(const _tchar * pDataFileName, _uint iCurLevel, _bool bIsHaveLayer)
+{
+	CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
+	_tchar* szName = new _tchar[256];
+	m_vecNameArray.push_back(szName);
+	_tchar szPath[MAX_PATH] = TEXT("../../Data/Skill_Effect/");
+	CGameObject* pGameObject = nullptr;
+	if (0 == iCurLevel)
+		iCurLevel = pLevelManager->GetCurLevelIdx();
+
+	if (pDataFileName == nullptr)
+	{
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szSaveDataname, sizeof(char[256]), szName, sizeof(_tchar[256]));
+		lstrcat(szPath, szName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+	}
+	else
+	{
+		lstrcat(szPath, pDataFileName);
+		lstrcpy(szName, szPath);
+		lstrcat(szName, TEXT(".dat"));
+	}
+
+	HANDLE      hFile = CreateFile(szName,
+		GENERIC_READ,
+		NULL,
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL,
+		NULL);
+
+	if (INVALID_HANDLE_VALUE == hFile)
+	{
+		return nullptr;
+	}
+
+	DWORD   dwByte = 0;
+
+	_uint iObjectNumber = 0;
+
+
+	while (true)
+	{
+		_float4x4 Worldmatrix = _float4x4();
+		_tchar* LayerTag = new _tchar[MAX_PATH];
+		_tchar* ProtoName = new _tchar[MAX_PATH];
+		_tchar* ParentName = new _tchar[MAX_PATH];
+		_tchar* TextureName = new _tchar[MAX_PATH];
+		_tchar *ObjectName = new _tchar[MAX_PATH];
+		_tchar *ModelName = new _tchar[MAX_PATH];
+		_uint	iShaderPass = 0;
+		_uint	iTextureIndex = 0; // 일단 UI 한정
+		_int iFrameCnt = 0;
+		_float fTextureMax_Width_Cnt = 0.f;
+		_float fTextureMax_Height_Cnt = 0.f;
+
+	
+
+		m_vecNameArray2.push_back(ModelName);
+		m_vecNameArray2.push_back(ObjectName);
+		m_vecNameArray2.push_back(LayerTag);
+		m_vecNameArray2.push_back(ProtoName);
+		m_vecNameArray2.push_back(ParentName);
+		m_vecNameArray2.push_back(TextureName);
+
+
+		ReadFile(hFile, &iFrameCnt, sizeof(_int), &dwByte, nullptr);
+		ReadFile(hFile, &fTextureMax_Width_Cnt, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &fTextureMax_Height_Cnt, sizeof(_float), &dwByte, nullptr);
+		ReadFile(hFile, &Worldmatrix, sizeof(XMFLOAT4X4), &dwByte, nullptr);
+		ReadFile(hFile, LayerTag, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ProtoName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ParentName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, TextureName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ModelName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, ObjectName, sizeof(_tchar[MAX_PATH]), &dwByte, nullptr);
+		ReadFile(hFile, &iShaderPass, sizeof(_uint), &dwByte, nullptr);
+		ReadFile(hFile, &iTextureIndex, sizeof(_uint), &dwByte, nullptr);
+		if (0 == dwByte)
+			break;
+
+		if (!lstrcmp(LayerTag, TEXT("Layer_Camera")) || !lstrcmp(LayerTag, TEXT("Layer_BackGround")))
+			continue;
+
+		if (!lstrcmp(LayerTag, LAYER_EFFECT))
+		{
+			CHitBoxObject::HitBoxObject Desc;
+			
+			
+			ZeroMemory(&Desc, sizeof(Desc));
+			lstrcpy(Desc.HitBoxOrigin_Desc.m_pModelTag, ModelName);
+			Desc.HitBoxOrigin_Desc.m_iShaderPass = iShaderPass;
+			lstrcpy(Desc.HitBoxOrigin_Desc.m_pTextureTag, TextureName);
+			
+			
+			Desc.Poing_Desc.m_iFrameCnt = iFrameCnt;
+			Desc.Poing_Desc.m_iTextureMax_Height_Cnt = fTextureMax_Height_Cnt;
+			Desc.Poing_Desc.m_iTextureMax_Width_Cnt = fTextureMax_Width_Cnt;
+			
+
+			CGameObject*		pPrototype = Find_Prototype(ProtoName);
+			if (nullptr == pPrototype)
+				return nullptr;
+
+			if(bIsHaveLayer == true)
+				Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &Desc);			
+			
+			else
+				pGameObject = pPrototype->Clone(&Desc);
+
+			if (pGameObject == nullptr)
+				assert(!"????");
+			(pGameObject)->Set_ProtoName(ProtoName);
+			(pGameObject)->Set_ObjectName(ObjectName);
+			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+
+			CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
+			pTexture->Set_SelectTextureIndex(iTextureIndex);
+		}
+	}
+
+	CloseHandle(hFile);
+	RELEASE_INSTANCE(CLevel_Manager);
+	
+	if (pGameObject == nullptr)
+		MSG_BOX("Load_Effect_Error");
+	return pGameObject;
 }
 
 void CObject_Manager::SceneChange_NameVectorClear()
@@ -646,6 +887,12 @@ void CObject_Manager::Imgui_Load()
 	{
 		Load_Object();
 	}
+	if (ImGui::Button("Load_Effect"))
+	{
+		Load_Effect();
+	}
+
+
 }
 
 void CObject_Manager::Imgui_ProtoViewer(const _tchar*& szSelectedProto)
@@ -703,6 +950,8 @@ void CObject_Manager::Imgui_ObjectViewer(_uint iLevel, CGameObject*& pSelectedOb
 	Imgui_RemoveObject(iLevel,&pSelectedObject);
 	ImGui::NewLine();
 	Imgui_Save();
+	ImGui::SameLine();
+	Imgui_Save_Effect();
 	ImGui::SameLine();
 	Imgui_Load();
 

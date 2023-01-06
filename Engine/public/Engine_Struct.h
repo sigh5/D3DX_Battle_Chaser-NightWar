@@ -90,7 +90,6 @@ namespace Engine
 
 
 
-
 	typedef struct tagVertexPointInstancing
 	{
 		XMFLOAT3		vPosition;
@@ -102,6 +101,13 @@ namespace Engine
 		static const unsigned int		iNumElements = 6;
 		static D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
 	}VTXPOINTINSTANCING_DECLARATION;
+
+
+	typedef struct ENGINE_DLL tagVertexPoint_Declaration
+	{
+		static const unsigned int		iNumElements = 2;
+		static D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements];
+	}VTXPOINT_DECLARATION;
 
 
 

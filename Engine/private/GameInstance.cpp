@@ -376,6 +376,13 @@ void CGameInstance::Load_Object(const _tchar * pDataFileNam, _uint iCurLevel )
 	return m_pObject_Manager->Load_Object(pDataFileNam, iCurLevel);
 }
 
+CGameObject* CGameInstance::Load_Effect(const _tchar * pDataFileName, _uint iCurLevel, _bool IsHaveLayer )
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+	return m_pObject_Manager->Load_Effect(pDataFileName, iCurLevel, IsHaveLayer);
+}
+
 void CGameInstance::Change_Level(_uint iLevleIdx)
 {
 	if (nullptr == m_pObject_Manager)

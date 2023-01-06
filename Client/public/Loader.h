@@ -48,6 +48,7 @@ public:
 	HRESULT ForGamePlay_Components(class CGameInstance* pGameInstance);
 	HRESULT ForGamePlay_GameObjects(class CGameInstance* pGameInstance);
 
+	HRESULT ForGamePlay_Skill_and_Effect(class CGameInstance* pGameInstance);
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

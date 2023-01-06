@@ -17,7 +17,11 @@
 #include "TurnStateCanvas.h"
 #include "TurnUICanvas.h"
 #include "HpMpBuffCanvas.h"
+#include "TrunWinCanvas.h"
+
 #include <string>
+
+
 
 IMPLEMENT_SINGLETON(CCombatController);
 
@@ -39,16 +43,41 @@ void CCombatController::Scene_Chane_Safe_Release()
 
 	for (auto& pCanvas : m_CanvasVec)
 	{
-		pCanvas->Delete_Delegate();
+		//pCanvas->Delete_Delegate();
 		Safe_Release(pCanvas);
 	}
 	m_CanvasVec.clear();
+
+
+	m_pTurnCanvas = nullptr;
+	m_pCurentActor = nullptr;
+	m_pHitActor = nullptr;
+	m_pTurnCanvas = nullptr;
+	m_pTurnStateButtonCanvas = nullptr;
+	
+	m_bCombatIntro = false;
 	m_bLateInit = false;
+	m_dIntroTimer = 0.0;
+
+	m_bIsHiterhit = false;
+	m_bisHitTimer_Alive = false;
+
+	m_fHitTimer = 0.0f;
+	m_fHitRecoverTime = 0.2f;
+
+	m_bMonsterSelect_Target = false;
+	m_iMonster_Player_Option = 0;
+
+	m_bIsPlayer = false;
+	m_bMonsterTurnEnd = false;
+
+	m_iHitNum = 0;
 }
 
 void CCombatController::Reset_Timer()
 {
 	m_dIntroTimer = 0.0;
+	m_bVirtory = false;
 }
 
 HRESULT CCombatController::Initialize(_uint iLevel)
@@ -59,7 +88,7 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
 		{
-			if (nullptr != dynamic_cast<CCombatActors*>(obj))
+			if ( dynamic_cast<CCombatActors*>(obj))
 			{	
 				ObjTag = obj->Get_ObjectName();
 				m_CurActorMap.emplace(ObjTag, obj);
@@ -116,12 +145,16 @@ HRESULT CCombatController::Late_Init()
 
 void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 {
+	if (m_bVirtory)
+		return;
+
 	m_dIntroTimer += TimeDelta *1.f;
 
 	if (m_dIntroTimer >= 3.f)
 	{
 		Late_Init();
 		m_bCombatIntro = false;
+		PlayerWin();
 	}
 	else
 	{
@@ -141,6 +174,7 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	MonsterSetTarget();
 	Active_Fsm();
 	Collison_Event();
+
 }
 
 void CCombatController::Status_CanvasInit()
@@ -152,6 +186,38 @@ void CCombatController::Status_CanvasInit()
 
 		pCanvas->Set_RenderActive(true);
 	}
+
+}
+
+void CCombatController::PlayerWin()
+{
+	_float fHPRatio = 0.f;
+
+	for (auto& pMonster : m_CurActorMap)
+	{
+		if (nullptr == dynamic_cast<CMonster*>(pMonster.second))
+			continue;
+
+		_float fMonsterHpRatio = Find_CurStatus(pMonster.first)->Get_CurStatusHpRatio();
+
+		fHPRatio += fMonsterHpRatio;
+	}
+	
+	if (fHPRatio <= 0.f && !m_bVirtory)
+	{
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
+		m_bVirtory = true;
+
+		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
+			LAYER_UI,TEXT("TurnWinCanvas")));
+		
+		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
+		pWinCanvas->Set_WinRender(true);
+		RELEASE_INSTANCE(CGameInstance);
+
+	}
+
 
 }
 
@@ -321,8 +387,7 @@ void CCombatController::Mana_Refresh()
 
 void CCombatController::Active_Fsm()
 {
-	/*if (m_pHitActor == nullptr)
-		return;*/
+
 	
 	To_Idle();
 	To_Intro();
@@ -352,6 +417,16 @@ void CCombatController::ResetState()
 	for (_uint i = 0; i < (_uint)(CGameObject::CHAR_STATE_END); ++i)
 	{
 		m_pCurentActor->Set_FsmState(false, (CGameObject::CHAR_STATE)(i));
+	}
+	
+	m_bVirtory = false;
+}
+
+void CCombatController::Render_StopCanvas()
+{
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		pCanvas->Set_RenderActive(false);
 	}
 }
 
@@ -417,6 +492,9 @@ void CCombatController::Collison_Event()
 
 HRESULT CCombatController::Set_CurrentActor()
 {
+	if (m_bVirtory)
+		return S_OK;
+
 	assert(m_pTurnCanvas != nullptr && "CCombatController::Set_CurrentActor issue");
 
 	UI_REPRESENT eCurActor = m_pTurnCanvas->Get_CurrentActor();
@@ -479,12 +557,7 @@ HRESULT CCombatController::Set_ActorsStatus()
 	return S_OK;
 }
 
-#ifdef _DEBUG
-void CCombatController::Imgui_CharAnim()
-{
-}
 
-#endif // !DEBUG
 
 _bool CCombatController::To_Idle()
 {

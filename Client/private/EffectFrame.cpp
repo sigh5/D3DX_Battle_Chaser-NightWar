@@ -24,6 +24,8 @@ HRESULT CEffectFrame::Initialize_Prototype()
 
 HRESULT CEffectFrame::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("TestFrame");
+
 	CGameObject::GAMEOBJECTDESC		GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof(GameObjectDesc));
 
@@ -45,14 +47,43 @@ HRESULT CEffectFrame::Initialize(void * pArg)
 
 HRESULT CEffectFrame::Last_Initialize()
 {
+	if (m_bLast_Initlize)
+		return S_OK;
+
+	m_pVIBufferCom->Set_FrameCnt(5);
+	m_pVIBufferCom->Set_TextureMax_Width_Cnt(4);
+	m_pVIBufferCom->Set_TextureMax_Height_Cnt(4);
+	
+	m_bLast_Initlize = true;
 	return S_OK;
 }
 
 void CEffectFrame::Tick(_double TimeDelta)
 {
+	Last_Initialize();
 	__super::Tick(TimeDelta);
+
 	
-	//m_pVIBufferCom->Tick(TimeDelta);
+
+	if (m_fPower >= 1.f)
+	{
+		m_bIsChange = true;
+	}
+	else if (m_fPower <= 0)
+		m_bIsChange = false;
+
+
+
+
+	if (m_bIsChange == true)
+		m_fPower += (_float)TimeDelta * -1.f;
+	else
+		m_fPower += (_float)TimeDelta;
+
+
+
+
+	m_pVIBufferCom->UV_Move_Tick(TimeDelta);
 
 }
 
@@ -60,9 +91,7 @@ void CEffectFrame::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-
-
-	m_iPlayOnFrameCnt++;
+	/*m_iPlayOnFrameCnt++;
 
 	if (m_iPlayOnFrameCnt == m_iFrameCnt)
 	{
@@ -84,12 +113,8 @@ void CEffectFrame::Late_Tick(_double TimeDelta)
 		m_iPlayOnFrameCnt = 0;
 		m_fCurX =  (m_iWidthTextureCnt % m_iTextureCnt_W) *0.25f;
 		m_fCurY = (m_iHeightTextureCnt % m_iTextureCnt_H) *0.25f;
-
-
-		
-
 	}
-
+*/
 
 
 	
@@ -107,7 +132,7 @@ HRESULT CEffectFrame::Render()
 		return E_FAIL;
 
 
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(1);
 	m_pVIBufferCom->Render();
 
 	return S_OK;
@@ -135,9 +160,17 @@ HRESULT CEffectFrame::SetUp_Components()
 		return E_FAIL;
 
 	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireTexture"), TEXT("Com_Texture"),
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Blue_Base"), TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
+	
+
+	/* For.Com_Texture_Glow */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Fire_Glow"), TEXT("Com_Texture2"),
+		(CComponent**)&m_pTextureCom2)))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
@@ -161,17 +194,24 @@ HRESULT CEffectFrame::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-	if (m_fCurY == 0)
-		m_fCurY = 0.25f;
-
-	if (m_fCurX == 0)
-		m_fCurX = 0.25f;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_UV_XCurRatio", &m_fCurX, sizeof(_float))))
+	if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fPower,sizeof(_float))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Set_RawValue("g_UV_YCurRatio", &m_fCurY, sizeof(_float))))
-		return E_FAIL;
+
+	//if (m_fCurY == 0)
+	//	m_fCurY = 0.25f;
+
+	//if (m_fCurX == 0)
+	//	m_fCurX = 0.25f;
+
+	//if (FAILED(m_pShaderCom->Set_RawValue("g_UV_XCurRatio", &m_fCurX, sizeof(_float))))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pShaderCom->Set_RawValue("g_UV_YCurRatio", &m_fCurY, sizeof(_float))))
+	//	return E_FAIL;
+
+	m_pVIBufferCom->Set_UV_RawValue(m_pShaderCom);
+
 
 
 
@@ -180,6 +220,12 @@ HRESULT CEffectFrame::SetUp_ShaderResources()
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture")))
 		return E_FAIL;
+
+	if (FAILED(m_pTextureCom2->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture")))
+		return E_FAIL;
+
+
+
 
 	return S_OK;
 }

@@ -77,3 +77,4 @@
 #define	  LAYER_PLAYER			TEXT("Layer_Player")
 #define	  LAYER_Monster			TEXT("Layer_Monster")
 #define	  LAYER_UI				TEXT("Layer_UI")
+#define	  LAYER_EFFECT			TEXT("Layer_Effect")

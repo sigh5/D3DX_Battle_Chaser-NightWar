@@ -14,7 +14,7 @@
 #include "VIBuffer_Point_Instancing.h"
 #include "Status.h"
 #include "Model_Instancing.h"
-
+#include "VIBuffer_Point.h"
 
 #include "Collider.h"
 

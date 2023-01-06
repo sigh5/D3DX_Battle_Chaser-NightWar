@@ -127,7 +127,9 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 
 	if (m_bIsCombatScene)
 	{
-		for (_uint i = 0; i < m_PlayerParts.size(); ++i)
+		size_t size = m_PlayerParts.size();
+
+		for (size_t i = 0; i < size; ++i)
 		{
 			m_PlayerParts[i]->Late_Tick(TimeDelta);
 		}
@@ -160,7 +162,6 @@ HRESULT CHero_Calibretto::Render()
 #ifdef _DEBUG
 	CClient_Manager::Collider_Render(this, m_pColliderCom);
 	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
-
 	if (m_bIsCombatScene)
 		m_pColliderCom->Render();
 #endif
@@ -178,28 +179,32 @@ void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
 	{
 		_float3 vScale = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonScale();
 		_float4 vPos = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonPos();
+		
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		m_pTransformCom->Set_Scaled(vScale);
 		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
 
-
+		m_iNonRenderMeshIndex = 0;
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_CalibrettoDungeon"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
-			assert("CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
+			assert(! "CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
 
 		m_bIsCombatScene = false;
 
 	}
 	else if (LEVEL_COMBAT == iLevleIdx)
 	{
+	
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-	
+		
+		
 		if (m_bCombat_LastInit)
 		{
+			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 			vPos = m_pStatusCom[COMBAT_PLAYER]->Get_CombatPos();
 			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
@@ -209,11 +214,9 @@ void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
 
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_CalibrettoCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
-			assert("CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
+			assert(! "CHero_Calibretto Change_Level_Data : LEVEL_COMBAT ");
 		m_bIsCombatScene = true;
 		
-
-
 	}
 	else
 		return;
@@ -284,7 +287,7 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 
 	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;
-
+	
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(4.f, 0.f, 32.f, 1.f));
 	_float3 vScale = _float3(4.f, 4.f, 4.f);
@@ -310,6 +313,11 @@ void CHero_Calibretto::Combat_Tick(_double TimeDelta)
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+	/*for (auto& pParts : m_PlayerParts)
+	{
+		pParts->Tick(TimeDelta);
+	}*/
 
 	for (_uint i = 0; i < m_PlayerParts.size(); ++i)
 	{

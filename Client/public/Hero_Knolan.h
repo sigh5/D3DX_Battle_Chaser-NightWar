@@ -26,6 +26,8 @@ public:
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
 	virtual	  _bool	  Is_Dead()override;
 
+	
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -51,6 +53,9 @@ public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	void			  Combat_DeadTick(_double TimeDelta);
+	void			 Create_Skill_Texture();
+	
+	
 	void			  Create_SkillFire();
 	void			  Create_Skill_Stop_Fire();
 	void			  Create_Skill_Meteo();
@@ -115,9 +120,15 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_SKILL;
 	_bool			m_bOnceCreate = false;
 
+	_bool			m_bOnceStop = false;
+
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
-	CSkill_Object::Skill_DIR	m_SkillDir = CSkill_Object::Skill_DIR_END;
+	Skill_DIR	m_SkillDir = Skill_DIR_END;
+
+	string			m_BoneTag = "";
+	wstring			m_TextureTag = TEXT("");
+
 
 private:
 	vector<CGameObject*>	m_PlayerParts;
@@ -127,6 +138,10 @@ private:
 	_float3					m_vTestScale;
 	 float Temp[3];
 	 float Sour[3];
+
+
+	 int					m_iRadioButton22=0;
+
 
 };
 

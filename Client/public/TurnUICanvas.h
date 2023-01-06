@@ -40,7 +40,9 @@ public:
 	void	DeleteCharUI(UI_REPRESENT UiRepresentNum);		// Obsever
 	void	Move_Children(); /*logic*/
 
+	void	Move_ReCoverChild();
 
+	virtual void	Set_RenderActive(_bool bActive);
 
 
 private:
@@ -60,7 +62,10 @@ private:
 
 	class CUI*				m_pTopUI = nullptr;
 	class CUI*				m_pBottomUI = nullptr;
+	_bool					m_bMoveFinish = false;
+	vector<CUI*>			OldCharImage;
 
+	_float					m_fAfter_Delete_Move_Timer = 0.f;
 
 public:
 	static CTurnUICanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

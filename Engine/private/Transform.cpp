@@ -327,7 +327,7 @@ void CTransform::Chase_Rising(_fvector vTargetPos, _double TimeDelta, _float fLi
 		
 		_float4		vYPos;
 		XMStoreFloat4(&vYPos, vPosition);
-		vYPos.y += 6.f* (_float)TimeDelta;
+		vYPos.y += 30.f* (_float)TimeDelta;
 
 		Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vYPos));
 	}

@@ -156,10 +156,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
 		return E_FAIL;
 
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Terrain"))))
-	//	return E_FAIL;
-
-	
 	Safe_Release(pGameInstance);
 
 	return S_OK;
@@ -233,7 +229,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 
 #ifdef NOMODLES
 
-
 #else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 #endif
@@ -248,12 +243,57 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Effect_Rect_Instancing"))))
-		return E_FAIL;*/
+#ifdef NOMODLES
+	//pGameInstance->Load_Effect(TEXT("bretto_Heal_Active_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("bretto_Heal_Active_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("bretto_Punch_Effect_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("bretto_Punch_Effect_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("bretto_Punch_Effect_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("bretto_Punch_Effect_3"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("FireBall_Knolan"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_blue_fire_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_blue_fire_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Beam"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Beam_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Beam_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Beam_3"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Beam_4"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_heal_spread_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_heal_spread_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_laser_Bullet_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_laser_Bullet_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_laser_Bullet_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Punch_Flash_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Punch_Flash_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Punch_Flash_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Punch_Smoke_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_smoke_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_smoke_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_smoke_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Fire_Glow"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Fire_Glow_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Fire_Glow_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_FireBall_Knolan"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_FireTexture"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_garrison_burst_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Garrsion_Fire_bot_Width_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Garrsion_Fire_bot_Width_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Knolan_Brust_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Knolan_Brust_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_2"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_3"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_4"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_5"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_Impact_0"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_Impact_1"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_Monster_Bite_Impact_2"), LEVEL_GAMEPLAY);
+#else
+
+#endif
 	
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Effect_Point_Instancing"))))
-		return E_FAIL;
-*/
+	
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;

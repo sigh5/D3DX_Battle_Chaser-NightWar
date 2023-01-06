@@ -163,6 +163,12 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TrunStartUI">
       <UniqueIdentifier>{c866b46b-8fe6-4908-bde4-2a7964f3c68b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TrunWinCanvas">
+      <UniqueIdentifier>{90cc5241-ac68-4fc5-9695-af5d8d5ca35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Player\Skill\Skill_Texture">
+      <UniqueIdentifier>{ec6bccd5-bcd3-4262-822c-a30bdd7228dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -342,6 +348,12 @@
     <ClInclude Include="..\Public\Trun_BattleStart_UI.h">
       <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TrunWinCanvas.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWinCanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Skill_TextureObj.h">
+      <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -503,6 +515,12 @@
     <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\TrunWinCanvas.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWinCanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Skill_TextureObj.cpp">
+      <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -552,6 +570,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelInstance.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

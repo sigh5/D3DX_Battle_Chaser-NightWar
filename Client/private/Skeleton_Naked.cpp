@@ -351,7 +351,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 160;//30;
+	m_iStateDamage = 1;//30;
 	m_pMeHit_Player = nullptr;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// ÇÑ´ëÅö
@@ -365,7 +365,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 80;			// 20*2 
+	m_iStateDamage = 1;			// 20*2 
 	m_pStatusCom->Use_SkillMp(30);
 	m_pMeHit_Player = nullptr;
 

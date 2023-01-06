@@ -29,35 +29,42 @@ void CHpMpBuffCanvas::Set_StatusHpMpBar(map<const wstring, CStatus*>& StatusMap)
 		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar2")))->Set_MpBarStatus(Find_Status(TEXT("Hero_Calibretto")));
 	}
 
-	if(static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
+	if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
 	{
-		
 		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar3")))->Set_HpBarStatus(Find_Status(TEXT("Skeleton_Naked")));
 		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3")))->Set_MpBarStatus(Find_Status(TEXT("Skeleton_Naked")));
-		
-		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
-		{
-			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_HpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
-			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_MpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
-		}
-	
-		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
-		{
-			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_HpBarStatus(Find_Status(TEXT("Spider_Mana")));
-			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_MpBarStatus(Find_Status(TEXT("Spider_Mana")));
-		}
 	}
+	if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
+	{
+		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_HpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
+		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_MpBarStatus(Find_Status(TEXT("Monster_SlimeKing")));
+	}
+
+	if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
+	{
+		static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_HpBarStatus(Find_Status(TEXT("Spider_Mana")));
+		static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_MpBarStatus(Find_Status(TEXT("Spider_Mana")));
+	}
+
+
+	for (auto& pChild : m_ChildrenVec)
+	{
+		if (nullptr != dynamic_cast<CHpMpBar*>(pChild))
+			static_cast<CHpMpBar*>(pChild)->Set_Hit(true);
+
+	}
+
 
 	m_StatusMap.clear();
 }
 
-void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter,_bool bHit)
+void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter, _bool bHit)
 {
 	for (auto& pChild : m_ChildrenVec)
 	{
-		if(dynamic_cast<CHpMpBar*>(pChild) ==nullptr )
+		if (dynamic_cast<CHpMpBar*>(pChild) == nullptr)
 			continue;
-		
+
 		if (static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar0"))) != nullptr)
 		{
 			if (!lstrcmp(pHiter->Get_ObjectName(), TEXT("Hero_Gully")))
@@ -75,30 +82,28 @@ void CHpMpBuffCanvas::Set_HitEvent(CGameObject* pHiter,_bool bHit)
 			else
 				continue;
 		}
-	
 
-		else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr &&
+			!lstrcmp(pHiter->Get_ObjectName(), TEXT("Skeleton_Naked")))
 		{
-			if (!lstrcmp(pHiter->Get_ObjectName(), TEXT("Skeleton_Naked")))
-			{
-				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar3")))->Set_Hit(bHit);
-			}
-			else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr &&
-				!lstrcmp(pHiter->Get_ObjectName(), TEXT("Monster_SlimeKing")))
-			{
-				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_Hit(bHit);
-			}
-			else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr &&
-				!lstrcmp(pHiter->Get_ObjectName(), TEXT("Spider_Mana")))
-			{
-				static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_Hit(bHit);
-			}
-			else
-				continue;
+			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar3")))->Set_Hit(bHit);
+		}
+		else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr &&
+			!lstrcmp(pHiter->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar4")))->Set_Hit(bHit);
+		}
+		else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr &&
+			!lstrcmp(pHiter->Get_ObjectName(), TEXT("Spider_Mana")))
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("HpBar5")))->Set_Hit(bHit);
 		}
 		else
 			continue;
 	}
+
+
+	
 }
 
 void CHpMpBuffCanvas::Set_MpEvent(_bool bMp)
@@ -116,22 +121,20 @@ void CHpMpBuffCanvas::Set_MpEvent(_bool bMp)
 		}
 
 
-		else if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3"))) != nullptr)
 		{
 			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar3")))->Set_Hit(bMp);
-			
-			if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
-			{
-				static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_Hit(bMp);
-			}
-		
-			if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
-			{
-				static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_Hit(bMp);
-			}
 		}
-		else
-			continue;
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4"))) != nullptr)
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar4")))->Set_Hit(bMp);
+		}
+
+		if (static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5"))) != nullptr)
+		{
+			static_cast<CHpMpBar*>(Find_UI(TEXT("MpBar5")))->Set_Hit(bMp);
+		}
+
 	}
 }
 
@@ -234,11 +237,6 @@ void CHpMpBuffCanvas::Set_RenderActive(_bool bTrue)
 		pChild->Set_RenderActive(bTrue);
 	}
 }
-
-void CHpMpBuffCanvas::Delete_Delegate()
-{
-}
-
 
 
 HRESULT CHpMpBuffCanvas::SetUp_Components()
@@ -352,5 +350,8 @@ void CHpMpBuffCanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+
+	m_StatusMap.clear();
 
 }

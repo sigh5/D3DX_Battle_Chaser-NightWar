@@ -130,9 +130,8 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 		}
 		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[1])
 		{
-			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
+			pGameInstance->Load_Object(TEXT("OneMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
 			pGameInstance->Setting_MonsterScene(1);

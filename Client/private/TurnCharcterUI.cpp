@@ -72,6 +72,10 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 void CTurnCharcterUI::Tick(_double TimeDelta)
 {
 	Last_Initialize();
+	__super::Tick(TimeDelta);
+
+	/*if (true == CClient_Manager::m_bCombatWin)
+		return;*/
 
 	if (m_bMove)
 	{
@@ -80,7 +84,7 @@ void CTurnCharcterUI::Tick(_double TimeDelta)
 	Bottom_Move();
 
 	
-	__super::Tick(TimeDelta);
+	
 }
 
 void CTurnCharcterUI::Late_Tick(_double TimeDelta)
@@ -101,8 +105,6 @@ HRESULT CTurnCharcterUI::Render()
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
-
-
 
 	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();

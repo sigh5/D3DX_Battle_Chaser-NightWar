@@ -42,6 +42,9 @@ private:
 	_double						m_dCombatIntroTimer = 0.0;
 	_bool						m_bIntroFinish = false;
 
+
+	_float						m_fSceneChaneTimer = 0.f;
+
 private:
 	_tchar					m_szFPS[MAX_PATH] = TEXT("");
 	_uint					m_iNumCallDraw = 0;

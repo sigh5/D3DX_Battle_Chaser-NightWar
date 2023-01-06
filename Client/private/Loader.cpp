@@ -10,7 +10,7 @@
 #include "MyImage.h"
 #include "EffectFrame.h"
 #include "MapOneTree.h"
-
+#include "TrunWinCanvas.h"
 
 /* For.CombatScene*/
 #include "SlimeKing.h"
@@ -35,6 +35,7 @@
 #include "ChestBox.h"
 #include "Map_3D_UI.h"
 #include "Trun_BattleStart_UI.h"
+#include "Skill_TextureObj.h"
 
 /* For.CombatScene*/
 
@@ -145,7 +146,8 @@ HRESULT CLoader::Loading_ForGamePlay()
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 		/* Model */
 #ifdef NOMODLES
-
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);	
+			
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
@@ -153,6 +155,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);
 		/* ~Model */
 #endif
 
@@ -362,6 +365,38 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			CTexture::TYPE_END, 10))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TrunBattle_Win"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/CombatWin/UI_BattleWin%d.png"),
+			CTexture::TYPE_END, 8))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_TrunBattle_WinCanvas"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/CombatWin/UI_BattleWinCanvas.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Fire_Glow"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Glow/blue_fire_4_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Blue_Base"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Glow/blue_fire_m_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+
+	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -402,6 +437,11 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), VTXMODEL_INSTAICING_DECLARATION::Elements, VTXMODEL_INSTAICING_DECLARATION::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Point"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint.hlsl"), VTXPOINT_DECLARATION::Elements, VTXPOINT_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -437,6 +477,14 @@ HRESULT CLoader::ForGamePlay_Components(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Point_Instancing"),
 		CVIBuffer_Point_Instancing::Create(m_pDevice, m_pContext, 30))))
 		return E_FAIL;
+
+
+	/* For.Prototype_Component_VIBuffer_Point_Instancing */
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_Point"),
+		CVIBuffer_Point::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션정보생성중"));
 	/* For.Prototype_Component_Navigation */
@@ -583,6 +631,172 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnBattleStart_UI"),
 		CTrun_BattleStart_UI::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TurnWinCanvas"),
+		CTrunWinCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_TextureObj"),
+		CSkill_TextureObj::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
+{
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_laser_Bullet"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Bullet/bretto_laser_Bullet_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Heal_Active"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Heal/bretto_Heal_Active_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_heal_spread"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Heal/bretto_heal_spread_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Punch_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Punch/Punch_Effect/Punch_Impact_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Punch_Flash"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Punch/Punch_Flash/Punch_Flash_%d.png"),
+			CTexture::TYPE_END, 3))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Punch_Smoke"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Punch/Smoke/calibretto punch_smoke_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Punch_particles"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Punch/calibretto_punch_particles_sheet.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_smoke"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Smoke/bretto_smoke_%d.png"),
+			CTexture::TYPE_END, 3))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Beam"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Beam/bretto_Beam_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Common_Aura"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/Arua/Aura_%d.png"),
+			CTexture::TYPE_END, 4))))
+		return E_FAIL;
+
+	
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_blue_fire1"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/BlueFire/blue_fire_1_sheet_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_garrison_burst"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Brust/garrison_burst.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_Crack"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Crack/Garrsion_Crack_%d.png"),
+			CTexture::TYPE_END, 4))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_Fire_bot_Height"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Garrsion_Fire_bot/Garrsion_Fire_bot_Height_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_Fire_bot_Width"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Garrsion_Fire_bot/Garrsion_Fire_bot_Width_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_knolan_crack"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/Crack/knolan_crack_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_FireBall_Knolan"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/FireBall/Knolan_FireBall.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_IceBlast_Knolan"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/Ice_Blast/knolan_iceblast.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Knolan_Brust"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/Brust/Knolan_Brust_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Bite"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Monster/Monster_Bite/bite_new_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Monster_Bite_Impact"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Monster/Monster_Bite_Impact/bite_impact_%d.png"),
+			CTexture::TYPE_END, 3))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Common_Fire_Exhurst"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/FireExhust/FireExhust_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Knolan_Fire_Meteo"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/FierMeteo/Fire_Meteo.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
 
 	return S_OK;
 }

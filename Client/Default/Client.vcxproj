@@ -212,11 +212,13 @@
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
     <ClInclude Include="..\Public\Skill_Object.h" />
+    <ClInclude Include="..\Public\Skill_TextureObj.h" />
     <ClInclude Include="..\Public\SkyBox.h" />
     <ClInclude Include="..\Public\SlimeKing.h" />
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\Public\TrunWinCanvas.h" />
     <ClInclude Include="..\Public\Trun_BattleStart_UI.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
     <ClInclude Include="..\Public\TurnStateCanvas.h" />
@@ -269,11 +271,13 @@
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
     <ClCompile Include="..\Private\Skill_Object.cpp" />
+    <ClCompile Include="..\Private\Skill_TextureObj.cpp" />
     <ClCompile Include="..\Private\SkyBox.cpp" />
     <ClCompile Include="..\Private\SlimeKing.cpp" />
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\Private\TrunWinCanvas.cpp" />
     <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />
     <ClCompile Include="..\Private\TurnStateCanvas.cpp" />
@@ -305,6 +309,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_PongShader.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_TerrainTile.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex_Tile.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPointInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />

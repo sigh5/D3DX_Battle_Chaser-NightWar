@@ -34,6 +34,10 @@ private:
 	void	Imgui_CreateObject();
 	void	Imgui_Create_UI();
 	void	Imgui_Create_Object();
+	void	Imgui_Create_Effect_Object();
+
+	
+	
 	void	Imgui_Show_Parent();
 
 

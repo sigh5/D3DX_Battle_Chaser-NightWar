@@ -41,7 +41,9 @@ namespace Client
 		,BUTTON_FSM_STATE_END,
 	};
 
-	
+	enum Skill_DIR {
+		Skill_DIR_straight, Skill_DIR_LISING, Skill_DIR_DOWN, Skill_DIR_ScaleUP_DOWN, SKILL_TEST , Skill_DIR_END
+	};
 
 }
 

@@ -84,6 +84,9 @@ public: /* For.Object_Manager */
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
 	void	Load_Object(const _tchar *pDataFileName = nullptr,_uint iCurLevel=0);
+	class CGameObject*	Load_Effect(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0,  _bool IsHaveLayer = false);
+	
+	
 	void	Change_Level(_uint iLevleIdx);
 
 public: /* For.Component_Manager */

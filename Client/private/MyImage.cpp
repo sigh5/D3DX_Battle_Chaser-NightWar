@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "..\public\MyImage.h"
 #include "GameInstance.h"
+#include "Client_Manager.h"
 
 CMyImage::CMyImage(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CUI(pDevice, pContext)
@@ -59,6 +60,9 @@ void CMyImage::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+
+	//ImGui::InputFloat("FontPosX",&m_fFontPosX);
+	//ImGui::InputFloat("FontPosY", &m_fFontPosY);
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)
@@ -85,6 +89,14 @@ HRESULT CMyImage::Render()
 	m_pVIBufferCom->Render();
 
 
+	if (m_bRenderFont)
+	{
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT(" VicTory !!"), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+		RELEASE_INSTANCE(CGameInstance);
+	}
+
+
 	return S_OK;
 }
 
@@ -104,6 +116,45 @@ void CMyImage::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 void CMyImage::Set_RenderActive(_bool bRenderActive)
 {
 	__super::Set_RenderActive(bRenderActive);
+}
+
+void CMyImage::MoveTexture(_double TimeDelta)
+{
+	m_bRenderFont = true;
+	m_fTextureMoveTimer += (_float)TimeDelta;
+
+	if (m_fTextureMoveTimer >= 0.1f)
+	{
+		_uint iTextureNum 	=	m_pTextureCom->Get_SelectTextureIndex();
+		
+		if (iTextureNum >= m_iMaxTextureNum)
+		{
+			CClient_Manager::m_bCombatWin = true;
+			return;
+		}
+		if (iTextureNum + 1 == 2)
+			m_pTransformCom->Set_Scaled(_float3(89.f, 99.f, 1.f));
+
+		if (iTextureNum + 1 == 4)
+		{
+			m_pTransformCom->Set_Scaled(_float3(126.f, 142.f, 1.f));
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-10.f, 50.f, 0.1f, 1.f));
+		}
+		if (iTextureNum + 1 == 5)
+			m_pTransformCom->Set_Scaled(_float3(123.f, 138.f, 1.f));
+
+		if(iTextureNum + 1 == 6)
+			m_pTransformCom->Set_Scaled(_float3(123.f, 134.f, 1.f));
+
+		if (iTextureNum + 1 == 7)
+			m_pTransformCom->Set_Scaled(_float3(123.f, 130.f, 1.f));
+
+
+		m_pTextureCom->Set_SelectTextureIndex(++iTextureNum);
+		m_fTextureMoveTimer = 0.f;
+	}
+
+
 }
 
 HRESULT CMyImage::SetUp_Components()

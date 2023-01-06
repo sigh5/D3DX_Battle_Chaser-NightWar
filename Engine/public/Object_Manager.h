@@ -33,6 +33,10 @@ public:
 
 
 	void	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);
+
+	class CGameObject*	Load_Effect(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0, _bool IsHaveLayer=false);
+
+
 	void	SceneChange_NameVectorClear();
 
 public:
@@ -68,13 +72,10 @@ public: /* imgui */
 	void		Imgui_Swap_Render_Sorting(_uint iLevel, CGameObject* pSelectedObject);
 
 private:
-	//void	Imgui_Select_LayerType();
-	//void	Imgui_Select_ProtoType();
-	//void	Imgui_Select_Texture();
-	//void	Imgui_Select_Model();
-
 	void	Imgui_RemoveObject(_uint iLevel,OUT class CGameObject** ppGameObject);
 	void	Imgui_Save();
+	void	Imgui_Save_Effect();
+
 	void	Imgui_Load();
 
 private: /* 원형객체들을ㅇ 모아놓는다. */

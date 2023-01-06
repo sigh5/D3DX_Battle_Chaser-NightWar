@@ -8,6 +8,7 @@ class CShader;
 class CRenderer;
 class CVIBuffer_Point_Instancing;
 class CTexture;
+class CVIBuffer_Point;
 END
 
 
@@ -34,28 +35,15 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*				m_pTextureCom = nullptr;
-
+	CTexture*				m_pTextureCom2 = nullptr;
 private:
 	_float4x4				m_ViewMatrix;
 	_float4x4				m_ProjMatrix;
-
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-
-	_uint m_iPlayOnFrameCnt = 0;
 	
-	_uint m_iWidthTextureCnt = 1;
-	_uint m_iHeightTextureCnt = 1;
-	_uint m_iFrameCnt = 5;
-	_uint m_iTextureCnt_W = 4;
-	_uint m_iTextureCnt_H = 4;
+	_float					m_fPower = 0.f;
 
-	_float m_fCurX = 0.25f;
-	_float m_fCurY = 0.25f;
-	_float m_fOldX = 0.75f;
-	_float m_fOldY = 0.5f;
-
-
-
+	_bool					m_bIsChange = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

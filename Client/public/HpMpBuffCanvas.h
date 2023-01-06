@@ -33,7 +33,7 @@ public:
 	virtual HRESULT Render()override;
 
 	virtual void	Set_RenderActive(_bool bTrue)override;
-	virtual void	Delete_Delegate()override;
+	
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

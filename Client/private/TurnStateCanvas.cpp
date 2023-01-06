@@ -22,8 +22,10 @@ CTurnStateCanvas::CTurnStateCanvas(const CTurnStateCanvas & rhs)
 
 void CTurnStateCanvas::Set_RenderActive(_bool bActive)
 {
-	Control_ChildRender(bActive);
-	_bool b = false;
+	if (CClient_Manager::m_bCombatWin == true)
+		Control_ChildRender(false);
+	else
+		Control_ChildRender(bActive);
 }
 
 HRESULT CTurnStateCanvas::Initialize_Prototype()
@@ -97,11 +99,6 @@ void CTurnStateCanvas::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
-
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	RELEASE_INSTANCE(CGameInstance);
-
 
 	PickingChild();
 }
@@ -236,7 +233,6 @@ void CTurnStateCanvas::Player_SceneChane(_bool bEvent)
 void CTurnStateCanvas::Control_ChildRender(_bool bRenderActive)
 {
 
-
 	for (auto& pChild : m_ChildrenVec)
 	{
 		/*if (dynamic_cast<CUIButton*>(pChild) != nullptr)
@@ -284,15 +280,14 @@ void CTurnStateCanvas::StateButton_Child()
 			continue;
 	}
 
-	size_t iFsmButtonSize = m_pCurFsmButton.size();
-
 	for (auto& pStateButton : m_pCurState)
 	{
-		for (size_t i =0; i<iFsmButtonSize; ++i)
+		for (auto& pCurFsmButton : m_pCurFsmButton)
 		{
-			static_cast<CUIButton*>(pStateButton.second)->Set_ChildFsmButton(static_cast<CUIButton*>(m_pCurFsmButton[i]));
+			static_cast<CUIButton*>(pStateButton.second)->Set_ChildFsmButton(static_cast<CUIButton*>(pCurFsmButton));
 		}
 	}
+
 }
 
 void CTurnStateCanvas::Delete_Delegate()
@@ -391,6 +386,9 @@ void CTurnStateCanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+	//m_pCurState.clear();
+	//m_pCurFsmButton.clear();
 
 	
 }

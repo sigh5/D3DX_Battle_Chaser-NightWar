@@ -45,13 +45,16 @@ public:  /*Combat Logic*/
 	HRESULT Late_Init();
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	void	Status_CanvasInit();
-	
+	void	PlayerWin();
 public:
 	void	Refresh_CurActor();
 	void	Mana_Refresh();
 public:
 	void	Active_Fsm();
 	void	ResetState();
+	void	Render_StopCanvas();
+
+
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
@@ -61,6 +64,7 @@ private:
 	void	Cal_HitPlayerTarget();
 
 	void	Set_Player_StateCanvas();
+
 	// 선 상태 설정 후 몬스터 설정
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
@@ -83,17 +87,16 @@ public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 private:
 	CGameInstance*			m_pGameInstace = nullptr;
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
-	//vector<CGameObject*>	m_CombatActors;	// 전체적인 흐름담당
+
 	map<const wstring,  CGameObject*> m_CurActorMap;
 	map<const wstring, CStatus*>	  m_ActorsStatusMap;
 
 
-	CGameObject*			m_pCurentActor = nullptr;		// 현재 순서인놈
-	CGameObject*			m_pHitActor =	nullptr;		// 맞은놈
+	CGameObject*			m_pCurentActor	= nullptr;		// 현재 순서인놈
+	CGameObject*			m_pHitActor			=		nullptr;		// 맞은놈
 
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
-
 
 
 private:
@@ -112,8 +115,10 @@ private:
 	_bool					m_bIsPlayer = false;
 	_bool					m_bMonsterTurnEnd = false;
 
-
 	_uint					m_iHitNum = 0;
+	_bool					m_bVirtory = false;
+
+
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();

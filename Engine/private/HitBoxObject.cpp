@@ -22,7 +22,12 @@ HRESULT CHitBoxObject::Initialize_Prototype()
 
 HRESULT CHitBoxObject::Initialize(void * pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	ZeroMemory(&m_HitBoxDesc, sizeof(HitBoxObject));
+
+	if (pArg != nullptr)
+		memcpy(&m_HitBoxDesc, pArg, sizeof(HitBoxObject));
+
+	if (FAILED(__super::Initialize(&m_HitBoxDesc.TransformDesc)))
 		return E_FAIL;
 
 	return S_OK;

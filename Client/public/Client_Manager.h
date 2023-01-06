@@ -11,6 +11,7 @@ class CGameObject;
 class CModel;
 class CNavigation;
 class CCollider;
+class CVIBuffer_Point_Instancing;
 END
 
 //bool compare(pair<int, int>a, pair<int, int>b) {
@@ -56,11 +57,14 @@ public:
 
 	static  void    Model_Load_2(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName, _uint iLevel);
 
+	
+
+
 public: /* For_Player */
 	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
 
 
-
+	
 
 
 public:/*For.Imgui_AnimTool*/
@@ -73,6 +77,13 @@ public:/*For.GameChange*/
 	static _bool			bIsCollPlayerTo3DUI[20];
 	static _matrix			m_StaticCameraMatrix;
 	static	_float			m_CameraEye_Z;
+
+	static	_bool			m_bCombatWin;
+
+	
+
+
+
 };
 
 template<typename T>

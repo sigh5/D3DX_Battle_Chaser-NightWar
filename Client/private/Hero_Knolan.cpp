@@ -10,6 +10,7 @@
 #include "Weapon.h"
 
 #include "Skill_Object.h"
+#include "Skill_TextureObj.h"
 #include "Bone.h"
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -109,18 +110,6 @@ void CHero_Knolan::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-
-	//Temp[3] = ( 0.f,0.f,0.f );
-	//Sour[3] = ( m_vTestScale.x,m_vTestScale.y,m_vTestScale.z );
-
-	//ImGui::InputFloat3("vPos", Temp);
-	//ImGui::InputFloat3("vScale", Sour);
-
-	//if (ImGui::Button("Skill"))
-	//{
-	//	Create_Skill_Stop_Fire();
-	//}
-
 	if (m_bIsCombatScene == false)
 	{
 		LookAtTarget(TimeDelta, m_pNavigationCom);
@@ -137,8 +126,29 @@ void CHero_Knolan::Tick(_double TimeDelta)
 			m_bIsDead = true;
 		}
 
+		static float ffPos[3] = {};
+		static float ffScale[3] = {};
+
+		ImGui::InputFloat3("SkillPos", ffPos);
+		ImGui::InputFloat3("SkillScale", ffScale);
+		ImGui::RadioButton("NonCreate_Pos", &m_iRadioButton22,0);
+		ImGui::RadioButton("Create_Pos" ,&m_iRadioButton22, 1);
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		if (ImGui::Button("Create_Skill"))
+		{
+
+			m_BoneTag = "Bone_Knolan_Hand_L";
+			m_TextureTag = TEXT("Texture_Knolan_Fire_Meteo");
+			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+			
+			Create_SkillFire();		// Test¿ë
+			
+		}
+		RELEASE_INSTANCE(CGameInstance);
 	}
 
+	
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
@@ -216,9 +226,9 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 
-
 		if (m_bCombat_LastInit)
 		{
+			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 			vPos = m_pStatusCom[COMBAT_PLAYER]->Get_CombatPos();
 			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
@@ -350,8 +360,19 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 	for (size_t i = 0; i < PartSize; ++i)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
-
 	}
+
+	for (size_t i = 0; i < PartSize; ++i)
+	{
+		if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
+		{
+			if (static_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Hit_CountIncrease())
+				m_iHitCount = 1;
+		}
+	}
+
+
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -360,7 +381,7 @@ void CHero_Knolan::Combat_DeadTick(_double TimeDelta)
 	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 }
 
-void CHero_Knolan::Create_SkillFire()
+void CHero_Knolan::Create_Skill_Texture()
 {
 	if (m_pHitTarget == nullptr)
 		return;
@@ -369,22 +390,57 @@ void CHero_Knolan::Create_SkillFire()
 
 	CGameObject* pSkillParts = nullptr;
 
-	CSkill_Object::SKILL_OBJ_DESC			SkillDesc;
-	ZeroMemory(&SkillDesc, sizeof(CSkill_Object::SKILL_OBJ_DESC));
+	CSkill_TextureObj::Skill_Texture_Client			SkillDesc;
+	ZeroMemory(&SkillDesc, sizeof(CSkill_TextureObj::Skill_Texture_Client));
 
 	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
 	SkillDesc.ParentTransform = m_pTransformCom;
-	SkillDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Staff_Classic");
+	SkillDesc.pSocket = m_pModelCom->Get_BonePtr(m_BoneTag.c_str()); 
 	SkillDesc.eType = WEAPON_SKILL;
-	lstrcpy(SkillDesc.pModelTag, TEXT("Prototype_Component_FireBall"));
+	SkillDesc.vScale = m_vSkill_Scale;
+
 	SkillDesc.pTraget = m_pHitTarget->Get_Transform();
+	
 	SkillDesc.eDir = m_SkillDir;
 	SkillDesc.vPosition = m_vSkill_Pos;
 	SkillDesc.vAngle = 90.f;
 
-	pSkillParts = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Obj"), &SkillDesc);
+	pSkillParts =	pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT,false);
+	static_cast<CSkill_TextureObj*>(pSkillParts)->Set_Skill_Texture_Client(SkillDesc);
+
 	assert(pSkillParts != nullptr && "Create_SkillFire");
 	m_PlayerParts.push_back(pSkillParts);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Knolan::Create_SkillFire()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pSkillParts = nullptr;
+
+	CSkill_TextureObj::Skill_Texture_Client			SkillDesc;
+	ZeroMemory(&SkillDesc, sizeof(CSkill_TextureObj::Skill_Texture_Client));
+
+	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
+	SkillDesc.ParentTransform = m_pTransformCom;
+	SkillDesc.pSocket = m_pModelCom->Get_BonePtr(m_BoneTag.c_str());
+	SkillDesc.eType = WEAPON_SKILL;
+	SkillDesc.vScale = m_vTestScale;
+
+	//SkillDesc.pTraget = m_pHitTarget->Get_Transform();
+
+	SkillDesc.eDir = SKILL_TEST;
+	SkillDesc.vPosition = m_vSkill_Pos;
+	SkillDesc.vAngle = 90.f;
+
+	//pSkillParts = pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, false);
+	CGameObject * pGameObject 	=	pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+	static_cast<CSkill_TextureObj*>(pGameObject)->Set_Skill_Texture_Client(SkillDesc);
+
+	/*assert(pSkillParts != nullptr && "Create_SkillFire");
+	m_PlayerParts.push_back(pSkillParts);*/
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -453,33 +509,64 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 {
 	if (m_pModelCom->Control_KeyFrame_Create(7, 64) && !m_bOnceCreate)
 	{
-		Create_SkillFire();
+		Create_Skill_Texture();
 		m_bOnceCreate = true;
+	}
+	else if (m_pModelCom->Control_KeyFrame_Create(24, 20)&& !m_bOnceStop)
+	{
+		
+		size_t PartSize = m_PlayerParts.size();
+		for (size_t i = 0; i < PartSize; ++i)
+		{
+			if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
+			{
+				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_ChaserBone(false);
+			}
+		}
+		m_bOnceStop = true;
+
 	}
 	else if (m_pModelCom->Control_KeyFrame_Create(24, 71) && !m_bOnceCreate)
 	{
 		m_bOnceCreate = true;
-
+		m_bOnceStop = false;
 		size_t PartSize = m_PlayerParts.size();
 		for (size_t i = 0; i < PartSize; ++i)
 		{
-			if (dynamic_cast<CSkill_Object*>(m_PlayerParts[i]) != nullptr)
+			if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
 			{
-				dynamic_cast<CSkill_Object*>(m_PlayerParts[i])->Set_Shoot(true);
+				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_Shoot(true);
 			}
 		}
+
 	}
+	//else if (m_pModelCom->Control_KeyFrame_Create(19, 40) && !m_bOnceStop)
+	//{
+
+	//	size_t PartSize = m_PlayerParts.size();
+	//	for (size_t i = 0; i < PartSize; ++i)
+	//	{
+	//		if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
+	//		{
+	//			dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_ChaserBone(false);
+	//		}
+	//	}
+	//	m_bOnceStop = true;
+
+	//}
+
 	else if (m_pModelCom->Control_KeyFrame_Create(19, 50) && !m_bOnceCreate)
 	{
 		size_t PartSize = m_PlayerParts.size();
 		for (size_t i = 0; i < PartSize; ++i)
 		{
-			if (dynamic_cast<CSkill_Object*>(m_PlayerParts[i]) != nullptr)
+			if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
 			{
-				dynamic_cast<CSkill_Object*>(m_PlayerParts[i])->Set_Shoot(true);
+				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_Shoot(true);
 			}
 		}
 		m_bOnceCreate = true;
+		//m_bOnceStop = false;
 
 	}
 	else
@@ -595,8 +682,12 @@ void CHero_Knolan::AnimNormalAttack()
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(0, 0, -1.5f, 1.f);
-	m_SkillDir = CSkill_Object::Skill_DIR_straight;
+	m_vSkill_Scale = _float3(14.f, 14.f, 14.f);
+	m_SkillDir = Skill_DIR_straight;
 	m_bOnceCreate = false;
+	m_BoneTag = "Weapon_Staff_Classic";
+	m_TextureTag = TEXT("FireBall_Knolan");
+
 
 	//_uint iHitRand = rand() % 4 + 13;
 	m_CurAnimqeue.push({ 7, 1.f }); //7 21(Á¦ÀÚ¸®),,25(µÚ·ÎÁ¡ÇÁ¼¦)
@@ -607,13 +698,17 @@ void CHero_Knolan::AnimNormalAttack()
 void CHero_Knolan::Anim_Skill1_Attack()
 {
 	m_iStateDamage = 40;
-	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
-	m_vSkill_Pos = _float4(0.7f, 0.6f, 2.f, 1.f);
-	m_SkillDir = CSkill_Object::Skill_DIR_LISING;
 	m_iHitCount = 1;
+	m_eWeaponType = WEAPON_SKILL;
+	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.9f, 1.f);
+	m_vSkill_Scale = _float3(4.f, 4.f, 4.f);
 	m_bOnceCreate = false;
-	Create_Skill_Stop_Fire();
-
+	m_TextureTag = TEXT("FireBall_Knolan");
+	m_BoneTag = "Bone_Knolan_Hand_L";
+	m_SkillDir = Skill_DIR_LISING;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
+	
+	Create_Skill_Texture();
 
 	m_CurAnimqeue.push({ 24, 1.f }); //24(°ñÇÁ¼¦)
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -623,12 +718,19 @@ void CHero_Knolan::Anim_Skill1_Attack()
 void CHero_Knolan::Anim_Skill2_Attack()
 {
 	m_iStateDamage = 40;
-	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
-	m_vSkill_Pos = _float4(0.7f, 0.6f, 2.f, 1.f);
-	m_SkillDir = CSkill_Object::Skill_DIR_ScaleUP_DOWN;
-	m_iHitCount = 1;
+	m_eWeaponType = WEAPON_SKILL;
+	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.5f, 1.f);
+	//m_iHitCount = 1;
+	m_vSkill_Scale = _float3(4.f, 4.f, 4.f);
 	m_bOnceCreate = false;
-	Create_Skill_Meteo();
+	m_TextureTag = TEXT("Texture_Knolan_Fire_Meteo");
+	m_BoneTag = "Bone_Knolan_Hand_L";
+	m_SkillDir = Skill_DIR_ScaleUP_DOWN;
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
+
+	Create_Skill_Texture();
+	
+	//Create_Skill_Meteo();
 
 
 

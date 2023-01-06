@@ -15,9 +15,6 @@ BEGIN(Client)
 class CSkill_Object final: public CHitBoxObject
 {
 public:
-	enum Skill_DIR {
-		Skill_DIR_straight, Skill_DIR_LISING, Skill_DIR_DOWN, Skill_DIR_ScaleUP_DOWN, Skill_DIR_END
-	};
 
 	typedef struct tagSkill_OBJ_Desc
 	{

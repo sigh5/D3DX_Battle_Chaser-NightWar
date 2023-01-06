@@ -43,7 +43,7 @@ HRESULT CLevel_Combat::Initialize()
 		return E_FAIL;
 	
 	
-	
+	m_pCombatController->Initialize(LEVEL_COMBAT);
 
 	return S_OK;
 }
@@ -65,8 +65,12 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-
-	if (GetKeyState(VK_SPACE) & 0x8000)
+	if (true == CClient_Manager::m_bCombatWin)
+	{
+		m_fSceneChaneTimer += _float(TimeDelta);
+		m_pCombatController->Render_StopCanvas();
+	}
+	if(m_fSceneChaneTimer >=5.f)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 		Safe_AddRef(pGameInstance);
@@ -79,6 +83,9 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 			return;
 
 		Safe_Release(pGameInstance);
+
+		CClient_Manager::m_bCombatWin = false;
+		m_fSceneChaneTimer = 0.f;
 	}
 
 }
@@ -181,7 +188,6 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Skeleton_Naked"))))
 			return E_FAIL;
 		break;
-
 	case 1:
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
@@ -247,13 +253,9 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 		break;
 	}
 
-
-
-
-
 	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
 	
-	m_pCombatController->Initialize(LEVEL_COMBAT);
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;

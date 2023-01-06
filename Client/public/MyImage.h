@@ -20,6 +20,9 @@ private:
 	virtual ~CMyImage() = default;
 
 public:
+	void	Set_MaxTextureNum(_uint iMaxTextureNum) { m_iMaxTextureNum = iMaxTextureNum; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Last_Initialize()override;
@@ -29,6 +32,8 @@ public:
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
 
 	virtual void	Set_RenderActive(_bool bRenderActive)override;
+
+	void			MoveTexture(_double TimeDelta);				// 텍스쳐 0~ m_iMaxTextureNum 돌리기
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -40,7 +45,12 @@ private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 
+	_uint					m_iMaxTextureNum = 0;
+	_float					m_fTextureMoveTimer = 0.f;
+	_bool					m_bRenderFont = false;
 
+	_float					m_fFontPosX = 545.f;
+	_float					m_fFontPosY = 400.f;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

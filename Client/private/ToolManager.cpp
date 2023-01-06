@@ -6,12 +6,16 @@
 #include "Canvas.h"
 #include "Camera.h"
 #include "Environment_Object.h"
+#include "HitBoxObject.h"
+
 #include "Terrain.h"
 #include "NoneAnim_BG.h"
 
 #include "Camera_Static.h"
 #include "Camera_Dynamic.h"
 #include "UIButton.h"
+
+#include "Skill_TextureObj.h"
 
 IMPLEMENT_SINGLETON(CToolManager)
 
@@ -22,6 +26,7 @@ CToolManager::CToolManager()
 	m_LayerName.push_back(LAYER_PLAYER);
 	m_LayerName.push_back(LAYER_Monster);
 	m_LayerName.push_back(LAYER_UI);
+	m_LayerName.push_back(LAYER_EFFECT);
 }
 
 void CToolManager::Imgui_SelectParentViewer()
@@ -186,6 +191,7 @@ void CToolManager::Imgui_CreateObject()
 		Imgui_Show_Parent();
 		Imgui_Create_UI();
 		Imgui_Create_Object();
+		Imgui_Create_Effect_Object();
 
 		Imgui_Crate_FilterMap();
 
@@ -283,6 +289,50 @@ void CToolManager::Imgui_Create_Object()
 			m_vecNameArray.push_back(szModelName);
 			m_vecNameArray.push_back(szObjectName);
 			
+
+	}
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CToolManager::Imgui_Create_Effect_Object()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	ImGui::NewLine();
+	if (ImGui::Button("Create_Skill_Effect"))
+	{
+		_tchar* szLayerName = new _tchar[MAX_PATH];
+		_tchar* szProtoName = new _tchar[MAX_PATH];
+		_tchar* szTextureName = new _tchar[MAX_PATH];
+		_tchar* szModelName = new _tchar[MAX_PATH];
+		_tchar* szObjectName = new _tchar[MAX_PATH];
+
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szLayerName, sizeof(char[256]), szLayerName, sizeof(_tchar[256]));
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szProtoName, sizeof(char[256]), szProtoName, sizeof(_tchar[256]));
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szTexturName, sizeof(char[256]), szTextureName, sizeof(_tchar[256]));
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szObjectName, sizeof(char[256]), szObjectName, sizeof(_tchar[256]));
+		MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, m_szModelName, sizeof(char[256]), szModelName, sizeof(_tchar[256]));
+
+		
+		CGameObject* pGameObject = nullptr;
+		CSkill_TextureObj::SKILL_TEXTURE_DESC Desc;
+		ZeroMemory(&Desc, sizeof(Desc));
+		lstrcpy(Desc.HitBoxOrigin_Desc.m_pModelTag, szModelName);
+		lstrcpy(Desc.HitBoxOrigin_Desc.m_pTextureTag, szTextureName);
+		Desc.HitBoxOrigin_Desc.m_iShaderPass = m_iShaderPass;
+
+		pGameInstance->Clone_GameObject_UseImgui(pGameInstance->GetCurLevelIdx(), szLayerName, szProtoName, &pGameObject, &Desc);
+		if (nullptr == pGameObject)
+			return;
+		pGameObject->Set_ObjectName(szObjectName);
+		pGameObject->Set_ProtoName(szProtoName);
+
+
+		m_vecNameArray.push_back(szLayerName);
+		m_vecNameArray.push_back(szProtoName);
+		m_vecNameArray.push_back(szTextureName);
+		m_vecNameArray.push_back(szModelName);
+		m_vecNameArray.push_back(szObjectName);
+
 
 	}
 	RELEASE_INSTANCE(CGameInstance);

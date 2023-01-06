@@ -187,15 +187,17 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 	}
 	else if (LEVEL_COMBAT == iLevleIdx)
 	{
+		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-
+		
 
 		if (m_bCombatInit)
 		{
+			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
 			vPos = m_pStatusCom[COMBAT_PLAYER]->Get_CombatPos();
 			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
@@ -275,6 +277,7 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 	else
 		CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
 	
+
 	for (_uint i = 0; i < m_PlayerParts.size(); ++i)
 	{
 		m_PlayerParts[i]->Tick(TimeDelta);
@@ -616,13 +619,13 @@ void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 	if (m_pHitTarget == nullptr || bResult == ANIM_EMD)
 		return;
 
-	_float4 Target;
-	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 
 	if (bResult == ANIM_DIR_STRAIGHT)
+	{
+		_float4 Target;
+		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-
-		
+	}
 }
 
 void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)

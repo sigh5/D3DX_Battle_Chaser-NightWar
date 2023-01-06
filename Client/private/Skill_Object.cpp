@@ -30,11 +30,11 @@ HRESULT CSkill_Object::Initialize(void * pArg)
 	if (nullptr != pArg)
 		memcpy(&m_SkillDesc, pArg, sizeof(m_SkillDesc));
 
-	CTransform::TRANSFORMDESC Desc;
+	tagHitBoxObject Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
 
-	Desc.fSpeedPerSec = 70.f;
-	Desc.fRotationPerSec = 90.f;
+	Desc.TransformDesc.fSpeedPerSec = 70.f;
+	Desc.TransformDesc.fRotationPerSec = 90.f;
 
 	if (FAILED(__super::Initialize(&Desc)))
 		return E_FAIL;
@@ -80,19 +80,19 @@ void CSkill_Object::Tick(_double TimeDelta)
 
 	switch (eDir)
 	{
-	case Client::CSkill_Object::Skill_DIR_straight:
+	case Skill_DIR_straight:
 		m_pTransformCom->Chase(m_SkillDesc.pTraget->Get_State(CTransform::STATE_TRANSLATION), TimeDelta);
 		break;
-	case Client::CSkill_Object::Skill_DIR_LISING:
+	case Skill_DIR_LISING:
 		Rising_Move_Start(TimeDelta);
 		break;
-	case Client::CSkill_Object::Skill_DIR_DOWN:
+	case Skill_DIR_DOWN:
 		
 		break;
-	case Client::CSkill_Object::Skill_DIR_ScaleUP_DOWN:
+	case Skill_DIR_ScaleUP_DOWN:
 		ScaleUP_Down_Move_Start(TimeDelta);
 		break;
-	case Client::CSkill_Object::Skill_DIR_END:
+	case Skill_DIR_END:
 		break;
 	default:
 		break;
