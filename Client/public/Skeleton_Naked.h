@@ -37,7 +37,7 @@ public:
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
-
+	virtual void			Create_Hit_Effect()override;
 
 
 private:

@@ -34,6 +34,7 @@ public:
 	}
 
 	void			Set_Point_Instancing_Scale(_float3 vScale);
+	void			Set_Point_Instancing_Num(_int iInstancingNum);
 
 
 public:
@@ -45,7 +46,8 @@ public:
 	/*For.Imgui*/
 	virtual		void	Imgui_RenderProperty()override;
 
-	void				UV_Move_Tick(_double TimeDelta);
+	void				Move_Up_Tick(_double TimeDelta, _float fSpeed);
+	_bool				UV_Move_Tick(_double TimeDelta);
 	HRESULT				Set_UV_RawValue(class CShader* pShader);
 
 private:

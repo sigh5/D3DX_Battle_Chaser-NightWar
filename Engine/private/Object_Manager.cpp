@@ -741,6 +741,9 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 
 CGameObject* CObject_Manager::Load_Effect(const _tchar * pDataFileName, _uint iCurLevel, _bool bIsHaveLayer)
 {
+	//bIsHaveLayer = true;
+
+
 	CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
 	_tchar* szName = new _tchar[256];
 	m_vecNameArray.push_back(szName);
@@ -844,7 +847,7 @@ CGameObject* CObject_Manager::Load_Effect(const _tchar * pDataFileName, _uint iC
 			if (nullptr == pPrototype)
 				return nullptr;
 
-			if(bIsHaveLayer == true)
+			if (bIsHaveLayer == true)
 				Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &Desc);			
 			
 			else

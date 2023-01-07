@@ -33,6 +33,7 @@ public:
 
 		_float				vAngle;		// 스킬의 크기
 
+		_int				iWeaponOption;
 		WeaponType			eType;
 		Skill_DIR			eDir;
 	}Skill_Texture_Client;
@@ -46,14 +47,18 @@ private:
 public:
 	virtual	 WeaponType		Get_Type()const override { return m_SkillDesc.eType; }
 	virtual	 CCollider*		Get_Colider() override { return m_pColliderCom; }
+	virtual _uint			Get_WeaponOption()override {return m_SkillDesc.iWeaponOption;}
+
 
 public:
 	const	_bool			Get_IsTargetHit()const { return m_IsHitTarget; }
 	void					Set_Shoot(_bool bShoot) { m_bShoot = bShoot; }
 	void					Set_ChaserBone(_bool bChaserBone) { m_bChaserBoneStop = bChaserBone; }
 	void					Set_Skill_Texture_Client(Skill_Texture_Client& Desc);
+	void					Set_SKill_Texture_Client_Make_Hiter(Skill_Texture_Client& Desc);
+	
 	_bool					Hit_CountIncrease();
-
+	_bool					Is_HitReady();
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -62,10 +67,6 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Last_Initialize()override;
 
-public:
-
-
-
 private:
 	CShader*							m_pShaderCom = nullptr;
 	CCollider*							m_pColliderCom = nullptr;
@@ -73,22 +74,24 @@ private:
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
 private:
-	Skill_Texture_Client		m_SkillDesc;
-	_bool					m_IsHitTarget = false;
-	_bool					m_bShoot = false;
-	_bool					m_bChaserBoneStop = true;
-	_float4x4				m_SocketMatrix;
-	_matrix					m_OriginMatrix;
-	_float3					m_vScale;
-	_int						iSubMul = 1;
+	Skill_Texture_Client				m_SkillDesc;
+	_bool								m_IsHitTarget = false;
+	_bool								m_bShoot = false;
+	_bool								m_bChaserBoneStop = true;
+	_float4x4							m_SocketMatrix;
+	_matrix								m_OriginMatrix;
+	_float3								m_vScale;
+	_int								iChange_Sign = 1;
 
-private:
+	_float								m_fGOlfTimer = 0.f;
+	_float								m_fFixTimer = 0.25f;
+	_float								m_fIncrease = 6.f;
+	_float								m_fDecreate = 7.f;
 
-	_float4x4				m_ViewMatrix;
-	_float4x4				m_ProjMatrix;
 
-	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-
+	_float								m_fHiter_CreateTimer;
+	_bool								m_bIncreateHit = false;
+	_bool								m_bSignChanger = false;
 
 private:
 	HRESULT SetUp_Components();
@@ -96,9 +99,12 @@ private:
 
 private:
 	void					Set_Cur_Pos();
+	void					Set_Cur_Pos_On_Hiter();
+
+	void					Skill_Charging(_double TimeDelta);
 	void					Skill_Golf_Shot(_double TimeDelta);
 	void					Skill_Meteo(_double TimeDelta);
-
+	void					Skill_Create_Hiter(_double TimeDelta);
 
 public:
 	static CSkill_TextureObj* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

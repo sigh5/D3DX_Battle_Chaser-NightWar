@@ -173,6 +173,7 @@
     <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h" />
     <ClInclude Include="..\public\AnimFsm.h" />
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Buff_Effect.h" />
     <ClInclude Include="..\Public\Buff_Image.h" />
     <ClInclude Include="..\Public\Camera_Combat.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
@@ -234,6 +235,7 @@
   <ItemGroup>
     <ClCompile Include="..\private\AnimFsm.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Buff_Effect.cpp" />
     <ClCompile Include="..\Private\Buff_Image.cpp" />
     <ClCompile Include="..\private\Camera_Combat.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />

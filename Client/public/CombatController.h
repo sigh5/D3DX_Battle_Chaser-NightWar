@@ -36,6 +36,9 @@ public:
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
 
+
+	 map<const wstring, CGameObject*>* Get_CurActorMap() { return &m_CurActorMap; }
+
 public:	/*For.Scene_Change*/
 	void				Scene_Chane_Safe_Release();
 	void				Reset_Timer();
@@ -53,6 +56,7 @@ public:
 	void	Active_Fsm();
 	void	ResetState();
 	void	Render_StopCanvas();
+	void	Wide_Buff_Create_Effect();
 
 
 

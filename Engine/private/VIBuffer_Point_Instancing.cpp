@@ -32,6 +32,48 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Scale(_float3 vScale)
 
 }
 
+void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
+{
+//	CONTEXT_LOCK;
+//	// Rect_Instancing 이랑 동일하다.
+//	m_iNumInstance = iInstancingNum;
+//	m_iNumPrimitive = iInstancingNum;
+//	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
+//
+//	m_iInstanceStride = sizeof(VTXMATRIX);	// 인스턴싱버퍼는 사이즈를 가지고 있어야한다.
+//
+//	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+//
+//	m_BufferDesc.ByteWidth = m_iInstanceStride * iInstancingNum;
+//	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+//	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//	m_BufferDesc.StructureByteStride = m_iInstanceStride;
+//	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//	m_BufferDesc.MiscFlags = 0;
+//
+//	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iInstancingNum];
+//	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
+//
+//	for (_uint i = 0; i < iInstancingNum; ++i)
+//	{
+//		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
+//		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
+//		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
+//		pInstanceVertices[i].vPosition = _float4(-0.5f +(0.1f *i), 0.1f, -0.5f + (0.1f *i), 1.f);
+//	}
+//
+//
+//	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+//	m_SubResourceData.pSysMem = pInstanceVertices;
+//	Safe_Release(m_pInstanceBuffer);
+//	m_pInstanceBuffer = nullptr;
+//	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
+//	Safe_Delete_Array(pInstanceVertices);
+
+
+
+}
+
 HRESULT CVIBuffer_Point_Instancing::Initialize_Prototype(_uint iNumInstance)
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -162,10 +204,7 @@ HRESULT CVIBuffer_Point_Instancing::Tick(_double TimeDelta)
 
 	for (_uint i = 0; i < m_iNumInstance; ++i)
 	{
-		((VTXMATRIX*)SubResource.pData)[i].vPosition.y -= (_float)(m_pSpeeds[i] * TimeDelta);
-
-		if (((VTXMATRIX*)SubResource.pData)[i].vPosition.y < 0.f)
-			((VTXMATRIX*)SubResource.pData)[i].vPosition.y = 3.f;
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += _float(0.1f * TimeDelta);
 	}
 
 	m_pContext->Unmap(m_pInstanceBuffer, 0);
@@ -226,7 +265,25 @@ void CVIBuffer_Point_Instancing::Imgui_RenderProperty()
 	}
 }
 
-void CVIBuffer_Point_Instancing::UV_Move_Tick(_double TimeDelta)
+void CVIBuffer_Point_Instancing::Move_Up_Tick(_double TimeDelta, _float fSpeed)
+{
+	CONTEXT_LOCK;
+	// Rect_Instancing 이랑 동일하다.
+	D3D11_MAPPED_SUBRESOURCE			SubResource;
+	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += (_float)(fSpeed * TimeDelta);
+	}
+
+	m_pContext->Unmap(m_pInstanceBuffer, 0);
+
+}
+
+_bool CVIBuffer_Point_Instancing::UV_Move_Tick(_double TimeDelta)
 {
 
 	m_iPlayOnFrameCnt++;
@@ -249,7 +306,11 @@ void CVIBuffer_Point_Instancing::UV_Move_Tick(_double TimeDelta)
 		m_iPlayOnFrameCnt = 0;
 	}
 
+	if (m_iHeightTextureCnt == m_Desc.m_iTextureMax_Height_Cnt-1 
+		&&   m_iWidthTextureCnt == m_Desc.m_iTextureMax_Width_Cnt - 1)
+		return true;
 
+	return false;
 }
 
 HRESULT CVIBuffer_Point_Instancing::Set_UV_RawValue(CShader * pShader )

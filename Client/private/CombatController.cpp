@@ -430,6 +430,8 @@ void CCombatController::Render_StopCanvas()
 	}
 }
 
+
+
 void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 {
 	if (nullptr == dynamic_cast<CPlayer*>(m_pCurentActor))
@@ -771,12 +773,14 @@ void CCombatController::To_Defence()
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ACTION//수정필요
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_DEFENCE)//수정필요
 	{
-		//m_pCurentActor->Set_FsmState(true, CGameObject::CHAR_STATE_END);
+		//m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
 
 		static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(true);
+		static_cast<CCombatActors*>(m_pCurentActor)->Create_Defence_Effect_And_Action();
+
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
-		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pTurnStateButtonCanvas->Set_RenderActive(false);
 		
 		Mana_Refresh();
 	}

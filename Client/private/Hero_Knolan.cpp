@@ -12,6 +12,9 @@
 #include "Skill_Object.h"
 #include "Skill_TextureObj.h"
 #include "Bone.h"
+#include "Buff_Effect.h"
+#include "ToolManager.h"
+
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -128,17 +131,22 @@ void CHero_Knolan::Tick(_double TimeDelta)
 
 		static float ffPos[3] = {};
 		static float ffScale[3] = {};
-
+		static char  szName[MAX_PATH] = "";
 		ImGui::InputFloat3("SkillPos", ffPos);
 		ImGui::InputFloat3("SkillScale", ffScale);
 		ImGui::RadioButton("NonCreate_Pos", &m_iRadioButton22,0);
 		ImGui::RadioButton("Create_Pos" ,&m_iRadioButton22, 1);
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		ImGui::InputText("TextureName", szName,MAX_PATH);
+		
 		if (ImGui::Button("Create_Skill"))
 		{
+			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) +1 , Texture_NameTag, MAX_PATH);
+			
+			m_BoneTag = "Weapon_Staff_Classic";
 
-			m_BoneTag = "Bone_Knolan_Hand_L";
-			m_TextureTag = TEXT("Texture_Knolan_Fire_Meteo");
+			m_TextureTag = TEXT("FireBall_Knolan");		//Texture_NameTag;
 			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
 			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 			
@@ -171,6 +179,22 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 		else
 			++iter;
 	}
+
+
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		if ((*iter) != nullptr)
+			(*iter)->Late_Tick(TimeDelta);
+
+		if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+		}
+		else
+			++iter;
+	}
+
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -271,7 +295,6 @@ void CHero_Knolan::Defence_Exit()
 
 	if (m_fDefencTimer >= 1.f)
 	{
-		Fsm_Exit();
 		m_bIsDefenceTimer = false;
 	}
 
@@ -356,6 +379,12 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Anim_Frame_Create_Control();
 
+	
+	for (auto &pEffect : m_pEffectParts)
+	{
+		pEffect->Tick(TimeDelta);
+	}
+
 	size_t PartSize = m_PlayerParts.size();
 	for (size_t i = 0; i < PartSize; ++i)
 	{
@@ -404,6 +433,7 @@ void CHero_Knolan::Create_Skill_Texture()
 	SkillDesc.eDir = m_SkillDir;
 	SkillDesc.vPosition = m_vSkill_Pos;
 	SkillDesc.vAngle = 90.f;
+	SkillDesc.iWeaponOption = m_iWeaponOption;
 
 	pSkillParts =	pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT,false);
 	static_cast<CSkill_TextureObj*>(pSkillParts)->Set_Skill_Texture_Client(SkillDesc);
@@ -412,6 +442,141 @@ void CHero_Knolan::Create_Skill_Texture()
 	m_PlayerParts.push_back(pSkillParts);
 
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Knolan::Create_Skill_Texture_On_Hiter()
+{
+	if (m_pHitTarget == nullptr)
+		return;
+
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pSkillParts = nullptr;
+
+	CSkill_TextureObj::Skill_Texture_Client			SkillDesc;
+	ZeroMemory(&SkillDesc, sizeof(CSkill_TextureObj::Skill_Texture_Client));
+
+	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
+	SkillDesc.ParentTransform = m_pTransformCom;
+	SkillDesc.pSocket = m_pModelCom->Get_BonePtr(m_BoneTag.c_str());
+	SkillDesc.eType = WEAPON_SKILL;
+	SkillDesc.vScale = m_vSkill_Scale;
+	SkillDesc.pTraget = m_pHitTarget->Get_Transform();
+	SkillDesc.eDir = m_SkillDir;
+	SkillDesc.vPosition = m_vSkill_Pos;
+	SkillDesc.vAngle = 90.f;
+	SkillDesc.iWeaponOption = m_iWeaponOption;
+
+	pSkillParts = pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, false);
+	static_cast<CSkill_TextureObj*>(pSkillParts)->Set_SKill_Texture_Client_Make_Hiter(SkillDesc);
+
+	assert(pSkillParts != nullptr && "Create_SkillFire");
+	m_PlayerParts.push_back(pSkillParts);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Knolan::Create_Defence_Effect_And_Action()
+{
+	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
+	m_CurAnimqeue.push({ 26, 1.f });	
+	m_CurAnimqeue.push({ 1,  1.f });
+	m_CurAnimqeue.push({ 2,  1.f });
+	Set_CombatAnim_Index(m_pModelCom);
+
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Common_Aura_8", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+	Fsm_Exit();
+
+
+}
+
+void CHero_Knolan::Create_WideBuffEffect()
+{
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	CCombatController* pCombatCtr = GET_INSTANCE(CCombatController);
+	
+	map<const wstring, CGameObject*> CurMap = *(pCombatCtr->Get_CurActorMap());
+
+	for (auto& pActor : CurMap)
+	{
+		if (dynamic_cast<CPlayer*>(pActor.second) != nullptr)
+		{
+			pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_5", LEVEL_COMBAT, false);
+			BuffDesc.ParentTransform = pActor.second->Get_Transform();
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			BuffDesc.vAngle = -90.f;
+			BuffDesc.fCoolTime = 5.f;
+			BuffDesc.bIsMainTain = false;
+			BuffDesc.iFrameCnt = 4;
+			BuffDesc.bIsUp = false;
+			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+			m_pEffectParts.push_back(pGameObject);
+		}
+	}
+
+	RELEASE_INSTANCE(CCombatController);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Knolan::Create_Wide_BuffEffect_Second()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	CCombatController* pCombatCtr = GET_INSTANCE(CCombatController);
+
+	map<const wstring, CGameObject*> CurMap = *(pCombatCtr->Get_CurActorMap());
+
+	for (auto& pActor : CurMap)
+	{
+		if (dynamic_cast<CPlayer*>(pActor.second) != nullptr)
+		{
+			pGameObject = pInstance->Load_Effect(L"Texture_blue_fire_Effect_1", LEVEL_COMBAT, false);
+			BuffDesc.ParentTransform = pActor.second->Get_Transform();
+			BuffDesc.vPosition = _float4(-0.4f, 1.5f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			BuffDesc.vAngle = -90.f;
+			BuffDesc.fCoolTime = 5.f;
+			BuffDesc.bIsMainTain = false;
+			BuffDesc.iFrameCnt = 4;
+			BuffDesc.bIsUp = true;
+			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+			m_pEffectParts.push_back(pGameObject);
+		}
+	}
+
+	RELEASE_INSTANCE(CCombatController);
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 void CHero_Knolan::Create_SkillFire()
@@ -445,74 +610,61 @@ void CHero_Knolan::Create_SkillFire()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CHero_Knolan::Create_Skill_Stop_Fire()
+void CHero_Knolan::Create_Skill_Ultimate_Effect()
 {
-	if (m_pHitTarget == nullptr)
-		return;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	CGameObject* pSkillParts = nullptr;
-
-	CSkill_Object::SKILL_OBJ_DESC			SkillDesc;
-	ZeroMemory(&SkillDesc, sizeof(CSkill_Object::SKILL_OBJ_DESC));
-
-	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
-	SkillDesc.ParentTransform = m_pTransformCom;
-	SkillDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Knolan_Hand_L");
-	SkillDesc.eType = WEAPON_SKILL;
-	lstrcpy(SkillDesc.pModelTag, TEXT("Prototype_Component_FireBall"));
-	SkillDesc.pTraget = m_pHitTarget->Get_Transform();
-	SkillDesc.vAngle = -180.f;
-
-	SkillDesc.vPosition = m_vSkill_Pos;
-	SkillDesc.eDir = m_SkillDir;
-	pSkillParts = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Obj"), &SkillDesc);
-	assert(pSkillParts != nullptr && "Create_SkillFire");
-	m_PlayerParts.push_back(pSkillParts);
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	
+	_int		iSign = 1;
+	_int		iRandomCnt = 0;
+	_int		iRandomScale = 0;
+	for (_uint i = 0; i < 50; ++i)
+	{
+		iRandomScale = rand() % 10 + 5;
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
+		BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
+		BuffDesc.vPosition = _float4(rand()% 3 * iSign, rand() % 2 , rand() % 3 * iSign, 1.f);
+		BuffDesc.vScale = _float3(iRandomScale, iRandomScale, iRandomScale);
+		BuffDesc.vAngle = -90.f;
+		BuffDesc.fCoolTime = 5.f;
+		BuffDesc.bIsMainTain = false;
+		BuffDesc.iFrameCnt = rand() % 10 + 4;
+		BuffDesc.bIsUp = true;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+		m_pEffectParts.push_back(pGameObject);
+		iSign *= -1;
+	}
+	
 
 	RELEASE_INSTANCE(CGameInstance);
-}
-
-void CHero_Knolan::Create_Skill_Meteo()
-{
-	if (m_pHitTarget == nullptr)
-		return;
-
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-	CGameObject* pSkillParts = nullptr;
-
-	CSkill_Object::SKILL_OBJ_DESC			SkillDesc;
-	ZeroMemory(&SkillDesc, sizeof(CSkill_Object::SKILL_OBJ_DESC));
-
-	XMStoreFloat4x4(&SkillDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
-	SkillDesc.ParentTransform = m_pTransformCom;
-	SkillDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Knolan_Hand_L");
-	SkillDesc.eType = WEAPON_SKILL;
-	lstrcpy(SkillDesc.pModelTag, TEXT("Prototype_Component_Meteo0"));
-	SkillDesc.pTraget = m_pHitTarget->Get_Transform();
-	SkillDesc.vAngle = -180.f;
-
-	SkillDesc.vPosition = m_vSkill_Pos;
-	SkillDesc.eDir = m_SkillDir;
-	pSkillParts = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Skill_Obj"), &SkillDesc);
-	assert(pSkillParts != nullptr && "Create_SkillFire");
-	m_PlayerParts.push_back(pSkillParts);
-
-	RELEASE_INSTANCE(CGameInstance);
-
 
 }
 
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
-	if (m_pModelCom->Control_KeyFrame_Create(7, 64) && !m_bOnceCreate)
+
+	if (m_pModelCom->Control_KeyFrame_Create(7, 15) && !m_bOnceStop)
 	{
 		Create_Skill_Texture();
-		m_bOnceCreate = true;
+		m_bOnceStop = true;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(24, 20)&& !m_bOnceStop)
+	else if (m_pModelCom->Control_KeyFrame_Create(7, 64) && !m_bOnceCreate)
+	{
+		size_t PartSize = m_PlayerParts.size();
+		for (size_t i = 0; i < PartSize; ++i)
+		{
+			if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
+			{
+				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_Shoot(true);
+			}
+		}
+		m_bOnceCreate = true;
+		m_bOnceStop = false;
+	}
+	else if (m_pModelCom->Control_KeyFrame_Create(24,10)&& !m_bOnceStop)
 	{
 		
 		size_t PartSize = m_PlayerParts.size();
@@ -540,35 +692,23 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		}
 
 	}
-	//else if (m_pModelCom->Control_KeyFrame_Create(19, 40) && !m_bOnceStop)
-	//{
-
-	//	size_t PartSize = m_PlayerParts.size();
-	//	for (size_t i = 0; i < PartSize; ++i)
-	//	{
-	//		if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
-	//		{
-	//			dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_ChaserBone(false);
-	//		}
-	//	}
-	//	m_bOnceStop = true;
-
-	//}
-
-	else if (m_pModelCom->Control_KeyFrame_Create(19, 50) && !m_bOnceCreate)
+	else if (m_pModelCom->Control_KeyFrame_Create(21, 53) && !m_bOnceCreate)
 	{
-		size_t PartSize = m_PlayerParts.size();
-		for (size_t i = 0; i < PartSize; ++i)
-		{
-			if (dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i]) != nullptr)
-			{
-				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_Shoot(true);
-			}
-		}
+		Create_Skill_Texture_On_Hiter();
 		m_bOnceCreate = true;
-		//m_bOnceStop = false;
-
 	}
+	else if (m_pModelCom->Control_KeyFrame_Create(27, 90) && !m_bOnceCreate)
+	{
+		Create_Wide_BuffEffect_Second();
+		m_bOnceCreate = true;
+	}
+	else if (m_pModelCom->Control_KeyFrame_Create(28, 60) && !m_bOnceCreate)
+	{
+		Create_Skill_Ultimate_Effect();
+		m_bOnceCreate = true;
+	}
+
+
 	else
 		return;
 }
@@ -662,6 +802,31 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 	return S_OK;
 }
 
+void CHero_Knolan::Create_Buff_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_4", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
 void CHero_Knolan::Anim_Idle()
 {
 
@@ -681,14 +846,13 @@ void CHero_Knolan::AnimNormalAttack()
 	m_iStateDamage = 30;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
-	m_vSkill_Pos = _float4(0, 0, -1.5f, 1.f);
+	m_vSkill_Pos = _float4(-0.5f, 0.5f, 2.5f, 1.f);
 	m_vSkill_Scale = _float3(14.f, 14.f, 14.f);
 	m_SkillDir = Skill_DIR_straight;
 	m_bOnceCreate = false;
 	m_BoneTag = "Weapon_Staff_Classic";
 	m_TextureTag = TEXT("FireBall_Knolan");
-
-
+	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
 	//_uint iHitRand = rand() % 4 + 13;
 	m_CurAnimqeue.push({ 7, 1.f }); //7 21(제자리),,25(뒤로점프샷)
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -707,7 +871,7 @@ void CHero_Knolan::Anim_Skill1_Attack()
 	m_BoneTag = "Bone_Knolan_Hand_L";
 	m_SkillDir = Skill_DIR_LISING;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
-	
+	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL1;
 	Create_Skill_Texture();
 
 	m_CurAnimqeue.push({ 24, 1.f }); //24(골프샷)
@@ -717,49 +881,56 @@ void CHero_Knolan::Anim_Skill1_Attack()
 
 void CHero_Knolan::Anim_Skill2_Attack()
 {
+	// Hiter에게 이펙트만 생성		//53 frame
 	m_iStateDamage = 40;
 	m_eWeaponType = WEAPON_SKILL;
-	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.5f, 1.f);
-	//m_iHitCount = 1;
-	m_vSkill_Scale = _float3(4.f, 4.f, 4.f);
+	m_vSkill_Pos = _float4(0.f, 1.f, 0.f, 1.f);
+	m_iHitCount = 1;
+	m_vSkill_Scale = _float3(10.f, 10.f, 10.f);
 	m_bOnceCreate = false;
 	m_TextureTag = TEXT("Texture_Knolan_Fire_Meteo");
 	m_BoneTag = "Bone_Knolan_Hand_L";
-	m_SkillDir = Skill_DIR_ScaleUP_DOWN;
+	m_SkillDir = SKILL_CREATE_HITER_POS;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
-
-	Create_Skill_Texture();
+	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 	
-	//Create_Skill_Meteo();
-
-
-
-	m_CurAnimqeue.push({ 19, 0.5f }); // fireStorm
+	
+	m_CurAnimqeue.push({ 21, 1.f }); // fireStorm
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Knolan::Anim_Uitimate()
 {
+	
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
-	m_CurAnimqeue.push({ 28, 1.f }); // 28 전체공격력 업
+	m_CurAnimqeue.push({ 28, 1.f }); // 	60프레임때 광역기 시전
 	m_CurAnimqeue.push({ 1,  1.f });
+	m_bOnceCreate = false;
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Knolan::Anim_Buff()
 {
+
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 26, 1.f });	// 자 버프 
 	m_CurAnimqeue.push({ 1,  1.f });
+
+	Create_Buff_Effect();
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Knolan::Anim_WideAreaBuff()
 {
+	//Frame90일때 이펙트 생성
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(60);
 	m_CurAnimqeue.push({ 27, 1.f });	// 마나 채워주기
 	m_CurAnimqeue.push({ 1,  1.f });
+	m_bOnceCreate = false;
+	Create_WideBuffEffect();
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

@@ -12,6 +12,11 @@ CHitBoxObject::CHitBoxObject(const CHitBoxObject & rhs)
 {
 }
 
+_uint CHitBoxObject::Get_WeaponOption()
+{
+	return 0;
+}
+
 HRESULT CHitBoxObject::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))

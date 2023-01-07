@@ -36,6 +36,9 @@
 #include "Map_3D_UI.h"
 #include "Trun_BattleStart_UI.h"
 #include "Skill_TextureObj.h"
+#include "Buff_Effect.h"
+
+
 
 /* For.CombatScene*/
 
@@ -641,6 +644,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		CSkill_TextureObj::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Buff_Effect"),
+		CBuff_Effect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
@@ -709,7 +717,7 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Common_Aura"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/Arua/Aura_%d.png"),
-			CTexture::TYPE_END, 4))))
+			CTexture::TYPE_END, 16))))
 		return E_FAIL;
 
 	
@@ -795,6 +803,19 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Knolan/FierMeteo/Fire_Meteo.png"),
 			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Common_Hit_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/HItEffect/Hit_Effect_%d.png"),
+			CTexture::TYPE_END, 12))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Buff_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Buff/Buff_%d.png"),
+			CTexture::TYPE_END, 18))))
 		return E_FAIL;
 
 

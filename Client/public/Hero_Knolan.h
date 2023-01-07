@@ -53,12 +53,17 @@ public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	void			  Combat_DeadTick(_double TimeDelta);
-	void			 Create_Skill_Texture();
+	void			  Create_Skill_Texture();		// 실제로 쓰는 것
+	void			  Create_Skill_Texture_On_Hiter();
+	virtual void	  Create_Defence_Effect_And_Action()override;
 	
-	
-	void			  Create_SkillFire();
-	void			  Create_Skill_Stop_Fire();
-	void			  Create_Skill_Meteo();
+
+	void			  Create_WideBuffEffect();
+	void			  Create_Wide_BuffEffect_Second();
+	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
+	void			  Create_Skill_Ultimate_Effect();
+												
+										
 	
 	
 	void			  Anim_Frame_Create_Control();
@@ -81,7 +86,7 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Ready_Parts_Combat();
-	
+	void					Create_Buff_Effect();
 
 public:
 	void					Anim_Idle();
@@ -128,11 +133,11 @@ private:
 
 	string			m_BoneTag = "";
 	wstring			m_TextureTag = TEXT("");
-
+	_uint			m_iWeaponOption = WEAPON_OPTIONAL_NONE;
 
 private:
 	vector<CGameObject*>	m_PlayerParts;
-
+	vector<CGameObject*>	m_pEffectParts;
 	
 	_float3					m_vTestPos;
 	_float3					m_vTestScale;

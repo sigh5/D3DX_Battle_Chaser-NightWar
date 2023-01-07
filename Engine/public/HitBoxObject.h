@@ -45,6 +45,10 @@ public:
 	void			Set_HitNum(_uint iHitNum) { m_iHitNum = iHitNum; }
 	_uint			Get_HitNum()const { return m_iHitNum; }
 
+	virtual _uint			Get_WeaponOption();
+
+
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

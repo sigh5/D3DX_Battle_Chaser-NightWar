@@ -227,7 +227,7 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			})
 				.OnExit([this]()
 			{
-				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
+				static_cast<CPlayer*>(m_pTarget)->Defence_Exit();
 			})
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{

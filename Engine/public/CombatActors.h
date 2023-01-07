@@ -30,6 +30,8 @@ public:
 		Set_Defence_Timer(bUseDefence);
 	}
 	
+	virtual void			Create_Hit_Effect();
+	virtual	void			Create_Defence_Effect_And_Action();
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -80,6 +82,9 @@ protected:
 	_uint							m_iHitCount = 0;
 
 	_float							m_fDefencTimer = 0.f;
+
+	_int							m_iHitWeaponOption = 0;
+
 protected:
 	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool			m_isWideBuff = false;

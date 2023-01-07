@@ -148,9 +148,6 @@
     <Filter Include="02.GameObjects\MapOne">
       <UniqueIdentifier>{3861e60d-1768-4a69-b6c5-c737a880638b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Effect\Effect_">
-      <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\MapOne\MapOneTree">
       <UniqueIdentifier>{0b37f63b-c8d9-4061-9260-e717aee6c304}</UniqueIdentifier>
     </Filter>
@@ -168,6 +165,18 @@
     </Filter>
     <Filter Include="02.GameObjects\Player\Skill\Skill_Texture">
       <UniqueIdentifier>{ec6bccd5-bcd3-4262-822c-a30bdd7228dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Attack_Effect">
+      <UniqueIdentifier>{0312608a-7bed-4e06-b412-2c1f8d74dcde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Hit_Effect">
+      <UniqueIdentifier>{304f5892-b1ef-4558-bd51-2615b4633908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Test_Effect_">
+      <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Buff_Effect">
+      <UniqueIdentifier>{19f820af-4b44-4593-8b8f-427a5ee9431e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -328,7 +337,7 @@
       <Filter>02.GameObjects\Player\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EffectFrame.h">
-      <Filter>02.GameObjects\Effect\Effect_</Filter>
+      <Filter>02.GameObjects\Effect\Test_Effect_</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MapOne2D.h">
       <Filter>02.GameObjects\MapOne</Filter>
@@ -353,6 +362,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Skill_TextureObj.h">
       <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Buff_Effect.h">
+      <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -495,7 +507,7 @@
       <Filter>02.GameObjects\Player\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EffectFrame.cpp">
-      <Filter>02.GameObjects\Effect\Effect_</Filter>
+      <Filter>02.GameObjects\Effect\Test_Effect_</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MapOne2D.cpp">
       <Filter>02.GameObjects\MapOne</Filter>
@@ -520,6 +532,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Skill_TextureObj.cpp">
       <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Buff_Effect.cpp">
+      <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

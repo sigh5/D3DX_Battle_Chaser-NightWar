@@ -14,6 +14,14 @@ CCombatActors::CCombatActors(const CCombatActors & rhs)
 }
 
 
+void CCombatActors::Create_Hit_Effect()
+{
+}
+
+void CCombatActors::Create_Defence_Effect_And_Action()
+{
+}
+
 HRESULT CCombatActors::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
