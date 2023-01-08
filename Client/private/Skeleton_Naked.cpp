@@ -156,16 +156,6 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 	}
 
 
-
-	for (auto& pParts : m_MonsterParts)
-	{
-	
-	}
-
-
-
-
-
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
@@ -276,10 +266,13 @@ void CSkeleton_Naked::Create_Hit_Effect()
 	switch (WeaponOption)
 	{
 	case Client::WEAPON_OPTIONAL_NONE:
-
-		break;
+		RELEASE_INSTANCE(CGameInstance);
+		return;
 	case Client::WEAPON_OPTIONAL_BLUE:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
+		BuffDesc.vPosition = _float4(0.f, 1.0f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+		iEffectNum = 1;
 		break;
 	case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
@@ -446,6 +439,9 @@ HRESULT CSkeleton_Naked::Ready_Parts()
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -1.f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 1.5f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
+	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_PULPLE;
+
+
 
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
 	if (nullptr == pPartObject)
@@ -480,6 +476,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 	m_eWeaponType = WEAPON_SWORD;
 	m_iStateDamage = 1;//30;
 	m_pMeHit_Player = nullptr;
+	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// ÇÑ´ëÅö
 	m_CurAnimqeue.push({ 9, 1.f });
@@ -492,9 +489,10 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 1;			// 20*2 
+	m_iStateDamage = 10;			// 20*2 
 	m_pStatusCom->Use_SkillMp(30);
 	m_pMeHit_Player = nullptr;
+	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2´ë Åö
 	m_CurAnimqeue.push({ 15, 1.f });
@@ -583,12 +581,10 @@ void CSkeleton_Naked::Free()
 		Safe_Release(pPart);
 	m_MonsterParts.clear();
 
-
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
-
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }

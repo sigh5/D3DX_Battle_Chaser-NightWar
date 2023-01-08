@@ -55,14 +55,16 @@ public:  /*For.Combat*/
 	void			  Combat_DeadTick(_double TimeDelta);
 	void			  Create_Skill_Texture();		// 실제로 쓰는 것
 	void			  Create_Skill_Texture_On_Hiter();
+	virtual void	  Create_Hit_Effect()override;
 	virtual void	  Create_Defence_Effect_And_Action()override;
 	
+	void				Create_Defence_Area();
 
 	void			  Create_WideBuffEffect();
 	void			  Create_Wide_BuffEffect_Second();
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
 	void			  Create_Skill_Ultimate_Effect();
-												
+
 										
 	
 	
@@ -124,7 +126,6 @@ private:
 	UI_REPRESENT	m_Represnt = REPRESENT_KNOLAN;
 	WeaponType		m_eWeaponType = WEAPON_SKILL;
 	_bool			m_bOnceCreate = false;
-
 	_bool			m_bOnceStop = false;
 
 	_float3			m_vSkill_Scale;
@@ -139,6 +140,7 @@ private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
 	
+
 	_float3					m_vTestPos;
 	_float3					m_vTestScale;
 	 float Temp[3];

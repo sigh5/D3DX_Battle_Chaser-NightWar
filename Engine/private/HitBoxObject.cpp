@@ -17,6 +17,10 @@ _uint CHitBoxObject::Get_WeaponOption()
 	return 0;
 }
 
+void CHitBoxObject::Set_WeaponOption(_uint iOption)
+{
+}
+
 HRESULT CHitBoxObject::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))

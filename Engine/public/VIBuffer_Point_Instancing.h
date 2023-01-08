@@ -35,7 +35,7 @@ public:
 
 	void			Set_Point_Instancing_Scale(_float3 vScale);
 	void			Set_Point_Instancing_Num(_int iInstancingNum);
-
+	void			Set_Point_Instancing_MainTain();
 
 public:
 	virtual HRESULT Initialize_Prototype(_uint iNumInstance);
@@ -56,7 +56,10 @@ private:
 
 	_float					m_iWidthTextureCnt = 0.f;		// 계속 증가해야됌
 	_float					m_iHeightTextureCnt = 0.f;	// 계속 증가해야됌
-	
+	_bool					m_bIsMaintain = false;
+
+
+
 	VIBUffer_Point_TextureDesc m_Desc;
 	
 	/*For.Imgui*/

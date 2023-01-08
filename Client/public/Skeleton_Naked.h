@@ -74,6 +74,7 @@ private:
 	_float					m_LimitDistance = 6.f;
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
+	_uint					m_iWeaponOption = WEAPON_OPTIONAL_NONE;
 
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;

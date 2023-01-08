@@ -21,6 +21,7 @@ public:
 		_float3				vScale;
 		_float4				vPosition;
 		WeaponType			eType;
+		_int				iWeaponOption;
 
 	}WEAPONDESC;
 
@@ -31,8 +32,9 @@ protected:
 
 public:
 	virtual CCollider*				Get_Colider() override { return m_pColliderCom; };
-	virtual WeaponType		Get_Type()const override { return m_WeaponDesc.eType; }
-
+	virtual WeaponType				Get_Type()const override { return m_WeaponDesc.eType; }
+	virtual _uint					Get_WeaponOption()override { return m_WeaponDesc.iWeaponOption; }
+	virtual  void 					Set_WeaponOption(_uint iOption)override { m_WeaponDesc.iWeaponOption = iOption; }
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

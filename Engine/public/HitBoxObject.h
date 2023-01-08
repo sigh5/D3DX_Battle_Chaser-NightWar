@@ -46,6 +46,7 @@ public:
 	_uint			Get_HitNum()const { return m_iHitNum; }
 
 	virtual _uint			Get_WeaponOption();
+	virtual  void 			Set_WeaponOption(_uint iOption);
 
 
 

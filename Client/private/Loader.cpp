@@ -655,6 +655,7 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 
 HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 {
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_laser_Bullet"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Bullet/bretto_laser_Bullet_%d.png"),
@@ -720,7 +721,7 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			CTexture::TYPE_END, 16))))
 		return E_FAIL;
 
-	
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_blue_fire1"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/BlueFire/blue_fire_1_sheet_%d.png"),
@@ -805,7 +806,6 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			CTexture::TYPE_END, 1))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Common_Hit_Effect"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/HItEffect/Hit_Effect_%d.png"),
@@ -816,6 +816,48 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Buff/Buff_%d.png"),
 			CTexture::TYPE_END, 18))))
+		return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Bleeding_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Bleeding_Effect/Bleeding_Effect_%d.png"),
+			CTexture::TYPE_END, 4))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Jump_Left_To_Right"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/Jump/Left_to_Right/Left_to_Right_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Jump_Right_To_Left"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Common/Jump/Right_to_Left/Right_to_Left_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Defence_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Defece_Effect/Defece_Effect_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Die_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Die_Effect/Die_Effect_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrison_Ultimate_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Ultimate_Effect/Ultimate_Effect_0.png"),
+			CTexture::TYPE_END, 1))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrison_Burn_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Burn/Garrison_Burn_%d.png"),
+			CTexture::TYPE_END, 9))))
 		return E_FAIL;
 
 

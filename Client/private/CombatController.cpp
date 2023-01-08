@@ -221,6 +221,8 @@ void CCombatController::PlayerWin()
 
 }
 
+
+
 void CCombatController::Cal_HitPlayerTarget()
 {
 	if (m_bMonsterSelect_Target)
@@ -542,6 +544,9 @@ HRESULT CCombatController::Set_CurrentActor()
 		break;
 	}
 
+
+
+
 	return S_OK;
 }
 
@@ -810,7 +815,7 @@ void CCombatController::To_Light_Hit()
 		{
 			m_pHitActor->Set_FsmState(true, CGameObject::m_Light_Hit);
 		}
-		m_bIsHiterhit = false;
+	
 		for (auto &Canvas : m_CanvasVec)
 		{
 			if (dynamic_cast<CHpMpBuffCanvas*>(Canvas) != nullptr)
@@ -819,6 +824,10 @@ void CCombatController::To_Light_Hit()
 				static_cast<CHpMpBuffCanvas*>(Canvas)->Set_MpEvent(true);
 			}
 		}
+
+		m_bIsHiterhit = false;
+		m_bisHitTimer_Alive = false;
+		m_fHitTimer = 0.0f;
 	}
 	else
 		return;

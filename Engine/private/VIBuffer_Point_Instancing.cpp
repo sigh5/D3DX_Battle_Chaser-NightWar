@@ -17,8 +17,10 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Scale(_float3 vScale)
 {
 	CONTEXT_LOCK;
 	// Rect_Instancing 이랑 동일하다.
+	
 	D3D11_MAPPED_SUBRESOURCE			SubResource;
 	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
 
 	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
 
@@ -29,7 +31,8 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Scale(_float3 vScale)
 	}
 
 	m_pContext->Unmap(m_pVB, 0);
-
+	
+	
 }
 
 void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
@@ -71,6 +74,35 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
 //	Safe_Delete_Array(pInstanceVertices);
 
 
+
+}
+
+void CVIBuffer_Point_Instancing::Set_Point_Instancing_MainTain()
+{
+	m_bIsMaintain = true;
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.StructureByteStride = m_iStride;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_BufferDesc.MiscFlags = 0;
+
+	VTXPOINTINSTANCING*			pVertices = new VTXPOINTINSTANCING;
+	ZeroMemory(pVertices, sizeof(VTXPOINTINSTANCING));
+
+	pVertices->vPosition = _float3(0.0f, 0.0f, 0.0f);		// 처음에 다 원점으로 고정
+	pVertices->vPSize = _float2(1.f, 1.f);					// 지름이라고 생각하면 편함 실제 전체사이즈의크기
+
+	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+	m_SubResourceData.pSysMem = pVertices;
+
+	Safe_Release(m_pVB);
+	m_pVB = nullptr;
+	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pVB);
+	Safe_Delete_Array(pVertices);
 
 }
 
@@ -221,7 +253,7 @@ HRESULT CVIBuffer_Point_Instancing::Render()
 
 	ID3D11Buffer*			pVertexBuffers[] = {
 		m_pVB,
-		m_pInstanceBuffer
+		m_pInstanceBuffer,
 	};
 
 	_uint					iStrides[] = {
@@ -367,5 +399,11 @@ void CVIBuffer_Point_Instancing::Free()
 	{
 		Safe_Delete_Array(m_pSpeeds);
 	}
+
+	if (m_bIsMaintain == true)
+	{
+		Safe_Release(m_pVB);
+	}
+
 }
 

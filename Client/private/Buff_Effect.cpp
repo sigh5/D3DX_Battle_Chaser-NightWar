@@ -66,6 +66,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 
 
 
+
 #ifdef NOMODLES
 	m_HitBoxDesc.Poing_Desc = m_pVIBufferCom->Get_Point_TextureDesc();
 #else
@@ -203,12 +204,26 @@ void CBuff_Effect::Reset_CurMartirx()
 	else
 		SocketMatrix = m_OriginMatrix* m_Client_BuffEffect_Desc.ParentTransform->Get_WorldMatrix();
 
-	XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
-	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
-	m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
-	m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
-	m_vScale = m_Client_BuffEffect_Desc.vScale;
-	m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
+	if (m_Client_BuffEffect_Desc.bIsMainTain)
+	{
+		XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
+		m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+		m_pVIBufferCom->Set_Point_Instancing_MainTain();
+		m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
+		m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+		m_vScale = m_Client_BuffEffect_Desc.vScale;
+		m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
+	}
+	else
+	{
+		XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
+		m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+		m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
+		m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+		m_vScale = m_Client_BuffEffect_Desc.vScale;
+		m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
+
+	}
 	
 }
 

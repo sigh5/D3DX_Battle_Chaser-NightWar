@@ -84,6 +84,7 @@ protected:
 	_float							m_fDefencTimer = 0.f;
 
 	_int							m_iHitWeaponOption = 0;
+	_bool							m_bIs_Multi_Hit = false; //맞은놈이 멀티히트를 맞았냐?
 
 protected:
 	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?

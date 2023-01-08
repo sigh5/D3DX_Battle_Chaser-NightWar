@@ -49,6 +49,7 @@ public:  /*Combat Logic*/
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	void	Status_CanvasInit();
 	void	PlayerWin();
+
 public:
 	void	Refresh_CurActor();
 	void	Mana_Refresh();
@@ -56,10 +57,8 @@ public:
 	void	Active_Fsm();
 	void	ResetState();
 	void	Render_StopCanvas();
-	void	Wide_Buff_Create_Effect();
-
-
-
+	
+	
 private:
 	void	PickingTarget();		//플레이어의 턴일때
 	void	MonsterSetTarget();
@@ -112,7 +111,7 @@ private:
 	_bool					m_bisHitTimer_Alive = false;
 
 	_float					m_fHitTimer = 0.0f;
-	_float					m_fHitRecoverTime =0.2f;		// 모든 연속공격일때 특단의 조치가 필요
+	_float					m_fHitRecoverTime =0.03f;		// 모든 연속공격일때 특단의 조치가 필요
 
 	_bool					m_bMonsterSelect_Target = false;			
 	_uint					m_iMonster_Player_Option=0;

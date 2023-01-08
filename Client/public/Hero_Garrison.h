@@ -50,15 +50,20 @@ public:  /*For.Combat*/
 	virtual	  void	  Combat_Ultimate(_double TimeDelta);
 	void			  Combat_DeadTick(_double TimeDelta);
 	
-	virtual   void	  Combat_BlendAnimTick(_double TimeDelta);
+	virtual   void		 Combat_BlendAnimTick(_double TimeDelta);
 	virtual		void	Fsm_Exit()override;
 	virtual		void	Defence_Exit()override;
+	void				 MovingAnimControl(_double TimeDelta);
 
 
-	void			 MovingAnimControl(_double TimeDelta);
-
-
-
+	virtual void	  Create_Hit_Effect()override;
+	virtual void	  Create_Defence_Effect_And_Action()override;
+	void			  Create_Normal_Attack_Effect();
+	void			  Create_Skill1_Attack_Effect();		// Test_Texture용 나중에 삭제바람
+	void			  Create_Skill2_Attack_Effect();
+	void			  Create_Ultimate_Effect();
+	void			  Create_BuffEffect();
+	void			  Anim_Frame_Create_Control();
 public:
 	virtual	  _bool	  Is_Dead()override;
 	_int	  Is_MovingAnim();
@@ -88,10 +93,18 @@ public:
 	void				Anim_Die();
 	void				Anim_Viroty();
 
+
+	void				Create_Test_Effect();
+	void				Create_Move_Target_Effect();
+
+	void				Create_Defence_Area();
+
 private:
 	_int		bResult = ANIM_EMD;
 	_bool		m_bCombatInit = false;
-
+	_bool			m_bOnceCreate = false;
+	_bool			m_bOnceStop = false;
+	_bool			m_bRun = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -103,7 +116,7 @@ private:
 	class CAnimFsm*				m_pAnimFsm = nullptr;
 private:
 	vector<CGameObject*>	m_PlayerParts;
-
+	vector<CGameObject*>	m_pEffectParts;
 private:
 	HRESULT		SetUp_Components();
 	HRESULT		SetUp_ShaderResources();
@@ -128,10 +141,20 @@ private:
 
 
 
+
 	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;
 	_float		m_ReturnDistance = 0.1f;
 	_float		m_setTickForSecond = 0.9f;
+	_uint		m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+
+	/*Imgui*/
+	wstring			m_TextureTag = TEXT("");
+	_float3			m_vTestPos;
+	_float3			m_vTestScale;
+	_float3			m_vSkill_Scale;
+	_float4			m_vSkill_Pos;
+
 };
 
 END
