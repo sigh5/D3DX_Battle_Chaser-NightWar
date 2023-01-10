@@ -138,8 +138,6 @@ HRESULT CTurnUICanvas::Render()
 		return S_OK;
 
 #ifdef NOMODLES
-
-#else
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
@@ -148,6 +146,8 @@ HRESULT CTurnUICanvas::Render()
 
 	m_pShaderCom->Begin(1);
 	m_pVIBufferCom->Render();
+#else
+	
 #endif
 	return S_OK;
 

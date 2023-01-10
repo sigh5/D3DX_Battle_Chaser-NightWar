@@ -57,6 +57,8 @@ HRESULT CCombatMap::Last_Initialize()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 
+	
+
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -68,13 +70,16 @@ HRESULT CCombatMap::Last_Initialize()
 void CCombatMap::Tick(_double TimeDelta)
 {
 	Last_Initialize();
+	
+
+
 	__super::Tick(TimeDelta);
 }
 
 void CCombatMap::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-
+	
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
 }

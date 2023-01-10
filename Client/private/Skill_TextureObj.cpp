@@ -71,7 +71,7 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 		Skill_Golf_Shot(TimeDelta);
 		break;
 	case Skill_DIR_DOWN:
-
+		Set_ChaserBone();
 		break;
 	case Skill_DIR_ScaleUP_DOWN:
 		Skill_Meteo(TimeDelta);
@@ -106,6 +106,8 @@ HRESULT CSkill_TextureObj::Render()
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
+
+	//m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass;
 	m_pShaderCom->Begin(0);
 	m_pVIBufferCom->Render();
 
@@ -170,13 +172,39 @@ HRESULT CSkill_TextureObj::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
-
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+
+	_matrix		matTest = XMMatrixIdentity();
+	_matrix		RotationMatrix = XMMatrixRotationAxis(XMVectorSet(0.f,1.f,0.f,0.f), XMConvertToDegrees(-45.f));
+
+	_vector		vRight = m_pTransformCom->Get_State(CTransform::STATE_RIGHT);
+	_vector		vUp = m_pTransformCom->Get_State(CTransform::STATE_UP);
+	_vector		vLook = m_pTransformCom->Get_State(CTransform::STATE_LOOK);
+	_vector		vTranslation = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+	_float3		vScale = m_pTransformCom->Get_Scaled();
+
+	vRight =	 XMVector4Transform(vRight, RotationMatrix) *vScale.x ;
+	vUp = XMVector4Transform(vUp, RotationMatrix) *vScale.y;
+	vLook = XMVector4Transform(vLook, RotationMatrix) *vScale.z;
+	vTranslation = XMVector4Transform(vTranslation, RotationMatrix);
+
+	memcpy(&matTest.r[0], &vRight,sizeof(_vector));
+	memcpy(&matTest.r[1], &vUp, sizeof(_vector));
+	memcpy(&matTest.r[2], &vLook, sizeof(_vector));
+	memcpy(&matTest.r[3], &vTranslation, sizeof(_vector));
+
+	_float4x4	 Temp;
+	XMStoreFloat4x4(&Temp, matTest);
+
+	if (FAILED(m_pShaderCom->Set_Matrix("g_WorldMatrixRotation",&Temp)))
+		return E_FAIL;
+
+
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
@@ -223,7 +251,9 @@ void CSkill_TextureObj::Skill_Charging(_double TimeDelta)
 		m_pVIBufferCom->Set_Point_Instancing_Scale(m_vScale);	// 텍스쳐의 크기를 키우는것
 		m_pTransformCom->Set_Scaled(m_vScale);
 
-		m_pTransformCom->Chase(m_SkillDesc.pTraget->Get_State(CTransform::STATE_TRANSLATION), TimeDelta);
+		m_pTransformCom->Chase_Rising(m_SkillDesc.pTraget->Get_State(CTransform::STATE_TRANSLATION), TimeDelta,true);
+		
+
 	}
 
 }
@@ -299,6 +329,26 @@ void CSkill_TextureObj::Set_SKill_Texture_Client_Make_Hiter(Skill_Texture_Client
 	iChange_Sign = 1;
 	memcpy(&m_SkillDesc, &Desc, sizeof(Skill_Texture_Client));
 	Set_Cur_Pos_On_Hiter();
+}
+
+void CSkill_TextureObj::Set_ChaserBone()
+{
+	_matrix		m_matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+	matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+	matRotX = XMMatrixRotationX(XMConvertToRadians(0.f));
+	matRotY = XMMatrixRotationY(XMConvertToRadians(m_SkillDesc.vAngle));	//스트레이트는 90 , 골프 -180
+	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+	matTrans = XMMatrixTranslation(m_SkillDesc.vPosition.x, m_SkillDesc.vPosition.y, m_SkillDesc.vPosition.z);
+	m_OriginMatrix = matScale * matRotX * matRotY * matRotZ * matTrans;
+	_matrix			SocketMatrix = m_SkillDesc.pSocket->Get_OffsetMatrix() * m_SkillDesc.pSocket->Get_CombindMatrix() * XMLoadFloat4x4(&m_SkillDesc.PivotMatrix);
+	SocketMatrix.r[0] = XMVector3Normalize(SocketMatrix.r[0]);
+	SocketMatrix.r[1] = XMVector3Normalize(SocketMatrix.r[1]);
+	SocketMatrix.r[2] = XMVector3Normalize(SocketMatrix.r[2]);
+	SocketMatrix = SocketMatrix *	m_OriginMatrix* m_SkillDesc.ParentTransform->Get_WorldMatrix();
+	XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
+	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	m_pVIBufferCom->Set_Point_Instancing_Scale(m_SkillDesc.vScale);	// 텍스쳐의 크기를 키우는것
+	m_pTransformCom->Set_Scaled(m_SkillDesc.vScale);
 }
 
 _bool CSkill_TextureObj::Hit_CountIncrease()

@@ -9,6 +9,7 @@ class CRenderer;
 class CModel;
 class CCollider;
 class CStatus;
+class CGameInstance;
 END
 
 BEGIN(Client)
@@ -38,7 +39,9 @@ public:
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
 	virtual void			Create_Hit_Effect()override;
+	void				Anim_Frame_Create_Control();
 
+	void		   Multi_Hit_Effect(class CGameInstance*pInstance);
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -75,6 +78,7 @@ private:
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
 	_uint					m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	_bool					m_bChange_hit_Effect = false;
 
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;

@@ -120,8 +120,9 @@ private:
 
 	_uint					m_iHitNum = 0;
 	_bool					m_bVirtory = false;
-
-
+	
+	_bool					m_bCanvasRenderCheck = false;
+	_float					m_fAfter_DefenceButtonCheck = 0.f;
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();

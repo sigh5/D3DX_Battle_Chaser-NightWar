@@ -15,9 +15,9 @@ END
 BEGIN(Client)
 
 
-class CHero_Garrison final : public CPlayer	
+class CHero_Garrison final : public CPlayer
 {
-/* 모든 애니메이션의 끝은 IDLE로 고정이다. 따라서 필요가없다.*/
+	/* 모든 애니메이션의 끝은 IDLE로 고정이다. 따라서 필요가없다.*/
 private:
 	CHero_Garrison(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHero_Garrison(const CHero_Garrison& rhs);
@@ -46,35 +46,38 @@ public: /*For.Dungeon*/
 	virtual	  void		Dungeon_Tick(_double TimeDelta)override;;
 
 public:  /*For.Combat*/
-	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	virtual	  void	  Combat_Ultimate(_double TimeDelta);
-	void			  Combat_DeadTick(_double TimeDelta);
-	
-	virtual   void		 Combat_BlendAnimTick(_double TimeDelta);
-	virtual		void	Fsm_Exit()override;
-	virtual		void	Defence_Exit()override;
-	void				 MovingAnimControl(_double TimeDelta);
+	virtual	  void		Combat_Tick(_double TimeDelta)override;
+	virtual	  void		Combat_Ultimate(_double TimeDelta);
+	void				Combat_DeadTick(_double TimeDelta);
 
+	virtual   void		Combat_BlendAnimTick(_double TimeDelta);
+	virtual	  void		Fsm_Exit()override;
+	virtual	  void		Defence_Exit()override;
+	void				MovingAnimControl(_double TimeDelta);
 
-	virtual void	  Create_Hit_Effect()override;
-	virtual void	  Create_Defence_Effect_And_Action()override;
-	void			  Create_Normal_Attack_Effect();
-	void			  Create_Skill1_Attack_Effect();		// Test_Texture용 나중에 삭제바람
-	void			  Create_Skill2_Attack_Effect();
-	void			  Create_Ultimate_Effect();
-	void			  Create_BuffEffect();
-	void			  Anim_Frame_Create_Control();
+public:	 /*Create_Effect*/
+	virtual void		Create_Hit_Effect()override;
+	virtual void		Create_Defence_Effect_And_Action()override;
+	void				Create_Normal_Attack_Effect();
+	void				Create_Skill1_Attack_Effect();		// Test_Texture용 나중에 삭제바람
+	void				Create_Skill2_Attack_Effect();
+	void				Create_Ultimate_Effect();
+	void				Create_BuffEffect();
+	void				Create_Move_Target_Effect();
+	void				Create_Defence_Area();
+
+	void				Anim_Frame_Create_Control();
 public:
 	virtual	  _bool	  Is_Dead()override;
-	_int	  Is_MovingAnim();
-	void	  CombatAnim_Move_Ultimate(_double TImeDelta);
+	_int			  Is_MovingAnim();
+	void			  CombatAnim_Move_Ultimate(_double TImeDelta);
 
-	void	  Is_Skill1MovingAnim();
-	void	  CombatAnim_Move(_double TImeDelta);
-	 
+	void			  Is_Skill1MovingAnim();
+	void			  CombatAnim_Move(_double TImeDelta);
 
 
-public: 
+
+public:
 	void				Anim_Idle();
 	void				Anim_Intro();
 	void				AnimNormalAttack();
@@ -93,25 +96,25 @@ public:
 	void				Anim_Die();
 	void				Anim_Viroty();
 
-
+private:
 	void				Create_Test_Effect();
-	void				Create_Move_Target_Effect();
-
-	void				Create_Defence_Area();
+	
 
 private:
-	_int		bResult = ANIM_EMD;
-	_bool		m_bCombatInit = false;
-	_bool			m_bOnceCreate = false;
+	_int			bResult = ANIM_EMD;
+	_bool			m_bCombatInit = false;
+	
 	_bool			m_bOnceStop = false;
 	_bool			m_bRun = false;
+	_bool			m_bCreateDefenceTimer = false;
+	_float			m_fDefenceFsmTimer = 0.f;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
-	CStatus*				m_pStatusCom[MAPTYPE_END] = {nullptr,nullptr};
+	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
 
 	class CAnimFsm*				m_pAnimFsm = nullptr;
 private:
@@ -133,27 +136,24 @@ public:
 	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
 private:
-	//queue<pair<_uint, _double>>	m_CurAnimqeue;
-private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_GARRISON;
 	WeaponType		m_eWeaponType = WEAPON_SWORD;
 
-
-
-
+private:
 	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;
 	_float		m_ReturnDistance = 0.1f;
 	_float		m_setTickForSecond = 0.9f;
 	_uint		m_iWeaponOption = WEAPON_OPTIONAL_NONE;
-
-	/*Imgui*/
 	wstring			m_TextureTag = TEXT("");
-	_float3			m_vTestPos;
-	_float3			m_vTestScale;
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
+
+	/*Imgui*/
+	_float3			m_vTestPos;
+	_float3			m_vTestScale;
+
 
 };
 

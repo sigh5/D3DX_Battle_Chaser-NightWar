@@ -52,10 +52,19 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-		
-		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());
+		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());	
+	
+		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
+			m_bIsHeavyHit = true;
 		
 		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
+
+		if (pCurActorWepon->Get_HitNum() > 1)
+		{
+			m_bIs_Multi_Hit = true;
+			m_bOnceCreate = false;
+		}
+
 		bResult = true;
 	}
 	
@@ -190,8 +199,13 @@ void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 
+	Anim_Frame_Create_Control();
+
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
+
+
+
 }
 
 _int CSkeleton_Naked::Is_MovingAnim()
@@ -275,7 +289,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		iEffectNum = 1;
 		break;
 	case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
+		//pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 		iEffectNum = 5;
 		break;
 	case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
@@ -296,6 +310,18 @@ void CSkeleton_Naked::Create_Hit_Effect()
 	case Client::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		break;
+	case Client::WEAPON_OPTIONAL_PUNCH_HIT:
+		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
+		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		break;
+	case Client::WEAPON_OPTIONAL_PUNCH_GUN:		
+		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
+		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		break;
 	case Client::WEAPON_OPTIONAL_END:
 		break;
 	default:
@@ -307,7 +333,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 	if(pGameObject == nullptr)
 		RELEASE_INSTANCE(CGameInstance);
 
-	
+
 	
 	if (iEffectNum == 1)
 	{
@@ -331,7 +357,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 			BuffDesc.ParentTransform = m_pTransformCom;
 			BuffDesc.vPosition = _float4(_float(rand() % 2 * iSignNum),  1 , _float(rand() % 2 * iSignNum) , 1.f);
-			BuffDesc.vScale = _float3(iRandScaleNum, iRandScaleNum, iRandScaleNum);
+			BuffDesc.vScale = _float3(_float(iRandScaleNum), _float(iRandScaleNum), _float(iRandScaleNum));
 			BuffDesc.vAngle = 90.f;
 			BuffDesc.fCoolTime = 2.f;
 			BuffDesc.bIsMainTain = false;
@@ -348,6 +374,42 @@ void CSkeleton_Naked::Create_Hit_Effect()
 
 }
 
+void CSkeleton_Naked::Anim_Frame_Create_Control()
+{
+	if (m_pModelCom->Control_KeyFrame_Create(6, 1) && !m_bOnceCreate)
+	{
+		Create_Hit_Effect();
+		m_bOnceCreate = true;
+	}
+	else
+	{
+		return;
+	}
+}
+
+void CSkeleton_Naked::Multi_Hit_Effect(CGameInstance* pInstance)
+{
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(CBuff_Effect::BuffEffcet_Client));
+	_int iSignNum = 1;
+	CGameObject* pGameObject = nullptr;
+	for (_uint i = 0; i < 5; ++i)
+	{
+		_int iRandomNum = rand() % 5;
+		pGameObject = pInstance->Load_Effect(L"Texture_bretto_Real_Bullet_Effect_0", LEVEL_COMBAT, false);
+		BuffDesc.ParentTransform = m_pTransformCom;
+		BuffDesc.vPosition = _float4(_float(iRandomNum*0.2f * iSignNum), 0.3f, 1.2f, 1.f);
+		BuffDesc.vScale = _float3(4.f,4.f,4.f);
+		BuffDesc.vAngle = 90.f;
+		BuffDesc.fCoolTime = 2.f;
+		BuffDesc.bIsMainTain = false;
+		BuffDesc.iFrameCnt = rand() % 4 + 3;
+		BuffDesc.bIsUp = false;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+		m_MonsterParts.push_back(pGameObject);
+		iSignNum *= -1;
+	}
+}
 
 void CSkeleton_Naked::Fsm_Exit()
 {
@@ -489,7 +551,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 10;			// 20*2 
+	m_iStateDamage = 20;			// 20*2 
 	m_pStatusCom->Use_SkillMp(30);
 	m_pMeHit_Player = nullptr;
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
@@ -519,7 +581,23 @@ void CSkeleton_Naked::Anim_Buff()
 void CSkeleton_Naked::Anim_Light_Hit()
 {
 	++m_iHitNum;
-	m_CurAnimqeue.push({ 7, 1.f });
+	if (m_bIsHeavyHit)
+	{
+		m_CurAnimqeue.push({ 6, 1.f }); //,10
+	}
+	else if (true == m_bIs_Multi_Hit)
+	{
+		m_CurAnimqeue.push({ 7,  1.f });
+		m_CurAnimqeue.push({ 6,  1.f });
+
+		m_bOnceCreate = false;
+		m_bIs_Multi_Hit = false;
+	}
+	else
+	{
+		m_CurAnimqeue.push({ 7 , 1.f });		
+	}
+	
 	Set_CombatAnim_Index(m_pModelCom);
 	Create_Hit_Effect();
 }
@@ -577,9 +655,16 @@ void CSkeleton_Naked::Free()
 {
 	__super::Free();
 
-	for (auto& pPart : m_MonsterParts)
-		Safe_Release(pPart);
-	m_MonsterParts.clear();
+	//for (auto& pPart : m_MonsterParts)
+	//	Safe_Release(pPart);
+	//m_MonsterParts.clear();
+
+	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_MonsterParts.erase(iter);
+	}
+
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

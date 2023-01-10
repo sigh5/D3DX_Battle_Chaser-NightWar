@@ -25,7 +25,7 @@ public:
 	virtual HRESULT Render() override;
 
 	void	Camera_Shaking();
-
+	void	Camera_ZoomIn_CurActor();
 private:
 	HRESULT SetUp_Components();
 

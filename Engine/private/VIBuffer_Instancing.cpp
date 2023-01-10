@@ -14,8 +14,6 @@ CVIBuffer_Instancing::CVIBuffer_Instancing(const CVIBuffer_Instancing & rhs)
 	, m_iInstanceStride(rhs.m_iInstanceStride)
 {
 
-	
-
 	Safe_AddRef(m_pInstanceBuffer);
 }
 

@@ -44,6 +44,7 @@ public: /* Imgui */
 protected:
 	CAMERADESC					m_CameraDesc;
 	_bool						m_bCameraActive = false;
+	_float						m_fFov = 60.f;
 private:
 	class CPipeLine*			m_pPipeLine = nullptr;
 	

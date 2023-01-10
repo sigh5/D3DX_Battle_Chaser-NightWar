@@ -53,21 +53,23 @@ public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	void			  Combat_DeadTick(_double TimeDelta);
+
+	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
+
+	void			  Create_Buff_Effect();
 	void			  Create_Skill_Texture();		// 실제로 쓰는 것
 	void			  Create_Skill_Texture_On_Hiter();
-	virtual void	  Create_Hit_Effect()override;
-	virtual void	  Create_Defence_Effect_And_Action()override;
-	
-	void				Create_Defence_Area();
-
+	void			  Create_Defence_Area();
 	void			  Create_WideBuffEffect();
 	void			  Create_Wide_BuffEffect_Second();
-	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
 	void			  Create_Skill_Ultimate_Effect();
 
-										
-	
-	
+	virtual void	  Create_Hit_Effect()override;
+	virtual void	  Create_Defence_Effect_And_Action()override;
+
+
+
+							
 	void			  Anim_Frame_Create_Control();
 
 private:
@@ -88,7 +90,7 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Ready_Parts_Combat();
-	void					Create_Buff_Effect();
+
 
 public:
 	void					Anim_Idle();
@@ -125,7 +127,7 @@ private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_KNOLAN;
 	WeaponType		m_eWeaponType = WEAPON_SKILL;
-	_bool			m_bOnceCreate = false;
+
 	_bool			m_bOnceStop = false;
 
 	_float3			m_vSkill_Scale;
@@ -136,17 +138,19 @@ private:
 	wstring			m_TextureTag = TEXT("");
 	_uint			m_iWeaponOption = WEAPON_OPTIONAL_NONE;
 
+	_bool			m_bCreateDefenceTimer = false;
+	_float			m_fDefenceFsmTimer = 0.f;
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
 	
 
+
+private:/*For_Imgui*/
 	_float3					m_vTestPos;
 	_float3					m_vTestScale;
 	 float Temp[3];
 	 float Sour[3];
-
-
 	 int					m_iRadioButton22=0;
 
 

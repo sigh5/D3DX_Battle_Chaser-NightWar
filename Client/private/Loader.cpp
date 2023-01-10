@@ -860,6 +860,17 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			CTexture::TYPE_END, 9))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Matrix_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Matrix/bretto_Matrix_%d.png"),
+			CTexture::TYPE_END, 7))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Real_Bullet_Effect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Bullet/Bullet_%d.png"),
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
 
 	return S_OK;
 }

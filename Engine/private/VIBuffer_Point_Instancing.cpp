@@ -37,50 +37,47 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Scale(_float3 vScale)
 
 void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
 {
-//	CONTEXT_LOCK;
-//	// Rect_Instancing 이랑 동일하다.
-//	m_iNumInstance = iInstancingNum;
-//	m_iNumPrimitive = iInstancingNum;
-//	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
-//
-//	m_iInstanceStride = sizeof(VTXMATRIX);	// 인스턴싱버퍼는 사이즈를 가지고 있어야한다.
-//
-//	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
-//
-//	m_BufferDesc.ByteWidth = m_iInstanceStride * iInstancingNum;
-//	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-//	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-//	m_BufferDesc.StructureByteStride = m_iInstanceStride;
-//	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-//	m_BufferDesc.MiscFlags = 0;
-//
-//	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iInstancingNum];
-//	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
-//
-//	for (_uint i = 0; i < iInstancingNum; ++i)
-//	{
-//		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
-//		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
-//		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
-//		pInstanceVertices[i].vPosition = _float4(-0.5f +(0.1f *i), 0.1f, -0.5f + (0.1f *i), 1.f);
-//	}
-//
-//
-//	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
-//	m_SubResourceData.pSysMem = pInstanceVertices;
-//	Safe_Release(m_pInstanceBuffer);
-//	m_pInstanceBuffer = nullptr;
-//	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
-//	Safe_Delete_Array(pInstanceVertices);
+	CONTEXT_LOCK;
+	// Rect_Instancing 이랑 동일하다.
+	m_iNumInstance = iInstancingNum;
+	m_iNumPrimitive = iInstancingNum;
+	m_iNumIndices = m_iNumIndicesPerPrimitive * m_iNumPrimitive;
+
+	m_iInstanceStride = sizeof(VTXMATRIX);	// 인스턴싱버퍼는 사이즈를 가지고 있어야한다.
+
+	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
+
+	m_BufferDesc.ByteWidth = m_iInstanceStride * iInstancingNum;
+	m_BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_BufferDesc.StructureByteStride = m_iInstanceStride;
+	m_BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_BufferDesc.MiscFlags = 0;
+
+	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iInstancingNum];
+	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
+
+	for (_uint i = 0; i < iInstancingNum; ++i)
+	{
+		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
+		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
+		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
+		pInstanceVertices[i].vPosition = _float4(-0.5f +(0.1f *i), 0.1f, -0.5f + (0.1f *i), 1.f);
+	}
 
 
-
+	ZeroMemory(&m_SubResourceData, sizeof m_SubResourceData);
+	m_SubResourceData.pSysMem = pInstanceVertices;
+	Safe_Release(m_pInstanceBuffer);
+	m_pInstanceBuffer = nullptr;
+	m_pDevice->CreateBuffer(&m_BufferDesc, &m_SubResourceData, &m_pInstanceBuffer);
+	Safe_Delete_Array(pInstanceVertices);
 }
 
 void CVIBuffer_Point_Instancing::Set_Point_Instancing_MainTain()
 {
+	CONTEXT_LOCK;
 	m_bIsMaintain = true;
-
 	ZeroMemory(&m_BufferDesc, sizeof m_BufferDesc);
 
 	m_BufferDesc.ByteWidth = m_iStride * m_iNumVertices;

@@ -40,6 +40,8 @@ public:
 
 public:
 	void	Set_Client_BuffDesc(BuffEffcet_Client& Desc);
+	void	Set_Client_BuffDesc(BuffEffcet_Client& Desc, class CBone* pSocket, _float4x4 PivotMatrix);
+	
 	const	_bool	Get_IsFinish()const { return m_bIsFinsishBuffer; }
 	const   _bool  Get_MainTain()const { return m_Client_BuffEffect_Desc.bIsMainTain; }
 	

@@ -19,7 +19,31 @@ void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc)
 	Reset_CurMartirx();
 }
 
+void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc, CBone * pSocket,_float4x4 PivotMatrix)
+{
+	memcpy(&m_Client_BuffEffect_Desc, &Desc, sizeof(BuffEffcet_Client));
 
+	_matrix		m_matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+	matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+	matRotX = XMMatrixRotationX(XMConvertToRadians(0.f));
+	matRotY = XMMatrixRotationY(XMConvertToRadians(m_Client_BuffEffect_Desc.vAngle));	//스트레이트는 90 , 골프 -180
+	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+	matTrans = XMMatrixTranslation(m_Client_BuffEffect_Desc.vPosition.x, m_Client_BuffEffect_Desc.vPosition.y, m_Client_BuffEffect_Desc.vPosition.z);
+	m_OriginMatrix = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+	_matrix			SocketMatrix = pSocket->Get_OffsetMatrix() * pSocket->Get_CombindMatrix() * XMLoadFloat4x4(&PivotMatrix);
+	SocketMatrix.r[0] = XMVector3Normalize(SocketMatrix.r[0]);
+	SocketMatrix.r[1] = XMVector3Normalize(SocketMatrix.r[1]);
+	SocketMatrix.r[2] = XMVector3Normalize(SocketMatrix.r[2]);
+	SocketMatrix = SocketMatrix *	m_OriginMatrix* m_Client_BuffEffect_Desc.ParentTransform->Get_WorldMatrix();
+	XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
+
+	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
+	m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+
+
+}
 
 HRESULT CBuff_Effect::Initialize_Prototype()
 {
@@ -38,7 +62,7 @@ HRESULT CBuff_Effect::Initialize(void * pArg)
 	
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-
+	//m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = 2;
 
 	return S_OK;
 }
@@ -59,7 +83,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			_float4 vPos;
 			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		
-			vPos.y += (_float)5 * TimeDelta;
+			vPos.y += (_float)(5 * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
 	}
@@ -109,7 +133,7 @@ HRESULT CBuff_Effect::Render()
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass);
 	m_pVIBufferCom->Render();
 
 	return S_OK;
@@ -218,6 +242,7 @@ void CBuff_Effect::Reset_CurMartirx()
 	{
 		XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
 		m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+		m_pVIBufferCom->Set_Point_Instancing_MainTain();
 		m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
 		m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
 		m_vScale = m_Client_BuffEffect_Desc.vScale;
@@ -255,9 +280,9 @@ CGameObject * CBuff_Effect::Clone(void * pArg)
 void CBuff_Effect::Free()
 {
 	__super::Free();
-	Safe_Release(m_pTextureCom);
-
+	
 	Safe_Release(m_pVIBufferCom);
+	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }

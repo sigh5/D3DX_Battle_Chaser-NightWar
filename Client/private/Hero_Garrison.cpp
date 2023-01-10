@@ -131,28 +131,28 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
 			m_bIsDead = true;
 
-		static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
+		//static float ffPos[3] = {};
+		//static float ffScale[3] = {};
+		//static char  szName[MAX_PATH] = "";
+		//ImGui::InputFloat3("SkillPos", ffPos);
+		//ImGui::InputFloat3("SkillScale", ffScale);
 
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);
+		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		//ImGui::InputText("TextureName", szName, MAX_PATH);
 
-		if (ImGui::Button("Create_Skill"))
-		{
-			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		//if (ImGui::Button("Create_Skill"))
+		//{
+		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-			m_TextureTag =   Texture_NameTag;
-			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		//	m_TextureTag =   Texture_NameTag;
+		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-			Create_Test_Effect();		// Test¿ë
+		//	Create_Test_Effect();		// Test¿ë
 
-		}
-		RELEASE_INSTANCE(CGameInstance);
+		//}
+		//RELEASE_INSTANCE(CGameInstance);
 	}
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -344,6 +344,17 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 		pParts->Tick(TimeDelta);
 	}
 
+	if (m_bCreateDefenceTimer == true)
+	{
+		m_fDefenceFsmTimer += _float(TimeDelta);
+	}
+	if (m_fDefenceFsmTimer >= 1.f)
+	{
+		m_bCreateDefenceTimer = false;
+		m_fDefenceFsmTimer = 0.f;
+		Fsm_Exit();
+	}
+
 	
 }
 
@@ -438,7 +449,6 @@ void CHero_Garrison::Create_Hit_Effect()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = nullptr;
-
 	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -463,26 +473,9 @@ void CHero_Garrison::Create_Hit_Effect()
 		switch (WeaponOption)
 		{
 		case Client::WEAPON_OPTIONAL_NONE:
-
 			break;
 		case Client::WEAPON_OPTIONAL_BLUE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
-			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
-			iEffectNum = 5;
-			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
-			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-			BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
-			iEffectNum = 1;
-			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
-			iEffectNum = 1;
-			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
 		case Client::WEAPON_OPTIONAL_PULPLE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
@@ -568,9 +561,10 @@ void CHero_Garrison::Create_Defence_Effect_And_Action()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 	m_bOnceCreate = false;
+	m_bCreateDefenceTimer = true;
 	RELEASE_INSTANCE(CGameInstance);
 
-	Fsm_Exit();
+	
 }
 
 void CHero_Garrison::Create_Normal_Attack_Effect()
@@ -977,12 +971,16 @@ void CHero_Garrison::Free()
 		Safe_Release(pPart);
 	m_PlayerParts.clear();
 
-	for (auto& m_pEffect : m_pEffectParts)
-		Safe_Release(m_pEffect);
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
 	m_pEffectParts.clear();
 
 	for (_uint i = 0; i < MAPTYPE_END; ++i)
 		Safe_Release(m_pStatusCom[i]);
+
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pAnimFsm);
@@ -1075,7 +1073,7 @@ void CHero_Garrison::Anim_Intro()
 
 void CHero_Garrison::AnimNormalAttack()
 {
-	m_iStateDamage = 10;
+	m_iStateDamage = 20;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
 	m_iWeaponOption = WEAPON_OPTIONAL_NONE;

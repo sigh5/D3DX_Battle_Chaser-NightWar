@@ -171,6 +171,18 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 		PickingTarget();
 	}
 
+	//if (m_bCanvasRenderCheck == true)
+	//{
+	//	m_fAfter_DefenceButtonCheck += TimeDelta;
+	//}
+
+	//if (m_fAfter_DefenceButtonCheck >= 1.f)
+	//{
+	//	m_pTurnStateButtonCanvas->Set_RenderActive(true);
+	//	m_bCanvasRenderCheck = false;
+	//}
+
+
 	MonsterSetTarget();
 	Active_Fsm();
 	Collison_Event();
@@ -785,13 +797,12 @@ void CCombatController::To_Defence()
 
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
-		//m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		
+		m_bCanvasRenderCheck = true;
+		m_pTurnStateButtonCanvas->Set_RenderActive(false);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
-		//static_cast<CCombatActors*>(m_pCurentActor)->Set_UseDefence(true);
 		m_pCurentActor->Set_FsmState(true, CGameObject::CHAR_STATE_END);
 		m_bMonsterTurnEnd = true;
 	}

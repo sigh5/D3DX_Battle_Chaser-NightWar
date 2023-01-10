@@ -33,8 +33,6 @@ public:
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
 
-
-
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 
@@ -44,20 +42,42 @@ public: /*For.Dungeon*/
 	virtual	  void		HighLightChar()override;
 	virtual	  void		NormalLightCharUI()override;
 	virtual	  void		Dungeon_Tick(_double TimeDelta)override;;
+	void				Anim_Frame_Create_Control();
 
 public:  /*For.Combat*/
-
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	void			  Combat_DeadTick(_double TimeDelta);
 	virtual	  _bool	  Is_Dead()override;
+	_int			  Is_MovingAnim();
+	void			  CombatAnim_Move(_double TImeDelta);
+	void			  MovingAnimControl(_double TimeDelta);
+	virtual	   void	  Fsm_Exit()override;
+	void			  Intro_Exit();
+
+private: /*Create_Effect*/
+	void				Create_Test_Effect();		// Test
+	void				Create_Test_TextureObj();		// Test
+
+
+	void			    Create_Skill1_Bullet();	
+	void			    Create_Skill1_Bullet_End();
 	
-	_int	  Is_MovingAnim();
-	void	  CombatAnim_Move(_double TImeDelta);
-	void	  MovingAnimControl(_double TimeDelta);
+	void			    Create_Skill2_Beam();		
+	void			    Create_Skill2_Beam_End();
+	
+	void				Create_Normal_Attack_Effect();
+	void				Create_Skill1_Attack_Effect();
+	void				Create_Skill2_Attack_Effect();
+	void				Create_Buff_Effect();
+	void			    Create_WideBuffEffect();
+	void			    Create_Wide_BuffEffect_Second();
+	void			    Create_Skill_Ultimate_Effect();
+	void				Create_Move_Target_Effect();
 
 
-	virtual		void	Fsm_Exit()override;
-	void				Intro_Exit();
+
+	virtual void		Create_Hit_Effect()override;
+
 	
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -72,7 +92,11 @@ private:
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
-
+	_int					m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
+	
+	_bool					m_bRun = false;
+	_bool					m_bBulletShoot = false;
+	_bool					m_bCreateSmoke = true;
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
@@ -120,6 +144,7 @@ public:
 
 private:
 	vector<CGameObject*>	m_PlayerParts;
+	vector<CGameObject*>	m_pEffectParts;
 	WeaponType		m_eWeaponType= WEAPON_END;
 
 
@@ -128,6 +153,14 @@ private:
 	_float		m_LimitDistance = 12.f;
 	_float		m_ReturnDistance = 0.4f;
 	_float		m_setTickForSecond = 0.9f;
+	wstring			m_TextureTag = TEXT("");
+	_float3			m_vSkill_Scale;
+	_float4			m_vSkill_Pos;
+
+private:
+	/*Imgui*/
+	_float3			m_vTestPos;
+	_float3			m_vTestScale;
 
 };
 

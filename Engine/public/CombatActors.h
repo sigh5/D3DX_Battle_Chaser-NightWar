@@ -85,7 +85,10 @@ protected:
 
 	_int							m_iHitWeaponOption = 0;
 	_bool							m_bIs_Multi_Hit = false; //맞은놈이 멀티히트를 맞았냐?
+	_bool							m_bIsHeavyHit = false;
 
+	_bool							m_bOnceCreate = false;
+			
 protected:
 	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool			m_isWideBuff = false;

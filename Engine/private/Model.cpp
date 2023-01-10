@@ -579,7 +579,6 @@ void CModel::Imgui_Gizmo_Bone()
 		if (pBone != nullptr)
 			pBone->Compute_CombindTransformationMatrix();
 	}
-
 }
 
 void CModel::Set_AnimIndex(_uint iAnimIndex)

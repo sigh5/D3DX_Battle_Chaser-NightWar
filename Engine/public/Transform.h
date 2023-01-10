@@ -104,7 +104,7 @@ public:
 
 	_bool	CombatChaseTarget(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f,_float fSpeedMultiple=2.f);
 
-	void	Chase_Rising(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f);
+	void	Chase_Rising(_fvector vTargetPos, _double TimeDelta, _float fLimit = 0.1f,_bool bLeftMove=false);
 
 
 

@@ -414,8 +414,17 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 		}
 	}
 
-
-
+	if (m_bCreateDefenceTimer == true)
+	{
+		m_fDefenceFsmTimer += _float(TimeDelta);
+	}
+	if (m_fDefenceFsmTimer >= 1.f)
+	{
+		m_bCreateDefenceTimer = false;
+		m_fDefenceFsmTimer = 0.f;
+		Fsm_Exit();
+	}
+	
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -632,12 +641,11 @@ void CHero_Knolan::Create_Defence_Effect_And_Action()
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
-
 	m_bOnceCreate = false;
+	m_bCreateDefenceTimer = true;
 	RELEASE_INSTANCE(CGameInstance);
-	Fsm_Exit();
-
-
+	
+	
 }
 
 void CHero_Knolan::Create_Defence_Area()
@@ -666,15 +674,13 @@ void CHero_Knolan::Create_Defence_Area()
 
 void CHero_Knolan::Create_WideBuffEffect()
 {
-
+	CCombatController* pCombatCtr = GET_INSTANCE(CCombatController);
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 
-	CCombatController* pCombatCtr = GET_INSTANCE(CCombatController);
-	
 	map<const wstring, CGameObject*> CurMap = *(pCombatCtr->Get_CurActorMap());
 
 	for (auto& pActor : CurMap)
@@ -1209,10 +1215,13 @@ void CHero_Knolan::Free()
 		Safe_Release(pObj);
 	m_PlayerParts.clear();
 
-
-	for (auto& pParts : m_pEffectParts)
-		Safe_Release(pParts);
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
 	m_pEffectParts.clear();
+
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);

@@ -2,6 +2,8 @@
 #include "..\public\Camera_Combat.h"
 #include "GameInstance.h"
 
+#include "CombatController.h"
+
 CCamera_Combat::CCamera_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CCamera(pDevice, pContext)
 {
@@ -70,11 +72,36 @@ void CCamera_Combat::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+
+	static float fov = 60.f;
+	static int iCurActorNum = -1;
+	static bool m_LerpTrue = false;;
+	ImGui::InputFloat("Fov", &fov);
+
+	if (ImGui::Button("CurActor && FOV"))
+	{
+		m_fFov = fov;
+		m_LerpTrue = true;
+
+
+
+		Camera_ZoomIn_CurActor();	
+	}
+	//
+	//if (m_LerpTrue)
+	//{
+	//	static float LerpTime = m_fFov - ;
+	//}
+
+
+	
 }
 
 void CCamera_Combat::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	
 }
 
 HRESULT CCamera_Combat::Last_Initialize()
@@ -99,6 +126,15 @@ HRESULT CCamera_Combat::Render()
 
 void CCamera_Combat::Camera_Shaking()
 {
+}
+
+void CCamera_Combat::Camera_ZoomIn_CurActor()
+{
+	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+	//_float4 vCurActorPos;
+	//XMStoreFloat4(&vCurActorPos, pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+	////m_pTransformCom->LookAt(XMLoadFloat4(&vCurActorPos));
+	//RELEASE_INSTANCE(CCombatController);
 }
 
 HRESULT CCamera_Combat::SetUp_Components()

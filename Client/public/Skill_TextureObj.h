@@ -57,6 +57,8 @@ public:
 	void					Set_Skill_Texture_Client(Skill_Texture_Client& Desc);
 	void					Set_SKill_Texture_Client_Make_Hiter(Skill_Texture_Client& Desc);
 	
+	void					Set_ChaserBone();
+
 	_bool					Hit_CountIncrease();
 	_bool					Is_HitReady();
 public:
