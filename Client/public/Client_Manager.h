@@ -53,24 +53,24 @@ public: /* For_UI */
 public:
 	static _double	 TimeDelta;
 	static  void    Model_Load(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName,_uint iLevel);
-
-
 	static  void    Model_Load_2(ID3D11Device* m_pDevice, ID3D11DeviceContext*	m_pDeviceContext, _tchar* pDataFileName, _uint iLevel);
-
-	
-
+	static _float	GetRandomFloat(_float lowBound, _float highBound);
 
 public: /* For_Player */
 	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
 
 
-	
-
-
 public:/*For.Imgui_AnimTool*/
+#ifdef _DEBUG
 	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
 	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider);
 	static void		Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom);
+
+#endif // !_DEBUG
+
+	
+
+
 
 
 public:/*For.GameChange*/

@@ -69,6 +69,9 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
+
+		CCombatController::GetInstance()->Camera_Shaking();
+
 		return true;
 	}
 	return false;
@@ -291,6 +294,7 @@ void CHero_Knolan::Fsm_Exit()
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 }
 
 void CHero_Knolan::Intro_Exit()
@@ -366,9 +370,9 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR1);
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
 
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-2.f, 0.f, 26.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
 
 	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;
@@ -377,7 +381,7 @@ HRESULT CHero_Knolan::Combat_Initialize()
 	m_isWideBuff = true;
 
 	_float4 vPos;
-	XMStoreFloat4(&vPos, XMVectorSet(-2.f, 0.f, 26.f, 1.f));
+	XMStoreFloat4(&vPos, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
 	_float3 vScale = _float3(4.f, 4.f, 4.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
@@ -1030,7 +1034,9 @@ void CHero_Knolan::AnimNormalAttack()
 	m_BoneTag = "Weapon_Staff_Classic";
 	m_TextureTag = TEXT("FireBall_Knolan");
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
-	//_uint iHitRand = rand() % 4 + 13;
+	CCombatController::GetInstance()->Camera_Zoom_In();
+
+
 	m_CurAnimqeue.push({ 7, 1.f }); //7 21(Á¦ÀÚ¸®),,25(µÚ·ÎÁ¡ÇÁ¼¦)
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1050,6 +1056,7 @@ void CHero_Knolan::Anim_Skill1_Attack()
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL1;
 	Create_Skill_Texture();
+	CCombatController::GetInstance()->Camera_Zoom_In();
 
 	m_CurAnimqeue.push({ 24, 1.f }); //24(°ñÇÁ¼¦)
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1070,7 +1077,7 @@ void CHero_Knolan::Anim_Skill2_Attack()
 	m_SkillDir = SKILL_CREATE_HITER_POS;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
-	
+	CCombatController::GetInstance()->Camera_Zoom_In();
 	
 	m_CurAnimqeue.push({ 21, 1.f }); // fireStorm
 	m_CurAnimqeue.push({ 1,  1.f });

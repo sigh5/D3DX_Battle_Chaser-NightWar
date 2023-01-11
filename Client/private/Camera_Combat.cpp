@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "CombatController.h"
+#include "Client_Manager.h"
 
 CCamera_Combat::CCamera_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CCamera(pDevice, pContext)
@@ -37,7 +38,7 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 		CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 		CameraDesc.vUp = _float4(0.f, 1.f, 0.f, 0.f);
 		CameraDesc.fMouse_sensitivity = 0.1f;
-		CameraDesc.TransformDesc.fSpeedPerSec = 20.f;
+		CameraDesc.TransformDesc.fSpeedPerSec = 5.f;
 		CameraDesc.TransformDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	}
 
@@ -61,9 +62,12 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 
 	m_matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 
-	_float4x4	WorldMat;	
-	XMStoreFloat4x4(&WorldMat, m_matWorld);
-	m_pTransformCom->Set_WorldMatrix(WorldMat);
+	
+	XMStoreFloat4x4(&m_WorldMat, m_matWorld);
+	m_pTransformCom->Set_WorldMatrix(m_WorldMat);
+
+
+	m_vOriginPos = _float4(-7.f, 21.7f, -11.88f, 1.f);
 
 	return S_OK;
 }
@@ -73,28 +77,58 @@ void CCamera_Combat::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	static float fov = 60.f;
-	static int iCurActorNum = -1;
+	//static float fov = 60.f;
+	//static int iCurActorNum = -1;
 	static bool m_LerpTrue = false;;
-	ImGui::InputFloat("Fov", &fov);
+	//ImGui::InputFloat("Fov", &fov);
+
+
 
 	if (ImGui::Button("CurActor && FOV"))
 	{
-		m_fFov = fov;
-		m_LerpTrue = true;
-
-
-
-		Camera_ZoomIn_CurActor();	
+		m_fCurShakeTime = 0.f;
+		m_fShakeTime = 0.5f;
+		m_fMagnitude = 0.1f;	
 	}
-	//
-	//if (m_LerpTrue)
-	//{
-	//	static float LerpTime = m_fFov - ;
-	//}
 
+	Camera_Shaking(TimeDelta);
 
 	
+	switch (m_bZoomMoveOption)
+	{
+	case Client::CCamera_Combat::CameraTarget_CurActor:
+		Camera_ZoomIn_CurActor(TimeDelta);
+		break;
+	case Client::CCamera_Combat::CameraTarget_Hiter:
+		Camera_ZoomIn_HitActor(TimeDelta);
+		break;
+	case Client::CCamera_Combat::CameraTarget_recover:
+		Camera_ZoomOut(TimeDelta);
+		break;
+	case Client::CCamera_Combat::CameraTarget_END:
+		break;
+	default:
+		break;
+	}
+
+
+	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+	//
+	//if (pCombatCotroller->Get_CurActor() != nullptr)
+	//{
+	//	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+	//	_vector vTargetPos = pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+
+	//	_float vDir = XMVectorGetX(XMVector3Length(vTargetPos - vPos));
+
+	//	_bool b = false;
+
+	//	
+	//}
+
+	//RELEASE_INSTANCE(CCombatController);
+		
 }
 
 void CCamera_Combat::Late_Tick(_double TimeDelta)
@@ -109,9 +143,6 @@ HRESULT CCamera_Combat::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-
-	//m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), 47.f);
-
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -124,18 +155,121 @@ HRESULT CCamera_Combat::Render()
 	return S_OK;
 }
 
-void CCamera_Combat::Camera_Shaking()
+void CCamera_Combat::Camera_Shaking(_double TimeDelta)
 {
+	if (!m_bCameraShakingActive)
+		return;
+
+	_float4		vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+
+	if (m_fShakeTime > m_fCurShakeTime)
+	{
+		m_fCurShakeTime += _float(TimeDelta);
+		_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+		_float ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+
+		_matrix matLocal = XMMatrixTranslation(ShakefX, ShakefY, 0.f);
+		
+		_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
+
+		matWorld = matLocal*matWorld;
+
+		_float4x4 vShakingMat;
+		XMStoreFloat4x4(&vShakingMat, matWorld);
+		
+		m_pTransformCom->Set_WorldMatrix(vShakingMat);
+
+	}
+	else
+	{
+		m_pTransformCom->Set_WorldMatrix(m_WorldMat);
+		m_bCameraShakingActive = false;
+	}
+
+
 }
 
-void CCamera_Combat::Camera_ZoomIn_CurActor()
+void CCamera_Combat::Camera_ZoomIn_CurActor(_double TimeDelta)
 {
-	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
-	//_float4 vCurActorPos;
-	//XMStoreFloat4(&vCurActorPos, pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
-	////m_pTransformCom->LookAt(XMLoadFloat4(&vCurActorPos));
-	//RELEASE_INSTANCE(CCombatController);
+	CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+	
+	CGameObject* pCurActor = pCombatCotroller->Get_CurActor();
+
+	if (nullptr == pCurActor && m_bZoomMoveOption == CameraTarget_CurActor)
+	{
+		RELEASE_INSTANCE(CCombatController);
+		return;
+	}
+
+	m_fZoomActor_to_Hiter_Timer  += _float(TimeDelta);
+	m_LeprFov += _float(TimeDelta * 5.f);
+
+	if (m_fFov >= m_fZoomInFov)
+	{
+		m_fFov -= m_LeprFov;
+	}
+	_float vDir = XMVectorGetX(XMVector3Length(XMLoadFloat4(&m_vOriginPos) - 
+		m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION)));
+
+	if (vDir >= 4.f)
+	{
+		RELEASE_INSTANCE(CCombatController);
+		return;
+	}
+	_vector vTargetPos = pCurActor->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	m_pTransformCom->Chase(vTargetPos, TimeDelta, 36.f);
+
+	RELEASE_INSTANCE(CCombatController);
 }
+
+
+void CCamera_Combat::Camera_ZoomIn_HitActor(_double TimeDelta)
+{
+
+	m_fZoomHiter_to_Actor_Timer += _float(TimeDelta);
+
+	CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+
+	CGameObject* pCurActor = pCombatCotroller->Get_HitActor();
+
+	if (nullptr == pCurActor && m_bZoomMoveOption == CameraTarget_Hiter)
+	{
+		RELEASE_INSTANCE(CCombatController);
+		return;
+	}
+
+	_float vDir = XMVectorGetX(XMVector3Length(XMLoadFloat4(&m_vOriginPos) -
+		m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION)));
+
+	if (vDir >= 6.f)
+	{
+		RELEASE_INSTANCE(CCombatController);
+		return;
+	}
+
+	_vector vTargetPos = pCurActor->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	m_pTransformCom->Chase(vTargetPos, TimeDelta, 36.f);
+
+	RELEASE_INSTANCE(CCombatController);
+
+}
+
+void CCamera_Combat::Camera_ZoomOut(_double TimeDelta)
+{
+	m_LeprFov += _float(TimeDelta * 10.f);
+	if (m_fFov <= m_fFixFov)
+	{
+		m_fFov += m_LeprFov;
+	}
+
+	m_pTransformCom->Chase(XMLoadFloat4(&m_vOriginPos), TimeDelta, 3.f);
+
+
+}
+
+
 
 HRESULT CCamera_Combat::SetUp_Components()
 {

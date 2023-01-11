@@ -61,6 +61,11 @@ void CCanvas::Delete_Delegate()
 {
 }
 
+void CCanvas::Shaking_Child_UI()
+{
+}
+
+
 HRESULT CCanvas::Add_ChildUI(CUI * pUI)
 {
 	if (nullptr == pUI)

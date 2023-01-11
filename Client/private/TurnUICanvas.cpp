@@ -117,11 +117,11 @@ HRESULT CTurnUICanvas::Last_Initialize()
 
 void CTurnUICanvas::Tick(_double TimeDelta)
 {
-
 	Last_Initialize();
-
 	__super::Tick(TimeDelta);
 
+	Shaking_Child_UI();
+	
 }
 
 void CTurnUICanvas::Late_Tick(_double TimeDelta)
@@ -235,8 +235,6 @@ HRESULT CTurnUICanvas::SetUp_ChildrenPosition()
 		dynamic_cast<CTurnCharcterUI*>(pUI)->Set_Top_BottomYPos(fTopY, fBottomY);
 	}
 
-
-
 	return S_OK;
 }
 
@@ -314,7 +312,6 @@ void CTurnUICanvas::Move_ReCoverChild()
 		}
 		assert(pNewUI != nullptr && "DeleteCharUI");
 
-							//static_cast<CTurnCharcterUI*>(m_ChildrenVec.back())->Get_LimitYPos();
 		pNewUI->MoveControl(CTurnCharcterUI::UI_POS_QUICK);
 		pNewUI->Set_LimitYPos_Float(_float(fBackLimitYPos));
 		m_ChildrenVec.push_back(pNewUI);
@@ -348,6 +345,24 @@ void CTurnUICanvas::Set_RenderActive(_bool bActive)
 
 }
 
+void CTurnUICanvas::Shaking_Child_UI()
+{
+	if (m_bChild_UI_Shaking)
+	{
+		for (auto& pChild : m_ChildrenVec)
+		{
+			if (nullptr != dynamic_cast<CTurnCharcterUI*>(pChild))
+			{
+				static_cast<CTurnCharcterUI*>(pChild)->ReadyShake(1.f, 0.01f);
+				static_cast<CTurnCharcterUI*>(pChild)->ShakingControl(3.f);
+			}
+
+		}
+		m_bChild_UI_Shaking = false;
+	}
+	
+}
+
 void CTurnUICanvas::ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton)
 {
 	if (iOpiton == 0)
@@ -356,14 +371,6 @@ void CTurnUICanvas::ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton)
 		DeleteCharUI(iRepesentNum);
 }
 
-void CTurnUICanvas::ChildrenShakingCheck(_uint iShakingTime)
-{
-	for (auto &pUI : m_ChildrenVec)
-	{
-		dynamic_cast<CTurnCharcterUI*>(pUI)->ShakingControl(iShakingTime);
-	}
-
-}
 
 void CTurnUICanvas::DeleteCharUI(UI_REPRESENT UiRepresentNum)
 {
@@ -387,7 +394,6 @@ void CTurnUICanvas::DeleteCharUI(UI_REPRESENT UiRepresentNum)
 		}
 	}
 
-	//size_t OldCharVecSize = OldCharImage.size();
 	for (auto iter = m_ChildrenVec.begin(); iter != m_ChildrenVec.end();)
 	{
 		_int iLimitCount = 0;

@@ -2,6 +2,7 @@
 #include "..\public\HpMpBuffCanvas.h"
 #include "GameInstance.h"
 #include "HpMpBar.h"
+#include "MyImage.h"
 
 CHpMpBuffCanvas::CHpMpBuffCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
@@ -192,6 +193,11 @@ HRESULT CHpMpBuffCanvas::Last_Initialize()
 	}
 #endif
 
+	
+	WideCharToMultiByte(CP_ACP, 0, m_ObjectName, lstrlen(m_ObjectName), Name2, MAX_PATH, NULL, NULL);
+
+	strcat_s(Name2, MAX_PATH, "22");
+
 
 	RELEASE_INSTANCE(CGameInstance);
 	m_bLast_Initlize = true;
@@ -203,6 +209,8 @@ void CHpMpBuffCanvas::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+
+	Shaking_Child_UI();
 }
 
 void CHpMpBuffCanvas::Late_Tick(_double TimeDelta)
@@ -238,6 +246,19 @@ void CHpMpBuffCanvas::Set_RenderActive(_bool bTrue)
 	}
 }
 
+void CHpMpBuffCanvas::Shaking_Child_UI()
+{
+	if (m_bChild_UI_Shaking)
+	{
+		for (auto& pChild : m_ChildrenVec)
+		{
+			static_cast<CUI*>(pChild)->ReadyShake(1.f, 0.01f);
+			static_cast<CUI*>(pChild)->ShakingControl(3.f); //À§ ¾Æ·¡
+
+		}
+		m_bChild_UI_Shaking = false;
+	}
+}
 
 HRESULT CHpMpBuffCanvas::SetUp_Components()
 {

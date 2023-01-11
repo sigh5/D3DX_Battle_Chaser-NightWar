@@ -28,8 +28,12 @@ private:
 	typedef list<class CGameObject*>	RENDEROBJECTS;
 
 private:
+	class CTarget_Manager*				m_pTarget_Manager = nullptr;
+
+private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonAlphaBlend();
+	HRESULT Render_LightAcc();
 	HRESULT Render_NonLight();
 	HRESULT Render_AlphaBlend();
 	HRESULT Render_UI();

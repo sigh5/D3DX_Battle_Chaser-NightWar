@@ -64,7 +64,7 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-
+		CCombatController::GetInstance()->UI_Shaking(true);
 		bResult = true;
 	}
 	
@@ -94,8 +94,8 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(27.f, 0.f, -3.5f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
 
 	m_pModelCom->Set_AnimIndex(0);
 
@@ -242,6 +242,7 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 				m_pHitTarget->Set_FsmState(true, CGameObject::m_Defence);
 			}
 		}
+		CCombatController::GetInstance()->Camera_Zoom_In();
 	
 	}
 	else
@@ -416,6 +417,7 @@ void CSkeleton_Naked::Fsm_Exit()
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 }
 
 _bool CSkeleton_Naked::IsCollMouse()

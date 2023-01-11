@@ -201,6 +201,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Engine_Typedef.h" />
     <ClInclude Include="..\Public\Environment_Object.h" />
     <ClInclude Include="..\public\Font_Manager.h" />
+    <ClInclude Include="..\Public\Frustum.h" />
     <ClInclude Include="..\public\FSMComponent.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameObject.h" />
@@ -242,9 +243,12 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Object_Manager.h" />
     <ClInclude Include="..\Public\PipeLine.h" />
     <ClInclude Include="..\public\Player.h" />
+    <ClInclude Include="..\Public\QuadTree.h" />
     <ClInclude Include="..\public\Renderer.h" />
+    <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\Public\Status.h" />
+    <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
@@ -278,6 +282,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\Private\DebugDraw.cpp" />
     <ClCompile Include="..\Private\Environment_Object.cpp" />
     <ClCompile Include="..\private\Font_Manager.cpp" />
+    <ClCompile Include="..\Private\Frustum.cpp" />
     <ClCompile Include="..\private\FSMComponent.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
@@ -302,9 +307,12 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Object_Manager.cpp" />
     <ClCompile Include="..\Private\PipeLine.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
+    <ClCompile Include="..\Private\QuadTree.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
+    <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\Private\Status.cpp" />
+    <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />

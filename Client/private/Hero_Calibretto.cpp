@@ -59,7 +59,7 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-
+		CCombatController::GetInstance()->Camera_Shaking();
 		return true;
 	}
 	return false;
@@ -408,8 +408,8 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.f, 0.f, 32.f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(3.13f, 0.f, 29.5f, 1.f));
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 
@@ -418,8 +418,8 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return E_FAIL;
 	
 	_float4 vPos;
-	XMStoreFloat4(&vPos, XMVectorSet(4.f, 0.f, 32.f, 1.f));
-	_float3 vScale = _float3(4.f, 4.f, 4.f);
+	XMStoreFloat4(&vPos, XMVectorSet(3.13f, 0.f, 29.5f, 1.f));
+	_float3 vScale = _float3(3.f, 3.f, 3.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
 
@@ -561,7 +561,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Calibretto_Hand_R");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(1.7f, 0.f, -1.1f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f, 0.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 3.f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_HAND;
 	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
 
@@ -615,7 +615,7 @@ void CHero_Calibretto::AnimNormalAttack()
 	m_bRun = false;
 
 	m_SpeedRatio = 8.f;
-	m_LimitDistance = 12.f;
+	m_LimitDistance = 8.f;
 	m_ReturnDistance = 0.4f;
 	m_setTickForSecond = 0.9f;
 
@@ -832,9 +832,14 @@ _bool CHero_Calibretto::Is_Dead()
 _int CHero_Calibretto::Is_MovingAnim()
 {
 	if (m_pModelCom->Get_AnimIndex() == 3)
+	{
 		bResult = ANIM_DIR_STRAIGHT;
+	}
 	else if (m_pModelCom->Get_AnimIndex() == 9)
+	{
 		bResult = ANIM_DIR_BACK;
+		CCombatController::GetInstance()->Camera_Zoom_Out();
+	}
 	else
 		bResult = ANIM_EMD;
 
@@ -856,7 +861,7 @@ void CHero_Calibretto::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
-
+		CCombatController::GetInstance()->Camera_Zoom_In();
 	}
 	else
 		return;
@@ -892,6 +897,7 @@ void CHero_Calibretto::Fsm_Exit()
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 
 }
 

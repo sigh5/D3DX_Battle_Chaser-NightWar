@@ -52,6 +52,9 @@ HRESULT CMyImage::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+
+
+
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -61,8 +64,7 @@ void CMyImage::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	//ImGui::InputFloat("FontPosX",&m_fFontPosX);
-	//ImGui::InputFloat("FontPosY", &m_fFontPosY);
+	Shake_Move(TimeDelta);
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)
@@ -116,6 +118,7 @@ void CMyImage::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 void CMyImage::Set_RenderActive(_bool bRenderActive)
 {
 	__super::Set_RenderActive(bRenderActive);
+
 }
 
 void CMyImage::MoveTexture(_double TimeDelta)
@@ -153,6 +156,49 @@ void CMyImage::MoveTexture(_double TimeDelta)
 		m_pTextureCom->Set_SelectTextureIndex(++iTextureNum);
 		m_fTextureMoveTimer = 0.f;
 	}
+
+
+}
+
+void CMyImage::ShakingControl(_float fCoolTime)
+{
+	if (m_iShakingOption == 1)
+		return;
+	
+	m_bMove = true;
+	XMStoreFloat4(&m_vOriginPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+}
+
+void CMyImage::Shake_Move(_double TimeDelta)
+{
+	if (m_bMove)
+	{
+		if (m_fShakeTime > m_fCurShakeTime)
+		{
+			m_fCurShakeTime += (_float)TimeDelta;
+			_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+			_float ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+
+			_matrix matLocal = XMMatrixTranslation(ShakefX, ShakefY, 0.f);
+
+			_matrix matWorld = m_pTransformCom->Get_LocalMatrix();
+
+			matWorld = matLocal*matWorld;
+
+			matWorld = matLocal*matWorld;
+
+			_float4x4	ShakingMat;
+			XMStoreFloat4x4(&ShakingMat, matWorld);
+			m_pTransformCom->Set_WorldMatrix(ShakingMat);
+		}
+		else
+		{
+			m_bMove = false;
+			
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION,XMLoadFloat4(&m_vOriginPos));
+		}
+	}
+	
 
 
 }

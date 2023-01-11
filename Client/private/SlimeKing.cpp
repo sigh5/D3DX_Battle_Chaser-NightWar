@@ -78,7 +78,7 @@ HRESULT CSlimeKing::Initialize(void * pArg)
 		return E_FAIL;
 	
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(29.f, 0.f, -13.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 

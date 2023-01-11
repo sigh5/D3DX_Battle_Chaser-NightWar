@@ -35,6 +35,11 @@ public:
 
 	void			MoveTexture(_double TimeDelta);				// 텍스쳐 0~ m_iMaxTextureNum 돌리기
 
+	virtual void			ShakingControl(_float fCoolTime)override;
+
+private:
+	virtual void			Shake_Move(_double TimeDelta)override;
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -51,6 +56,16 @@ private:
 
 	_float					m_fFontPosX = 545.f;
 	_float					m_fFontPosY = 400.f;
+
+	// shake
+	_float					m_fCoolTime = 0.f;
+	_bool					m_bMove = false;
+	_float4					m_vOriginPos;
+
+	_float4x4				m_WorldMat;
+	// shake
+
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

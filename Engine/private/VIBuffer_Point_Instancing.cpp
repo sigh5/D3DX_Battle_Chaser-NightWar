@@ -57,7 +57,7 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
 	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iInstancingNum];
 	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
 
-	for (_uint i = 0; i < iInstancingNum; ++i)
+	for (_int i = 0; i < iInstancingNum; ++i)
 	{
 		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
 		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);

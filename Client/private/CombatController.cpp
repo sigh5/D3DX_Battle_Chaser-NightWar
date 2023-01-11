@@ -18,6 +18,7 @@
 #include "TurnUICanvas.h"
 #include "HpMpBuffCanvas.h"
 #include "TrunWinCanvas.h"
+#include "Camera_Combat.h"
 
 #include <string>
 
@@ -48,7 +49,7 @@ void CCombatController::Scene_Chane_Safe_Release()
 	}
 	m_CanvasVec.clear();
 
-
+	m_pCombatCamera = nullptr;
 	m_pTurnCanvas = nullptr;
 	m_pCurentActor = nullptr;
 	m_pHitActor = nullptr;
@@ -119,6 +120,12 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 
 
 	}
+
+
+	m_pCombatCamera = static_cast<CCamera_Combat*>(
+		m_pGameInstace->Get_GameObject(LEVEL_COMBAT,
+			TEXT("Layer_Camera"), TEXT("CombatLevel_Camera")));
+
 	return S_OK;
 }
 
@@ -171,17 +178,6 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 		PickingTarget();
 	}
 
-	//if (m_bCanvasRenderCheck == true)
-	//{
-	//	m_fAfter_DefenceButtonCheck += TimeDelta;
-	//}
-
-	//if (m_fAfter_DefenceButtonCheck >= 1.f)
-	//{
-	//	m_pTurnStateButtonCanvas->Set_RenderActive(true);
-	//	m_bCanvasRenderCheck = false;
-	//}
-
 
 	MonsterSetTarget();
 	Active_Fsm();
@@ -194,9 +190,12 @@ void CCombatController::Status_CanvasInit()
 	for (auto& pCanvas : m_CanvasVec)
 	{
 		if (dynamic_cast<CHpMpBuffCanvas*>(pCanvas) == nullptr)
+			pCanvas->Set_RenderActive(true);
+		else if(dynamic_cast<CTurnUICanvas*>(pCanvas) == nullptr)
+			pCanvas->Set_RenderActive(true);
+		else
 			continue;
 
-		pCanvas->Set_RenderActive(true);
 	}
 
 }
@@ -444,7 +443,28 @@ void CCombatController::Render_StopCanvas()
 	}
 }
 
+void CCombatController::Camera_Shaking()
+{
+	m_pCombatCamera->Ready_CameraShaking(0.5f, 0.1f);
+	m_pCombatCamera->Set_CameraShaking_Active(true);
+}
 
+void CCombatController::Camera_Zoom_Out()
+{
+	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_recover);
+}
+
+void CCombatController::Camera_Zoom_In()
+{
+	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
+}
+
+void CCombatController::UI_Shaking(_bool bShaking)
+{
+	for (auto& pCurCanvas : m_CanvasVec)
+		pCurCanvas->Set_Child_UI_Shaking(bShaking);
+
+}
 
 void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 {
@@ -556,7 +576,7 @@ HRESULT CCombatController::Set_CurrentActor()
 		break;
 	}
 
-
+	
 
 
 	return S_OK;
@@ -612,11 +632,13 @@ void CCombatController::To_Normal_Attack()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Normal_Attack);
 		m_bMonsterTurnEnd = true;
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else
 		return;
@@ -635,11 +657,13 @@ void CCombatController::To_Skill1_Attack()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Skill1_Attack);
+	//	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		m_bMonsterTurnEnd = true;
 	}
 	else
@@ -660,12 +684,14 @@ void CCombatController::To_Skill2_Attack()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Skill2_Attack);
 		m_bMonsterTurnEnd = true;
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else
 		return;
@@ -685,6 +711,7 @@ void CCombatController::To_Uitimate()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
@@ -710,11 +737,13 @@ void CCombatController::To_Buff()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Buff);
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		m_bMonsterTurnEnd = true;
 	}
 	else
@@ -737,11 +766,13 @@ void CCombatController::To_WideAreaBuff()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_WideAreaBuff);
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		m_bMonsterTurnEnd = true;
 	}
 	else
@@ -763,6 +794,7 @@ void CCombatController::To_Use_Item()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else if (m_iMonster_Player_Option == 0 &&
 			m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
@@ -800,11 +832,13 @@ void CCombatController::To_Defence()
 		m_bCanvasRenderCheck = true;
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
 		Mana_Refresh();
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::CHAR_STATE_END);
 		m_bMonsterTurnEnd = true;
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else
 		return;
@@ -835,7 +869,7 @@ void CCombatController::To_Light_Hit()
 				static_cast<CHpMpBuffCanvas*>(Canvas)->Set_MpEvent(true);
 			}
 		}
-
+		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_Hiter);
 		m_bIsHiterhit = false;
 		m_bisHitTimer_Alive = false;
 		m_fHitTimer = 0.0f;

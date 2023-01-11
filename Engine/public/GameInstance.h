@@ -122,6 +122,11 @@ public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);
 	HRESULT Render_Font(const _tchar* pFontTag, const _tchar* pText, const _float2& vPos, _float fRadian, _float2 vScale, _fvector vColor = XMVectorSet(1.f, 0.f, 0.f, 1.f));
 
+public: /* For.Frustum */
+	_bool isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange = 0.f);
+	_bool isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange = 0.f);
+
+
 private:
 	static				_uint		m_iStaticLevelIndex;
 	_bool							m_bIsCreatePrototypes[20] = { false, };	//≥À≥À«œ∞‘ 20¿∏∑Œ ¿‚¿⁄∞Ì æ¿∏∂¥Ÿ
@@ -138,8 +143,8 @@ private:
 	class CTimer_Manager*			m_pTimer_Manager		= nullptr;
 	class CLight_Manager*			m_pLight_Manager		= nullptr;
 	class CFont_Manager*			m_pFont_Manager			= nullptr;
-
-
+	class CFrustum*					m_pFrustum				= nullptr;
+	class CTarget_Manager*			m_pTarget_Manager		= nullptr;
 public:
 	static void Release_Engine();
 

@@ -147,6 +147,7 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
+
 	
 
 	RELEASE_INSTANCE(CGameInstance);

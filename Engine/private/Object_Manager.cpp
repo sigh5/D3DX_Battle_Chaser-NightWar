@@ -457,8 +457,9 @@ void CObject_Manager::Imgui_Save()
 
 						lstrcpy(TextureName, dynamic_cast<CUI*>(pObject)->Get_TextureTag());
 						lstrcpy(ModelName, TEXT("Nullptr"));
-						iShaderPass = 0;
 						
+						iShaderPass = static_cast<CUI*>(pObject)->Get_Shaking_Option();
+
 						CTexture* pTexture =dynamic_cast<CTexture*>(pObject->Get_Component(TEXT("Com_Texture")));
 						iTextureIndex = pTexture->Get_SelectTextureIndex();
 					}
@@ -722,6 +723,8 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 			(pGameObject)->Set_ProtoName(ProtoName);
 			(pGameObject)->Set_ObjectName(ObjectName);
 			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
+			static_cast<CUI*>(pGameObject)->Set_Shaking_Option(iShaderPass);
+
 
 			CTexture* pTexture = dynamic_cast<CTexture*>(pGameObject->Get_Component(TEXT("Com_Texture")));
 			pTexture->Set_SelectTextureIndex(iTextureIndex);

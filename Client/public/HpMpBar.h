@@ -36,6 +36,11 @@ public:
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
 
 
+	virtual void			ShakingControl(_float fCoolTime)override;
+
+private:
+	virtual void			Shake_Move(_double TimeDelta)override;
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -51,6 +56,21 @@ private:
 	
 	_float					m_fRatio = 1.f;
 	_float					m_fRatioX = 0.f;
+
+/*For_Shaking*/
+	_float					m_fCoolTime = 0.f;
+	_bool					m_bMove = false;
+	_float4					m_vOriginPos;
+	_int					m_iSwitching = 1;
+	_float					m_fShakingTimer = 0.f;
+	_float4x4				m_WorldMat;
+/* ~For_Shaking*/
+
+
+
+	
+
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

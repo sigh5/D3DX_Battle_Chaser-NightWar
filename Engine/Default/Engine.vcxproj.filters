@@ -172,9 +172,6 @@
     <Filter Include="01.Utility\02.GameObject\HitBoxObject">
       <UniqueIdentifier>{eab33790-9f71-4b48-ba01-afc5df255bd3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.Components\02.VIBuffer\RCEffect">
-      <UniqueIdentifier>{570cc1e5-0582-4ae9-b386-a286a24b00e5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.Components\07.Colider\03.Shader">
       <UniqueIdentifier>{11f01796-9cbe-4ede-89af-4018c042c5a2}</UniqueIdentifier>
     </Filter>
@@ -198,6 +195,18 @@
     </Filter>
     <Filter Include="01.Utility\03.Components\02.VIBuffer\Point">
       <UniqueIdentifier>{0044362d-a808-40cb-b847-97cfde36077a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08.FrustSum">
+      <UniqueIdentifier>{7663fd50-841c-47fe-919d-bdbe45053746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Components\02.VIBuffer\Terrain\QuadTree">
+      <UniqueIdentifier>{e4dea63a-5ce3-40e3-ac5f-813770bfc51a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\09.RenderTargets">
+      <UniqueIdentifier>{06dbdbee-010b-48a8-aaf2-1e5d7584f92b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\09.RenderTargets\Manager">
+      <UniqueIdentifier>{5b3b52af-5bbd-47ed-a747-bad9c4cad07b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -444,6 +453,18 @@
     <ClInclude Include="..\public\VIBuffer_Point.h">
       <Filter>01.Utility\03.Components\02.VIBuffer\Point</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Frustum.h">
+      <Filter>01.Utility\08.FrustSum</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QuadTree.h">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Terrain\QuadTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Target_Manager.h">
+      <Filter>01.Utility\09.RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>01.Utility\09.RenderTargets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -661,6 +682,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Point.cpp">
       <Filter>01.Utility\03.Components\02.VIBuffer\Point</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Frustum.cpp">
+      <Filter>01.Utility\08.FrustSum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QuadTree.cpp">
+      <Filter>01.Utility\03.Components\02.VIBuffer\Terrain\QuadTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Target_Manager.cpp">
+      <Filter>01.Utility\09.RenderTargets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>01.Utility\09.RenderTargets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,8 @@ public:
 	 CGameObject*		Get_CurActor()const { return m_pCurentActor; }
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
 	
+	 CGameObject*		Get_HitActor()const { return m_pHitActor; }
+
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
 
@@ -57,8 +59,12 @@ public:
 	void	Active_Fsm();
 	void	ResetState();
 	void	Render_StopCanvas();
-	
-	
+	void	Camera_Shaking();
+	void	Camera_Zoom_Out();
+	void	Camera_Zoom_In();
+	void	UI_Shaking(_bool bShaking);
+
+
 private:
 	void	PickingTarget();		//플레이어의 턴일때
 	void	MonsterSetTarget();
@@ -97,6 +103,8 @@ private:
 
 	CGameObject*			m_pCurentActor	= nullptr;		// 현재 순서인놈
 	CGameObject*			m_pHitActor			=		nullptr;		// 맞은놈
+	class CCamera_Combat*			m_pCombatCamera = nullptr;
+
 
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;

@@ -86,6 +86,14 @@ void CUI::Set_parentName(_uint iCulLevel, const _tchar * pParentTag)
 }
 
 
+void CUI::ShakingControl(_float fCoolTime)
+{
+}
+
+void CUI::Shake_Move(_double TimeDelta)
+{
+}
+
 HRESULT CUI::SetUp_UI()
 {
 	

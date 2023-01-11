@@ -33,7 +33,9 @@ public:
 	virtual HRESULT Render()override;
 
 	virtual void	Set_RenderActive(_bool bTrue)override;
-	
+	virtual void	Shaking_Child_UI()override;
+
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -50,6 +52,9 @@ private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
 	map<const wstring, CStatus*>	 m_StatusMap;
+
+	/*Imgui*/
+	char Name2[MAX_PATH] = "";
 
 public:
 	static CHpMpBuffCanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

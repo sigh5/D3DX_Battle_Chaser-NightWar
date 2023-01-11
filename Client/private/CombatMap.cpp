@@ -35,14 +35,14 @@ HRESULT CCombatMap::Initialize(void * pArg)
 		return E_FAIL;
 
 
-	m_fSizeX = (_float)g_iWinSizeX / 1.5f;
+	/*m_fSizeX = (_float)g_iWinSizeX / 1.5f;
 	m_fSizeY = (_float)g_iWinSizeY / 4.f;
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
 	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - g_iWinSizeX * 0.5f, -m_fY + g_iWinSizeY * 0.5f, 0.f, 1.f));
-
+*/
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
 
@@ -79,6 +79,8 @@ void CCombatMap::Tick(_double TimeDelta)
 void CCombatMap::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+	
+
 	
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);
@@ -137,10 +139,16 @@ HRESULT CCombatMap::SetUp_ShaderResources()
 
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+	/*if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
+		return E_FAIL;*/
+	
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_VIEW))))
 		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+
 
 
 	RELEASE_INSTANCE(CGameInstance);

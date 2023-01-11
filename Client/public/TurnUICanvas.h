@@ -36,14 +36,16 @@ public:
 	virtual void	Delete_Delegate()override;
 public:
 	void	ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton); // iOption == 0,1,2,3,4,5 RepesetOption
-	void	ChildrenShakingCheck(_uint CoolTime);
+	
 	void	DeleteCharUI(UI_REPRESENT UiRepresentNum);		// Obsever
 	void	Move_Children(); /*logic*/
 
 	void	Move_ReCoverChild();
 
-	virtual void	Set_RenderActive(_bool bActive);
+	virtual void	Set_RenderActive(_bool bActive)override;
+	
 
+	virtual void			Shaking_Child_UI()override;
 
 private:
 	CShader*				m_pShaderCom = nullptr;

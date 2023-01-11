@@ -136,6 +136,16 @@ void CClient_Manager::Model_Load_2(ID3D11Device * m_pDevice, ID3D11DeviceContext
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+_float CClient_Manager::GetRandomFloat(_float lowBound, _float highBound)
+{
+	if (lowBound >= highBound)
+		return lowBound;
+
+	float f = (rand() % 10000) * 0.0001f;
+
+	return (f * (highBound - lowBound)) + lowBound;
+}
+
 void CClient_Manager::CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform)
 {
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
@@ -205,20 +215,6 @@ void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, An
 	}
 
 	ImGui::End();
-
-
-
-	//queue<pair<_uint, _double>> AnimQueue;
-	//CClient_Manager::Make_Anim_Queue(AnimQueue, ANIM_CHAR6);
-
-	//if (ImGui::Button("QueueMaker"))
-	//{
-	//	m_CurAnimqeue = AnimQueue;
-	//}
-
-	//Combat_Tick(TimeDelta);
-
-
 }
 
 

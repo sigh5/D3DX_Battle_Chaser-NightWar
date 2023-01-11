@@ -54,6 +54,9 @@ HRESULT CTurnCharcterUI::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
+
+	
+
 	return S_OK;
 }
 
@@ -65,6 +68,14 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 	if (FAILED(Set_Represent_Char()))
 		return S_OK;
 
+
+	if (LEVEL_GAMEPLAY == CGameInstance::GetInstance()->GetCurLevelIdx())
+	{
+		m_bRenderActive = true;
+	}
+	else
+		m_bRenderActive = false;
+
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -74,17 +85,11 @@ void CTurnCharcterUI::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	/*if (true == CClient_Manager::m_bCombatWin)
-		return;*/
-
 	if (m_bMove)
 	{
 		m_Movefun();
 	}
 	Bottom_Move();
-
-	
-	
 }
 
 void CTurnCharcterUI::Late_Tick(_double TimeDelta)
@@ -190,24 +195,29 @@ void CTurnCharcterUI::Quick_Move()
 
 void CTurnCharcterUI::Shake_Move()
 {
-	_float4		vPos;
-
-	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
-	m_Timer += _float(CClient_Manager::TimeDelta * 1.f);
-
-	if (m_Timer >= m_fCoolTime)
+	if (m_fShakeTime > m_fCurShakeTime)
 	{
-		m_Timer = 0.f;
+		m_fCurShakeTime += (_float)CClient_Manager::TimeDelta;
+		_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+		_float ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+
+		_matrix matLocal = XMMatrixTranslation(ShakefX, ShakefY, 0.f);
+
+		_matrix matWorld = m_pTransformCom->Get_LocalMatrix();
+
+		matWorld = matLocal*matWorld;
+
+		matWorld = matLocal*matWorld;
+
+		_float4x4	ShakingMat;
+		XMStoreFloat4x4(&ShakingMat, matWorld);
+		m_pTransformCom->Set_WorldMatrix(ShakingMat);
+	}
+	else
+	{
 		m_bMove = false;
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
 	}
-	
-	vPos.y += _float((m_iSwitching)*  400.f * CClient_Manager::TimeDelta);
-	
-	m_iSwitching *= -1;
-
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 }
 
 void CTurnCharcterUI::Bottom_Move()
@@ -253,9 +263,9 @@ void CTurnCharcterUI::MoveControl(_uint iOption)
 
 }
 
-void CTurnCharcterUI::ShakingControl(_uint iOption)
+void CTurnCharcterUI::ShakingControl(_float fCoolTime)
 {
-	m_fCoolTime = (_float)iOption;
+	m_fCoolTime = fCoolTime;
 	m_bMove = true;
 	XMStoreFloat4(&m_vOriginPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	m_Movefun = std::bind(&CTurnCharcterUI::Shake_Move, this);

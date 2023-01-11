@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "..\public\HpMpBar.h"
 #include "GameInstance.h"
-
+#include "Client_Manager.h"
 
 
 CHpMpBar::CHpMpBar(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -83,6 +83,9 @@ HRESULT CHpMpBar::Last_Initialize()
 	m_fSizeX = vScale.x;
 	m_fSizeY = vScale.y;
 
+
+	
+
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -120,6 +123,7 @@ void CHpMpBar::Tick(_double TimeDelta)
 		m_bHit = false;
 	}
 	
+	Shake_Move(TimeDelta);
 
 }
 
@@ -161,6 +165,48 @@ void CHpMpBar::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		assert("CTurnCharcterUI Change_Texture");
+}
+
+void CHpMpBar::ShakingControl(_float fCoolTime)
+{
+	m_bMove = true;
+	XMStoreFloat4(&m_vOriginPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+}
+
+void CHpMpBar::Shake_Move(_double TimeDelta)
+{
+	if (m_bMove)
+	{
+		/*	_float4		vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));*/
+
+		if (m_fShakeTime > m_fCurShakeTime)
+		{
+			m_fCurShakeTime += (_float)TimeDelta;
+			_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+			_float ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+
+			_matrix matLocal = XMMatrixTranslation(ShakefX, ShakefY, 0.f);
+
+			_matrix matWorld = m_pTransformCom->Get_LocalMatrix();
+
+			matWorld = matLocal*matWorld;
+			
+			_float4x4	ShakingMat;
+			XMStoreFloat4x4(&ShakingMat, matWorld);
+			m_pTransformCom->Set_WorldMatrix(ShakingMat);
+		}
+		else
+		{
+			m_bMove = false;
+			m_fShakingTimer = 0.f;
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
+		}
+
+	}
+	
+		
+
 }
 
 

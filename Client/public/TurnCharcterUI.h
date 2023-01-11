@@ -50,7 +50,7 @@ public: /*Observer Pattern*/
 	void	Shake_Move();
 
 	void	MoveControl(_uint iOption);
-	void	ShakingControl(_uint iOption);
+	virtual  void	ShakingControl(_float fCoolTime)override;
 
 	_bool	isUITop(OUT CUI*& pUI);
 	_bool	isUIBottom(OUT CUI*& pUI);

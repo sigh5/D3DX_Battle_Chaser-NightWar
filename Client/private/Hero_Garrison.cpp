@@ -67,6 +67,7 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
+		CCombatController::GetInstance()->Camera_Shaking();
 		return true;
 	}
 	return false;
@@ -406,6 +407,7 @@ void CHero_Garrison::Fsm_Exit()
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 }
 
 void CHero_Garrison::Defence_Exit()
@@ -606,7 +608,7 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Garrsion_Fire_bot_Height_Effect_0", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
-	BuffDesc.vPosition = _float4(1.5f, 1.f, -1.5f, 1.f);
+	BuffDesc.vPosition = _float4(2.0f, 1.f, -1.5f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 14.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -877,8 +879,8 @@ HRESULT CHero_Garrison::Combat_Init()
 
 	m_pAnimFsm = CAnimFsm::Create(this, ANIM_CHAR2);
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(9.f, 0.f, 16.f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(8.8f, 0.f, 16.f, 1.f));
 	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 
@@ -886,8 +888,8 @@ HRESULT CHero_Garrison::Combat_Init()
 		return E_FAIL;
 
 	_float4 vPos;
-	XMStoreFloat4(&vPos, XMVectorSet(9.f, 0.f, 16.f, 1.f));
-	_float3 vScale = _float3(4.f, 4.f, 4.f);
+	XMStoreFloat4(&vPos, XMVectorSet(8.8f, 0.f, 16.f, 1.f));
+	_float3 vScale = _float3(3.f, 3.f, 3.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
 
@@ -996,6 +998,7 @@ _int CHero_Garrison::Is_MovingAnim()
 	if (m_pModelCom->Get_AnimIndex() == 4)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
+		
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 18)
 	{
@@ -1004,6 +1007,7 @@ _int CHero_Garrison::Is_MovingAnim()
 	else if (m_pModelCom->Get_AnimIndex() == 11)
 	{
 		bResult = ANIM_DIR_BACK;
+	
 	}
 	else
 		bResult = ANIM_EMD;
@@ -1029,8 +1033,10 @@ void CHero_Garrison::Is_Skill1MovingAnim()
 void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 {
 	if (bResult == ANIM_DIR_BACK)
-		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);	
-	
+	{
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TImeDelta, m_ReturnDistance, m_SpeedRatio);
+		CCombatController::GetInstance()->Camera_Zoom_Out();
+	}
 	if (m_pHitTarget == nullptr || bResult == ANIM_EMD)
 		return;
 
@@ -1039,6 +1045,7 @@ void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 		_float4 Target;
 		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
 		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TImeDelta, m_LimitDistance, m_SpeedRatio);
+		CCombatController::GetInstance()->Camera_Zoom_In();
 	}
 }
 

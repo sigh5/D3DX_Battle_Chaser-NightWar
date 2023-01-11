@@ -48,7 +48,7 @@ HRESULT CTerrain::Last_Initialize()
 	m_ProtoName = TEXT("Prototype_GameObject_Terrain");
 
 	/*For.Imgui */
-	m_pNavigationCom->Set_SaveSort_NavigatorVector(&m_vecAllNavi);
+	//m_pNavigationCom->Set_SaveSort_NavigatorVector(&m_vecAllNavi);
 	
 	m_bLast_Initlize = true;
 
@@ -93,7 +93,7 @@ HRESULT CTerrain::Render()
 	m_pVIBufferCom->Render();
 
 #ifdef _DEBUG
-	m_pNavigationCom->Render(m_iNaviShaderPass);
+	//m_pNavigationCom->Render(m_iNaviShaderPass);
 #endif
 
 	return S_OK;
@@ -265,91 +265,91 @@ void CTerrain::Get_PickingPos()
 
 void CTerrain::DeleteNavi()
 {
-	m_pNavigationCom->Delete_Navi();
-	size_t size_Num = m_vecAllNavi.size()-3;
-	
-	_uint i = 0;
+	//m_pNavigationCom->Delete_Navi();
+	//size_t size_Num = m_vecAllNavi.size()-3;
+	//
+	//_uint i = 0;
 
-	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
-	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
-	m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+	//m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+	//m_vecAllNavi.erase(m_vecAllNavi.end()-1);
+	//m_vecAllNavi.erase(m_vecAllNavi.end()-1);
 }
 
 void CTerrain::Create_NaviMap(_float4 vPos)
 {
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//CToolManager* ptoolManager = GET_INSTANCE(CToolManager);
 
-	_float4 Dest = vPos;
-	for (auto PrevPos : m_vecAllNavi)
-	{
-		_vector		vPrevPos = XMVectorSetW(XMLoadFloat3(&PrevPos), 1.f);;
-		_vector		vDir = XMLoadFloat4(&vPos) - vPrevPos;
-		_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
+	//_float4 Dest = vPos;
+	//for (auto PrevPos : m_vecAllNavi)
+	//{
+	//	_vector		vPrevPos = XMVectorSetW(XMLoadFloat3(&PrevPos), 1.f);;
+	//	_vector		vDir = XMLoadFloat4(&vPos) - vPrevPos;
+	//	_float		fDistance = XMVectorGetX(XMVector3Length(vDir));
 
-		if (fDistance <= 0.1f)
-		{
-			XMStoreFloat4(&Dest, vPrevPos);
-		}
-	}
+	//	if (fDistance <= 0.1f)
+	//	{
+	//		XMStoreFloat4(&Dest, vPrevPos);
+	//	}
+	//}
 
-	_float3		vRealPos;
-	vRealPos.x = Dest.x;
-	vRealPos.y = Dest.y;			// 일단은 0
-	vRealPos.z = Dest.z;
-	m_vNaviPosVec.push_back(vRealPos);
-
-
-	if (m_vNaviPosVec.size() == 3)
-	{
-		Create_Cells();
-	}
+	//_float3		vRealPos;
+	//vRealPos.x = Dest.x;
+	//vRealPos.y = Dest.y;			// 일단은 0
+	//vRealPos.z = Dest.z;
+	//m_vNaviPosVec.push_back(vRealPos);
 
 
-	RELEASE_INSTANCE(CToolManager);
-	RELEASE_INSTANCE(CGameInstance);
+	//if (m_vNaviPosVec.size() == 3)
+	//{
+	//	Create_Cells();
+	//}
+
+
+	//RELEASE_INSTANCE(CToolManager);
+	//RELEASE_INSTANCE(CGameInstance);
 }
 
 void CTerrain::Create_Cells()
 {
-	_float3		vFirst, vSecond, vThird;
+	//_float3		vFirst, vSecond, vThird;
 
-	// 나중에 수정할것임 벡터 외적을 통한 값으로 비교할것임
-	_vector vPointa = XMLoadFloat3(&m_vNaviPosVec[0]);
-	_vector vPointb = XMLoadFloat3(&m_vNaviPosVec[1]);
-	_vector vPointc = XMLoadFloat3(&m_vNaviPosVec[2]);
+	//// 나중에 수정할것임 벡터 외적을 통한 값으로 비교할것임
+	//_vector vPointa = XMLoadFloat3(&m_vNaviPosVec[0]);
+	//_vector vPointb = XMLoadFloat3(&m_vNaviPosVec[1]);
+	//_vector vPointc = XMLoadFloat3(&m_vNaviPosVec[2]);
 
-	_vector vAtoB = vPointb - vPointa;
-	_vector vBtoC = vPointc - vPointb;
+	//_vector vAtoB = vPointb - vPointa;
+	//_vector vBtoC = vPointc - vPointb;
 
-	_vector vDir = XMVector3Cross(vAtoB, vBtoC);
+	//_vector vDir = XMVector3Cross(vAtoB, vBtoC);
 
-	_vector vUp = { 0.f, 1.f, 0.f };
+	//_vector vUp = { 0.f, 1.f, 0.f };
 
-	//외적한 방향이 +y축을 가리키면 ccw, 아니면 cw
-	if (XMVectorGetX(XMVector3Dot(XMVector3Normalize(vDir), vUp)) > 0.f)
-	{
-		XMStoreFloat3(&vFirst, vPointa);
-		XMStoreFloat3(&vSecond, vPointb);
-		XMStoreFloat3(&vThird, vPointc);
-	}
-	else
-	{
-		XMStoreFloat3(&vFirst, vPointa);
-		XMStoreFloat3(&vSecond, vPointc);
-		XMStoreFloat3(&vThird, vPointb);
-	}
-	
-	_float3 Temp[3] = { vFirst,vSecond,vThird };
+	////외적한 방향이 +y축을 가리키면 ccw, 아니면 cw
+	//if (XMVectorGetX(XMVector3Dot(XMVector3Normalize(vDir), vUp)) > 0.f)
+	//{
+	//	XMStoreFloat3(&vFirst, vPointa);
+	//	XMStoreFloat3(&vSecond, vPointb);
+	//	XMStoreFloat3(&vThird, vPointc);
+	//}
+	//else
+	//{
+	//	XMStoreFloat3(&vFirst, vPointa);
+	//	XMStoreFloat3(&vSecond, vPointc);
+	//	XMStoreFloat3(&vThird, vPointb);
+	//}
+	//
+	//_float3 Temp[3] = { vFirst,vSecond,vThird };
 
-	m_pNavigationCom->AddCell(Temp);
+	//m_pNavigationCom->AddCell(Temp);
 
-	for (_uint i = 0; i < 3; ++i)
-	{
-		m_vecAllNavi.push_back(Temp[i]);
-	}
-	
-	m_vNaviPosVec.clear();
+	//for (_uint i = 0; i < 3; ++i)
+	//{
+	//	m_vecAllNavi.push_back(Temp[i]);
+	//}
+	//
+	//m_vNaviPosVec.clear();
 }
 
 
@@ -398,10 +398,10 @@ HRESULT CTerrain::SetUp_Components()
 		(CComponent**)&m_pTextureCom[TYPE_FILTER])))
 		return E_FAIL;
 
-	/* For.Com_Navigation */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), TEXT("Com_Navigation"),
-		(CComponent**)&m_pNavigationCom)))
-		return E_FAIL;
+	///* For.Com_Navigation */
+	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Navigation"), TEXT("Com_Navigation"),
+	//	(CComponent**)&m_pNavigationCom)))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -421,8 +421,8 @@ HRESULT CTerrain::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	// For_Lights
-	const	LIGHTDESC*	pLightDesc = pGameInstance->Get_LightDesc(0);
+	//For_Lights
+		const	LIGHTDESC*	pLightDesc = pGameInstance->Get_LightDesc(0);
 	if (nullptr == pLightDesc)
 		return E_FAIL;
 
@@ -497,7 +497,7 @@ void CTerrain::Free()
 		Safe_Release(pTextureCom);
 
 	
-	Safe_Release(m_pNavigationCom);
+	//Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
