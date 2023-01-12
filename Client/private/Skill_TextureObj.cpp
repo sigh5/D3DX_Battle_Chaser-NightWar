@@ -96,7 +96,10 @@ void CSkill_TextureObj::Late_Tick(_double TimeDelta)
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	{
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+	}
 }
 
 HRESULT CSkill_TextureObj::Render()
@@ -111,9 +114,7 @@ HRESULT CSkill_TextureObj::Render()
 	m_pShaderCom->Begin(0);
 	m_pVIBufferCom->Render();
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif 
+
 	return S_OK;
 }
 

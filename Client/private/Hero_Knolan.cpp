@@ -14,6 +14,7 @@
 #include "Bone.h"
 #include "Buff_Effect.h"
 #include "ToolManager.h"
+#include "Damage_Font_Manager.h"
 
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -50,14 +51,23 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
+		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+
 		if (m_bUseDefence == true)
 		{
-			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(pCurActorWepon->Get_WeaponDamage()*0.5));
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage( _int(m_iGetDamageNum*0.5f));
+			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
+
 			Create_Hit_Effect();
 		}
 		else
-			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
-
+		{
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
+			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		}
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 		{
 			m_bIsHeavyHit = true;
@@ -70,7 +80,9 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 			m_bOnceCreate = false;
 		}
 
-		CCombatController::GetInstance()->Camera_Shaking();
+	
+		
+		CCombatController::GetInstance()->UI_Shaking(true);
 
 		return true;
 	}
@@ -214,7 +226,17 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+#ifdef  _DEBUG
+		CClient_Manager::Collider_Render(this, m_pColliderCom, m_pRendererCom);
+		CClient_Manager::Navigation_Render(this, m_pNavigationCom, m_pRendererCom);
+		if (m_bIsCombatScene)
+			m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+#endif //  _DEBUG
+
+		
+	}
 }
 
 HRESULT CHero_Knolan::Render()
@@ -230,13 +252,13 @@ HRESULT CHero_Knolan::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
-#ifdef _DEBUG
-	CClient_Manager::Collider_Render(this, m_pColliderCom);
-	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
-	if (m_bIsCombatScene)
-		m_pColliderCom->Render();
-
-#endif
+//#ifdef _DEBUG
+//	CClient_Manager::Collider_Render(this, m_pColliderCom);
+//	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
+//	if (m_bIsCombatScene)
+//		m_pColliderCom->Render();
+//
+//#endif
 	return S_OK;
 }
 
@@ -831,8 +853,16 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	}
 	else if (m_pModelCom->Control_KeyFrame_Create(9, 1) && !m_bOnceCreate)
 	{
+		CCombatController::GetInstance()->Camera_Shaking();
+		CCombatController::GetInstance()->UI_Shaking(true);
 		Create_Hit_Effect();
-	
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		_int iRandom = rand() % 5;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum);
+
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
 	}
@@ -889,6 +919,13 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
 		m_bIs_Multi_Hit = false;
+		
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		_int iRandom = rand() % 5;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +_int(m_iGetDamageNum*0.5));
+
 	}
 	else
 		return;
@@ -1024,7 +1061,7 @@ void CHero_Knolan::Anim_Intro()
 
 void CHero_Knolan::AnimNormalAttack()
 {
-	m_iStateDamage = 30;
+	m_iStateDamage = rand() % 10 + 30;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(-0.5f, 0.5f, 2.5f, 1.f);
@@ -1044,7 +1081,7 @@ void CHero_Knolan::AnimNormalAttack()
 
 void CHero_Knolan::Anim_Skill1_Attack()
 {
-	m_iStateDamage = 40;
+	m_iStateDamage = rand() % 10 + 40;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.9f, 1.f);
@@ -1066,7 +1103,7 @@ void CHero_Knolan::Anim_Skill1_Attack()
 void CHero_Knolan::Anim_Skill2_Attack()
 {
 	// Hiter에게 이펙트만 생성		//53 frame
-	m_iStateDamage = 40;
+	m_iStateDamage = rand() % 10 + 50;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(0.f, 1.f, 0.f, 1.f);
 	m_iHitCount = 1;

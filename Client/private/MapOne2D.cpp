@@ -73,7 +73,10 @@ void CMapOne2D::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		
+	}
 }
 
 HRESULT CMapOne2D::Render()

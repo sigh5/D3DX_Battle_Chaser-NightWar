@@ -10,7 +10,7 @@
 #include "Weapon.h"
 #include "Bone.h"
 #include "Buff_Effect.h"
-
+#include "Damage_Font_Manager.h"
 
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice,pContext)
@@ -48,15 +48,24 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
+		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		//vPos.x -= 1.f;
+		vPos.y += 4.f;
+
 		if (m_bUseDefence == true)
 		{
-			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(pCurActorWepon->Get_WeaponDamage()*0.5));
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5));
+			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
+
 			Create_Hit_Effect();
 		}
 		else
-			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
-	
-		
+		{
+			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
+			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		}
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
@@ -67,7 +76,7 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-		CCombatController::GetInstance()->Camera_Shaking();
+		CCombatController::GetInstance()->UI_Shaking(true);
 		return true;
 	}
 	return false;
@@ -165,7 +174,7 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
-	
+
 	if (m_bIsCombatScene)
 	{
 		for (auto &pParts : m_PlayerParts)
@@ -184,7 +193,7 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
 		}
-		else if (true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() && m_bUseDefence ==false)
+		else if (true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() && m_bUseDefence == false)
 		{
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
@@ -195,7 +204,15 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+#ifdef _DEBUG
+		CClient_Manager::Collider_Render(this, m_pColliderCom, m_pRendererCom);
+		CClient_Manager::Navigation_Render(this, m_pNavigationCom, m_pRendererCom);
+		if (m_bIsCombatScene)
+			m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+#endif	
+	}
 }
 
 HRESULT CHero_Garrison::Render()
@@ -211,12 +228,7 @@ HRESULT CHero_Garrison::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0,"g_BoneMatrices","DN_FR_FishingRod");
 	}
-#ifdef _DEBUG
-	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
-	CClient_Manager::Collider_Render(this, m_pColliderCom);
-	if (m_bIsCombatScene)
-		m_pColliderCom->Render();
-#endif
+
 	return S_OK;
 }
 
@@ -608,7 +620,7 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Garrsion_Fire_bot_Height_Effect_0", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
-	BuffDesc.vPosition = _float4(2.0f, 1.f, -1.5f, 1.f);
+	BuffDesc.vPosition = _float4(2.0f, 1.5f, -1.5f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 14.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -733,6 +745,14 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 {
 	if (m_pModelCom->Control_KeyFrame_Create(16, 1) && !m_bOnceCreate)
 	{
+		CCombatController::GetInstance()->Camera_Shaking();
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		_int iRandom = rand() % 5;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum);
+
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
 	}
@@ -769,6 +789,10 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 	else if (m_bUseDefence == true && !m_bOnceCreate &&m_pModelCom->Control_KeyFrame_Create(32, 43))
 	{
 		Create_Hit_Effect();
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
 		m_bOnceCreate = true;
 		m_bIs_Multi_Hit = false;
 	}
@@ -1080,7 +1104,7 @@ void CHero_Garrison::Anim_Intro()
 
 void CHero_Garrison::AnimNormalAttack()
 {
-	m_iStateDamage = 20;
+	m_iStateDamage = rand() % 10 + 20;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
 	m_iWeaponOption = WEAPON_OPTIONAL_NONE;
@@ -1105,7 +1129,7 @@ void CHero_Garrison::Anim_Skill1_Attack()
 	m_bRun = false;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 40;
+	m_iStateDamage = rand() % 10 + 40;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_SpeedRatio = 7.f;
 	m_LimitDistance = 10.f;
@@ -1127,7 +1151,7 @@ void CHero_Garrison::Anim_Skill2_Attack()
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 50;
+	m_iStateDamage = rand() % 10 + 50;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_iHitCount = 1;
 	m_LimitDistance = 12.f;

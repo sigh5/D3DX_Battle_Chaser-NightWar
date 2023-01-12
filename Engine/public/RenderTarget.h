@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Base.h"
-/*
-	뭔가를 그려놓기 위한 데이터이다.
-	디퍼드시 : DIFFUSE(반사색), NORMAL(노멀벡터), SHADE(명암)
-*/
+
 BEGIN(Engine)
+
+/* 뭔가를 그려놓기위한 데이터다. */
+/* 디퍼드시 : DIFFUSE(반사색), NORMAL(노멀벡터), SHADE(명암)*/
+
 class CRenderTarget final : public CBase
 {
 private:
@@ -13,14 +14,18 @@ private:
 	virtual ~CRenderTarget() = default;
 
 public:
-	ID3D11RenderTargetView* Get_RTV()const
-	{
+	ID3D11RenderTargetView* Get_RTV() const {
 		return m_pRTV;
+	}
+
+	ID3D11ShaderResourceView* Get_SRV() const {
+		return m_pSRV;
 	}
 
 public:
 	HRESULT Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4* pClearColor);
 	HRESULT Clear();
+
 
 #ifdef _DEBUG
 

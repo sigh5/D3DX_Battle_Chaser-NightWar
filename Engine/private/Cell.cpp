@@ -82,7 +82,7 @@ _bool CCell::isIn(_fvector vTargetPos, _int* pNeighborIndex)
 
 
 #ifdef _DEBUG
-HRESULT CCell::Render(CShader * pShader,_uint iShaderPass)
+HRESULT CCell::Render(CShader * pShader)
 {
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
@@ -101,7 +101,7 @@ HRESULT CCell::Render(CShader * pShader,_uint iShaderPass)
 
 	RELEASE_INSTANCE(CPipeLine);
 
-	pShader->Begin(iShaderPass);
+	pShader->Begin(0);
 
 	m_pVIBuffer->Render();
 

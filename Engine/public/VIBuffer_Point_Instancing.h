@@ -27,6 +27,9 @@ public:
 	void			Set_TextureMax_Width_Cnt(_float iMaxWidth_Cnt) { m_Desc.m_iTextureMax_Width_Cnt = iMaxWidth_Cnt; }
 	void			Set_TextureMax_Height_Cnt(_float iMaxHeight_Cnt) { m_Desc.m_iTextureMax_Height_Cnt = iMaxHeight_Cnt; }
 
+	void			Set_WidthTextureCnt(_float fCurWidthCnt) { m_iWidthTextureCnt = fCurWidthCnt; }
+	void			Set_HeightTextureCnt(_float fCurHeightCnt) { m_iHeightTextureCnt = fCurHeightCnt; }
+
 	const			VIBUffer_Point_TextureDesc& Get_Point_TextureDesc()const { return m_Desc; }
 	void			Set_Point_Desc(VIBUffer_Point_TextureDesc& Desc)
 	{
@@ -46,6 +49,8 @@ public:
 	/*For.Imgui*/
 	virtual		void	Imgui_RenderProperty()override;
 
+
+	void				Move_Up_Position(_float4 vPos);
 	void				Move_Up_Tick(_double TimeDelta, _float fSpeed);
 	_bool				UV_Move_Tick(_double TimeDelta);
 	HRESULT				Set_UV_RawValue(class CShader* pShader);

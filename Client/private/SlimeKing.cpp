@@ -130,12 +130,15 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
-	
+
 	for (auto &pParts : m_MonsterParts)
 		pParts->Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+	}
 }
 
 HRESULT CSlimeKing::Render()
@@ -152,10 +155,7 @@ HRESULT CSlimeKing::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
 
-#endif // !_DEBUG
 
 	return S_OK;
 }

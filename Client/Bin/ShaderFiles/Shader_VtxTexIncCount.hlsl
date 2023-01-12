@@ -234,9 +234,6 @@ void	GS_MAIN_Mirror(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 }
 
 
-
-
-
 [maxvertexcount(4)]		// 정점은 숫자가 관계없으나 20개 이하가 지오메트리의 성능을 발휘하기에 좋다,
 void	GS_MAIN_Lazor(point GS_IN_Lazor In[1], inout TriangleStream<GS_OUT> Vertices)
 {
@@ -341,6 +338,65 @@ void	GS_MAIN_Lazor(point GS_IN_Lazor In[1], inout TriangleStream<GS_OUT> Vertice
 }
 
 
+[maxvertexcount(6)]		// 정점은 숫자가 관계없으나 20개 이하가 지오메트리의 성능을 발휘하기에 좋다,
+void	GS_MAIN_Test(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
+{
+	//  GS_IN In[N] N의 숫자는
+	// TOPOLOGY가 라인이면 2개 포인트면 1개 트라이앵글리스트면 3개 
+
+	GS_OUT		Out[4];	// 사각형을 만들거니까 인덱스는 4개필요
+
+						/* 외적결과를 통해 Right,Up,Look 을 구한다 */
+	float3		vLook = g_vCamPosition.xyz - In[0].vPosition;		//카메라를 구해온것은 빌보드처럼 만들려고 
+	float3		vRight = normalize(cross(float3(0.f, 1.f, 0.f), vLook)) * In[0].vPSize.x * 0.5f;
+	float3		vUp = normalize(cross(vLook, vRight)) * In[0].vPSize.y * 0.5f;
+
+	matrix		matVP = mul(g_ViewMatrix, g_ProjMatrix);
+
+	float3		vPosition;
+
+
+	Out[0].vTexUVOrigin = float2(0.f, 0.f);
+	Out[1].vTexUVOrigin = float2(1.f, 0.f);
+	Out[2].vTexUVOrigin = float2(1.f, 1.f);
+	Out[3].vTexUVOrigin = float2(0.f, 1.f);
+
+
+
+
+	vPosition = In[0].vPosition + (vRight*2) + vUp;
+	Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
+	Out[0].vTexUV = float2(1.f / g_iUV_Max_Width_Num * (g_iUV_Cur_Width_Num),
+		(1.f) / g_iUV_Max_Height_Num * (g_iUV_Cur_Height_Num));
+
+	vPosition = In[0].vPosition - (vRight * 2) + vUp;
+	Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
+	Out[1].vTexUV = float2(1.f / g_iUV_Max_Width_Num *(g_iUV_Cur_Width_Num + 1.f),
+		(1.f) / g_iUV_Max_Height_Num* (g_iUV_Cur_Height_Num));
+
+	vPosition = In[0].vPosition - (vRight * 2) - vUp;
+	Out[2].vPosition = mul(vector(vPosition, 1.f), matVP);
+	Out[2].vTexUV = float2(1.f / g_iUV_Max_Width_Num* (g_iUV_Cur_Width_Num + 1.f),
+		(1.f) / g_iUV_Max_Height_Num * (g_iUV_Cur_Height_Num + 1.f));
+
+	vPosition = In[0].vPosition + (vRight * 2) - vUp;
+	Out[3].vPosition = mul(vector(vPosition, 1.f), matVP);
+	Out[3].vTexUV = float2(1.f / g_iUV_Max_Width_Num * g_iUV_Cur_Width_Num,
+		(1.f) / g_iUV_Max_Height_Num* (g_iUV_Cur_Height_Num + 1.f));
+
+
+
+	Vertices.Append(Out[0]);
+	Vertices.Append(Out[1]);
+	Vertices.Append(Out[2]);
+	Vertices.RestartStrip();		// 이걸 안써주면 라인 스트립처럼그려서 
+									//트라이앵글리스트를 쓸려면 한번 끊어줘야한다.
+
+	Vertices.Append(Out[0]);
+	Vertices.Append(Out[2]);
+	Vertices.Append(Out[3]);
+	Vertices.RestartStrip();
+}
 
 
 
@@ -438,7 +494,20 @@ technique11 DefaultTechnique
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+	
 
+	pass Test
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = compile gs_5_0 GS_MAIN_Test();
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN();
+	}
 
 
 

@@ -7,11 +7,13 @@ BEGIN(Engine)
 class CTarget_Manager final : public CBase
 {
 	DECLARE_SINGLETON(CTarget_Manager)
-	using RENDERTARGETS = map<const _tchar*, class CRenderTarget*>;
-	using MRTS = map<const _tchar*, list<class CRenderTarget*>>;
+
 public:
 	CTarget_Manager();
 	virtual ~CTarget_Manager() = default;
+
+public:
+	ID3D11ShaderResourceView* Get_SRV(const _tchar* pTargetTag);
 
 public:
 	HRESULT Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -29,12 +31,15 @@ public:
 
 private:
 	map<const _tchar*, class CRenderTarget*>				m_RenderTargets;
-
+	typedef map<const _tchar*, class CRenderTarget*>		RENDERTARGETS;
 
 private:
 	/* 동시에 장치에 바인딩 되어야할 렌더타겟들. 최대 여덟개 */
 	map<const _tchar*, list<class CRenderTarget*>>			m_MRTs;
-	
+	typedef map<const _tchar*, list<class CRenderTarget*>>	MRTS;
+
+
+
 private:
 	ID3D11RenderTargetView*				m_pBackBufferView = nullptr;
 	ID3D11DepthStencilView*				m_pDepthStencilView = nullptr;

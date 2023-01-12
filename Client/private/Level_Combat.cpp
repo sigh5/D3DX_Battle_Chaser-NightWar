@@ -7,9 +7,11 @@
 #include "CombatController.h"
 #include "PlayerController.h"
 
+
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pCombatController(CCombatController::GetInstance())
+	
 {
 	
 }
@@ -44,7 +46,7 @@ HRESULT CLevel_Combat::Initialize()
 	
 	
 	m_pCombatController->Initialize(LEVEL_COMBAT);
-
+	
 	return S_OK;
 }
 
@@ -57,6 +59,8 @@ void CLevel_Combat::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 	Combat_Control_Tick(TimeDelta);
 
+	
+
 	m_TimeAcc += TimeDelta;
 
 }
@@ -64,6 +68,8 @@ void CLevel_Combat::Tick(_double TimeDelta)
 void CLevel_Combat::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	m_pCombatController->Late_Tick(TimeDelta);
 
 	if (true == CClient_Manager::m_bCombatWin)
 	{
@@ -88,6 +94,9 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 		m_fSceneChaneTimer = 0.f;
 	}
 
+
+
+	
 }
 
 HRESULT CLevel_Combat::Render()

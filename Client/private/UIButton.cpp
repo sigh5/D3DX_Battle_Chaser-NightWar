@@ -127,6 +127,11 @@ HRESULT CUIButton::Render()
 
 
 
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	pGameInstance->Render_Font(TEXT("Font_Comic"), m_strSkillName.c_str(), m_strPos, 0.f, m_vSFontize, XMLoadFloat4(&m_vFontColor));
+	RELEASE_INSTANCE(CGameInstance);
+
+
 	return S_OK;
 }
 
@@ -173,18 +178,26 @@ void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 
 	if (ChildFsmButtonSize == 0)
 		return;*/
-
+	//m_eActiceType = eType;
 
 	for (auto pChildButton : m_ChildFsmButton)
 	{
 		pChildButton->Set_RenderActive(true);
 
 		if (eType == BUTTON_STATE_ACTION)
+		{
 			pChildButton->Change_ICON_Active();
+		}
 		else if (eType == BUTTON_STATE_ABLILTY)
+		{
+			
 			pChildButton->Change_ICON_Ablity();
+		}
 		else if (eType == BUTTON_STATE_ITEM)
+		{
+			//Refresh_UtillsButtonName();
 			pChildButton->Change_ICON_Item();
+		}
 		else
 			continue;
 	}
@@ -216,6 +229,31 @@ void CUIButton::Change_ICON_Active()
 	{
 		pTexture->Set_SelectTextureIndex(0);
 		m_eFsmState = BUTTON_FSM_NORMALATTACK;
+
+		if (m_iFontCharOption == 0)
+		{
+			m_strSkillName = TEXT("FireBall");
+			m_strPos = _float2(700.f, 575.f);
+			m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+			m_vSFontize = _float2(0.3f, 0.3f);
+		}
+		else if (m_iFontCharOption == 1)
+		{
+			m_strSkillName = TEXT("Blade");
+			m_strPos = _float2(700.f, 575.f);
+			m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+			m_vSFontize = _float2(0.3f, 0.3f);
+		}
+		else if (m_iFontCharOption == 2)
+		{
+			m_strSkillName = TEXT("Punch");
+			m_strPos = _float2(700.f, 575.f);
+			m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+			m_vSFontize = _float2(0.3f, 0.3f);
+		}
+		else
+			return;
+
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
@@ -223,12 +261,24 @@ void CUIButton::Change_ICON_Active()
 		{
 			pTexture->Set_SelectTextureIndex(1);
 			m_eFsmState = BUTTON_FSM_DEFENCE;
+
+			if (m_iFontCharOption == 0 || m_iFontCharOption == 1)
+			{
+				m_strSkillName = TEXT("Defence");
+				m_strPos = _float2(700.f, 625.f);
+				m_vSFontize = _float2(0.3f, 0.3f);
+				m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+			}
+			else
+				return;
 		}
 		else
 			Set_RenderActive(false);;
 	}
 	else
-		Set_RenderActive(false);;
+		Set_RenderActive(false);
+
+
 
 }
 
@@ -241,21 +291,67 @@ void CUIButton::Change_ICON_Ablity()
 	{
 		pTexture->Set_SelectTextureIndex(2);
 		m_eFsmState = BUTTON_FSM_SKILL1;
+
+
+		m_strPos = _float2(700.f, 575.f);
+		m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+		m_vSFontize = _float2(0.3f, 0.3f);
+		if (m_iFontCharOption == 0)
+			m_strSkillName = TEXT("GolfBall");
+		else if (m_iFontCharOption == 1)
+		{
+			m_strPos = _float2(695.f, 575.f);
+			m_strSkillName = TEXT("TakeDown");
+		}
+		else if (m_iFontCharOption == 2)
+		{
+			m_strPos = _float2(695.f, 575.f);
+			m_strSkillName = TEXT("PunchGun");
+		}
+			
+
+		
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
 		pTexture->Set_SelectTextureIndex(3);
 		m_eFsmState = BUTTON_FSM_SKILL2;
+
+		m_strPos = _float2(700.f, 625.f);
+		m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
+		m_vSFontize = _float2(0.3f, 0.3f);
+
+		if (m_iFontCharOption == 0)
+			m_strSkillName = TEXT("TeleFire");
+		else if (m_iFontCharOption == 1)
+			m_strSkillName = TEXT("Sting");
+		else if (m_iFontCharOption == 2)
+			m_strSkillName = TEXT("Lazor");
+
+		
+
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
 	{
 		pTexture->Set_SelectTextureIndex(4);
 		m_eFsmState = BUTTON_FSM_ULTIMATE;
+	
+		m_strSkillName = TEXT("Ultimate");
+		m_strPos = _float2(700.f, 675.f);
+		m_vFontColor = _float4(1.f, 0.f, 0.f, 1.f);
+		m_vSFontize = _float2(0.3f, 0.3f);
+
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button3")))
 	{
 		pTexture->Set_SelectTextureIndex(5);
 		m_eFsmState = BUTTON_FSM_BUFF;
+
+		m_strSkillName = TEXT("Buff");
+		m_strPos = _float2(800.f, 575.f);
+		m_vFontColor = _float4(0.f, 1.f, 0.f, 1.f);
+		m_vSFontize = _float2(0.3f, 0.3f);
+
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button4")))
 	{
@@ -267,9 +363,11 @@ void CUIButton::Change_ICON_Ablity()
 		else
 			Set_RenderActive(false);
 
+		m_strSkillName = TEXT("WideBuff");
+		m_strPos = _float2(800.f, 625.f);
+		m_vFontColor = _float4(0.f, 0.f, 1.f, 1.f);
+		m_vSFontize = _float2(0.3f, 0.3f);
 	}
-	else
-		return;
 
 
 	// 아마여기에 많이 추개해서 버프랑 와이드 버프 넣어야함
@@ -283,20 +381,35 @@ void CUIButton::Change_ICON_Item()
 	{
 		pTexture->Set_SelectTextureIndex(7);
 		m_eFsmState = BUTTON_FSM_USE_HP_ITEM;		// 체력
+		m_strSkillName = TEXT("HP");
+		m_strPos = _float2(700.f, 575.f);
+		m_vFontColor = _float4(1.f, 0.f, 0.f, 0.f);
+		m_vSFontize = _float2(0.4f, 0.4f);
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
 		pTexture->Set_SelectTextureIndex(8);
 		m_eFsmState = BUTTON_FSM_USE_MP_ITEM;		// 마나
+		m_strSkillName = TEXT("Mana");
+		m_strPos = _float2(700.f, 625.f);
+		m_vFontColor = _float4(0.f, 0.f, 1.f, 1.f);
+		m_vSFontize = _float2(0.4f, 0.4f);
 
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
 	{						//도망
 		pTexture->Set_SelectTextureIndex(9);
 		m_eFsmState = BUTTON_FSM_FLEE;
+		m_strSkillName = TEXT("Flee");
+		m_strPos = _float2(700.f, 675.f);
+		m_vFontColor = _float4(1.f, 0.f, 1.f, 1.f);
+		m_vSFontize = _float2(0.4f, 0.4f);
 	}
 	else
-		Set_RenderActive(false);;
+		Set_RenderActive(false);
+
+
+	//Refresh_UtillsButtonName();
 }
 
 _bool CUIButton::Click_This_Button()
@@ -338,23 +451,6 @@ _bool CUIButton::Click_This_Button()
 void CUIButton::Shaking()
 {
 	
-	//_float4		vPos;
-
-	//XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
-	//m_ShakeTimer += _float(CClient_Manager::TimeDelta * 1.f);
-
-	//if (m_ShakeTimer >= m_fCoolTime)
-	//{
-	//	m_ShakeTimer = 0.f;
-	//	//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
-	//}
-
-	//vPos.y += 1.f*  400.f * CClient_Manager::TimeDelta;
-
-	//m_iSwitching *= -1;
-
-	//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 }
 
 void CUIButton::Button_RenderSetActive(_bool bRenderActive)
@@ -450,9 +546,29 @@ void CUIButton::Change_ButtonIcon(const wstring & TextureTag)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	m_pButtonImage->Change_Texture(LEVEL_GAMEPLAY, TextureTag);	//GamePlayerLoader
-
 	RELEASE_INSTANCE(CGameInstance);
+
+	if (TextureTag == TEXT("Prototype_Component_Texture_UI_State_Icon_Knolan"))
+	{
+		m_iFontCharOption = 0;
+	}
+	else if (TextureTag == TEXT("Prototype_Component_Texture_UI_State_Icon_Garrison"))
+	{
+		m_iFontCharOption = 1;
+	}
+	else if (TextureTag == TEXT("Prototype_Component_Texture_UI_State_Icon_Calibretto"))
+	{
+		m_iFontCharOption = 2;
+	}
+	else
+		return;
+
+
+	
+
 }
+
+
 
 void CUIButton::Free()
 {

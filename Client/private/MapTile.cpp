@@ -196,8 +196,10 @@ void CMapTile::Late_Tick(_double TimeDelta)
 	//m_pVIBufferCom->Culling(m_pTransformCom->Get_WorldMatrix());
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
-
+		m_pRendererCom->Add_DebugRenderGroup(m_pNavigationCom);
+	}
 }
 
 HRESULT CMapTile::Render()
@@ -213,9 +215,9 @@ HRESULT CMapTile::Render()
 
 
 
-#ifdef _DEBUG
-	m_pNavigationCom->Render(0);
-#endif
+//#ifdef _DEBUG
+//	m_pNavigationCom->Render();
+//#endif
 
 	return S_OK;
 }
@@ -395,43 +397,15 @@ HRESULT CMapTile::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	// For_Lights
-	const	LIGHTDESC*	pLightDesc = pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_vCamPosition", &pGameInstance->Get_CamPositon(), sizeof(_float4))))
-		return E_FAIL;
-
-
 	RELEASE_INSTANCE(CGameInstance);
-
-	_uint	m_iDiffuseTextureIndex = 1;
-
-	if (FAILED(m_pShaderCom->Set_RawValue("g_iDiffuseTextureIndex", &m_iDiffuseTextureIndex, sizeof(_uint))))
-		return E_FAIL;
 
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture")))
 		return E_FAIL;
 
-
-	/*if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResource(m_pShaderCom, "g_FilterCanvasTexture")))
-		return E_FAIL;*/
-
 	if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResources(m_pShaderCom, "g_FilterTexture")))
 		return E_FAIL;
-
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vBrushPos", &m_vBrushPos, sizeof(_float4))))
 		return E_FAIL;

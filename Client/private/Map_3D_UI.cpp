@@ -89,7 +89,7 @@ void CMap_3D_UI::Late_Tick(_double TimeDelta)
 
 	__super::Late_Tick(TimeDelta);
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
 
 HRESULT CMap_3D_UI::Render()

@@ -184,6 +184,8 @@
     <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\CombatController.h" />
     <ClInclude Include="..\Public\CombatMap.h" />
+    <ClInclude Include="..\Public\DamageFont.h" />
+    <ClInclude Include="..\Public\Damage_Font_Manager.h" />
     <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
     <ClInclude Include="..\Public\EffectFrame.h" />
@@ -245,6 +247,8 @@
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
     <ClCompile Include="..\Private\CombatMap.cpp" />
+    <ClCompile Include="..\Private\DamageFont.cpp" />
+    <ClCompile Include="..\Private\Damage_Font_Manager.cpp" />
     <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
     <ClCompile Include="..\Private\EffectFrame.cpp" />

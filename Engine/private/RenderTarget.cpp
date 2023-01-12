@@ -12,7 +12,7 @@ CRenderTarget::CRenderTarget(ID3D11Device * pDevice, ID3D11DeviceContext * pCont
 
 HRESULT CRenderTarget::Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4 * pClearColor)
 {
-	D3D11_TEXTURE2D_DESC TextureDesc;
+	D3D11_TEXTURE2D_DESC	TextureDesc;
 	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 
 	TextureDesc.Width = iWidth;
@@ -32,11 +32,11 @@ HRESULT CRenderTarget::Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixe
 	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &m_pTexture2D)))
 		return E_FAIL;
 
-	/*장치에 바인딩하여 세이더를 통해 바인딩된 이 텍스처에 픽셀을 기록한다. */
+	/* 장치에 바인딩하여 셰이더를 통해 바인딩된 이 텍스쳐에 픽셀을 기록한다.*/
 	if (FAILED(m_pDevice->CreateRenderTargetView(m_pTexture2D, nullptr, &m_pRTV)))
 		return E_FAIL;
-	/* 이텍스쳐를 셰이더 전역으로 전달하여 픽셀 쎼이더안에서 
-		이 텍스쳐에 저장된 픽셀의 값(Diffuse, Normal, Shade) 을 읽어온다. */
+
+	/* 이 텍스쳐를 셰이더 전역으로 전달하여 픽셀셰이더안에서 이 텍스쳐에 저장된 픽셀의 값(Diffuse, Normal, Shade)을 읽어온다. */
 	if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexture2D, nullptr, &m_pSRV)))
 		return E_FAIL;
 
@@ -48,14 +48,17 @@ HRESULT CRenderTarget::Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixe
 HRESULT CRenderTarget::Clear()
 {
 	m_pContext->ClearRenderTargetView(m_pRTV, (_float*)&m_vClearColor);
+
 	return S_OK;
 }
+
 #ifdef _DEBUG
+
 HRESULT CRenderTarget::Ready_Debug(_float fX, _float fY, _float fSizeX, _float fSizeY)
 {
 	D3D11_VIEWPORT			ViewportDesc;
 	ZeroMemory(&ViewportDesc, sizeof ViewportDesc);
-	
+
 	_uint			iNumViewports = 1;
 
 	m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
@@ -70,7 +73,6 @@ HRESULT CRenderTarget::Ready_Debug(_float fX, _float fY, _float fSizeX, _float f
 
 	return S_OK;
 }
-
 
 void CRenderTarget::Render(CShader * pShader, CVIBuffer_Rect * pVIBuffer)
 {
@@ -96,6 +98,10 @@ CRenderTarget * CRenderTarget::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 
 void CRenderTarget::Free()
 {
+
+	/*if(m_vClearColor.y == 0.f)
+	SaveDDSTextureToFile(m_pContext, m_pTexture2D, TEXT("../Bin/Test.dds"));
+	*/
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 

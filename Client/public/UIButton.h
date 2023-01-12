@@ -32,6 +32,11 @@ public:
 	void			Set_ChildFsmButton(CUIButton* pNodeButton);
 	
 	BUTTON_FSM_STATE	Get_ButtonFsmState()const { return m_eFsmState; }
+	void			Set_FontDesc(wstring pName, _float2 vPos, _float2 vScale, _float4 vColor)
+	{
+		m_strSkillName = pName;
+		m_strPos = vPos; m_vSFontize = vScale; m_vFontColor = vColor;
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -49,11 +54,14 @@ public:
 	void			Change_ButtonIcon(const wstring& TextureTag);
 
 
+
+	
+
 private:
 	void			FirstDungeonUIInit();
 
 public:
-	void				State_Image_Change(BUTTON_STATE eType);
+	void			State_Image_Change(BUTTON_STATE eType);
 
 public:
 	_bool			Click_This_Button();
@@ -80,14 +88,22 @@ private:
 	_double					m_fCoolTime = 1.0;
 	_int					m_iSwitching = -1;
 
+
+	wstring					m_strSkillName = TEXT("");
+	_float2					m_strPos;
+	_float2					m_vSFontize = _float2(0.5f, 0.5f);
+	_float4					m_vFontColor =_float4(1.f,1.f,1.f,1.f);
 	BUTTON_FSM_STATE		m_eFsmState = BUTTON_FSM_STATE_END;
 
 
+	//BUTTON_STATE			m_eActiceType = BUTTON_STATE_END;
+	_uint					m_iFontCharOption = 0;
 private:
 	CUI*					m_pButtonImage = nullptr;
 	vector<CUIButton*>			m_ChildFsmButton;
 
-
+	float temp[2] = { 0.f,575.f };
+	float TestSize[2] = { 1.f,1.f };
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

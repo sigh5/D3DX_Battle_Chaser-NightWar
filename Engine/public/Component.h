@@ -17,10 +17,17 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+
 	virtual		void	Final_Update() {} // 마지막 계산을 하는 용도 LateTick 이랑 안걸릴려고
 public: /* imgui */
 	// 이 컴포넌트에서 보여줄 데이터를 imgui로 작성한다.
 	virtual void Imgui_RenderProperty(){}
+
+
+//#ifdef _DEBUG
+public:
+	virtual HRESULT Render() { return S_OK; }
+//#endif // 
 
 protected:
 	ID3D11Device*				m_pDevice = nullptr;

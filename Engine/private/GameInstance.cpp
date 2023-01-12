@@ -627,7 +627,6 @@ void CGameInstance::Free()
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
-
 	Safe_Release(m_pImgui_Manager);
 }
 

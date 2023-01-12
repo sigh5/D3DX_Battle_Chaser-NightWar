@@ -9,6 +9,7 @@
 #include "ToolManager.h"
 #include "PlayerController.h"
 #include "CombatController.h"
+#include "Damage_Font_Manager.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
@@ -312,6 +313,8 @@ void CMainApp::Free()
 	CCombatController::DestroyInstance();
 	CPlayerController::DestroyInstance();
 	CToolManager::DestroyInstance();
+	CDamage_Font_Manager::DestroyInstance();
+
 
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pRenderer);

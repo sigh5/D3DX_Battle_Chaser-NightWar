@@ -130,7 +130,10 @@ void CSpider_Mana::Late_Tick(_double TimeDelta)
 		pParts->Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+	}
 }
 
 HRESULT CSpider_Mana::Render()
@@ -147,10 +150,7 @@ HRESULT CSpider_Mana::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
 
-#endif // !_DEBUG
 
 	return S_OK;
 }

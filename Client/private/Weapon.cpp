@@ -66,16 +66,16 @@ void CWeapon::Late_Tick(_double TimeDelta)
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix() * SocketMatrix);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+	{
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+	}
 }
 
 HRESULT CWeapon::Render()
 {
 	
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-#endif 
 
 	return S_OK;
 }

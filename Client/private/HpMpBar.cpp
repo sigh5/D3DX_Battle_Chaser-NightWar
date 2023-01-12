@@ -199,8 +199,10 @@ void CHpMpBar::Shake_Move(_double TimeDelta)
 		else
 		{
 			m_bMove = false;
-			m_fShakingTimer = 0.f;
-			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
+			m_pTransformCom->Set_Scaled(_float3(m_fSizeX*m_fRatio, m_fSizeY, 1.f));
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - (m_fRatioX*0.5f), m_vOriginPos.y, 0.1f, 1.f));
+
+			//m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&m_vOriginPos));
 		}
 
 	}

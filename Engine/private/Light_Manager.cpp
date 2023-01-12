@@ -1,5 +1,4 @@
 #include "..\public\Light_Manager.h"
-
 #include "Light.h"
 
 IMPLEMENT_SINGLETON(CLight_Manager)
@@ -28,6 +27,15 @@ HRESULT CLight_Manager::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * 
 	return S_OK;
 }
 
+void CLight_Manager::Render_Light(CVIBuffer_Rect * pVIBuffer, CShader * pShader)
+{
+	for (auto& pLight : m_Lights)
+	{
+		if (nullptr != pLight)
+			pLight->Render(pVIBuffer, pShader);
+	}
+}
+
 void CLight_Manager::Clear()
 {
 	for (auto &iter : m_Lights)
@@ -38,5 +46,8 @@ void CLight_Manager::Clear()
 
 void CLight_Manager::Free()
 {
-	Clear();
+	for (auto& pLight : m_Lights)
+		Safe_Release(pLight);
+
+	m_Lights.clear();
 }

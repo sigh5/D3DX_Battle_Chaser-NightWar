@@ -12,6 +12,7 @@ class CModel;
 class CNavigation;
 class CCollider;
 class CVIBuffer_Point_Instancing;
+class CRenderer;
 END
 
 //bool compare(pair<int, int>a, pair<int, int>b) {
@@ -27,7 +28,6 @@ enum COMPARE_UI_POS {COMPARE_UI_POS_X, COMPARE_UI_POS_Y, COMPARE_UI_POS_END,};
 
 class CClient_Manager  
 {
-
 
 public:
 	CClient_Manager() = default;
@@ -63,8 +63,8 @@ public: /* For_Player */
 public:/*For.Imgui_AnimTool*/
 #ifdef _DEBUG
 	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);
-	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider);
-	static void		Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom);
+	static void		Collider_Render(CGameObject * pGameObject, CCollider * pColider,  CRenderer* pRenderer);
+	static void		Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom, CRenderer* pRenderer);
 
 #endif // !_DEBUG
 

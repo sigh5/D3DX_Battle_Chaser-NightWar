@@ -37,7 +37,8 @@ private:
 
 
 private:
-	class	CCombatController*	m_pCombatController = nullptr;
+	class	CCombatController*	 	m_pCombatController = nullptr;
+
 
 	_double						m_dCombatIntroTimer = 0.0;
 	_bool						m_bIntroFinish = false;

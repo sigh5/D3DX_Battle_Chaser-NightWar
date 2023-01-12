@@ -70,17 +70,20 @@ struct PS_IN
 struct PS_OUT
 {
 	/*SV_TARGET0 : 모든 정보가 결정된 픽셀이다. AND 0번째 렌더타겟에 그리기위한 색상이다. */
-	float4		vColor : SV_TARGET0;
+	float4		vDiffuse : SV_TARGET0;
+	float4		vNormal : SV_TARGET1;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-
-	if (0.1f > Out.vColor.a)
+	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	if (0.1f > vDiffuse.a)
 		discard;
+
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 
 	return Out;
 }

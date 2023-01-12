@@ -7,7 +7,7 @@
 #include "CombatController.h"
 #include "Weapon.h"
 #include "Buff_Effect.h"
-
+#include "Damage_Font_Manager.h"
 CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
 {
@@ -17,9 +17,9 @@ CSkeleton_Naked::CSkeleton_Naked(const CSkeleton_Naked & rhs)
 	: CMonster(rhs)
 	, m_pShaderCom{ nullptr }
 	, m_pRendererCom{ nullptr }
-	,m_pModelCom{ nullptr }
-	,m_pColliderCom{ nullptr }
-	,m_pStatusCom{ nullptr }
+	, m_pModelCom{ nullptr }
+	, m_pColliderCom{ nullptr }
+	, m_pStatusCom{ nullptr }
 	, m_pFsmCom{ nullptr }
 {
 	m_MonsterParts.clear();
@@ -31,7 +31,7 @@ CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
 	{
 		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
-			
+
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
 			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
@@ -43,7 +43,7 @@ CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
 
 _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 {
-	
+
 	_bool bResult = false;
 	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
@@ -52,11 +52,12 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());	
-	
+		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
+		m_pStatusCom->Take_Damage(m_iGetDamageNum);
+
 		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
-		
+
 		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
 
 		if (pCurActorWepon->Get_HitNum() > 1)
@@ -64,11 +65,16 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		CCombatController::GetInstance()->UI_Shaking(true);
 		bResult = true;
 	}
-	
-	
+
+
 	return bResult;
 }
 
@@ -136,6 +142,29 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 		m_bIsDead = true;
 	}
 
+	//static float ffPos[3] = {};
+	//static float ffScale[3] = {};
+	//static char  szName[MAX_PATH] = "";
+	//ImGui::InputFloat3("SkillPos", ffPos);
+	//ImGui::InputFloat3("SkillScale", ffScale);
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//ImGui::InputText("TextureName", szName, MAX_PATH);
+	//if (ImGui::Button("Create_Effect"))
+	//{
+	//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+	//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+
+	//	m_TextureTag = Texture_NameTag;
+	//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+	//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+
+	//	Create_Test_Effect();		// Test
+
+	//}
+
+	//RELEASE_INSTANCE(CGameInstance);
+
+
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
@@ -166,7 +195,10 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 
 
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+	}
 }
 
 HRESULT CSkeleton_Naked::Render()
@@ -183,10 +215,6 @@ HRESULT CSkeleton_Naked::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-
-#endif // !_DEBUG
 	return S_OK;
 }
 
@@ -203,9 +231,6 @@ void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
 
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
-
-
-
 }
 
 _int CSkeleton_Naked::Is_MovingAnim()
@@ -243,7 +268,7 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 			}
 		}
 		CCombatController::GetInstance()->Camera_Zoom_In();
-	
+
 	}
 	else
 		return;
@@ -317,7 +342,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
 		break;
-	case Client::WEAPON_OPTIONAL_PUNCH_GUN:		
+	case Client::WEAPON_OPTIONAL_PUNCH_GUN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
@@ -331,15 +356,15 @@ void CSkeleton_Naked::Create_Hit_Effect()
 
 	// 3개정도 생성하고 랜덤위치하고 아래에서 위로 올라가는 것처럼 만들기
 
-	if(pGameObject == nullptr)
+	if (pGameObject == nullptr)
 		RELEASE_INSTANCE(CGameInstance);
 
 
-	
+
 	if (iEffectNum == 1)
 	{
 		BuffDesc.ParentTransform = m_pTransformCom;
-	
+
 		BuffDesc.vAngle = 90.f;
 		BuffDesc.fCoolTime = 2.f;
 		BuffDesc.bIsMainTain = false;
@@ -357,7 +382,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		{
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 			BuffDesc.ParentTransform = m_pTransformCom;
-			BuffDesc.vPosition = _float4(_float(rand() % 2 * iSignNum),  1 , _float(rand() % 2 * iSignNum) , 1.f);
+			BuffDesc.vPosition = _float4(_float(rand() % 2 * iSignNum), 1, _float(rand() % 2 * iSignNum), 1.f);
 			BuffDesc.vScale = _float3(_float(iRandScaleNum), _float(iRandScaleNum), _float(iRandScaleNum));
 			BuffDesc.vAngle = 90.f;
 			BuffDesc.fCoolTime = 2.f;
@@ -369,8 +394,8 @@ void CSkeleton_Naked::Create_Hit_Effect()
 			iSignNum *= -1;
 		}
 	}
-	
-	
+
+
 	RELEASE_INSTANCE(CGameInstance);
 
 }
@@ -380,8 +405,21 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 	if (m_pModelCom->Control_KeyFrame_Create(6, 1) && !m_bOnceCreate)
 	{
 		Create_Hit_Effect();
+		CCombatController::GetInstance()->Camera_Shaking();
+		_int iRandom = rand() % 5 + 10;
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
+		m_pStatusCom->Take_Damage(iRandom + m_iGetDamageNum);
 		m_bOnceCreate = true;
 	}
+	else if (m_pModelCom->Control_KeyFrame_Create(8, 1) && !m_bRun)
+	{
+		Create_Move_Target_Effect();
+		m_bRun = true;
+	}
+
 	else
 	{
 		return;
@@ -400,7 +438,7 @@ void CSkeleton_Naked::Multi_Hit_Effect(CGameInstance* pInstance)
 		pGameObject = pInstance->Load_Effect(L"Texture_bretto_Real_Bullet_Effect_0", LEVEL_COMBAT, false);
 		BuffDesc.ParentTransform = m_pTransformCom;
 		BuffDesc.vPosition = _float4(_float(iRandomNum*0.2f * iSignNum), 0.3f, 1.2f, 1.f);
-		BuffDesc.vScale = _float3(4.f,4.f,4.f);
+		BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
 		BuffDesc.vAngle = 90.f;
 		BuffDesc.fCoolTime = 2.f;
 		BuffDesc.bIsMainTain = false;
@@ -410,6 +448,53 @@ void CSkeleton_Naked::Multi_Hit_Effect(CGameInstance* pInstance)
 		m_MonsterParts.push_back(pGameObject);
 		iSignNum *= -1;
 	}
+}
+
+void CSkeleton_Naked::Create_Move_Target_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Jump_Right_To_Left_3", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 0.5f, -1.f, 1.f);
+	BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 1;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CSkeleton_Naked::Create_Test_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = m_vSkill_Pos;
+	BuffDesc.vScale = m_vTestScale;
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CSkeleton_Naked::Fsm_Exit()
@@ -538,9 +623,10 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 1;//30;
+	m_iStateDamage = rand() % 10 + 20;
 	m_pMeHit_Player = nullptr;
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
+	m_bRun = false;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 한대툭
 	m_CurAnimqeue.push({ 9, 1.f });
@@ -553,9 +639,10 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 20;			// 20*2 
+	m_iStateDamage = rand() % 10 + 20;
 	m_pStatusCom->Use_SkillMp(30);
 	m_pMeHit_Player = nullptr;
+	m_bRun = false;
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2대 툭
@@ -597,9 +684,9 @@ void CSkeleton_Naked::Anim_Light_Hit()
 	}
 	else
 	{
-		m_CurAnimqeue.push({ 7 , 1.f });		
+		m_CurAnimqeue.push({ 7 , 1.f });
 	}
-	
+
 	Set_CombatAnim_Index(m_pModelCom);
 	Create_Hit_Effect();
 }

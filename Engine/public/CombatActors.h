@@ -68,6 +68,7 @@ protected:
 	_bool							m_bCombatChaseTarget = false;
 	_bool							m_bUseDefence = false;//디펜스를 사용할때
 	_bool							m_bIsDefenceTimer = false;
+
 protected:
 	_uint							m_bFinishOption = 0;
 	_uint							m_iOldAnim = 0;
@@ -88,7 +89,9 @@ protected:
 	_bool							m_bIsHeavyHit = false;
 
 	_bool							m_bOnceCreate = false;
-			
+	_int							m_iGetDamageNum = 0;
+
+
 protected:
 	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool			m_isWideBuff = false;

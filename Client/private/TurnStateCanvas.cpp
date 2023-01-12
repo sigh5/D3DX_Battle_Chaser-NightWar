@@ -97,6 +97,7 @@ HRESULT CTurnStateCanvas::Last_Initialize()
 
 void CTurnStateCanvas::Tick(_double TimeDelta)
 {
+
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
@@ -263,14 +264,17 @@ void CTurnStateCanvas::StateButton_Child()
 		if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Action")))
 		{
 			m_pCurState.emplace(TEXT("UI_State_Action"), pChild);
+			static_cast<CUIButton*>(pChild)->Set_FontDesc(TEXT("Normal"), _float2(560.f, 575.f), _float2(0.5f, 0.5f), _float4(1.f, 1.f, 1.f, 1.f));
 		}
 		else if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Ablity")))
 		{
 			m_pCurState.emplace(TEXT("UI_State_Ablity"), pChild);
+			static_cast<CUIButton*>(pChild)->Set_FontDesc(TEXT("Skill"), _float2(560.f, 625.f), _float2(0.5f, 0.5f), _float4(0.f, 0.f, 1.f, 1.f));
 		}
 		else if (!lstrcmp(pChild->Get_ObjectName(), TEXT("UI_State_Item")))
 		{
 			m_pCurState.emplace(TEXT("UI_State_Item"), pChild);
+			static_cast<CUIButton*>(pChild)->Set_FontDesc(TEXT("Utills"), _float2(560.f, 675.f), _float2(0.5f, 0.5f), _float4(1.f, 0.f, 0.f, 1.f));
 		}
 		else if (nullptr != dynamic_cast<CUIButton*>(pChild))
 		{
@@ -386,9 +390,5 @@ void CTurnStateCanvas::Free()
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
-	//m_pCurState.clear();
-	//m_pCurFsmButton.clear();
-
-	
 }
+

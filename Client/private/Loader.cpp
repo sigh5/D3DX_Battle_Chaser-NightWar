@@ -37,7 +37,7 @@
 #include "Trun_BattleStart_UI.h"
 #include "Skill_TextureObj.h"
 #include "Buff_Effect.h"
-
+#include "DamageFont.h"
 
 
 /* For.CombatScene*/
@@ -395,6 +395,13 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			CTexture::TYPE_END, 1))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Font"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Font/Font_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -646,6 +653,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Buff_Effect"),
 		CBuff_Effect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DamageFont"),
+		CDamageFont::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

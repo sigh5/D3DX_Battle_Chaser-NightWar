@@ -218,7 +218,7 @@ void CClient_Manager::Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, An
 }
 
 
-void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pColider)
+void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pColider,CRenderer* pRenderer)
 {
 	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -230,14 +230,15 @@ void CClient_Manager::Collider_Render(CGameObject * pGameObject, CCollider * pCo
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
 	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
 	{
-		pColider->Render();
+		pRenderer->Add_DebugRenderGroup(pColider);
+		//pColider->Render();
 	}
 
 	RELEASE_INSTANCE(CPlayerController);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom)
+void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation * pNavigationCom, CRenderer* pRenderer)
 {
 	CGameInstance *pGameInstance = GET_INSTANCE(CGameInstance);
 
@@ -251,7 +252,7 @@ void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation *
 
 	if (!lstrcmp(pGameObject->Get_ObjectName(), pPlayerController->Get_Captin()->Get_ObjectName()))
 	{
-		pNavigationCom->Render();
+		pRenderer->Add_DebugRenderGroup(pNavigationCom);
 	}
 
 	RELEASE_INSTANCE(CPlayerController);

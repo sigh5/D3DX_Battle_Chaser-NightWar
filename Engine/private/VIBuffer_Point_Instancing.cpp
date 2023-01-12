@@ -234,6 +234,7 @@ HRESULT CVIBuffer_Point_Instancing::Tick(_double TimeDelta)
 	for (_uint i = 0; i < m_iNumInstance; ++i)
 	{
 		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += _float(0.1f * TimeDelta);
+
 	}
 
 	m_pContext->Unmap(m_pInstanceBuffer, 0);
@@ -292,6 +293,25 @@ void CVIBuffer_Point_Instancing::Imgui_RenderProperty()
 			m_iPlayOnFrameCnt = 0;
 		}
 	}
+}
+
+void CVIBuffer_Point_Instancing::Move_Up_Position(_float4 vPos)
+{
+	CONTEXT_LOCK;
+	D3D11_MAPPED_SUBRESOURCE			SubResource;
+	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.x = (_float)(vPos.x);
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y = (_float)(vPos.y);
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.z = (_float)(vPos.z);
+	}
+
+	m_pContext->Unmap(m_pInstanceBuffer, 0);
+
 }
 
 void CVIBuffer_Point_Instancing::Move_Up_Tick(_double TimeDelta, _float fSpeed)

@@ -8,16 +8,29 @@ IMPLEMENT_SINGLETON(CTarget_Manager)
 
 CTarget_Manager::CTarget_Manager()
 {
+
 }
 
-HRESULT CTarget_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+ID3D11ShaderResourceView * CTarget_Manager::Get_SRV(const _tchar * pTargetTag)
+{
+	CRenderTarget*		pRenderTarget = Find_RenderTarget(pTargetTag);
+	if (nullptr == pRenderTarget)
+		return nullptr;
+
+	return pRenderTarget->Get_SRV();
+}
+
+HRESULT CTarget_Manager::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 #ifdef _DEBUG
+
 	D3D11_VIEWPORT			ViewportDesc;
 	ZeroMemory(&ViewportDesc, sizeof ViewportDesc);
+
 	_uint			iNumViewports = 1;
 
 	pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
 
@@ -28,9 +41,12 @@ HRESULT CTarget_Manager::Initialize(ID3D11Device * pDevice, ID3D11DeviceContext 
 	m_pVIBuffer = CVIBuffer_Rect::Create(pDevice, pContext);
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
+
 #endif // _DEBUG
+
 	return S_OK;
 }
+
 
 HRESULT CTarget_Manager::Add_RenderTarget(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pTargetTag, _uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4 * pClearColor)
 {
@@ -74,8 +90,10 @@ HRESULT CTarget_Manager::Add_MRT(const _tchar * pMRTTag, const _tchar * pTargetT
 HRESULT CTarget_Manager::Begin_MRT(ID3D11DeviceContext * pContext, const _tchar * pMRTTag)
 {
 	list<CRenderTarget*>*		pMRTList = Find_MRT(pMRTTag);
+
 	if (nullptr == pMRTList)
 		return E_FAIL;
+
 	pContext->OMGetRenderTargets(1, &m_pBackBufferView, &m_pDepthStencilView);
 
 	ID3D11RenderTargetView*		pRTVs[8] = { nullptr };
@@ -104,6 +122,7 @@ HRESULT CTarget_Manager::End_MRT(ID3D11DeviceContext * pContext, const _tchar * 
 	return S_OK;
 }
 #ifdef _DEBUG
+
 HRESULT CTarget_Manager::Ready_Debug(const _tchar * pTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
 {
 	CRenderTarget*		pTarget = Find_RenderTarget(pTargetTag);
@@ -114,7 +133,7 @@ HRESULT CTarget_Manager::Ready_Debug(const _tchar * pTargetTag, _float fX, _floa
 	return pTarget->Ready_Debug(fX, fY, fSizeX, fSizeY);
 }
 
-void CTarget_Manager::Render_Debug(const _tchar * pMRTTag)
+void CTarget_Manager::Render_Debug(const _tchar* pMRTTag)
 {
 	list<CRenderTarget*>*		pMRTList = Find_MRT(pMRTTag);
 	if (nullptr == pMRTList)
@@ -131,7 +150,7 @@ void CTarget_Manager::Render_Debug(const _tchar * pMRTTag)
 		pRenderTarget->Render(m_pShader, m_pVIBuffer);
 	}
 }
-#endif 
+#endif // _DEBUG
 
 CRenderTarget * CTarget_Manager::Find_RenderTarget(const _tchar * pTargetTag)
 {
@@ -166,7 +185,6 @@ void CTarget_Manager::Free()
 
 	for (auto& Pair : m_RenderTargets)
 		Safe_Release(Pair.second);
-
 	m_RenderTargets.clear();
 
 
@@ -176,4 +194,3 @@ void CTarget_Manager::Free()
 
 #endif
 }
-

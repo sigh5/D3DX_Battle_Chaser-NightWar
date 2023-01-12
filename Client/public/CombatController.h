@@ -33,6 +33,8 @@ public:
 	 CGameObject*		Get_CurActor()const { return m_pCurentActor; }
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
 	
+	 const _bool		Get_Late_Init()const { return m_bLateInit; }
+
 	 CGameObject*		Get_HitActor()const { return m_pHitActor; }
 
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
@@ -51,7 +53,7 @@ public:  /*Combat Logic*/
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	void	Status_CanvasInit();
 	void	PlayerWin();
-
+	void	Late_Tick(_double TimeDelta);
 public:
 	void	Refresh_CurActor();
 	void	Mana_Refresh();
@@ -95,20 +97,19 @@ public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 
 private:
 	CGameInstance*			m_pGameInstace = nullptr;
-	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
+	class   CDamage_Font_Manager*	m_pFontManager = nullptr;
 
+private:
+	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
 	map<const wstring,  CGameObject*> m_CurActorMap;
 	map<const wstring, CStatus*>	  m_ActorsStatusMap;
 
-
+private:
 	CGameObject*			m_pCurentActor	= nullptr;		// 현재 순서인놈
 	CGameObject*			m_pHitActor			=		nullptr;		// 맞은놈
 	class CCamera_Combat*			m_pCombatCamera = nullptr;
-
-
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
-
 
 private:
 	_bool					m_bCombatIntro = false;

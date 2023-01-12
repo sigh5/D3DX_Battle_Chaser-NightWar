@@ -19,6 +19,7 @@
 #include "HpMpBuffCanvas.h"
 #include "TrunWinCanvas.h"
 #include "Camera_Combat.h"
+#include "Damage_Font_Manager.h"
 
 #include <string>
 
@@ -28,6 +29,7 @@ IMPLEMENT_SINGLETON(CCombatController);
 
 CCombatController::CCombatController()
 	:m_pGameInstace{ CGameInstance::GetInstance() }
+	, m_pFontManager(CDamage_Font_Manager::GetInstance())
 {
 	//Safe_AddRef(m_pGameInstace);
 }
@@ -126,6 +128,8 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 		m_pGameInstace->Get_GameObject(LEVEL_COMBAT,
 			TEXT("Layer_Camera"), TEXT("CombatLevel_Camera")));
 
+	m_pFontManager->Initialize();
+
 	return S_OK;
 }
 
@@ -154,6 +158,8 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 {
 	if (m_bVirtory)
 		return;
+
+	m_pFontManager->Tick(TimeDelta);
 
 	m_dIntroTimer += TimeDelta *1.f;
 
@@ -230,6 +236,11 @@ void CCombatController::PlayerWin()
 	}
 
 
+}
+
+void CCombatController::Late_Tick(_double TimeDelta)
+{
+	m_pFontManager->Late_Tick(TimeDelta);
 }
 
 

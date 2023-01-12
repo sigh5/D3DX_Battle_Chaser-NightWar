@@ -178,6 +178,12 @@
     <Filter Include="02.GameObjects\Effect\Buff_Effect">
       <UniqueIdentifier>{19f820af-4b44-4593-8b8f-427a5ee9431e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\DamageFont">
+      <UniqueIdentifier>{5ae434d5-d772-4819-b362-22a2b14031dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\DamageFont\Manager">
+      <UniqueIdentifier>{5989a432-e668-4e01-8edb-4bb8a8b1ba7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -366,6 +372,12 @@
     <ClInclude Include="..\Public\Buff_Effect.h">
       <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\DamageFont.h">
+      <Filter>02.GameObjects\DamageFont</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Damage_Font_Manager.h">
+      <Filter>02.GameObjects\DamageFont\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -535,6 +547,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Buff_Effect.cpp">
       <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DamageFont.cpp">
+      <Filter>02.GameObjects\DamageFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Damage_Font_Manager.cpp">
+      <Filter>02.GameObjects\DamageFont\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

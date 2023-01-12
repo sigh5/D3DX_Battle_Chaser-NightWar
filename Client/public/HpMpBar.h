@@ -62,7 +62,6 @@ private:
 	_bool					m_bMove = false;
 	_float4					m_vOriginPos;
 	_int					m_iSwitching = 1;
-	_float					m_fShakingTimer = 0.f;
 	_float4x4				m_WorldMat;
 /* ~For_Shaking*/
 

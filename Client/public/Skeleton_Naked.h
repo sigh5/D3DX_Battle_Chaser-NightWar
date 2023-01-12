@@ -41,7 +41,15 @@ public:
 	virtual void			Create_Hit_Effect()override;
 	void				Anim_Frame_Create_Control();
 
+
+public:
 	void		   Multi_Hit_Effect(class CGameInstance*pInstance);
+	void		   Create_Move_Target_Effect();
+
+public: /*For.Imgui*/
+	void				Create_Test_Effect();		// Test
+
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -79,9 +87,17 @@ private:
 	_float					m_setTickForSecond = 1.f;
 	_uint					m_iWeaponOption = WEAPON_OPTIONAL_NONE;
 	_bool					m_bChange_hit_Effect = false;
-
+	_bool					m_bRun = false;
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;
+
+private: /*For.Imgui*/
+	wstring			m_TextureTag = TEXT("");
+	_float3			m_vSkill_Scale;
+	_float4			m_vSkill_Pos;
+	_float3			m_vTestPos;
+	_float3			m_vTestScale;
+
 
 public:
 	BaseDelegater<UI_REPRESENT, _uint> m_Monster_CombatTurnDelegeter;	// 턴제

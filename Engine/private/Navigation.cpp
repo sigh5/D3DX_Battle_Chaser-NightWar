@@ -249,7 +249,7 @@ void CNavigation::Delete_Navi()
 
 #ifdef _DEBUG
 
-HRESULT CNavigation::Render(_uint iShaderPass)
+HRESULT CNavigation::Render()
 {
 	_float		fHeight = 0.0f;
 
@@ -275,7 +275,7 @@ HRESULT CNavigation::Render(_uint iShaderPass)
 	for (auto& pCell : m_Cells)
 	{
 		if (nullptr != pCell)
-			pCell->Render(m_pShader, iShaderPass);
+			pCell->Render(m_pShader);
 	}
 
 	return S_OK;

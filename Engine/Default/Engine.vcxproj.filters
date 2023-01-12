@@ -700,5 +700,8 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Navigation.hlsl">
       <Filter>01.Utility\03.Components\09.Navigation\Shader</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred.hlsl">
+      <Filter>01.Utility\03.Components\01.Renderer</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

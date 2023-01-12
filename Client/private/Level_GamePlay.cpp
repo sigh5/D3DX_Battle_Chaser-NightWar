@@ -5,6 +5,7 @@
 #include "PlayerController.h"
 #include "Client_Manager.h"
 #include "Camera_Static.h"
+#include "Damage_Font_Manager.h"
 
 #include "Level_Loading.h"
 #include "UI.h"
@@ -12,6 +13,9 @@
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pPlayerController(CPlayerController::GetInstance())
+	
+	
+
 {
 }
 
@@ -44,8 +48,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
 	
-
-
+	
+	
 	
 	return S_OK;
 
@@ -68,7 +72,9 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+	
 
+	
 	//if (GetKeyState(VK_SPACE) & 0x8000)
 	//{
 	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
@@ -104,6 +110,8 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 
 		Safe_Release(pGameInstance);
 	}
+
+	
 
 #endif
 }
@@ -244,6 +252,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
+
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_DamageFont"))))
+		return E_FAIL;*/
+
+
 	//pGameInstance->Load_Effect(TEXT("bretto_Heal_Active_0"), LEVEL_GAMEPLAY);
 	//pGameInstance->Load_Effect(TEXT("bretto_Heal_Active_1"), LEVEL_GAMEPLAY);
 	//pGameInstance->Load_Effect(TEXT("bretto_Punch_Effect_0"), LEVEL_GAMEPLAY);
@@ -342,4 +355,6 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	
+	
+
 }

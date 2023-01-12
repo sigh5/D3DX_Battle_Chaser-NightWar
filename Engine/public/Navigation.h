@@ -48,7 +48,7 @@ public:	/*For.Tool*/
 
 #ifdef _DEBUG
 public:
-	HRESULT Render(_uint iShaderPass=0);
+	virtual HRESULT Render()override;
 #endif // 
 
 private:
