@@ -203,7 +203,7 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 	}
 
 
-	if (nullptr != m_pRendererCom)
+	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 #ifdef _DEBUG

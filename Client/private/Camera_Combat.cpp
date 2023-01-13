@@ -77,20 +77,6 @@ void CCamera_Combat::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	//static float fov = 60.f;
-	//static int iCurActorNum = -1;
-	static bool m_LerpTrue = false;;
-	//ImGui::InputFloat("Fov", &fov);
-
-
-
-	if (ImGui::Button("CurActor && FOV"))
-	{
-		m_fCurShakeTime = 0.f;
-		m_fShakeTime = 0.5f;
-		m_fMagnitude = 0.1f;	
-	}
-
 	Camera_Shaking(TimeDelta);
 
 	
@@ -113,7 +99,7 @@ void CCamera_Combat::Tick(_double TimeDelta)
 
 
 	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
-	//
+
 	//if (pCombatCotroller->Get_CurActor() != nullptr)
 	//{
 	//	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
@@ -124,11 +110,82 @@ void CCamera_Combat::Tick(_double TimeDelta)
 
 	//	_bool b = false;
 
-	//	
-	//}
 
+	//}
 	//RELEASE_INSTANCE(CCombatController);
-		
+
+
+#ifdef _DEBUG
+	
+	if (GetKeyState('W') & 0x8000)
+	{
+		m_pTransformCom->Go_Straight(TimeDelta);
+	}
+
+	if (GetKeyState('S') & 0x8000)
+	{
+		m_pTransformCom->Go_Backward(TimeDelta);
+	}
+
+	if (GetKeyState('A') & 0x8000)
+	{
+		m_pTransformCom->Go_Left(TimeDelta);
+	}
+
+	if (GetKeyState('D') & 0x8000)
+	{
+		m_pTransformCom->Go_Right(TimeDelta);
+	}
+
+
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	if (pGameInstance->Key_Down(DIK_T))
+	{
+		m_bCusorFix = !m_bCusorFix;
+	}
+
+	if (m_bCusorFix)
+	{
+
+
+		if (pGameInstance->Get_DIMouseState(CInput_Device::DIM_RB) & 0x80)
+		{
+			_long			MouseMove = 0;
+
+			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_X))
+			{
+				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 20.f);
+			}
+
+			if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_Y))
+			{
+				m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 20.f);
+			}
+		}
+	}
+	else
+	{
+		_long			MouseMove = 0;
+
+		if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_X))
+		{
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), TimeDelta * MouseMove * 0.1f);
+		}
+
+		if (MouseMove = pGameInstance->Get_DIMouseMove(CInput_Device::DIMS_Y))
+		{
+			m_pTransformCom->Turn(m_pTransformCom->Get_State(CTransform::STATE_RIGHT), TimeDelta * MouseMove * 0.1f);
+		}
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
+
+#endif
+	
+
+
+
 }
 
 void CCamera_Combat::Late_Tick(_double TimeDelta)
@@ -267,6 +324,42 @@ void CCamera_Combat::Camera_ZoomOut(_double TimeDelta)
 	m_pTransformCom->Chase(XMLoadFloat4(&m_vOriginPos), TimeDelta, 3.f);
 
 
+}
+
+void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
+{
+	_matrix		matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+	_float4x4 UntiMat;
+	if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Gully")))
+	{
+
+		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+
+		matRotX = XMMatrixRotationX(XMConvertToRadians(18.f));
+		matRotY = XMMatrixRotationY(XMConvertToRadians(21.7f));
+		matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+		matTrans = XMMatrixTranslation(-4.05f, 5.13f, 16.127f);
+
+		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+		XMStoreFloat4x4(&UntiMat, matWorld);
+		m_pTransformCom->Set_WorldMatrix(UntiMat);
+	}
+
+}
+
+void CCamera_Combat::Ultimate_EndCameraWork()
+{
+	
+	m_pTransformCom->Set_WorldMatrix(m_WorldMat);
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	pGameInstance->Set_Timedelta(TEXT("Timer_60"), 1.0);
+	RELEASE_INSTANCE(CGameInstance);
+
+
+	
+	
 }
 
 

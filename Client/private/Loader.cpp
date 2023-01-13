@@ -402,6 +402,11 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 		return E_FAIL;
 
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Ultimate_Banner"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Ultimate_Banner/Ultimate_Banner_%d.png"),
+			CTexture::TYPE_END, 4))))
+		return E_FAIL;
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -883,6 +888,8 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Bullet/Bullet_%d.png"),
 			CTexture::TYPE_END, 5))))
 		return E_FAIL;
+
+
 
 	return S_OK;
 }

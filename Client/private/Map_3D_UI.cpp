@@ -39,6 +39,12 @@ HRESULT CMap_3D_UI::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+#ifdef NOMODLES
+	m_ObjectName = L"TestUI";
+	m_pTransformCom->Set_Scaled(_float3(1.f, 1.f, 1.f));
+#endif
+
+
 	m_pTransformCom->Set_TransfromDesc(0.5f, 90.f);
 
 	m_bLast_Initlize = true;
@@ -47,15 +53,23 @@ HRESULT CMap_3D_UI::Last_Initialize()
 
 void CMap_3D_UI::Tick(_double TimeDelta)
 {
-	
 
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+#ifdef NOMODLES
+	m_fMoveTimer += _float(TimeDelta);
 
+	if (m_fMoveTimer >= 1.f)
+	{
+		m_iLeft_Right *= -1;
+		m_fMoveTimer = 0;
+		m_pTransformCom->Set_TransfromDesc(10.f*m_iLeft_Right, 90.f);
+}
+
+	m_pTransformCom->Go_Left(TimeDelta);
+#else
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-
 	Coll_CaptinPlayer();
-
 	m_fMoveTimer += _float(TimeDelta);
 
 	if (m_fMoveTimer >= 1.f)
@@ -64,10 +78,14 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 		m_fMoveTimer = 0;
 		m_pTransformCom->Set_TransfromDesc(0.1f*m_iLeft_Right, 90.f);
 	}
-	
+
 	m_pTransformCom->Go_Left(TimeDelta);
+#endif
+	
 
+#ifdef NOMODLES
 
+#else
 	if (m_bOnce )
 	{
 		m_SceneChaneTimer += (_float)(TimeDelta);
@@ -79,7 +97,7 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 	}
 
 	is_Cal_This_Delete();
-
+#endif
 }
 
 void CMap_3D_UI::Late_Tick(_double TimeDelta)
@@ -89,7 +107,12 @@ void CMap_3D_UI::Late_Tick(_double TimeDelta)
 
 	__super::Late_Tick(TimeDelta);
 	if (nullptr != m_pRendererCom)
+	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+#ifdef _DEBUG
+		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
+#endif
+	}
 }
 
 HRESULT CMap_3D_UI::Render()
@@ -102,10 +125,7 @@ HRESULT CMap_3D_UI::Render()
 	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
-#ifdef _DEBUG
-	m_pColliderCom->Render();
 
-#endif // !_DEBUG
 	return S_OK;
 }
 
@@ -211,10 +231,16 @@ HRESULT CMap_3D_UI::SetUp_Components()
 		return E_FAIL;
 	//m_EnviromentDesc.m_pTextureTag
 	/* For.Com_Texture */
+
+#ifdef NOMODLES
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_3DUI_MapColl"), TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+#else
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
-
+#endif
 	CCollider::COLLIDERDESC			ColliderDesc;
 	/* For.Com_AABB */
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));

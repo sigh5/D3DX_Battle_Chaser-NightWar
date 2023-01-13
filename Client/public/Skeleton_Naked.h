@@ -38,13 +38,16 @@ public:
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
-	virtual void			Create_Hit_Effect()override;
-	void				Anim_Frame_Create_Control();
+	virtual void	Create_Hit_Effect()override;
+	virtual void	Create_Heacy_Hit_Effect()override;
+
+	void			Anim_Frame_Create_Control();
 
 
 public:
 	void		   Multi_Hit_Effect(class CGameInstance*pInstance);
 	void		   Create_Move_Target_Effect();
+
 
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test

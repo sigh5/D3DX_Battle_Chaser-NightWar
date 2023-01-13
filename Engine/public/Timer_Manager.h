@@ -14,6 +14,8 @@ private:
 public:
 	_double		Get_TimeDelta(const _tchar* pTimerTag);
 
+	void		Set_Timedelta(const _tchar* pTimerTag, _double Time);
+
 public:
 	HRESULT		Ready_Timer(const _tchar* pTimerTag);
 	void		Update_Timer(const _tchar* pTimerTag);

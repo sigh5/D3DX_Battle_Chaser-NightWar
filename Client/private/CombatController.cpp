@@ -20,8 +20,10 @@
 #include "TrunWinCanvas.h"
 #include "Camera_Combat.h"
 #include "Damage_Font_Manager.h"
+#include "CombatMap.h"
 
-#include <string>
+#include "MyImage.h"
+
 
 
 
@@ -188,6 +190,7 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	MonsterSetTarget();
 	Active_Fsm();
 	Collison_Event();
+	
 
 }
 
@@ -241,6 +244,7 @@ void CCombatController::PlayerWin()
 void CCombatController::Late_Tick(_double TimeDelta)
 {
 	m_pFontManager->Late_Tick(TimeDelta);
+	Ultimate_Tick(TimeDelta);
 }
 
 
@@ -385,6 +389,84 @@ void CCombatController::Set_Player_StateCanvas()
 
 }
 
+void CCombatController::Ultimate_Camera_On()
+{
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
+		{
+			m_CombatMapVec.push_back(pCanvas);
+			continue;
+		}
+		else
+			pCanvas->Set_RenderActive(false);
+	}
+
+	for (auto &pActor : m_CurActorMap)
+	{
+		static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(false);
+	}
+	static_cast<CCombatActors*>(m_pCurentActor)->Set_ModelRender(true);
+
+	m_bCurActorUltimateUse = true;
+
+	
+	m_pGameInstace->Set_Timedelta(TEXT("Timer_60"), 0.3);
+	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Gully")))
+	{
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Knolan"), LEVEL_COMBAT));
+	}
+
+
+
+
+	// ToDo
+	/*
+		카메라 현재 Actor 줌인  + 회전
+		배경 검정색으로만들고 캐릭터만 렌더하게 만들기
+
+	*/
+
+}
+
+void CCombatController::Ultimate_Camera_Off()
+{
+	for (auto &pActor : m_CurActorMap)
+	{
+		static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(true);
+	}
+
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		pCanvas->Set_RenderActive(true);
+	}
+	m_pCombatCamera->Ultimate_EndCameraWork();
+}
+
+void CCombatController::Ultimate_Tick(_double TimeDelta)
+{
+	if (false == m_bCurActorUltimateUse)
+		return;
+
+	if (true == m_pCurBannerImage->Get_BannerTimerFinsish())
+	{
+		m_pCombatCamera->UltimateStart_CameraWork(m_pCurentActor);
+		m_pGameInstace->DeleteGameObject(LEVEL_COMBAT,m_pCurBannerImage->Get_ObjectName());
+		m_bCurActorUltimateUse = false;
+		m_pCurBannerImage = nullptr;
+
+		for (auto& pCanvas : m_CombatMapVec)
+		{
+			pCanvas->Set_RenderActive(false);
+		}
+		m_CombatMapVec.clear();
+	}
+
+
+	
+
+}
+
 void CCombatController::Refresh_CurActor()
 {
 	Set_CurrentActor();
@@ -450,7 +532,8 @@ void CCombatController::Render_StopCanvas()
 {
 	for (auto& pCanvas : m_CanvasVec)
 	{
-		pCanvas->Set_RenderActive(false);
+		if(dynamic_cast<CCombatMap*>(pCanvas) == nullptr)
+			pCanvas->Set_RenderActive(false);
 	}
 }
 
@@ -474,6 +557,29 @@ void CCombatController::UI_Shaking(_bool bShaking)
 {
 	for (auto& pCurCanvas : m_CanvasVec)
 		pCurCanvas->Set_Child_UI_Shaking(bShaking);
+
+}
+
+void CCombatController::Wide_Attack(_bool IsPlayer)
+{
+	if (true == IsPlayer)
+	{
+
+	}
+	else
+	{
+		for (auto& pMonster : m_CurActorMap)
+		{
+			if(dynamic_cast<CMonster*>(pMonster.second) == nullptr)
+				continue;
+
+			pMonster.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
+		}
+
+		Camera_Shaking();
+		//Camera_Zoom_In();
+	}
+
 
 }
 
@@ -981,6 +1087,8 @@ void CCombatController::Free()
 	for (auto& pCanvas : m_CanvasVec)
 		Safe_Release(pCanvas);
 	m_CanvasVec.clear();
+
+	Safe_Release(m_pCurBannerImage);
 
 	//Safe_Release(m_pGameInstace);
 

@@ -4,7 +4,7 @@
 #include "Camera.h"
 
 BEGIN(Engine)
-
+class CGameObject;
 
 END
 
@@ -46,7 +46,10 @@ public:
 	void	Camera_ZoomIn_CurActor(_double TimeDelta);
 	void	Camera_ZoomIn_HitActor(_double TimeDelta);
 	void	Camera_ZoomOut(_double TimeDelta);
+	
 
+	void	UltimateStart_CameraWork(CGameObject* pCurActor);
+	void	Ultimate_EndCameraWork();
 
 
 
@@ -74,6 +77,9 @@ private:
 	_float					m_fZoomHiter_to_Actor_Timer = 0.f;
 	_bool					m_bZoomFinish = false;
 	_float4					m_vOriginPos;
+
+
+	_float4					m_vUltimatePos;
 
 	// shake
 	_float m_fShakeTime=0.f;

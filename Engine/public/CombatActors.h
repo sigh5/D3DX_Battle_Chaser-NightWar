@@ -30,8 +30,15 @@ public:
 		Set_Defence_Timer(bUseDefence);
 	}
 	
+	void			Set_ModelRender(_bool bModelRender) { m_bModelRender = bModelRender; }
+	const _bool		Get_Model_Render()const				{ return m_bModelRender; }
+
 	virtual void			Create_Hit_Effect();
+	virtual void			Create_Heacy_Hit_Effect();
 	virtual	void			Create_Defence_Effect_And_Action();
+
+
+
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -90,11 +97,12 @@ protected:
 
 	_bool							m_bOnceCreate = false;
 	_int							m_iGetDamageNum = 0;
-
+	_bool							m_bIsUseUltimate = false;
 
 protected:
-	_bool			m_bDefence = false;			//스킬에 디펜스가있냐?
-	_bool			m_isWideBuff = false;
+	_bool							m_bDefence = false;			//스킬에 디펜스가있냐?
+	_bool							m_isWideBuff = false;
+	_bool							m_bModelRender = true;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

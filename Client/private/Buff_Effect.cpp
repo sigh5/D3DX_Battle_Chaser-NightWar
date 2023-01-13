@@ -38,10 +38,36 @@ void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc, CBone * pSocket
 	SocketMatrix = SocketMatrix *	m_OriginMatrix* m_Client_BuffEffect_Desc.ParentTransform->Get_WorldMatrix();
 	XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
 
+	//m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	//m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
+	//m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+
+
 	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	m_pVIBufferCom->Set_Point_Instancing_MainTain();
 	m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
 	m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+	m_vScale = m_Client_BuffEffect_Desc.vScale;
+	m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
 
+}
+
+
+void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber)
+{
+	m_bUseGlow = bUseGlow;
+	m_GlowstrTag = GlowTag;
+	m_iGlowTextureNum = iGlowTextureNumber;
+
+	if(true ==m_bUseGlow )
+	{
+	/* For.Com_Texture */
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, GlowTag.c_str(), TEXT("Com_GlowTexture"),
+			(CComponent**)&m_pGlowTextureCom)))
+			assert(!" CBuff_Effect::Set_Glow");
+
+		m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = 1; //Glow
+	}
 
 }
 
@@ -62,8 +88,7 @@ HRESULT CBuff_Effect::Initialize(void * pArg)
 	
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-	//m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = 2;
-
+	
 	return S_OK;
 }
 
@@ -94,26 +119,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 #ifdef NOMODLES
 	m_HitBoxDesc.Poing_Desc = m_pVIBufferCom->Get_Point_TextureDesc();
 #else
-	BUFF_TYPE eType = m_Client_BuffEffect_Desc.eBuffType;
-
-	switch (eType)
-	{
-	case Client::BUFF_ATTACK:
-		break;
-	case Client::BUFF_DEFENCE:
-		break;
-	case Client::BUFF_SINGLE_MANA_UP:
-		break;
-	case Client::BUFF_HP_UP:
-		break;
-	case Client::BUFF_BLEEDING:
-		break;
-	case Client::BUFF_BRUN:
-		break;
 	
-	default:
-		break;
-	}
 #endif	
 
 }
@@ -133,6 +139,7 @@ HRESULT CBuff_Effect::Render()
 
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
+
 	m_pShaderCom->Begin(m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass);
 	m_pVIBufferCom->Render();
 
@@ -203,6 +210,13 @@ HRESULT CBuff_Effect::SetUp_ShaderResources()
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
+
+	if (m_bUseGlow == true)
+	{
+		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", m_iGlowTextureNum)))
+			return E_FAIL;
+	}
+
 
 	return S_OK;
 }
@@ -281,8 +295,16 @@ void CBuff_Effect::Free()
 {
 	__super::Free();
 	
+	if (m_bUseGlow)
+	{
+		Safe_Release(m_pGlowTextureCom);
+	}
+
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+
+
 }

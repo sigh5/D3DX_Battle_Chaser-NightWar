@@ -45,6 +45,7 @@ public:
 	const	_bool	Get_IsFinish()const { return m_bIsFinsishBuffer; }
 	const   _bool  Get_MainTain()const { return m_Client_BuffEffect_Desc.bIsMainTain; }
 	
+	void	Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -59,6 +60,7 @@ private:
 	CRenderer*							m_pRendererCom = nullptr;
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
+	CTexture*							m_pGlowTextureCom = nullptr;
 
 private:
 	BuffEffcet_Client					m_Client_BuffEffect_Desc;
@@ -67,12 +69,18 @@ private:
 	_float4x4							m_SocketMatrix;
 	_float3								m_vScale;
 	_bool								m_bIsFinsishBuffer = false;
+	_bool								m_bUseGlow = false;
+	wstring								m_GlowstrTag = TEXT("");
+	_int								m_iGlowTextureNum = 0;
+	_float								m_bMainTainTimer = 0.f;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 	
 private:
 	void		Reset_CurMartirx();
+
 
 
 public:

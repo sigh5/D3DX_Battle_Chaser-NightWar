@@ -129,7 +129,7 @@ void CSpider_Mana::Late_Tick(_double TimeDelta)
 	for (auto &pParts : m_MonsterParts)
 		pParts->Late_Tick(TimeDelta);
 
-	if (nullptr != m_pRendererCom)
+	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);

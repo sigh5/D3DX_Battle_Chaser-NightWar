@@ -225,7 +225,7 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 	}
 
 
-	if (nullptr != m_pRendererCom)
+	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 #ifdef  _DEBUG
@@ -799,6 +799,13 @@ void CHero_Knolan::Create_SkillFire()
 
 void CHero_Knolan::Create_Skill_Ultimate_Effect()
 {
+#ifdef CAMERA_WORK
+
+#else
+	if (m_pHitTarget == nullptr)
+		return;
+#endif
+
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
@@ -833,12 +840,12 @@ void CHero_Knolan::Create_Skill_Ultimate_Effect()
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
 
-	if (m_pModelCom->Control_KeyFrame_Create(7, 15) && !m_bOnceStop)
+	if (!m_bOnceStop && m_pModelCom->Control_KeyFrame_Create(7, 15) )
 	{
 		Create_Skill_Texture();
 		m_bOnceStop = true;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(7, 64) && !m_bOnceCreate)
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(7, 64) )
 	{
 		size_t PartSize = m_PlayerParts.size();
 		for (size_t i = 0; i < PartSize; ++i)
@@ -851,7 +858,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(9, 1) && !m_bOnceCreate)
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(9, 1)  )
 	{
 		CCombatController::GetInstance()->Camera_Shaking();
 		CCombatController::GetInstance()->UI_Shaking(true);
@@ -866,7 +873,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(24,10)&& !m_bOnceStop)
+	else if (!m_bOnceStop &&m_pModelCom->Control_KeyFrame_Create(24,10))
 	{
 		
 		size_t PartSize = m_PlayerParts.size();
@@ -880,7 +887,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceStop = true;
 
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(24, 71) && !m_bOnceCreate)
+	else if (!m_bOnceCreate  && m_pModelCom->Control_KeyFrame_Create(24, 71) )
 	{
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
@@ -894,27 +901,36 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		}
 
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(21, 53) && !m_bOnceCreate)
+	else if (!m_bOnceCreate &&m_pModelCom->Control_KeyFrame_Create(21, 53) )
 	{
 		Create_Skill_Texture_On_Hiter();
 		m_bOnceCreate = true;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(27, 90) && !m_bOnceCreate)
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(27, 90))
 	{
 		Create_Wide_BuffEffect_Second();
 		m_bOnceCreate = true;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(28, 60) && !m_bOnceCreate)
+#ifdef CAMERA_WORK
+
+#else
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 60) )
 	{
 		Create_Skill_Ultimate_Effect();
 		m_bOnceCreate = true;
 	}
-	else if (m_bUseDefence == true && m_pModelCom->Control_KeyFrame_Create(26, 20) && !m_bOnceCreate)
+	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 100))
+	{
+		CCombatController::GetInstance()->Wide_Attack(false);
+		m_bIsUseUltimate = true;
+	}
+#endif
+	else if (m_bUseDefence == true &&  !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(26, 20))
 	{
 		Create_Defence_Area();
 		m_bOnceCreate = true;
 	}
-	else if (m_bUseDefence == true && !m_bOnceCreate &&m_pModelCom->Control_KeyFrame_Create(6, 43))
+	else if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 43))
 	{
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
@@ -1127,6 +1143,7 @@ void CHero_Knolan::Anim_Uitimate()
 	m_CurAnimqeue.push({ 28, 1.f }); // 	60프레임때 광역기 시전
 	m_CurAnimqeue.push({ 1,  1.f });
 	m_bOnceCreate = false;
+	m_bIsUseUltimate = false;
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

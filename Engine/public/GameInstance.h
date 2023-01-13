@@ -83,7 +83,7 @@ public: /* For.Object_Manager */
 	class CGameObject* Get_SelectObject();
 	HRESULT Loading_Objects();
 	class CGameObject*		Get_GameObject(_uint iLevelIndex, const wstring& pLayerTag, const wstring& pObjectNameTag);
-	void	Load_Object(const _tchar *pDataFileName = nullptr,_uint iCurLevel=0);
+	class CGameObject*	Load_Object(const _tchar *pDataFileName = nullptr,_uint iCurLevel=0);
 	class CGameObject*	Load_Effect(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0,  _bool IsHaveLayer = false);
 	
 	
@@ -113,6 +113,7 @@ public:/* For.TimeManager */
 	_double		Get_TimeDelta(const _tchar* pTimerTag);
 	HRESULT		Ready_Timer(const _tchar* pTimerTag);
 	void		Update_Timer(const _tchar* pTimerTag);
+	void		Set_Timedelta(const _tchar * pTimerTag, _double Time);
 
 public:/* For.Light_Manager */
 	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;

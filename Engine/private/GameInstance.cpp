@@ -381,10 +381,10 @@ CGameObject * CGameInstance::Get_GameObject(_uint iLevelIndex, const wstring & p
 	return m_pObject_Manager->Get_GameObject(iLevelIndex, pLayerTag, pObjectNameTag);
 }
 
-void CGameInstance::Load_Object(const _tchar * pDataFileNam, _uint iCurLevel )
+CGameObject* CGameInstance::Load_Object(const _tchar * pDataFileNam, _uint iCurLevel )
 {
 	if (nullptr == m_pObject_Manager)
-		return ;
+		return nullptr;
 	return m_pObject_Manager->Load_Object(pDataFileNam, iCurLevel);
 }
 
@@ -534,6 +534,14 @@ void CGameInstance::Update_Timer(const _tchar * pTimerTag)
 		return;
 
 	m_pTimer_Manager->Update_Timer(pTimerTag);
+}
+
+void CGameInstance::Set_Timedelta(const _tchar * pTimerTag, _double Time)
+{
+	if (nullptr == m_pTimer_Manager)
+		return;
+
+	m_pTimer_Manager->Set_Timedelta(pTimerTag, Time);
 }
 
 const LIGHTDESC * CGameInstance::Get_LightDesc(_uint iIndex) const

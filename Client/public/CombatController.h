@@ -52,29 +52,40 @@ public:  /*Combat Logic*/
 	HRESULT Late_Init();
 	void	CurrentTurn_ActorControl(_double TimeDelta);		//Tick
 	void	Status_CanvasInit();
-	void	PlayerWin();
 	void	Late_Tick(_double TimeDelta);
-public:
-	void	Refresh_CurActor();
-	void	Mana_Refresh();
-public:
 	void	Active_Fsm();
-	void	ResetState();
-	void	Render_StopCanvas();
-	void	Camera_Shaking();
-	void	Camera_Zoom_Out();
-	void	Camera_Zoom_In();
-	void	UI_Shaking(_bool bShaking);
-
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
 	void	MonsterSetTarget();
+
+public:	/*Reset*/
+	void	Refresh_CurActor();
+	void	Mana_Refresh();
+	void	ResetState();
+	void	Set_Player_StateCanvas();
+	/*Win*/
+	void	PlayerWin();	
+	void	Render_StopCanvas();
 	
+	/*Camera*/
+	void	Camera_Shaking();
+	void	Camera_Zoom_Out();
+	void	Camera_Zoom_In();
+	void	UI_Shaking(_bool bShaking);
+	void	Wide_Attack(_bool IsPlayer);
+
+
 	void	Collison_Event();
 	void	Cal_HitPlayerTarget();
 
-	void	Set_Player_StateCanvas();
+
+
+public:		/*플레이어턴 + 얼티메이트 */
+	void	Ultimate_Camera_On();
+	void	Ultimate_Camera_Off();
+	void	Ultimate_Tick(_double TimeDelta);
+
 
 	// 선 상태 설정 후 몬스터 설정
 
@@ -101,6 +112,7 @@ private:
 
 private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
+	vector<CCanvas*>		m_CombatMapVec;
 	map<const wstring,  CGameObject*> m_CurActorMap;
 	map<const wstring, CStatus*>	  m_ActorsStatusMap;
 
@@ -110,6 +122,8 @@ private:
 	class CCamera_Combat*			m_pCombatCamera = nullptr;
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
+	class CMyImage*			m_pCurBannerImage = nullptr;
+	
 
 private:
 	_bool					m_bCombatIntro = false;
@@ -132,6 +146,10 @@ private:
 	
 	_bool					m_bCanvasRenderCheck = false;
 	_float					m_fAfter_DefenceButtonCheck = 0.f;
+	
+	_bool					m_bCurActorUltimateUse = false;
+
+
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();

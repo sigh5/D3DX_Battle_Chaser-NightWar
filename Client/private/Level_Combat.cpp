@@ -61,6 +61,7 @@ void CLevel_Combat::Tick(_double TimeDelta)
 
 	
 
+
 	m_TimeAcc += TimeDelta;
 
 }
@@ -124,6 +125,18 @@ HRESULT CLevel_Combat::Render()
 void CLevel_Combat::Combat_Control_Tick(_double TimeDelta)
 {
 	m_pCombatController->CurrentTurn_ActorControl(TimeDelta);
+
+	if (ImGui::Button("Ultimate_ON"))
+	{
+		m_pCombatController->Ultimate_Camera_On();
+	}
+	
+	if (ImGui::Button("Ultimate_OFF"))
+	{
+		m_pCombatController->Ultimate_Camera_Off();
+	}
+
+
 }
 
 void CLevel_Combat::Combat_Intro()

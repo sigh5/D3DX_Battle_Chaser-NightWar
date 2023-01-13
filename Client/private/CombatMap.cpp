@@ -71,7 +71,13 @@ void CCombatMap::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	
+	char Name[MAX_PATH] = "";
 
+	WideCharToMultiByte(CP_ACP, 0, m_ObjectName, MAX_PATH, Name, MAX_PATH, NULL, NULL);
+
+	ImGui::Text("%s", Name);
+
+		
 
 	__super::Tick(TimeDelta);
 }
@@ -88,6 +94,9 @@ void CCombatMap::Late_Tick(_double TimeDelta)
 
 HRESULT CCombatMap::Render()
 {
+	if (!m_bRenderActive)
+		return S_OK;
+
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 
@@ -162,6 +171,11 @@ void CCombatMap::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 	if (FAILED(__super::Add_Component(iLevel, m_UIDesc.m_pTextureTag, TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom)))
 		assert("CTurnCharcterUI Change_Texture");
+}
+
+void CCombatMap::Set_RenderActive(_bool bActive)
+{
+	__super::Set_RenderActive(bActive);
 }
 
 

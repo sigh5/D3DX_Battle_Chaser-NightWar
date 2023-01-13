@@ -52,6 +52,11 @@ HRESULT CMyImage::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	if (!lstrcmp(m_UIDesc.m_pTextureTag, TEXT("Prototype_Component_Texture_Ultimate_Banner")))
+	{
+		m_iShaderPassNum = 3;
+		m_bRenderActive = true;
+	}
 
 
 
@@ -64,12 +69,27 @@ void CMyImage::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+	if (3 == m_iShaderPassNum)
+	{
+		m_BanerTimer += (_float)TimeDelta;
+	
+		if (m_BanerTimer >= 1.0f)
+		{
+			m_bRenderActive = false;
+			m_bBanerTimerFinish = true;
+		}
+	
+	}
+
 	Shake_Move(TimeDelta);
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+
+	if (m_bBanerTimerFinish)
+		return;
 
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
@@ -87,7 +107,7 @@ HRESULT CMyImage::Render()
 		return E_FAIL;
 
 
-	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
+	m_pShaderCom->Begin(m_iShaderPassNum);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
 

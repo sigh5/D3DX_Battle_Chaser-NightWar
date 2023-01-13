@@ -11,6 +11,8 @@
 #include "CombatController.h"
 #include "Damage_Font_Manager.h"
 
+
+
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 	, m_pToolManager(CToolManager::GetInstance())
@@ -84,13 +86,28 @@ void CMainApp::Tick(_double TimeDelta)
 
 	LastInitalize();
 
-	CClient_Manager::TimeDelta = TimeDelta;
 	
-
 	m_pGameInstance->Tick_Engine(TimeDelta);
 	m_pToolManager->Imgui_SelectParentViewer();
 
-	
+	CClient_Manager::TimeDelta = TimeDelta;
+
+	//static double TimeSlow = 1.0;
+	//ImGui::InputDouble("Time : ", &TimeSlow);
+
+
+	//if (ImGui::Button("TimeSLow"))
+	//{
+	//	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	//	pGameInstance->Set_Timedelta(TEXT("Timer_60"), TimeSlow);
+
+	//	RELEASE_INSTANCE(CGameInstance);
+	//}
+
+	//
+
+
 }
 
 HRESULT CMainApp::Render()
@@ -101,7 +118,7 @@ HRESULT CMainApp::Render()
 
 
 	m_pGameInstance->Render_ImGui();
-	m_pGameInstance->Clear_Graphic_Device(&_float4(0.5f, 0.5f, 0.5f, 1.f));
+	m_pGameInstance->Clear_Graphic_Device(&_float4(0.0f, 0.0f, 0.0f, 1.f));
 	m_pRenderer->Draw_RenderGroup();
 	m_pGameInstance->Render_Update_ImGui();
 	m_pGameInstance->Render_Level();

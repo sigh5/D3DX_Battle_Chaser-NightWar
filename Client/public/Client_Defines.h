@@ -5,11 +5,13 @@
 #include <time.h>
 #include <queue>
 #include <set>
-
+#include <string>
 #define EPSILON 0.0001
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
 //#define NOMODLES
+#define	 CAMERA_WORK
+
 
 namespace Client
 {																			
@@ -80,6 +82,8 @@ extern unsigned int	g_iWinSizeX;
 extern unsigned int	g_iWinSizeY;
 extern const unsigned int	g_iFullWinSizeX;
 extern const unsigned int	g_iFullWinSizeY;
+
+
 
 static  int			m_iLoadingIndex;
 

@@ -18,6 +18,10 @@ void CCombatActors::Create_Hit_Effect()
 {
 }
 
+void CCombatActors::Create_Heacy_Hit_Effect()
+{
+}
+
 void CCombatActors::Create_Defence_Effect_And_Action()
 {
 }

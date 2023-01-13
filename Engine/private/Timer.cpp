@@ -33,7 +33,7 @@ void CTimer::Update_Timer()
 		m_OriginTime = m_CurrentTime;
 	}
 
-	m_TimeDelta = float(m_CurrentTime.QuadPart - m_OldTime.QuadPart) / m_CpuTick.QuadPart;
+	m_TimeDelta = (float(m_CurrentTime.QuadPart - m_OldTime.QuadPart) / m_CpuTick.QuadPart ) *m_TimeSlowDelta;
 
 	m_OldTime = m_CurrentTime;
 }

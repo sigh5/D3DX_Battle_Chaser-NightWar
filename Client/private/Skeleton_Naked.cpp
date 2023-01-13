@@ -194,7 +194,7 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 	}
 
 
-	if (nullptr != m_pRendererCom)
+	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
@@ -400,9 +400,37 @@ void CSkeleton_Naked::Create_Hit_Effect()
 
 }
 
+void CSkeleton_Naked::Create_Heacy_Hit_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+
+	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	pGameObject = pInstance->Load_Effect(L"Texture_Die_Effect_3", LEVEL_COMBAT, false);
+	BuffDesc.vPosition = _float4(0.f, 2.0f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+	BuffDesc.ParentTransform = m_pTransformCom;
+
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 2.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
 void CSkeleton_Naked::Anim_Frame_Create_Control()
 {
-	if (m_pModelCom->Control_KeyFrame_Create(6, 1) && !m_bOnceCreate)
+	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 1))
 	{
 		Create_Hit_Effect();
 		CCombatController::GetInstance()->Camera_Shaking();
@@ -414,10 +442,20 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		m_pStatusCom->Take_Damage(iRandom + m_iGetDamageNum);
 		m_bOnceCreate = true;
 	}
-	else if (m_pModelCom->Control_KeyFrame_Create(8, 1) && !m_bRun)
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 1) )
 	{
 		Create_Move_Target_Effect();
 		m_bRun = true;
+	}
+	else if(!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(17, 68))
+	{
+		_int iRandom = rand() % 10 + 50;
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom);
+		m_pStatusCom->Take_Damage(iRandom);
+		m_bOnceCreate = true;
 	}
 
 	else
@@ -694,9 +732,16 @@ void CSkeleton_Naked::Anim_Light_Hit()
 void CSkeleton_Naked::Anim_Heavy_Hit()
 {
 	++m_iHitNum;
-	m_CurAnimqeue.push({ 6, 1.f });
+	m_bOnceCreate = false;
+	
+	m_CurAnimqeue.push({ 17, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	Create_Hit_Effect();
+	
+	Create_Heacy_Hit_Effect();
+	
+	
+	
+	
 }
 
 void CSkeleton_Naked::Anim_Die()

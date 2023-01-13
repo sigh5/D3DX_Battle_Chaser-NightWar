@@ -26,6 +26,7 @@ public:
 	void Tick(_double TimeDelta);
 	HRESULT Render();	
 	
+	const _bool	 ChangeTimeDelta()const { return m_bTimeStop; }
 private:
 	HRESULT Ready_Gara();
 
@@ -56,7 +57,7 @@ private:
 	HRESULT	Ready_BufferLock_UnLock();
 
 	_bool	m_bLastUpdate = false;
-
+	_bool	m_bTimeStop = false;
 
 
 public:

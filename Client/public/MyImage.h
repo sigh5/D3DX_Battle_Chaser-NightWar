@@ -21,7 +21,7 @@ private:
 
 public:
 	void	Set_MaxTextureNum(_uint iMaxTextureNum) { m_iMaxTextureNum = iMaxTextureNum; }
-
+	const _bool Get_BannerTimerFinsish()const { return m_bBanerTimerFinish; }
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -65,6 +65,10 @@ private:
 	_float4x4				m_WorldMat;
 	// shake
 
+	_uint					m_iShaderPassNum = 1;
+	_float					m_BanerTimer = 0.f;
+
+	_bool					m_bBanerTimerFinish = false;
 
 private:
 	HRESULT SetUp_Components();

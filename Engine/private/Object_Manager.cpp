@@ -605,14 +605,14 @@ void CObject_Manager::Imgui_Save_Effect()
 	}
 }
 
-void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
+CGameObject* CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 {
 
 	CLevel_Manager* pLevelManager = GET_INSTANCE(CLevel_Manager);
 	_tchar* szName = new _tchar[256];
 	m_vecNameArray.push_back(szName);
 	_tchar szPath[MAX_PATH] = TEXT("../../Data/");
-
+	CGameObject* pGameObject = nullptr;
 	if (0 == iCurLevel)
 		iCurLevel = pLevelManager->GetCurLevelIdx();
 
@@ -640,7 +640,7 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 
 	if (INVALID_HANDLE_VALUE == hFile)
 	{
-		return;
+		return nullptr;
 	}
 
 	DWORD   dwByte = 0;
@@ -700,7 +700,7 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 			lstrcpy(Desc.m_pModelTag, ModelName);
 			Desc.m_iShaderPass = iShaderPass;
 			lstrcpy(Desc.m_pTextureTag, TextureName);
-			CGameObject* pGameObject = nullptr;
+			
 			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &Desc);
 			if (pGameObject == nullptr)
 				assert(!"????");
@@ -716,7 +716,6 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 			ZeroMemory(&UIDesc, sizeof(UIDesc));
 			lstrcpy(UIDesc.m_pTextureTag, TextureName);
 
-			CGameObject* pGameObject = nullptr;
 			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &UIDesc);
 			if (pGameObject == nullptr)
 				assert(!"????");
@@ -737,8 +736,13 @@ void CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCurLevel)
 	}
 
 	CloseHandle(hFile);
-
 	RELEASE_INSTANCE(CLevel_Manager);
+
+	if (nullptr != pGameObject)
+		return pGameObject;
+	else
+		assert(!  "Error");
+	
 
 }
 

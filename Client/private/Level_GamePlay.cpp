@@ -61,6 +61,11 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 		
 
 	m_TimeAcc += TimeDelta;
+
+
+	
+
+
 #ifdef NOMODLES
 
 
@@ -192,7 +197,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Map_3D_UI"))))
+		return E_FAIL;
 
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);

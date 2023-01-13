@@ -28,6 +28,7 @@ public:
 	virtual HRESULT Render()override;
 
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag)override;
+	virtual void	Set_RenderActive(_bool bActive);
 
 private:
 	CShader*				m_pShaderCom = nullptr;

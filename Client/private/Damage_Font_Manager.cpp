@@ -66,9 +66,6 @@ HRESULT CDamage_Font_Manager::Initialize()
 
 void CDamage_Font_Manager::Tick(_double TimeDelta)
 {
-
-	ImGui::InputFloat("Between", &m_fBetween);
-
 	if (m_bFontUpdate)
 	{
 		m_fFontTimer += (_float)TimeDelta;

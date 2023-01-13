@@ -66,9 +66,9 @@ BlendState BS_Default
 BlendState BS_AlphaBlend
 {
 	BlendEnable[0] = true;
-SrcBlend = SRC_ALPHA;
-DestBlend = INV_SRC_ALPHA;
-BlendOp = Add;
+	SrcBlend = SRC_ALPHA;
+	DestBlend = INV_SRC_ALPHA;
+	BlendOp = Add;
 };
 
 BlendState BS_One			// 나무 그릴때 멀리서 있으때 색깔을 섞는것

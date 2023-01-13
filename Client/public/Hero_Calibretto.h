@@ -97,6 +97,7 @@ private:
 	_bool					m_bRun = false;
 	_bool					m_bBulletShoot = false;
 	_bool					m_bCreateSmoke = true;
+	_bool					m_bLazorStop = true;
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();

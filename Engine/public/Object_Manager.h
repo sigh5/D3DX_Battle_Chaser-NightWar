@@ -32,7 +32,7 @@ public:
 	class CGameObject* Clone_UI(_uint iLevel, const wstring& pLayerTag,class CGameObject* pGameObject); 	// UI_TurnCanvas  Àü¿ë
 
 
-	void	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);
+	class CGameObject*	Load_Object(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0);
 
 	class CGameObject*	Load_Effect(const _tchar *pDataFileName = nullptr, _uint iCurLevel = 0, _bool IsHaveLayer=false);
 
