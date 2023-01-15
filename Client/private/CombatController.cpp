@@ -244,7 +244,8 @@ void CCombatController::PlayerWin()
 void CCombatController::Late_Tick(_double TimeDelta)
 {
 	m_pFontManager->Late_Tick(TimeDelta);
-	Ultimate_Tick(TimeDelta);
+	
+	Ultimate_LateTick(TimeDelta);
 }
 
 
@@ -391,50 +392,43 @@ void CCombatController::Set_Player_StateCanvas()
 
 void CCombatController::Ultimate_Camera_On()
 {
+
+	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_END);
+
 	for (auto& pCanvas : m_CanvasVec)
 	{
 		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
 		{
-			m_CombatMapVec.push_back(pCanvas);
+			//m_CombatMapVec.push_back(pCanvas);
 			continue;
 		}
 		else
 			pCanvas->Set_RenderActive(false);
 	}
 
-	for (auto &pActor : m_CurActorMap)
-	{
-		static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(false);
-	}
-	static_cast<CCombatActors*>(m_pCurentActor)->Set_ModelRender(true);
+
 
 	m_bCurActorUltimateUse = true;
 
-	
-	m_pGameInstace->Set_Timedelta(TEXT("Timer_60"), 0.3);
 	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Gully")))
 	{
 		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Knolan"), LEVEL_COMBAT));
 	}
-
-
-
-
-	// ToDo
-	/*
-		카메라 현재 Actor 줌인  + 회전
-		배경 검정색으로만들고 캐릭터만 렌더하게 만들기
-
-	*/
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Alumon")))
+	{
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Garrison"), LEVEL_COMBAT));
+	}
+	else if(!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	{
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Caibretto"), LEVEL_COMBAT));
+	}
 
 }
 
 void CCombatController::Ultimate_Camera_Off()
 {
 	for (auto &pActor : m_CurActorMap)
-	{
 		static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(true);
-	}
 
 	for (auto& pCanvas : m_CanvasVec)
 	{
@@ -443,7 +437,14 @@ void CCombatController::Ultimate_Camera_Off()
 	m_pCombatCamera->Ultimate_EndCameraWork();
 }
 
-void CCombatController::Ultimate_Tick(_double TimeDelta)
+void CCombatController::Ultimate_LateTick(_double TimeDelta)
+{
+	Ultimate_Start_LateTick(TimeDelta);
+	Ultimate_Timedelta_Tick(TimeDelta);
+	Ultimate_End_LateTick(TimeDelta);
+}
+
+void CCombatController::Ultimate_Start_LateTick(_double TimeDelta)
 {
 	if (false == m_bCurActorUltimateUse)
 		return;
@@ -451,20 +452,48 @@ void CCombatController::Ultimate_Tick(_double TimeDelta)
 	if (true == m_pCurBannerImage->Get_BannerTimerFinsish())
 	{
 		m_pCombatCamera->UltimateStart_CameraWork(m_pCurentActor);
-		m_pGameInstace->DeleteGameObject(LEVEL_COMBAT,m_pCurBannerImage->Get_ObjectName());
+		m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCurBannerImage->Get_ObjectName());
 		m_bCurActorUltimateUse = false;
 		m_pCurBannerImage = nullptr;
-
-		for (auto& pCanvas : m_CombatMapVec)
+		m_bBannerClose = true;
+		m_pCombatBG = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG"), LEVEL_COMBAT);
+		
+		for (auto &pActor : m_CurActorMap)
 		{
-			pCanvas->Set_RenderActive(false);
+			static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(false);
 		}
-		m_CombatMapVec.clear();
+		static_cast<CCombatActors*>(m_pCurentActor)->Set_ModelRender(true);
 	}
 
+}
 
+void CCombatController::Ultimate_Timedelta_Tick(_double TimeDelta)
+{
+	if (false == m_bBannerClose)
+		return;
 	
+	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	{
+		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 1.0f);
+		return;
+	}
 
+	m_fTimeSlowRatio -= _float(TimeDelta);
+	m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.3f);
+	m_pGameInstace->Set_Timedelta(TEXT("Timer_60"), m_fTimeSlowRatio);	
+	
+}
+
+void CCombatController::Ultimate_End_LateTick(_double TimeDelta)
+{
+	if (false == m_bCurActorUltimateEnd)
+		return;
+	m_bBannerClose = false;
+	m_bCurActorUltimateEnd = false;
+	m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCombatBG->Get_ObjectName());
+	Ultimate_Camera_Off();
+	m_pCombatBG = nullptr;
+	
 }
 
 void CCombatController::Refresh_CurActor()
@@ -475,7 +504,7 @@ void CCombatController::Refresh_CurActor()
 	m_bisHitTimer_Alive = false;
 	m_fHitTimer = 0.0f;
 	m_iHitNum = 0;
-
+	
 	
 	Set_Player_StateCanvas();
 }
@@ -514,6 +543,18 @@ void CCombatController::Active_Fsm()
 
 	//To_Die();
 	
+}
+
+void CCombatController::HPMp_Update(CGameObject* pHiter)
+{
+	for (auto &Canvas : m_CanvasVec)
+	{
+		if (dynamic_cast<CHpMpBuffCanvas*>(Canvas) != nullptr)
+		{
+			static_cast<CHpMpBuffCanvas*>(Canvas)->Set_HitEvent(pHiter, true);
+			static_cast<CHpMpBuffCanvas*>(Canvas)->Set_MpEvent(true);
+		}
+	}
 }
 
 void CCombatController::ResetState()
@@ -823,8 +864,9 @@ void CCombatController::To_Uitimate()
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_ULTIMATE)
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Uitimate);
+		//m_pCurentActor->Set_FsmState(true, CGameObject::m_Uitimate);
 
+		Ultimate_Camera_On();
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);

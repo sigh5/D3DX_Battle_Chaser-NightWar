@@ -62,6 +62,7 @@ public:	 /*Create_Effect*/
 	void				Create_Skill1_Attack_Effect();		// Test_Texture용 나중에 삭제바람
 	void				Create_Skill2_Attack_Effect();
 	void				Create_Ultimate_Effect();
+	void				Create_Ultimate_End_Effect();
 	void				Create_BuffEffect();
 	void				Create_Move_Target_Effect();
 	void				Create_Defence_Area();
@@ -74,7 +75,7 @@ public:
 
 	void			  Is_Skill1MovingAnim();
 	void			  CombatAnim_Move(_double TImeDelta);
-
+	void		      Ultimate_Anim_Frame_Control();
 
 
 public:
@@ -139,6 +140,8 @@ private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_GARRISON;
 	WeaponType		m_eWeaponType = WEAPON_SWORD;
+	_bool			m_bUltimamteEffect = false;
+	_float			m_UltimateTimer = 0.f;
 
 private:
 	_float		m_SpeedRatio = 7.f;
@@ -149,6 +152,8 @@ private:
 	wstring			m_TextureTag = TEXT("");
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
+
+	_bool		m_bUltimateHit[14] = { false };
 
 	/*Imgui*/
 	_float3			m_vTestPos;

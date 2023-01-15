@@ -39,6 +39,10 @@ public:
 
 	 void				Set_CombatIntro(_bool bIsIntro) { m_bCombatIntro = bIsIntro;}
 	 void				Set_MonsterSetTarget(_bool bSetTaget) { m_bMonsterSelect_Target = bSetTaget; }
+	 void				Set_Ultimate_End(_bool bUltimateEnd) { m_bCurActorUltimateEnd = bUltimateEnd; }
+
+
+	
 
 
 	 map<const wstring, CGameObject*>* Get_CurActorMap() { return &m_CurActorMap; }
@@ -54,6 +58,9 @@ public:  /*Combat Logic*/
 	void	Status_CanvasInit();
 	void	Late_Tick(_double TimeDelta);
 	void	Active_Fsm();
+
+
+	void	HPMp_Update(CGameObject* pHiter);
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
@@ -82,12 +89,15 @@ public:	/*Reset*/
 
 
 public:		/*플레이어턴 + 얼티메이트 */
+	void	Ultimate_LateTick(_double TimeDelta);
+
+private:
+	void	Ultimate_Start_LateTick(_double TimeDelta);
+	void	Ultimate_Timedelta_Tick(_double TimeDelta);
+	void	Ultimate_End_LateTick(_double TimeDelta);
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
-	void	Ultimate_Tick(_double TimeDelta);
 
-
-	// 선 상태 설정 후 몬스터 설정
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 	_bool		To_Idle();				// 애는 좀 애매함
@@ -112,7 +122,7 @@ private:
 
 private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
-	vector<CCanvas*>		m_CombatMapVec;
+	//vector<CCanvas*>		m_CombatMapVec;
 	map<const wstring,  CGameObject*> m_CurActorMap;
 	map<const wstring, CStatus*>	  m_ActorsStatusMap;
 
@@ -123,7 +133,7 @@ private:
 	class CTurnUICanvas*	m_pTurnCanvas = nullptr;
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
 	class CMyImage*			m_pCurBannerImage = nullptr;
-	
+	class CGameObject*		m_pCombatBG = nullptr;
 
 private:
 	_bool					m_bCombatIntro = false;
@@ -148,6 +158,9 @@ private:
 	_float					m_fAfter_DefenceButtonCheck = 0.f;
 	
 	_bool					m_bCurActorUltimateUse = false;
+	_float					m_fTimeSlowRatio = 0.5f;
+	_bool					m_bCurActorUltimateEnd = false;
+	_bool					m_bBannerClose = false;
 
 
 private:

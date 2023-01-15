@@ -56,6 +56,9 @@ public:  /*For.Combat*/
 
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
+	void				Create_Test_Rect_Effect();		// Test
+
+	
 	void				Create_Test_TextureObj();		// Test
 
 
@@ -72,6 +75,7 @@ private: /*Create_Effect*/
 	void			    Create_WideBuffEffect();
 	void			    Create_Wide_BuffEffect_Second();
 	void			    Create_Skill_Ultimate_Effect();
+	void				Create_Ultimate_End_Effect();
 	void				Create_Move_Target_Effect();
 
 
@@ -154,10 +158,11 @@ private:
 	_float		m_LimitDistance = 12.f;
 	_float		m_ReturnDistance = 0.4f;
 	_float		m_setTickForSecond = 0.9f;
-	wstring			m_TextureTag = TEXT("");
-	_float3			m_vSkill_Scale;
-	_float4			m_vSkill_Pos;
-
+	wstring		m_TextureTag = TEXT("");
+	_float3		m_vSkill_Scale;
+	_float4		m_vSkill_Pos;
+	_bool		m_bRecoverHeight = false;
+	_bool		m_bUltimateStop = false;
 private:
 	/*Imgui*/
 	_float3			m_vTestPos;

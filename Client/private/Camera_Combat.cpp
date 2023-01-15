@@ -97,6 +97,13 @@ void CCamera_Combat::Tick(_double TimeDelta)
 		break;
 	}
 
+	//if (m_bAlumonCameraOn)
+	//{
+	//	CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+	//	_vector pTargetPos = pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+	//	m_pTransformCom->Chase(pTargetPos, CClient_Manager::TimeDelta, 5.f);
+	//	RELEASE_INSTANCE(CCombatController);
+	//}
 
 	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
 
@@ -332,7 +339,6 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 	_float4x4 UntiMat;
 	if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Gully")))
 	{
-
 		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
 
 		matRotX = XMMatrixRotationX(XMConvertToRadians(18.f));
@@ -345,6 +351,40 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 		XMStoreFloat4x4(&UntiMat, matWorld);
 		m_pTransformCom->Set_WorldMatrix(UntiMat);
 	}
+	else if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Alumon")))
+	{
+		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+
+		matRotX = XMMatrixRotationX(XMConvertToRadians(20.115f));
+		matRotY = XMMatrixRotationY(XMConvertToRadians(18.5f));
+		matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+		matTrans = XMMatrixTranslation(7.6f, 9.5f, 1.95f);
+
+		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+		XMStoreFloat4x4(&UntiMat, matWorld);
+		m_pTransformCom->Set_WorldMatrix(UntiMat);
+		m_bAlumonCameraOn = true;
+	}
+	else if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	{
+		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+
+		matRotX = XMMatrixRotationX(XMConvertToRadians(34.f));
+		matRotY = XMMatrixRotationY(XMConvertToRadians(48.2f));
+		matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+		matTrans = XMMatrixTranslation(-3.15f, 16.f, 19.8f);
+
+		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+		XMStoreFloat4x4(&UntiMat, matWorld);
+		m_pTransformCom->Set_WorldMatrix(UntiMat);
+		m_bAlumonCameraOn = true;
+		
+	}
+	else
+		return;
+
 
 }
 
@@ -356,7 +396,7 @@ void CCamera_Combat::Ultimate_EndCameraWork()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	pGameInstance->Set_Timedelta(TEXT("Timer_60"), 1.0);
 	RELEASE_INSTANCE(CGameInstance);
-
+	m_bAlumonCameraOn = false;
 
 	
 	

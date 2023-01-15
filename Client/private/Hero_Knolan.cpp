@@ -799,12 +799,9 @@ void CHero_Knolan::Create_SkillFire()
 
 void CHero_Knolan::Create_Skill_Ultimate_Effect()
 {
-#ifdef CAMERA_WORK
 
-#else
 	if (m_pHitTarget == nullptr)
 		return;
-#endif
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
@@ -911,20 +908,22 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		Create_Wide_BuffEffect_Second();
 		m_bOnceCreate = true;
 	}
-#ifdef CAMERA_WORK
-
-#else
+	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
+	{
+		CCombatController::GetInstance()->Set_Ultimate_End(true);
+		m_bIsUseUltimate = true;
+	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 60) )
 	{
 		Create_Skill_Ultimate_Effect();
 		m_bOnceCreate = true;
+		m_bIsUseUltimate = false;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 100))
 	{
 		CCombatController::GetInstance()->Wide_Attack(false);
 		m_bIsUseUltimate = true;
 	}
-#endif
 	else if (m_bUseDefence == true &&  !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(26, 20))
 	{
 		Create_Defence_Area();
@@ -1144,6 +1143,7 @@ void CHero_Knolan::Anim_Uitimate()
 	m_CurAnimqeue.push({ 1,  1.f });
 	m_bOnceCreate = false;
 	m_bIsUseUltimate = false;
+	
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

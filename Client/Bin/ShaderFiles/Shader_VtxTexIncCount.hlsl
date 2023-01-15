@@ -8,7 +8,7 @@ vector			g_vCamPosition;		// 빌보드 형식으로 나오게하기위해서
 texture2D		g_Texture;
 texture2D		g_GlowTexture;
 
-
+matrix			g_RotMatirx;
 
 matrix			g_WorldMatrixRotation;
 matrix			g_WorldMatrixRotation1;
@@ -70,15 +70,15 @@ VS_OUT VS_MAIN(VS_IN In)
 }
 
 /* 정점이 추가적으로 생성할 수 있는 상황을 준비해둔다.*/
-VS_OUT_Lazor VS_MAIN_LAZOR(VS_IN In)
+VS_OUT VS_MAIN_LAZOR(VS_IN In)
 {
-	VS_OUT_Lazor		Out = (VS_OUT_Lazor)0;
+	VS_OUT		Out = (VS_OUT)0;
 
 
-	vector		vPosition = mul(float4(In.vPosition, 1.f), In.Matrix);
+	vector		vPosition = mul(float4(In.vPosition, 1.f), g_WorldMatrixRotation);
+	vPosition = mul(float4(In.vPosition, 1.f), In.Matrix);
 
-	Out.vPosition[0]  = mul(vPosition, g_WorldMatrix).xyz;
-	Out.vPosition[1] = mul(vPosition, g_WorldMatrixRotation).xyz;
+	Out.vPosition = mul(vPosition, g_WorldMatrix).xyz;
 	Out.vPSize = In.vPSize;
 
 	return Out;
@@ -128,7 +128,8 @@ void	GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 	Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[0].vTexUV = float2(	1.f / g_iUV_Max_Width_Num * (g_iUV_Cur_Width_Num),
 			(1.f) / g_iUV_Max_Height_Num * (g_iUV_Cur_Height_Num));
-	
+
+
 	vPosition = In[0].vPosition - vRight + vUp;
 	Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
 	Out[1].vTexUV = float2( 1.f / g_iUV_Max_Width_Num *( g_iUV_Cur_Width_Num +1.f ),
@@ -441,7 +442,7 @@ PS_OUT PS_MAIN_Glow(PS_IN In)
 	GlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUV);
 	
 	
-	Out.vColor = saturate(TexturColor   + (GlowColor* G_Power));
+	Out.vColor = saturate(TexturColor + ( GlowColor* G_Power));
 		
 	if (Out.vColor.a < 0.1f)
 		discard;
@@ -505,6 +506,7 @@ technique11 DefaultTechnique
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
+
 
 
 

@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="..\Bin\ShaderFiles\Shader_Client_Defines.h" />
     <ClInclude Include="..\public\AnimFsm.h" />
+    <ClInclude Include="..\Public\Attack_Effect_Rect.h" />
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\Buff_Effect.h" />
     <ClInclude Include="..\Public\Buff_Image.h" />
@@ -236,6 +237,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\AnimFsm.cpp" />
+    <ClCompile Include="..\Private\Attack_Effect_Rect.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\Buff_Effect.cpp" />
     <ClCompile Include="..\Private\Buff_Image.cpp" />

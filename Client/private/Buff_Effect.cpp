@@ -111,8 +111,32 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			vPos.y += (_float)(5 * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
+
+		if (m_Client_BuffEffect_Desc.bIsStraight)
+		{
+			_float4 vPos;
+			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+			vPos.x += (_float)(35.f * TimeDelta);
+			vPos.y += (_float)(0.5f * TimeDelta);
+			vPos.z -= (_float)(25.f * TimeDelta);
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+		}
+
 	}
 
+
+	if (m_bUseGlow)
+	{
+		if (m_fGlowStrength >= 1.f)
+			m_bIsChange = true;
+		else if (m_fGlowStrength <= 0)
+			m_bIsChange = false;
+
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f;
+		else
+			m_fGlowStrength += (_float)TimeDelta;
+	}
 
 
 
@@ -210,9 +234,14 @@ HRESULT CBuff_Effect::SetUp_ShaderResources()
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
+	
 
 	if (m_bUseGlow == true)
 	{
+		if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength ,sizeof(_float))))
+			return E_FAIL;
+
+
 		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", m_iGlowTextureNum)))
 			return E_FAIL;
 	}

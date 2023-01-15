@@ -378,6 +378,7 @@
     <ClInclude Include="..\Public\Damage_Font_Manager.h">
       <Filter>02.GameObjects\DamageFont\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Attack_Effect_Rect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -554,6 +555,7 @@
     <ClCompile Include="..\Private\Damage_Font_Manager.cpp">
       <Filter>02.GameObjects\DamageFont\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Attack_Effect_Rect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

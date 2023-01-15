@@ -38,7 +38,7 @@
 #include "Skill_TextureObj.h"
 #include "Buff_Effect.h"
 #include "DamageFont.h"
-
+#include "Attack_Effect_Rect.h"
 
 /* For.CombatScene*/
 
@@ -405,8 +405,11 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Ultimate_Banner"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Ultimate_Banner/Ultimate_Banner_%d.png"),
-			CTexture::TYPE_END, 4))))
+			CTexture::TYPE_END, 5))))
 		return E_FAIL;
+
+
+
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -666,6 +669,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		return E_FAIL;
 
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Attack_Effect"),
+		CAttack_Effect_Rect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }
@@ -866,8 +874,8 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrison_Ultimate_Effect"),
 		CTexture::Create(m_pDevice, m_pContext,
-			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Ultimate_Effect/Ultimate_Effect_0.png"),
-			CTexture::TYPE_END, 1))))
+			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Ultimate_Effect/Ultimate_Effect_%d.png"),
+			CTexture::TYPE_END, 2))))
 		return E_FAIL;
 
 
@@ -888,6 +896,21 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Bullet/Bullet_%d.png"),
 			CTexture::TYPE_END, 5))))
 		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_RECT/Lazor/Lazer_%d.png"),
+			CTexture::TYPE_END, 8))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Glow_Ultimate_Rect"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Skill_RECT/Lazor_Glow/Glow_%d.png"),
+			CTexture::TYPE_END, 8))))
+		return E_FAIL;
+
 
 
 

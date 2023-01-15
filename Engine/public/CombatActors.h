@@ -103,6 +103,7 @@ protected:
 	_bool							m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool							m_isWideBuff = false;
 	_bool							m_bModelRender = true;
+	
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

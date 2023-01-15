@@ -99,7 +99,7 @@ private:
 private: /*For.Imgui*/
 	_bool								m_bAnimcontrol = false;
 	int									m_iMeshIndex = -1;
-	_double								m_iTickPerSecond = 0.0;
+	_double								m_iTickPerSecond = 1.0;
 	char								m_imguiAnimName[MAX_PATH] = "";
 	_uint								m_iNoRenderIndex = 999;
 	class CBone*						m_pSelectedBone = nullptr;

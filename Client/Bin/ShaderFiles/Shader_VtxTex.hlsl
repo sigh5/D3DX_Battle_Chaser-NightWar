@@ -2,10 +2,11 @@
 
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_Texture;
-
+texture2D		g_GlowTexture;
 vector			g_vCamPosition;		// 빌보드 형식으로 나오게하기위해서
 
 float			g_Ratio = 1.f;
+float				G_Power;
 
 BlendState			AlphaBlend
 {
@@ -152,6 +153,24 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_Glow(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	float4	GlowColor, TexturColor;
+	TexturColor = g_Texture.Sample(LinearSampler, In.vTexUV);
+	GlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUV);
+
+
+	Out.vColor = saturate(TexturColor + (GlowColor* G_Power));
+
+	if (Out.vColor.a < 0.1f)
+	discard;
+
+	return Out;
+}
+
+
 
 technique11 DefaultTechnique
 {
@@ -196,17 +215,17 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Rect_NonAlpah
+	pass Rect_Glow
 	{
 		SetRasterizerState(RS_Default);
-		SetDepthStencilState(DS_Default, 0);
-		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = NULL;
 		HullShader = NULL;
 		DomainShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
+		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
 
 

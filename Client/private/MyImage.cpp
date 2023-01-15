@@ -2,6 +2,8 @@
 #include "..\public\MyImage.h"
 #include "GameInstance.h"
 #include "Client_Manager.h"
+#include "CombatController.h"
+#include "CombatActors.h"
 
 CMyImage::CMyImage(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CUI(pDevice, pContext)
@@ -69,6 +71,9 @@ void CMyImage::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+#ifdef NOMODLES
+
+#else
 	if (3 == m_iShaderPassNum)
 	{
 		m_BanerTimer += (_float)TimeDelta;
@@ -77,11 +82,16 @@ void CMyImage::Tick(_double TimeDelta)
 		{
 			m_bRenderActive = false;
 			m_bBanerTimerFinish = true;
+			CCombatController::GetInstance()->Get_CurActor()->
+				Set_FsmState(true, CGameObject::m_Uitimate);
+
+
 		}
 	
 	}
 
 	Shake_Move(TimeDelta);
+#endif
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)

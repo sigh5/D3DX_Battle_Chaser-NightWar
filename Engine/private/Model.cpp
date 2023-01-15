@@ -456,7 +456,16 @@ void CModel::Imgui_RenderProperty()
 		int	iFrameIndex = m_Animations[m_iCurrentAnimIndex]->Get_Key_Frame();
 		ImGui::Text("FrameIndex : %d", iFrameIndex);
 
+		//m_iTickPerSecond
+		ImGui::InputDouble("TikcperSecond Set : " , &m_iTickPerSecond);
+
+		m_Animations[m_iCurrentAnimIndex]->Set_TickPerSecond(m_iTickPerSecond);
+
+
+
 	}
+	
+	
 	_uint iMeshNum = 0;
 	if (ImGui::TreeNode("MeshName"))
 	{
@@ -482,6 +491,7 @@ void CModel::Imgui_RenderProperty()
 		ImGui::TreePop();
 	}
 
+	
 	//Imgui_Gizmo_Bone();
 
 	ImGui::End();

@@ -77,6 +77,7 @@ private:
 	_float					m_fZoomHiter_to_Actor_Timer = 0.f;
 	_bool					m_bZoomFinish = false;
 	_float4					m_vOriginPos;
+	_bool					m_bAlumonCameraOn = false;
 
 
 	_float4					m_vUltimatePos;

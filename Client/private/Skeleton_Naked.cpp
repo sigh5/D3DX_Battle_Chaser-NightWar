@@ -52,6 +52,8 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
+
+
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 
@@ -455,6 +457,8 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		vPos.y += 4.f;
 		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom);
 		m_pStatusCom->Take_Damage(iRandom);
+		CCombatController::GetInstance()->HPMp_Update(this);
+		
 		m_bOnceCreate = true;
 	}
 
@@ -512,6 +516,7 @@ void CSkeleton_Naked::Create_Move_Target_Effect()
 	RELEASE_INSTANCE(CGameInstance);
 
 }
+
 
 void CSkeleton_Naked::Create_Test_Effect()
 {
@@ -627,9 +632,6 @@ HRESULT CSkeleton_Naked::Ready_Parts()
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 1.5f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
 	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_PULPLE;
-
-
-
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
 	if (nullptr == pPartObject)
 		return E_FAIL;

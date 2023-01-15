@@ -29,6 +29,7 @@ public:
 		BUFF_TYPE			eBuffType;
 		_int				iFrameCnt;
 		_bool				bIsUp;
+		_bool				bIsStraight;
 	
 	}BuffEffcet_Client;
 
@@ -73,7 +74,8 @@ private:
 	wstring								m_GlowstrTag = TEXT("");
 	_int								m_iGlowTextureNum = 0;
 	_float								m_bMainTainTimer = 0.f;
-
+	_float								m_fGlowStrength=0.f;
+	_bool								m_bIsChange = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
@@ -81,7 +83,7 @@ private:
 private:
 	void		Reset_CurMartirx();
 
-
+	
 
 public:
 	static CBuff_Effect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

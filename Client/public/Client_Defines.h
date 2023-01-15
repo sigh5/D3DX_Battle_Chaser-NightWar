@@ -10,7 +10,7 @@
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
 //#define NOMODLES
-#define	 CAMERA_WORK
+
 
 
 namespace Client

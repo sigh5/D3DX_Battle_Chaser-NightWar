@@ -11,7 +11,7 @@
 #include "Buff_Effect.h"
 #include "Skill_TextureObj.h"
 #include "Damage_Font_Manager.h"
-
+#include "Attack_Effect_Rect.h"
 
 
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -153,14 +153,14 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			}*/
 
 
-		//static float ffPos[3] = {};
-		//static float ffScale[3] = {};
-		//static char  szName[MAX_PATH] = "";
-		//ImGui::InputFloat3("SkillPos", ffPos);
-		//ImGui::InputFloat3("SkillScale", ffScale);
+		static float ffPos[3] = {};
+		static float ffScale[3] = {};
+		static char  szName[MAX_PATH] = "";
+		ImGui::InputFloat3("SkillPos", ffPos);
+		ImGui::InputFloat3("SkillScale", ffScale);
 
-		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		//ImGui::InputText("TextureName", szName, MAX_PATH);
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		ImGui::InputText("TextureName", szName, MAX_PATH);
 
 		//if (ImGui::Button("Create_Skill"))
 		//{
@@ -174,23 +174,24 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		//	Create_Test_TextureObj();		// Test
 
 		//}
-		//if (ImGui::Button("Create_Effect"))
-		//{
-		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		if (ImGui::Button("Create_Effect"))
+		{
+			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-		//	m_TextureTag = Texture_NameTag;
-		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+			m_TextureTag = Texture_NameTag;
+			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-		//	//Create_Skill2_Beam();
+			//Create_Skill2_Beam();
 
-		//	Create_Test_Effect();		// Test
-		//	//Create_Skill1_Bullet();
-		//	//Create_Skill1_Bullet_End();
-		//}
+			//Create_Test_Effect();		// Test
+			//Create_Skill1_Bullet();
+			//Create_Skill1_Bullet_End();
+			Create_Test_Rect_Effect();
+		}
 
-		//RELEASE_INSTANCE(CGameInstance);
+		RELEASE_INSTANCE(CGameInstance);
 	}
 
 
@@ -229,6 +230,12 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
 		}
+		else if ( m_bUltimateStop == true && true == static_cast<CAttack_Effect_Rect*>(*iter)->Get_MainTain() )
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+		}
+
 		else
 			++iter;
 	}
@@ -444,7 +451,45 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		m_bLazorStop = true;
 		CCombatController::GetInstance()->Wide_Attack(false);
 	}
-	
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	// 대신 쓴 변수
+	{
+		CCombatController::GetInstance()->Set_Ultimate_End(true);
+		CCombatController::GetInstance()->Camera_Zoom_In();
+		m_bRun = true;
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 10.f;
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+
+	}	
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(46, 210))	// 대신 쓴 변수
+	{
+		m_bOnceCreate = true;
+		Create_Skill_Ultimate_Effect();
+		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 0.5f);
+	}
+	else if (!m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 250))	// 대신 쓴 변수
+	{
+		m_bUltimateStop = true;
+		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 1.0f);
+	}
+	else if (m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 260))	// 대신 쓴 변수
+	{
+		Create_Ultimate_End_Effect();
+		CCombatController::GetInstance()->Wide_Attack(false);
+		m_bUltimateStop = false;
+	}
+
+	else if (!m_bRecoverHeight && m_pModelCom->Control_KeyFrame_Create(46, 400))	// 대신 쓴 변수
+	{
+		m_bRecoverHeight = true;
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y -= 10.f;
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+	}
+
 	else
 	{
 		return;
@@ -729,6 +774,11 @@ void CHero_Calibretto::Anim_Uitimate()
 {
 	m_iStateDamage = 50;			// 20*2 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
+	m_bOnceCreate = false;
+	m_bRun = false;
+	m_bIsUseUltimate = false;
+	m_bRecoverHeight = false;
+	m_bUltimateStop = false;
 	m_CurAnimqeue.push({ 46, 1.f }); // 위에서 로켓쏘기
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -976,8 +1026,34 @@ void CHero_Calibretto::Create_Test_Effect()
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
+	BuffDesc.bIsStraight = false;
+
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CHero_Calibretto::Create_Test_Rect_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
+	ZeroMemory(&EffectDesc, sizeof(EffectDesc));
+
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	EffectDesc.fCoolTime = 5.f;
+	EffectDesc.bIsMainTain = false;
+	EffectDesc.iFrameCnt = 5;
+
+
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc);
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true,TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"),0);
+
+	RELEASE_INSTANCE(CGameInstance);
+
 
 }
 
@@ -1076,7 +1152,7 @@ void CHero_Calibretto::Create_Skill2_Beam()
 	CBone* pSocket = m_pModelCom->Get_BonePtr("Bone_Calibretto_Hand_L");
 
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject = pInstance->Load_Effect(L"Texture_bretto_laser_Bullet_Effect_0", LEVEL_COMBAT, false);
+	pGameObject = pInstance->Load_Effect(L"Texture_bretto_laser_Bullet_Effect_2", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(2.5f, -0.3f, 12.5f, 1.f);		//m_vSkill_Pos;
@@ -1084,11 +1160,11 @@ void CHero_Calibretto::Create_Skill2_Beam()
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 10.f;
 	BuffDesc.bIsMainTain = true;
-	BuffDesc.iFrameCnt = 10;
+	BuffDesc.iFrameCnt = 3;
 	BuffDesc.bIsUp = false;
 
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, L"Prototype_Component_Texture_bretto_laser_Bullet",3);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, L"Prototype_Component_Texture_bretto_laser_Bullet",0);
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -1240,6 +1316,61 @@ void CHero_Calibretto::Create_Wide_BuffEffect_Second()
 
 void CHero_Calibretto::Create_Skill_Ultimate_Effect()
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
+	ZeroMemory(&EffectDesc, sizeof(EffectDesc));
+
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_bretto_Glow_Ultimate_Rect"), LEVEL_COMBAT, false);
+
+	EffectDesc.fCoolTime = 5.f;
+	EffectDesc.bIsMainTain = true;
+	EffectDesc.iFrameCnt = 1;
+
+
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc);
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"), 0);
+
+	m_pEffectParts.push_back(pGameObject);
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Calibretto::Create_Ultimate_End_Effect()
+{
+	if (m_pHitTarget == nullptr)
+		return;
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	_int		iSign = 1;
+	_int		iRandomCnt = 0;
+	_int		iRandomScale = 0;
+	for (_uint i = 0; i < 50; ++i)
+	{
+		iRandomScale = rand() % 10 + 7;
+		pGameObject = pInstance->Load_Effect(L"Texture_Garrsion_Fire_bot_Height_Effect_0", LEVEL_COMBAT, false);
+		BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
+		BuffDesc.vPosition = _float4(_float(rand() % 3 * iSign), _float(rand() % 2), _float(rand() % 3 * iSign), 1.f);
+		BuffDesc.vScale = _float3(_float(iRandomScale), _float(iRandomScale), _float(iRandomScale));
+		BuffDesc.vAngle = -90.f;
+		BuffDesc.fCoolTime = 5.f;
+		BuffDesc.bIsMainTain = false;
+		BuffDesc.iFrameCnt = rand() % 10 + 4;
+		BuffDesc.bIsUp = true;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+		m_pEffectParts.push_back(pGameObject);
+		iSign *= -1;
+	}
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CHero_Calibretto::Create_Move_Target_Effect()

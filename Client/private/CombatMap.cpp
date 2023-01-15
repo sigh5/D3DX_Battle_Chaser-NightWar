@@ -54,14 +54,6 @@ HRESULT CCombatMap::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
-
-	
-
-
-	RELEASE_INSTANCE(CGameInstance);
-
 	m_bLast_Initlize = true;
 
 	return S_OK;
@@ -70,12 +62,12 @@ HRESULT CCombatMap::Last_Initialize()
 void CCombatMap::Tick(_double TimeDelta)
 {
 	Last_Initialize();
-	
+	/*
 	char Name[MAX_PATH] = "";
 
 	WideCharToMultiByte(CP_ACP, 0, m_ObjectName, MAX_PATH, Name, MAX_PATH, NULL, NULL);
 
-	ImGui::Text("%s", Name);
+	ImGui::Text("%s", Name);*/
 
 		
 
@@ -85,8 +77,6 @@ void CCombatMap::Tick(_double TimeDelta)
 void CCombatMap::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-	
-
 	
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_PRIORITY, this);

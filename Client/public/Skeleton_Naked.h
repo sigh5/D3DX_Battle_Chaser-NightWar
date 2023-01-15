@@ -48,7 +48,6 @@ public:
 	void		   Multi_Hit_Effect(class CGameInstance*pInstance);
 	void		   Create_Move_Target_Effect();
 
-
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
 
