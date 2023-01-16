@@ -50,7 +50,10 @@ void CDamageFont::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	m_pVIBufferCom->Tick(50.f*TimeDelta);
+	_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+
+
+	m_pVIBufferCom->Tick_Shaking(50.f*TimeDelta,ShakefX);
 	
 }
 
@@ -172,7 +175,6 @@ HRESULT CDamageFont::Ready_Font()
 void CDamageFont::Render_Font(_float4 vPos, _float3 vScale)
 {
 	m_pVIBufferCom->Move_Up_Position(_float4(0.f, 0.f, 0.f, 1.f));
-
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 	m_pVIBufferCom->Set_Point_Instancing_Scale(vScale);
 

@@ -80,7 +80,7 @@ public:	/*Reset*/
 	void	Camera_Zoom_Out();
 	void	Camera_Zoom_In();
 	void	UI_Shaking(_bool bShaking);
-	void	Wide_Attack(_bool IsPlayer);
+	void	Wide_Attack(_bool IsPlayer, _int iDamage);
 
 
 	void	Collison_Event();
@@ -119,7 +119,7 @@ public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 private:
 	CGameInstance*			m_pGameInstace = nullptr;
 	class   CDamage_Font_Manager*	m_pFontManager = nullptr;
-
+	class   CExplain_FontMgr*		m_pExplainFontManager = nullptr;
 private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
 	//vector<CCanvas*>		m_CombatMapVec;
@@ -144,7 +144,7 @@ private:
 	_bool					m_bisHitTimer_Alive = false;
 
 	_float					m_fHitTimer = 0.0f;
-	_float					m_fHitRecoverTime =0.03f;		// 모든 연속공격일때 특단의 조치가 필요
+	_float					m_fHitRecoverTime =0.01f;		// 모든 연속공격일때 특단의 조치가 필요
 
 	_bool					m_bMonsterSelect_Target = false;			
 	_uint					m_iMonster_Player_Option=0;

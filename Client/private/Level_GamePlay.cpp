@@ -6,6 +6,8 @@
 #include "Client_Manager.h"
 #include "Camera_Static.h"
 #include "Damage_Font_Manager.h"
+#include "Explain_FontMgr.h"
+
 
 #include "Level_Loading.h"
 #include "UI.h"
@@ -49,7 +51,7 @@ HRESULT CLevel_GamePlay::Initialize()
 		return E_FAIL;
 	
 	
-	
+	//CExplain_FontMgr::GetInstance()->Initialize();
 	
 	return S_OK;
 
@@ -62,8 +64,8 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 
 	m_TimeAcc += TimeDelta;
 
-
-	
+	/*CExplain_FontMgr::GetInstance()->Tick(TimeDelta);
+	*/
 
 
 #ifdef NOMODLES
@@ -79,7 +81,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 	
 
-	
+	/*CExplain_FontMgr::GetInstance()->Late_Tick(TimeDelta);*/
 	//if (GetKeyState(VK_SPACE) & 0x8000)
 	//{
 	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();

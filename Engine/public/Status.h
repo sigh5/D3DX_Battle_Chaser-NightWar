@@ -42,6 +42,8 @@ public:
 	const _float3			Get_CombatScale()const { return m_StatusDesc.vCombat_Scale; }
 
 
+	void					Incrase_Hp(_int iAmount);
+	void					Incrase_Mp(_int iAmount);
 
 
 	_float			Get_CurStatusHpRatio();

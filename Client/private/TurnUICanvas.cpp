@@ -71,10 +71,7 @@ HRESULT CTurnUICanvas::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
-#ifdef NOMODLES
 
-
-#else
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
@@ -103,12 +100,9 @@ HRESULT CTurnUICanvas::Last_Initialize()
 		dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 	}
 
-
-
 	SetUp_ChildrenPosition();
 	RELEASE_INSTANCE(CGameInstance);
 
-#endif
 
 	m_bLast_Initlize = true;
 
@@ -314,6 +308,7 @@ void CTurnUICanvas::Move_ReCoverChild()
 
 		pNewUI->MoveControl(CTurnCharcterUI::UI_POS_QUICK);
 		pNewUI->Set_LimitYPos_Float(_float(fBackLimitYPos));
+		pNewUI->Set_RenderActive(true);
 		m_ChildrenVec.push_back(pNewUI);
 		Safe_AddRef(pNewUI);
 		fBackLimitYPos += 50.f;
@@ -415,30 +410,28 @@ void CTurnUICanvas::DeleteCharUI(UI_REPRESENT UiRepresentNum)
 
 	Move_ReCoverChild();
 
-		//_float fBackLimitYPos = -250.f;
+	//_float fBackLimitYPos = -250.f;
 
-		//_float fSmallY = 0.f;
-		//_uint iRandomNum = 999;
-		//
-		//// 삭제된 벡터를 계속 써서 벡터 오류가난거임
+	//_float fSmallY = 0.f;
+	//_uint iRandomNum = 999;
+	//
+	//// 삭제된 벡터를 계속 써서 벡터 오류가난거임
 
-		//vector<_int> pUIRepresentNumVec;
-		//_int iIndex = 0;
-		//for (auto& pVec : m_ChildrenVec)
-		//{
-		//	if (pVec != nullptr)
-		//	{
-		//		if (nullptr != dynamic_cast<CTurnCharcterUI*>(pVec))
-		//		{
-		//			_int iRepresentNum = static_cast<CTurnCharcterUI*>(pVec)->Get_Represent_Char();
-		//			pUIRepresentNumVec.push_back(iIndex);
-		//		}
-		//	}
-		//	++iIndex;
-		//}
+	//vector<_int> pUIRepresentNumVec;
+	//_int iIndex = 0;
+	//for (auto& pVec : m_ChildrenVec)
+	//{
+	//	if (pVec != nullptr)
+	//	{
+	//		if (nullptr != dynamic_cast<CTurnCharcterUI*>(pVec))
+	//		{
+	//			_int iRepresentNum = static_cast<CTurnCharcterUI*>(pVec)->Get_Represent_Char();
+	//			pUIRepresentNumVec.push_back(iIndex);
+	//		}
+	//	}
+	//	++iIndex;
+	//}
 
-
-		
 
 	//for (auto &pOldCharVec : OldCharImage)
 	//{

@@ -90,8 +90,12 @@ private:
 	_uint					m_iWeaponOption = WEAPON_OPTIONAL_NONE;
 	_bool					m_bChange_hit_Effect = false;
 	_bool					m_bRun = false;
-	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
+	_float					m_fHitPerSecond = 1.f;
+	_int					m_iSign = 1;
+
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;
+
 
 private: /*For.Imgui*/
 	wstring			m_TextureTag = TEXT("");

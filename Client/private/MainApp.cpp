@@ -10,7 +10,7 @@
 #include "PlayerController.h"
 #include "CombatController.h"
 #include "Damage_Font_Manager.h"
-
+#include "Explain_FontMgr.h"
 
 
 CMainApp::CMainApp()
@@ -331,7 +331,7 @@ void CMainApp::Free()
 	CPlayerController::DestroyInstance();
 	CToolManager::DestroyInstance();
 	CDamage_Font_Manager::DestroyInstance();
-
+	CExplain_FontMgr::DestroyInstance();
 
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pRenderer);

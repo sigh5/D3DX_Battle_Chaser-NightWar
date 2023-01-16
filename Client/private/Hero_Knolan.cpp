@@ -15,6 +15,7 @@
 #include "Buff_Effect.h"
 #include "ToolManager.h"
 #include "Damage_Font_Manager.h"
+#include "Explain_FontMgr.h"
 
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -66,6 +67,10 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 		else
 		{
 			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
+
+			if (m_iGetDamageNum >= 100)
+				m_iGetDamageNum = 99;
+
 			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		}
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
@@ -80,9 +85,13 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 			m_bOnceCreate = false;
 		}
 
-	
-		
-		CCombatController::GetInstance()->UI_Shaking(true);
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead())
+		{
+			m_bIsDead = true;
+			Set_FsmState(true, m_Die);
+		}
+		else
+			CCombatController::GetInstance()->UI_Shaking(true);
 
 		return true;
 	}
@@ -158,26 +167,45 @@ void CHero_Knolan::Tick(_double TimeDelta)
 		//static char  szName[MAX_PATH] = "";
 		//ImGui::InputFloat3("SkillPos", ffPos);
 		//ImGui::InputFloat3("SkillScale", ffScale);
-		//ImGui::RadioButton("NonCreate_Pos", &m_iRadioButton22,0);
-		//ImGui::RadioButton("Create_Pos" ,&m_iRadioButton22, 1);
+
 		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		//ImGui::InputText("TextureName", szName,MAX_PATH);
-		//
+		//ImGui::InputText("TextureName", szName, MAX_PATH);
+
 		//if (ImGui::Button("Create_Skill"))
 		//{
 		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) +1 , Texture_NameTag, MAX_PATH);
-		//	
-		//	m_BoneTag = "Weapon_Staff_Classic";
+		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-		//	m_TextureTag = TEXT("FireBall_Knolan");		//Texture_NameTag;
+		//	m_TextureTag = Texture_NameTag;
 		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
 		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
-		//	
-		//	Create_SkillFire();		// Test용
-		//	
+
+		//	Create_Test_Effect();		// Test용
+
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
+
+		static float vPosPlus[3] = {0.f,0.f,0.f};
+		static float vPosPlusScale = 1.f;
+		ImGui::InputFloat3("PosPlus", vPosPlus);
+		ImGui::InputFloat("ScalePlus", &vPosPlusScale);
+		if (ImGui::Button("Create_Font"))
+		{
+			_float4 vPos;
+			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+			vPos.x += vPosPlus[0];
+			vPos.y += vPosPlus[1];
+			vPos.z = 0.f + vPosPlus[1];
+
+			CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos, 
+				_float3(vPosPlusScale, vPosPlusScale, vPosPlusScale), TEXT("damage up"));
+		}
+
+		
+
+
+
 	}
 
 	
@@ -215,11 +243,18 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
 		}
-		else if (true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() && m_bUseDefence == false)
+		else if (m_bOriginBuff == false && m_bUseDefence == false &&  true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() )
 		{
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
 		}
+		else if (m_bOriginBuff == true && m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+			m_bOriginBuff = false;
+		}
+
 		else
 			++iter;
 	}
@@ -655,7 +690,7 @@ void CHero_Knolan::Create_Defence_Effect_And_Action()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject = pInstance->Load_Effect(L"Texture_Common_Aura_8", LEVEL_COMBAT, false);
+	pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_4", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
@@ -663,7 +698,7 @@ void CHero_Knolan::Create_Defence_Effect_And_Action()
 	BuffDesc.vAngle = -90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 4;
+	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
@@ -695,6 +730,16 @@ void CHero_Knolan::Create_Defence_Area()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("shiled"));
+
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -713,7 +758,7 @@ void CHero_Knolan::Create_WideBuffEffect()
 	{
 		if (dynamic_cast<CPlayer*>(pActor.second) != nullptr)
 		{
-			pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_5", LEVEL_COMBAT, false);
+			pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_4", LEVEL_COMBAT, false);
 			BuffDesc.ParentTransform = pActor.second->Get_Transform();
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
@@ -758,11 +803,27 @@ void CHero_Knolan::Create_Wide_BuffEffect_Second()
 			BuffDesc.bIsUp = true;
 			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 			m_pEffectParts.push_back(pGameObject);
+
+			CStatus* pStatus = static_cast<CStatus*>(pActor.second->Get_Component(TEXT("Com_StatusCombat")));
+			assert(nullptr != pStatus && "CHero_Calibretto::Create_Wide_BuffEffect_Second");
+			static_cast<CCombatActors*>(pActor.second)->WideBuff_Status(pStatus, 1, 50);
+			CCombatController::GetInstance()->HPMp_Update(pActor.second);
 		}
 	}
 
 	RELEASE_INSTANCE(CCombatController);
 	RELEASE_INSTANCE(CGameInstance);
+
+
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("mana up"));
+
 
 }
 
@@ -793,6 +854,29 @@ void CHero_Knolan::Create_SkillFire()
 
 	/*assert(pSkillParts != nullptr && "Create_SkillFire");
 	m_PlayerParts.push_back(pSkillParts);*/
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Knolan::Create_Test_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = m_vSkill_Pos;
+	BuffDesc.vScale = m_vTestScale;
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -834,6 +918,34 @@ void CHero_Knolan::Create_Skill_Ultimate_Effect()
 
 }
 
+void CHero_Knolan::Create_Buff_MainTain_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_Common_Aura_11"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(-1.0f, 0.6f, -0.6f, 1.f);
+	BuffDesc.vScale = _float3(4.f, 7.f, 4.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+	BuffDesc.bIsStraight = false;
+
+
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
 
@@ -858,7 +970,6 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(9, 1)  )
 	{
 		CCombatController::GetInstance()->Camera_Shaking();
-		CCombatController::GetInstance()->UI_Shaking(true);
 		Create_Hit_Effect();
 
 		_float4 vPos;
@@ -921,7 +1032,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 100))
 	{
-		CCombatController::GetInstance()->Wide_Attack(false);
+		CCombatController::GetInstance()->Wide_Attack(false,83);
 		m_bIsUseUltimate = true;
 	}
 	else if (m_bUseDefence == true &&  !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(26, 20))
@@ -929,6 +1040,13 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		Create_Defence_Area();
 		m_bOnceCreate = true;
 	}
+
+	else if (m_bOriginBuff == true && !m_bOnceCreateBuff && m_pModelCom->Control_KeyFrame_Create(26, 40))
+	{
+		Create_Buff_MainTain_Effect();
+		m_bOnceCreate = true;
+	}
+
 	else if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 43))
 	{
 		Create_Hit_Effect();
@@ -1043,7 +1161,7 @@ void CHero_Knolan::Create_Buff_Effect()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_4", LEVEL_COMBAT, false);
+	pGameObject = pInstance->Load_Effect(L"Texture_Buff_Effect_5", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
@@ -1062,7 +1180,6 @@ void CHero_Knolan::Create_Buff_Effect()
 
 void CHero_Knolan::Anim_Idle()
 {
-
 	m_CurAnimqeue.push({ 2,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -1076,7 +1193,7 @@ void CHero_Knolan::Anim_Intro()
 
 void CHero_Knolan::AnimNormalAttack()
 {
-	m_iStateDamage = rand() % 10 + 30;
+	m_iStateDamage = rand() % 10 + 30 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(-0.5f, 0.5f, 2.5f, 1.f);
@@ -1087,7 +1204,8 @@ void CHero_Knolan::AnimNormalAttack()
 	m_TextureTag = TEXT("FireBall_Knolan");
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
 	CCombatController::GetInstance()->Camera_Zoom_In();
-
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bBuffEffectStop = true;
 
 	m_CurAnimqeue.push({ 7, 1.f }); //7 21(제자리),,25(뒤로점프샷)
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1096,7 +1214,7 @@ void CHero_Knolan::AnimNormalAttack()
 
 void CHero_Knolan::Anim_Skill1_Attack()
 {
-	m_iStateDamage = rand() % 10 + 40;
+	m_iStateDamage = rand() % 10 + 40 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.9f, 1.f);
@@ -1109,6 +1227,8 @@ void CHero_Knolan::Anim_Skill1_Attack()
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL1;
 	Create_Skill_Texture();
 	CCombatController::GetInstance()->Camera_Zoom_In();
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bBuffEffectStop = true;
 
 	m_CurAnimqeue.push({ 24, 1.f }); //24(골프샷)
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1118,7 +1238,7 @@ void CHero_Knolan::Anim_Skill1_Attack()
 void CHero_Knolan::Anim_Skill2_Attack()
 {
 	// Hiter에게 이펙트만 생성		//53 frame
-	m_iStateDamage = rand() % 10 + 50;
+	m_iStateDamage = rand() % 10 + 50 + m_iStage_Buff_DamgaeUP;
 	m_eWeaponType = WEAPON_SKILL;
 	m_vSkill_Pos = _float4(0.f, 1.f, 0.f, 1.f);
 	m_iHitCount = 1;
@@ -1130,7 +1250,10 @@ void CHero_Knolan::Anim_Skill2_Attack()
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 	CCombatController::GetInstance()->Camera_Zoom_In();
-	
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bBuffEffectStop = true;
+
+
 	m_CurAnimqeue.push({ 21, 1.f }); // fireStorm
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1138,6 +1261,8 @@ void CHero_Knolan::Anim_Skill2_Attack()
 
 void CHero_Knolan::Anim_Uitimate()
 {
+	m_bBuffEffectStop = true;
+
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_CurAnimqeue.push({ 28, 1.f }); // 	60프레임때 광역기 시전
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1149,9 +1274,26 @@ void CHero_Knolan::Anim_Uitimate()
 
 void CHero_Knolan::Anim_Buff()
 {
+	m_iStage_Buff_DamgaeUP = 10;
+	m_bBuffEffectStop = false;
+	m_bOnceCreateBuff = false;
+	m_bOriginBuff = true;
+
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_CurAnimqeue.push({ 26, 1.f });	// 자 버프 
 	m_CurAnimqeue.push({ 1,  1.f });
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	
+
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("damage up"));
+
+
 
 	Create_Buff_Effect();
 
@@ -1161,6 +1303,7 @@ void CHero_Knolan::Anim_Buff()
 void CHero_Knolan::Anim_WideAreaBuff()
 {
 	//Frame90일때 이펙트 생성
+	m_bBuffEffectStop = true;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(60);
 	m_CurAnimqeue.push({ 27, 1.f });	// 마나 채워주기
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1172,6 +1315,7 @@ void CHero_Knolan::Anim_WideAreaBuff()
 
 void CHero_Knolan::Anim_Use_Item()
 {
+	m_bBuffEffectStop = true;
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1228,16 +1372,45 @@ void CHero_Knolan::Anim_Flee()
 void CHero_Knolan::Anim_Die()
 {
 	m_iTurnCanvasOption = 1;
+	m_bIsDead = true;
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 5,  1.f });
 	m_CurAnimqeue.push({ 23, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 
+
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
+	m_pEffectParts.clear();
+	CCombatController::GetInstance()->Camera_Shaking();
+
+
 }
 
 void CHero_Knolan::Anim_Viroty()
 {
-	//Is_Dead();
+	while (!m_CurAnimqeue.empty())
+	{
+		m_CurAnimqeue.pop();
+	}
+
+	if (Is_Dead())
+	{
+		m_CurAnimqeue.push({ 34,  1.f });
+		m_CurAnimqeue.push({ 35, 1.f });
+
+		m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(150);
+	}
+	else
+	{
+		m_CurAnimqeue.push({ 37,  1.f });
+		m_CurAnimqeue.push({ 36, 1.f });
+	}
+
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

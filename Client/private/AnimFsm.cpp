@@ -105,7 +105,14 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},0))
+
+				.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+			{
+				return static_cast<CHero_Knolan*>(m_pTarget)->To_Viroty();
+			},1))
+
+				
 
 		.AddState(L"SkillAttack1")
 			.OnStart([this]()
@@ -120,11 +127,16 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CPlayer*>(m_pTarget)->Fsm_Exit();
 			})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"),[this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},0))
+				.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+			{
+				return static_cast<CHero_Knolan*>(m_pTarget)->To_Viroty();
+			},1))
 
+			
 		.AddState(L"SkillAttack2")
 			.OnStart([this]()
 			{
@@ -141,8 +153,13 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},0))
+				.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+			{
+				return static_cast<CHero_Knolan*>(m_pTarget)->To_Viroty();
+			}, 1))
 
+			
 		.AddState(L"Uitimate")
 			.OnStart([this]()
 			{
@@ -159,7 +176,8 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-			}))
+			},0))
+			
 
 		.AddState(L"Buff")
 			.OnStart([this]()
@@ -295,10 +313,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 			})
-		/*	.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
 			{
-				return m_pCombatController->To_Idle();
-			}))*/
+				return static_cast<CHero_Knolan*>(m_pTarget)->To_Viroty();
+			}))
 
 		.AddState(L"Viroty")
 			.OnStart([this]()
@@ -312,7 +330,11 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return m_pCombatController->To_Idle();
-			}))
+			},1))
+				.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			{
+				return m_pCombatController->To_Intro();
+			},0))
 
 		.Build();
 		__super::Initialize(&builder);
@@ -378,7 +400,11 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Garrison*>(m_pTarget)->To_Viroty();
+		},1))
 
 
 			.AddState(L"SkillAttack1")
@@ -397,7 +423,12 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Garrison*>(m_pTarget)->To_Viroty();
+		}, 1))
+
 
 			.AddState(L"SkillAttack2")
 			.OnStart([this]()
@@ -415,7 +446,11 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Garrison*>(m_pTarget)->To_Viroty();
+		}, 1))
 
 			.AddState(L"Uitimate")
 			.OnStart([this]()
@@ -550,10 +585,10 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			{
 				static_cast<CHero_Garrison*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 			})
-		//.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-		//	{
-		//		return m_pCombatController->To_Idle();	// ¾ê´Â Á×´Â°Å
-		//	}))
+				.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+			{
+				return static_cast<CHero_Garrison*>(m_pTarget)->To_Viroty();
+			}))
 
 		.AddState(L"Viroty")
 			.OnStart([this]()
@@ -567,7 +602,11 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 			{
 				return m_pCombatController->To_Idle();		//¾ê´Â ½Â¸®
-			}))
+			},1))
+				.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+			{
+				return m_pCombatController->To_Intro();
+			}, 0))
 
 			.Build();
 		__super::Initialize(&builder);
@@ -638,8 +677,12 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
 
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Calibretto*>(m_pTarget)->To_Viroty();
+		},1))
 		.AddState(L"SkillAttack1")
 			.OnStart([this]()
 		{
@@ -656,7 +699,11 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Calibretto*>(m_pTarget)->To_Viroty();
+		}, 1))
 
 		.AddState(L"SkillAttack2")
 			.OnStart([this]()
@@ -674,7 +721,11 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
-		}))
+		},0))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Calibretto*>(m_pTarget)->To_Viroty();
+		}, 1))
 
 		.AddState(L"Uitimate")
 			.OnStart([this]()
@@ -692,6 +743,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return  static_cast<CPlayer*>(m_pTarget)->Get_IsIdle();
+		}))
+			.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+		{
+			return static_cast<CHero_Calibretto*>(m_pTarget)->To_Viroty();
 		}))
 
 		.AddState(L"Buff")
@@ -807,10 +862,10 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 		})
-			/*.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
 		{
-			return m_pCombatController->To_Idle();
-		}))*/
+			return static_cast<CHero_Calibretto*>(m_pTarget)->To_Viroty();
+		}))
 
 		.AddState(L"Viroty")
 			.OnStart([this]()
@@ -824,7 +879,11 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 		{
 			return m_pCombatController->To_Idle();
-		}))
+		},1))
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		{
+			return m_pCombatController->To_Intro();
+		}, 0))
 
 		.Build();
 	

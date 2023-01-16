@@ -50,6 +50,7 @@ private:
 	_tchar					m_szFPS[MAX_PATH] = TEXT("");
 	_uint					m_iNumCallDraw = 0;
 	_double					m_TimeAcc = 0.f;
+	_bool					m_bSceneChange = false;
 
 public:
 	static CLevel_Combat* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

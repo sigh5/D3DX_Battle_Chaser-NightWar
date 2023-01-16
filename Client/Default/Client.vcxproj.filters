@@ -184,6 +184,12 @@
     <Filter Include="02.GameObjects\DamageFont\Manager">
       <UniqueIdentifier>{5989a432-e668-4e01-8edb-4bb8a8b1ba7a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\ExPlain_Font">
+      <UniqueIdentifier>{3e63dc48-8b3a-448d-af83-1bc45411d0de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\ExPlain_Font\Mgr">
+      <UniqueIdentifier>{142111fd-6934-451c-924b-f4bb0717fa18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -378,7 +384,15 @@
     <ClInclude Include="..\Public\Damage_Font_Manager.h">
       <Filter>02.GameObjects\DamageFont\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Attack_Effect_Rect.h" />
+    <ClInclude Include="..\Public\Attack_Effect_Rect.h">
+      <Filter>02.GameObjects\Effect\Attack_Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Explain_Font.h">
+      <Filter>02.GameObjects\ExPlain_Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Explain_FontMgr.h">
+      <Filter>02.GameObjects\ExPlain_Font\Mgr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -555,7 +569,15 @@
     <ClCompile Include="..\Private\Damage_Font_Manager.cpp">
       <Filter>02.GameObjects\DamageFont\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Attack_Effect_Rect.cpp" />
+    <ClCompile Include="..\Private\Attack_Effect_Rect.cpp">
+      <Filter>02.GameObjects\Effect\Attack_Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explain_Font.cpp">
+      <Filter>02.GameObjects\ExPlain_Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Explain_FontMgr.cpp">
+      <Filter>02.GameObjects\ExPlain_Font\Mgr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

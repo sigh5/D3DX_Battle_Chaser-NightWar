@@ -39,6 +39,7 @@
 #include "Buff_Effect.h"
 #include "DamageFont.h"
 #include "Attack_Effect_Rect.h"
+#include "Explain_Font.h"
 
 /* For.CombatScene*/
 
@@ -398,7 +399,7 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Font"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Font/Font_%d.png"),
-			CTexture::TYPE_END, 2))))
+			CTexture::TYPE_END, 3))))
 		return E_FAIL;
 
 
@@ -666,6 +667,10 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_DamageFont"),
 		CDamageFont::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Explain_Font"),
+		CExplain_Font::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

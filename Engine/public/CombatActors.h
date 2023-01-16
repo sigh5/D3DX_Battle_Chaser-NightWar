@@ -33,11 +33,7 @@ public:
 	void			Set_ModelRender(_bool bModelRender) { m_bModelRender = bModelRender; }
 	const _bool		Get_Model_Render()const				{ return m_bModelRender; }
 
-	virtual void			Create_Hit_Effect();
-	virtual void			Create_Heacy_Hit_Effect();
-	virtual	void			Create_Defence_Effect_And_Action();
-
-
+	void			Set_WideAttackDamage(_int iWideAttackDamage) { m_iWideAttackDamgae = iWideAttackDamage; }
 
 
 public:
@@ -56,11 +52,19 @@ public: /*For.Animamtion*/
 	virtual void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
 	virtual void	  Set_CombatAnim_Index(class CModel* pModel);
 
+
+
 public:
-	virtual		void	Fsm_Exit();
-	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
-	virtual		void	HitActor_LoseHP(CGameObject* pCurActor);
-	virtual		 void	Defence_Exit();
+	virtual		void		Fsm_Exit();
+	virtual		_bool		Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
+	virtual		void		HitActor_LoseHP(CGameObject* pCurActor);
+	virtual		void		Defence_Exit();
+
+	virtual		void		Create_Hit_Effect();
+	virtual		void		Create_Heacy_Hit_Effect();
+	virtual		void		Create_Defence_Effect_And_Action();
+
+	void					WideBuff_Status(class CStatus* pStatus, _int iOption, _int iAmount);
 
 protected:
 	CGameObject*					m_pHitTarget = nullptr;		//Combat
@@ -81,7 +85,8 @@ protected:
 	_uint							m_iOldAnim = 0;
 	_uint							m_iAnimIndex = 0;
 	_uint							m_iStateDamage = 0;		// 어떤 공격인지에 따라 데미지가 다름
-	
+	_uint							m_iStage_Buff_DamgaeUP = 0;
+
 	_bool							m_bIsCombatScene = false;
 	_bool							m_bIsCombatLastInit = false;
 	_bool							m_bIsCombatAndAnimSequnce = false;
@@ -95,6 +100,7 @@ protected:
 	_bool							m_bIs_Multi_Hit = false; //맞은놈이 멀티히트를 맞았냐?
 	_bool							m_bIsHeavyHit = false;
 
+	_bool							m_bOnceCreateBuff = false;
 	_bool							m_bOnceCreate = false;
 	_int							m_iGetDamageNum = 0;
 	_bool							m_bIsUseUltimate = false;
@@ -104,6 +110,8 @@ protected:
 	_bool							m_isWideBuff = false;
 	_bool							m_bModelRender = true;
 	
+	_int							m_iWideAttackDamgae = 0;
+
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

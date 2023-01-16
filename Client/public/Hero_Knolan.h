@@ -55,6 +55,8 @@ public:  /*For.Combat*/
 	void			  Combat_DeadTick(_double TimeDelta);
 
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
+	void			 Create_Test_Effect();		//Test_Effect
+
 
 	void			  Create_Buff_Effect();
 	void			  Create_Skill_Texture();		// 실제로 쓰는 것
@@ -63,6 +65,7 @@ public:  /*For.Combat*/
 	void			  Create_WideBuffEffect();
 	void			  Create_Wide_BuffEffect_Second();
 	void			  Create_Skill_Ultimate_Effect();
+	void			  Create_Buff_MainTain_Effect();
 
 	virtual void	  Create_Hit_Effect()override;
 	virtual void	  Create_Defence_Effect_And_Action()override;
@@ -140,6 +143,7 @@ private:
 
 	_bool			m_bCreateDefenceTimer = false;
 	_float			m_fDefenceFsmTimer = 0.f;
+	_bool			m_bOriginBuff = false;
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;

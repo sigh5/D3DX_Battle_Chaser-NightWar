@@ -66,6 +66,7 @@ public:	 /*Create_Effect*/
 	void				Create_BuffEffect();
 	void				Create_Move_Target_Effect();
 	void				Create_Defence_Area();
+	void				Create_Buff_MainTain_Effect();
 
 	void				Anim_Frame_Create_Control();
 public:
@@ -142,7 +143,7 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_SWORD;
 	_bool			m_bUltimamteEffect = false;
 	_float			m_UltimateTimer = 0.f;
-
+	
 private:
 	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;
@@ -153,7 +154,9 @@ private:
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
 
-	_bool		m_bUltimateHit[14] = { false };
+	_bool		m_bUltimateHit[15] = { false };
+	_bool		m_bOriginBuff = false;
+
 
 	/*Imgui*/
 	_float3			m_vTestPos;

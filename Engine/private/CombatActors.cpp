@@ -1,6 +1,7 @@
 #include "..\public\CombatActors.h"
 #include "Model.h"
 #include "Collider.h"
+#include "Status.h"
 
 CCombatActors::CCombatActors(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CGameObject(pDevice,pContext)
@@ -24,6 +25,14 @@ void CCombatActors::Create_Heacy_Hit_Effect()
 
 void CCombatActors::Create_Defence_Effect_And_Action()
 {
+}
+
+void CCombatActors::WideBuff_Status(CStatus * pStatus, _int iOption, _int iAmount)
+{
+	if (iOption == 0)
+		pStatus->Incrase_Hp(iAmount);
+	else if (iOption == 1)
+		pStatus->Incrase_Mp(iAmount);
 }
 
 HRESULT CCombatActors::Initialize_Prototype()

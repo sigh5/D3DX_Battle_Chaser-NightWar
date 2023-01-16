@@ -11,6 +11,26 @@ CStatus::CStatus(const CStatus & rhs)
 {
 }
 
+void CStatus::Incrase_Hp(_int iAmount)
+{
+	_int iSum = iAmount + m_StatusDesc.iHp;
+
+	if (iSum >= m_iMaxHp)
+		m_StatusDesc.iHp = m_iMaxHp;
+	else
+		m_StatusDesc.iHp = iSum;
+}
+
+void CStatus::Incrase_Mp(_int iAmount)
+{
+	_int iSum = iAmount + m_StatusDesc.iMp;
+
+	if (iSum >= m_iMaxMp)
+		m_StatusDesc.iMp = m_iMaxMp;
+	else
+		m_StatusDesc.iMp = iSum;
+}
+
 _float CStatus::Get_CurStatusHpRatio()
 {
 	return (_float)(m_StatusDesc.iHp) / (_float)(m_iMaxHp);

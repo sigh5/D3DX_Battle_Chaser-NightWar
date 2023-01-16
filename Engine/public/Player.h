@@ -68,7 +68,8 @@ protected:
 	MAPTYPE							m_ePlayerType = DUNGEON_PLAYER;
 	_bool							m_bControlKeyInput = false;
 	CGameObject*					m_pCaptinPlayer = nullptr;	//Dungeon
-	_bool					m_bIsHeavyHit = false;
+	_bool							m_bIsHeavyHit = false;
+	_bool							m_bBuffEffectStop = false;
 private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;
@@ -76,6 +77,7 @@ private:
 	_bool					m_bIsSwap = false;
 	_bool					m_isStop = false;
 	_bool					m_bIsWalk = false;
+
 
 	
 public:

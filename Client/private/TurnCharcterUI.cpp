@@ -54,9 +54,8 @@ HRESULT CTurnCharcterUI::Initialize(void * pArg)
 
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 
-
+	m_bRenderActive = false;
 	
-
 	return S_OK;
 }
 
@@ -68,13 +67,11 @@ HRESULT CTurnCharcterUI::Last_Initialize()
 	if (FAILED(Set_Represent_Char()))
 		return S_OK;
 
-
 	if (LEVEL_GAMEPLAY == CGameInstance::GetInstance()->GetCurLevelIdx())
 	{
 		m_bRenderActive = true;
 	}
-	else
-		m_bRenderActive = false;
+	
 
 	m_bLast_Initlize = true;
 	return S_OK;

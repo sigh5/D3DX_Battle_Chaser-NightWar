@@ -192,6 +192,8 @@
     <ClInclude Include="..\Public\EffectFrame.h" />
     <ClInclude Include="..\Public\Effect_Point_Instancing.h" />
     <ClInclude Include="..\Public\Effect_Rect_Instancing.h" />
+    <ClInclude Include="..\Public\Explain_Font.h" />
+    <ClInclude Include="..\Public\Explain_FontMgr.h" />
     <ClInclude Include="..\Public\Hero_Calibretto.h" />
     <ClInclude Include="..\public\Hero_Garrison.h" />
     <ClInclude Include="..\public\Hero_Knolan.h" />
@@ -256,6 +258,8 @@
     <ClCompile Include="..\Private\EffectFrame.cpp" />
     <ClCompile Include="..\Private\Effect_Point_Instancing.cpp" />
     <ClCompile Include="..\Private\Effect_Rect_Instancing.cpp" />
+    <ClCompile Include="..\Private\Explain_Font.cpp" />
+    <ClCompile Include="..\Private\Explain_FontMgr.cpp" />
     <ClCompile Include="..\Private\Hero_Calibretto.cpp" />
     <ClCompile Include="..\private\Hero_Garrison.cpp" />
     <ClCompile Include="..\private\Hero_Knolan.cpp" />

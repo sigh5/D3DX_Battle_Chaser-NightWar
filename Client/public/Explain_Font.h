@@ -10,20 +10,22 @@ class CShader;
 class CTexture;
 END
 
-
 BEGIN(Client)
-class CDamageFont   final : public CHitBoxObject
+class CExplain_Font final : public CHitBoxObject
 {
 public:
-	typedef struct tag_DamageFont_Desc
+	typedef struct tag_ExPlainFont_Desc
 	{
-		_uint		iRepresentNum;
-	}FONT_DESC;
+		_tchar		szRepresent;
+	}FONT_EXPLAIN_DESC;
 
 public:
-	CDamageFont(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CDamageFont(const CDamageFont& rhs);
-	virtual ~CDamageFont() = default;
+	CExplain_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CExplain_Font(const CExplain_Font& rhs);
+	virtual ~CExplain_Font() = default;
+
+public:
+	void	Set_RenderActive(_bool bRenderActive) { m_bIsRendering = bRenderActive; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -39,27 +41,23 @@ private:
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
 
-
 public:
-	HRESULT		Ready_Font();
-	void		Render_Font(_float4 vPos, _float3 vScale);
+	
+	void		Render_Font(_float4 vPos, _float3 vScale,_tchar szChar);
 
-
+private:
+	HRESULT		SetUp_Components();
+	HRESULT		SetUp_ShaderResources();
 
 private:
 	_bool								m_bMoveTrue = false;
-	FONT_DESC							m_fontDesc;
-	
-	_float								m_fMagnitude = 3.f;
+	FONT_EXPLAIN_DESC					m_fontDesc;
 
-private:
-	HRESULT SetUp_Components();
-	HRESULT SetUp_ShaderResources();
+	_bool								m_bIsRendering = false;
 
 public:
-	static CDamageFont* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CExplain_Font* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };
-
 END

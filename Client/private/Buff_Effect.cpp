@@ -107,7 +107,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 		{
 			_float4 vPos;
 			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		
+
 			vPos.y += (_float)(5 * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
@@ -121,8 +121,10 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			vPos.z -= (_float)(25.f * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
-
 	}
+
+
+	
 
 
 	if (m_bUseGlow)

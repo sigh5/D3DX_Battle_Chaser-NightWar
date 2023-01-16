@@ -130,7 +130,7 @@ HRESULT CAttack_Effect_Rect::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(3);
+	m_pShaderCom->Begin(4);
 	m_pVIBufferCom->Render();
 
 	return S_OK;

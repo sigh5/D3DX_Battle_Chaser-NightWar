@@ -20,6 +20,7 @@
 #include "TrunWinCanvas.h"
 #include "Camera_Combat.h"
 #include "Damage_Font_Manager.h"
+#include "Explain_FontMgr.h"
 #include "CombatMap.h"
 
 #include "MyImage.h"
@@ -32,6 +33,7 @@ IMPLEMENT_SINGLETON(CCombatController);
 CCombatController::CCombatController()
 	:m_pGameInstace{ CGameInstance::GetInstance() }
 	, m_pFontManager(CDamage_Font_Manager::GetInstance())
+	, m_pExplainFontManager(CExplain_FontMgr::GetInstance())
 {
 	//Safe_AddRef(m_pGameInstace);
 }
@@ -53,6 +55,7 @@ void CCombatController::Scene_Chane_Safe_Release()
 	}
 	m_CanvasVec.clear();
 
+	m_bVirtory = false;
 	m_pCombatCamera = nullptr;
 	m_pTurnCanvas = nullptr;
 	m_pCurentActor = nullptr;
@@ -131,6 +134,7 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 			TEXT("Layer_Camera"), TEXT("CombatLevel_Camera")));
 
 	m_pFontManager->Initialize();
+	m_pExplainFontManager->Initialize();
 
 	return S_OK;
 }
@@ -158,10 +162,17 @@ HRESULT CCombatController::Late_Init()
 
 void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 {
-	if (m_bVirtory)
-		return;
 
 	m_pFontManager->Tick(TimeDelta);
+	m_pExplainFontManager->Tick(TimeDelta);
+	
+	if (m_bVirtory)
+	{
+		Render_StopCanvas();
+		return;
+	}
+	m_pFontManager->Tick(TimeDelta);
+	m_pExplainFontManager->Tick(TimeDelta);
 
 	m_dIntroTimer += TimeDelta *1.f;
 
@@ -223,28 +234,53 @@ void CCombatController::PlayerWin()
 		fHPRatio += fMonsterHpRatio;
 	}
 	
-	if (fHPRatio <= 0.f && !m_bVirtory)
+	/*if (fHPRatio <= 0.f && !m_bVirtory)
 	{
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 		CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
 		m_bVirtory = true;
 
 		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
-			LAYER_UI,TEXT("TurnWinCanvas")));
-		
+			LAYER_UI, TEXT("TurnWinCanvas")));
+
 		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
 		pWinCanvas->Set_WinRender(true);
 		RELEASE_INSTANCE(CGameInstance);
+	}
+*/
 
+
+	if (fHPRatio <= 0.f && !m_bVirtory)
+	{
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		
+		CClient_Manager::m_bCombatWin = true;
+		m_bVirtory = true;
+
+	/*	CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
+		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
+			LAYER_UI, TEXT("TurnWinCanvas")));
+		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
+		pWinCanvas->Set_WinRender(true);*/
+		
+		
+		for (auto& pPlayer : m_CurActorMap)
+		{
+			pPlayer.second->Set_FsmState(true, CGameObject::m_Viroty);
+		}
+		
+		
+		RELEASE_INSTANCE(CGameInstance);
 	}
 
+	
 
 }
 
 void CCombatController::Late_Tick(_double TimeDelta)
 {
 	m_pFontManager->Late_Tick(TimeDelta);
-	
+	m_pExplainFontManager->Late_Tick(TimeDelta);
 	Ultimate_LateTick(TimeDelta);
 }
 
@@ -432,13 +468,17 @@ void CCombatController::Ultimate_Camera_Off()
 
 	for (auto& pCanvas : m_CanvasVec)
 	{
-		pCanvas->Set_RenderActive(true);
+		if(dynamic_cast<CTurnStateCanvas*>(pCanvas) == nullptr)
+			pCanvas->Set_RenderActive(true);
 	}
 	m_pCombatCamera->Ultimate_EndCameraWork();
 }
 
 void CCombatController::Ultimate_LateTick(_double TimeDelta)
 {
+	if (m_bVirtory)
+		return;
+
 	Ultimate_Start_LateTick(TimeDelta);
 	Ultimate_Timedelta_Tick(TimeDelta);
 	Ultimate_End_LateTick(TimeDelta);
@@ -536,7 +576,7 @@ void CCombatController::Active_Fsm()
 	To_Use_Item();
 	To_Defence();
 	To_Flee();
-	To_Viroty();
+	//To_Viroty();
 
 	To_Light_Hit();
 	To_Heavy_Hit();
@@ -601,7 +641,7 @@ void CCombatController::UI_Shaking(_bool bShaking)
 
 }
 
-void CCombatController::Wide_Attack(_bool IsPlayer)
+void CCombatController::Wide_Attack(_bool IsPlayer, _int iDamage)
 {
 	if (true == IsPlayer)
 	{
@@ -615,6 +655,7 @@ void CCombatController::Wide_Attack(_bool IsPlayer)
 				continue;
 
 			pMonster.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
+			static_cast<CCombatActors*>(pMonster.second)->Set_WideAttackDamage(iDamage);
 		}
 
 		Camera_Shaking();
@@ -864,13 +905,10 @@ void CCombatController::To_Uitimate()
 		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_ULTIMATE)
 	{
-		//m_pCurentActor->Set_FsmState(true, CGameObject::m_Uitimate);
-
 		Ultimate_Camera_On();
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
-		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)

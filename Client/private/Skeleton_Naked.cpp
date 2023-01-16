@@ -8,6 +8,8 @@
 #include "Weapon.h"
 #include "Buff_Effect.h"
 #include "Damage_Font_Manager.h"
+#include "Explain_FontMgr.h"
+
 CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
 {
@@ -52,11 +54,16 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-
-
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
-		m_pStatusCom->Take_Damage(m_iGetDamageNum);
-
+		
+		if (pCurActorWepon->Get_HitNum() == 100)
+		{
+			m_fHitPerSecond = 2.5f;
+			m_iSign *= -1;
+			return true;
+		}
+		
+		
 		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
@@ -67,12 +74,24 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-
+		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
 		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		if (m_iGetDamageNum >= 50)
+		{
+			m_bIsHeavyHit = true;
+			vPos.x -= 2.f;
+			CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+				_float3(1.f, 1.f, 1.f), TEXT("critical"));
+		}
+		
+	
+		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		CCombatController::GetInstance()->UI_Shaking(true);
+		m_fHitPerSecond = 1.f;
+		m_iSign = 1;
 		bResult = true;
 	}
 
@@ -436,12 +455,12 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 	{
 		Create_Hit_Effect();
 		CCombatController::GetInstance()->Camera_Shaking();
-		_int iRandom = rand() % 5 + 10;
+		//_int iRandom = rand() % 5 + 10;
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
-		m_pStatusCom->Take_Damage(iRandom + m_iGetDamageNum);
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f),  m_iGetDamageNum);
+		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 1) )
@@ -449,16 +468,24 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		Create_Move_Target_Effect();
 		m_bRun = true;
 	}
-	else if(!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(17, 68))
+	else if(!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(17, 20))
 	{
-		_int iRandom = rand() % 10 + 50;
+		_int iRandom = rand() % 10 + m_iWideAttackDamgae;
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
 		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom);
+	
+		vPos.x -= 2.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+			_float3(2.f, 2.f, 2.f), TEXT("critical"));
+		
 		m_pStatusCom->Take_Damage(iRandom);
 		CCombatController::GetInstance()->HPMp_Update(this);
 		
+
+
+
 		m_bOnceCreate = true;
 	}
 
@@ -490,6 +517,13 @@ void CSkeleton_Naked::Multi_Hit_Effect(CGameInstance* pInstance)
 		m_MonsterParts.push_back(pGameObject);
 		iSignNum *= -1;
 	}
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("critical"));
 }
 
 void CSkeleton_Naked::Create_Move_Target_Effect()
@@ -516,7 +550,6 @@ void CSkeleton_Naked::Create_Move_Target_Effect()
 	RELEASE_INSTANCE(CGameInstance);
 
 }
-
 
 void CSkeleton_Naked::Create_Test_Effect()
 {
@@ -580,7 +613,7 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 250;
+	StatusDesc.iHp = 10;
 	StatusDesc.iMp = 125;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -654,8 +687,8 @@ void CSkeleton_Naked::Anim_Idle()
 
 void CSkeleton_Naked::Anim_Intro()
 {
-	m_CurAnimqeue.push({ 13, 1.f });		//이때 안보이게 뭐를 설정해야함
-	m_CurAnimqeue.push({ 12, 1.f });
+	m_CurAnimqeue.push({ 11, 0.8f });	
+	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -663,11 +696,11 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = rand() % 10 + 20;
+	m_iStateDamage = rand() % 10 + 200;
 	m_pMeHit_Player = nullptr;
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 	m_bRun = false;
-
+	m_LimitDistance = 5.f;
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 한대툭
 	m_CurAnimqeue.push({ 9, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
@@ -679,8 +712,10 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = rand() % 10 + 20;
+	m_iStateDamage = rand() % 10 + 200;
 	m_pStatusCom->Use_SkillMp(30);
+	
+	m_LimitDistance = 6.f;
 	m_pMeHit_Player = nullptr;
 	m_bRun = false;
 	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
@@ -724,7 +759,10 @@ void CSkeleton_Naked::Anim_Light_Hit()
 	}
 	else
 	{
-		m_CurAnimqeue.push({ 7 , 1.f });
+		if(m_iSign ==1 )
+			m_CurAnimqeue.push({ 7 , m_fHitPerSecond });
+		else 
+			m_CurAnimqeue.push({ 1 , m_fHitPerSecond });
 	}
 
 	Set_CombatAnim_Index(m_pModelCom);
@@ -753,6 +791,12 @@ void CSkeleton_Naked::Anim_Die()
 	m_CurAnimqeue.push({ 2, 1.f });
 	m_CurAnimqeue.push({ 18, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_MonsterParts.erase(iter);
+	}
+	m_MonsterParts.clear();
 }
 
 void CSkeleton_Naked::Anim_Viroty()
@@ -791,16 +835,13 @@ void CSkeleton_Naked::Free()
 {
 	__super::Free();
 
-	//for (auto& pPart : m_MonsterParts)
-	//	Safe_Release(pPart);
-	//m_MonsterParts.clear();
 
 	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
 	{
 		Safe_Release(*iter);
 		iter = m_MonsterParts.erase(iter);
 	}
-
+	m_MonsterParts.clear();
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

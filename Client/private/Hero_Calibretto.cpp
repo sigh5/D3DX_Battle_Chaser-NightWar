@@ -12,7 +12,7 @@
 #include "Skill_TextureObj.h"
 #include "Damage_Font_Manager.h"
 #include "Attack_Effect_Rect.h"
-
+#include "Explain_FontMgr.h"
 
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -50,6 +50,7 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
+
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
@@ -58,8 +59,9 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
-
+		
 		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
+		
 	
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
@@ -68,6 +70,7 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		}
 		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		CCombatController::GetInstance()->UI_Shaking(true);
+		
 		return true;
 	}
 	return false;
@@ -130,7 +133,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		m_pFsmCom->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	
-		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
+		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead())
 		{
 			m_bIsDead = true;
 		}
@@ -153,14 +156,14 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			}*/
 
 
-		static float ffPos[3] = {};
+		/*static float ffPos[3] = {};
 		static float ffScale[3] = {};
 		static char  szName[MAX_PATH] = "";
 		ImGui::InputFloat3("SkillPos", ffPos);
 		ImGui::InputFloat3("SkillScale", ffScale);
 
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);
+		ImGui::InputText("TextureName", szName, MAX_PATH);*/
 
 		//if (ImGui::Button("Create_Skill"))
 		//{
@@ -174,24 +177,24 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		//	Create_Test_TextureObj();		// Test
 
 		//}
-		if (ImGui::Button("Create_Effect"))
-		{
-			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+	//	if (ImGui::Button("Create_Effect"))
+	//	{
+	//		_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+	//		MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-			m_TextureTag = Texture_NameTag;
-			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+	//		m_TextureTag = Texture_NameTag;
+	//		m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+	//		m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-			//Create_Skill2_Beam();
+	//		//Create_Skill2_Beam();
 
-			//Create_Test_Effect();		// Test
-			//Create_Skill1_Bullet();
-			//Create_Skill1_Bullet_End();
-			Create_Test_Rect_Effect();
-		}
+	//		Create_Test_Effect();		// Test
+	//		//Create_Skill1_Bullet();
+	//		//Create_Skill1_Bullet_End();
+	//		//Create_Test_Rect_Effect();
+	//	}
 
-		RELEASE_INSTANCE(CGameInstance);
+	//	RELEASE_INSTANCE(CGameInstance);
 	}
 
 
@@ -225,7 +228,7 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
 		}
-		else if (true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() && m_bLazorStop == true)
+		else if (true == m_bLazorStop && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
 		{
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
@@ -234,6 +237,12 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 		{
 			Safe_Release(*iter);
 			iter = m_pEffectParts.erase(iter);
+		}
+		else if (m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+			m_bLazorStop = true;
 		}
 
 		else
@@ -431,27 +440,39 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		Create_Buff_Effect();
 		m_bOnceCreate = true;
 	}
+	else if (!m_bOnceCreateBuff && m_pModelCom->Control_KeyFrame_Create(7, 90))
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.x -= 2.f;
+		vPos.y += 9.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+			_float3(1.f, 1.f, 1.f), TEXT("damage up"));
+
+		Create_Buff_MainTain_Effect();
+		m_bOnceCreateBuff = true;
+	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(40, 50))
 	{
 		Create_WideBuffEffect();
 		m_bOnceCreate = true;
 	}
-	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(40, 90))	// 대신 쓴 변수
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(40, 90))	
 	{
 		Create_Wide_BuffEffect_Second();
 		m_bRun = true;
 	}
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 3))	// 대신 쓴 변수
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 3))	
 	{
 		Create_Skill2_Beam();
 		m_bOnceCreate = true;
 	}
-	else if (!m_bLazorStop && m_pModelCom->Control_KeyFrame_Create(28, 58))	// 대신 쓴 변수
+	else if (!m_bLazorStop && m_pModelCom->Control_KeyFrame_Create(28, 58))	
 	{
 		m_bLazorStop = true;
-		CCombatController::GetInstance()->Wide_Attack(false);
+		CCombatController::GetInstance()->Wide_Attack(false,86);
 	}
-	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	// 대신 쓴 변수
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	
 	{
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		CCombatController::GetInstance()->Camera_Zoom_In();
@@ -463,21 +484,21 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 
 	}	
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(46, 210))	// 대신 쓴 변수
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(46, 210))	
 	{
 		m_bOnceCreate = true;
 		Create_Skill_Ultimate_Effect();
 		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 0.5f);
 	}
-	else if (!m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 250))	// 대신 쓴 변수
+	else if (!m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 250))	
 	{
 		m_bUltimateStop = true;
 		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 1.0f);
 	}
-	else if (m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 260))	// 대신 쓴 변수
+	else if (m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 260))	
 	{
 		Create_Ultimate_End_Effect();
-		CCombatController::GetInstance()->Wide_Attack(false);
+		CCombatController::GetInstance()->Wide_Attack(false,50);
 		m_bUltimateStop = false;
 	}
 
@@ -702,7 +723,7 @@ void CHero_Calibretto::Anim_Intro()
 
 void CHero_Calibretto::AnimNormalAttack()
 {
-	m_iStateDamage = rand() % 10 + 20;
+	m_iStateDamage = rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
 	m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
@@ -713,6 +734,8 @@ void CHero_Calibretto::AnimNormalAttack()
 	m_LimitDistance = 8.f;
 	m_ReturnDistance = 0.4f;
 	m_setTickForSecond = 0.9f;
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bBuffEffectStop = true;
 
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 3,	 1.f });
@@ -725,7 +748,7 @@ void CHero_Calibretto::AnimNormalAttack()
 
 void CHero_Calibretto::Anim_Skill1_Attack()
 {
-	m_iStateDamage = rand() % 10 + 15;		// 펀치하고 총갈기기
+	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;		// 펀치하고 총갈기기
 	m_iHitCount = 2;
 	m_eWeaponType = WEAPON_HAND;
 	m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_GUN;
@@ -738,6 +761,8 @@ void CHero_Calibretto::Anim_Skill1_Attack()
 	m_LimitDistance = 8.f;
 	m_ReturnDistance = 0.4f;
 	m_setTickForSecond = 0.9f;
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bBuffEffectStop = true;
 	//m_vSkill_Pos= 
 	//
 
@@ -753,7 +778,7 @@ void CHero_Calibretto::Anim_Skill1_Attack()
 
 void CHero_Calibretto::Anim_Skill2_Attack()
 {
-	m_iStateDamage = rand() % 10 + 50;				//레이저빔
+	m_iStateDamage = rand() % 10 + 50 + m_iStage_Buff_DamgaeUP;				//레이저빔
 	m_SpeedRatio = 8.f;
 	m_LimitDistance = 20.f;
 	m_ReturnDistance = 0.4f;
@@ -763,6 +788,8 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 	m_bRun = false;
 	m_bBulletShoot = false;
 	m_bCreateSmoke = false;
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bLazorStop = true;
 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 28, 1.f });		// 찐 공격궁 Brust??
@@ -772,6 +799,7 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 
 void CHero_Calibretto::Anim_Uitimate()
 {
+	m_bBuffEffectStop = true;
 	m_iStateDamage = 50;			// 20*2 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
 	m_bOnceCreate = false;
@@ -786,13 +814,20 @@ void CHero_Calibretto::Anim_Uitimate()
 
 void CHero_Calibretto::Anim_Buff()
 {
+	m_iStage_Buff_DamgaeUP = 10;
+	m_bOnceCreate = false;
+	m_bOnceCreateBuff = false;
+	m_bBuffEffectStop = false;
+
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 7,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
-
-	m_bOnceCreate = false;
-
 	Set_CombatAnim_Index(m_pModelCom);
+
+
+	
+
+
 }
 
 void CHero_Calibretto::Anim_WideAreaBuff()
@@ -857,12 +892,46 @@ void CHero_Calibretto::Anim_Die()
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 6,  1.f });
 	m_CurAnimqeue.push({ 35, 1.f });
+	m_bIsDead = true;
+
 	Set_CombatAnim_Index(m_pModelCom);
+
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
+	m_pEffectParts.clear();
+
 }
 
 void CHero_Calibretto::Anim_Viroty()
 {
-	//Is_Dead();
+	
+
+	while (!m_CurAnimqeue.empty())
+	{
+		m_CurAnimqeue.pop();
+	}
+
+	if (m_bIsDead)
+	{
+		m_CurAnimqeue.push({ 44,  1.f });
+		m_CurAnimqeue.push({ 45, 1.f });
+	}
+	else
+	{
+		m_CurAnimqeue.push({ 30,  1.f });
+		m_CurAnimqeue.push({ 37, 1.f });
+	}
+	
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
+	m_pEffectParts.clear();
+
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -922,7 +991,6 @@ _bool CHero_Calibretto::Is_Dead()
 {
 	if (__super::Is_Dead())
 	{
-		//Anim_Die();
 		return true;
 	}
 
@@ -1021,7 +1089,7 @@ void CHero_Calibretto::Create_Test_Effect()
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = m_vSkill_Pos;
 	BuffDesc.vScale =	 m_vTestScale;
-	BuffDesc.vAngle = -90.f;
+	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
@@ -1174,6 +1242,34 @@ void CHero_Calibretto::Create_Skill2_Beam_End()
 {
 }
 
+void CHero_Calibretto::Create_Buff_MainTain_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_Common_Aura_9"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(-1.5f,2.f,-0.5f,1.f);
+	BuffDesc.vScale = _float3(10.f,17.f,10.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+	BuffDesc.bIsStraight = false;
+	m_bLazorStop = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
 void CHero_Calibretto::Create_Normal_Attack_Effect()
 {
 	if (m_pHitTarget == nullptr)
@@ -1306,11 +1402,25 @@ void CHero_Calibretto::Create_Wide_BuffEffect_Second()
 			BuffDesc.bIsUp = false;
 			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 			m_pEffectParts.push_back(pGameObject);
+
+
+			CStatus* pStatus = static_cast<CStatus*>(pActor.second->Get_Component(TEXT("Com_StatusCombat")));
+			assert(nullptr != pStatus && "CHero_Calibretto::Create_Wide_BuffEffect_Second");
+			static_cast<CCombatActors*>(pActor.second)->WideBuff_Status(pStatus, 0, 50);
+			CCombatController::GetInstance()->HPMp_Update(pActor.second);
 		}
 	}
 
 	RELEASE_INSTANCE(CCombatController);
 	RELEASE_INSTANCE(CGameInstance);
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.x -= 2.f;
+	vPos.y += 9.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
+
 
 }
 

@@ -57,8 +57,6 @@ public:  /*For.Combat*/
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
 	void				Create_Test_Rect_Effect();		// Test
-
-	
 	void				Create_Test_TextureObj();		// Test
 
 
@@ -67,7 +65,9 @@ private: /*Create_Effect*/
 	
 	void			    Create_Skill2_Beam();		
 	void			    Create_Skill2_Beam_End();
-	
+	void				Create_Buff_MainTain_Effect();
+
+
 	void				Create_Normal_Attack_Effect();
 	void				Create_Skill1_Attack_Effect();
 	void				Create_Skill2_Attack_Effect();
@@ -135,7 +135,7 @@ private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_CALIBRETTO;
 	_uint	m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
-
+	
 public:
 	static CHero_Calibretto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

@@ -277,6 +277,27 @@ HRESULT CVIBuffer_Point_Instancing::Render()
 	return S_OK;
 }
 
+HRESULT CVIBuffer_Point_Instancing::Tick_Shaking(_double TimeDelta, _float fShakex)
+{
+	CONTEXT_LOCK;
+	// Rect_Instancing 이랑 동일하다.
+	D3D11_MAPPED_SUBRESOURCE			SubResource;
+	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.x += _float(0.1f * TimeDelta * fShakex);
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += _float(0.1f * TimeDelta);
+
+	}
+
+	m_pContext->Unmap(m_pInstanceBuffer, 0);
+
+	return S_OK;
+}
+
 void CVIBuffer_Point_Instancing::Imgui_RenderProperty()
 {
 	if (ImGui::CollapsingHeader("Point_Buffer", ImGuiTreeNodeFlags_DefaultOpen))

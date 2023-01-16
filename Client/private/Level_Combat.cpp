@@ -6,7 +6,7 @@
 #include "Client_Manager.h"
 #include "CombatController.h"
 #include "PlayerController.h"
-
+#include "TrunWinCanvas.h"
 
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -19,7 +19,6 @@ CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pCont
 HRESULT CLevel_Combat::Initialize()
 {
 	
-
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 	
@@ -75,24 +74,39 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 	if (true == CClient_Manager::m_bCombatWin)
 	{
 		m_fSceneChaneTimer += _float(TimeDelta);
-		m_pCombatController->Render_StopCanvas();
+		//m_pCombatController->Render_StopCanvas();
 	}
-	if(m_fSceneChaneTimer >=5.f)
+	if (m_fSceneChaneTimer >= 5.f)
+	{
+		
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
+		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
+			LAYER_UI, TEXT("TurnWinCanvas")));
+		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
+		pWinCanvas->Set_WinRender(true); 
+
+		CClient_Manager::m_bCombatWin = false;
+		m_fSceneChaneTimer = 0.f;
+		m_bSceneChange = true;
+		RELEASE_INSTANCE(CGameInstance);
+	}
+
+	if (m_bSceneChange &&  GetKeyState(VK_RETURN) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
 		Safe_AddRef(pGameInstance);
 
 		pGameInstance->SceneChange_NameVectorClear();
 		m_pCombatController->Scene_Chane_Safe_Release();
-		pGameInstance->Set_CopyIndexs(LEVEL_COMBAT,LEVEL_GAMEPLAY);
+		pGameInstance->Set_CopyIndexs(LEVEL_COMBAT, LEVEL_GAMEPLAY);
 
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY), true)))
 			return;
 
-		Safe_Release(pGameInstance);
-
 		CClient_Manager::m_bCombatWin = false;
-		m_fSceneChaneTimer = 0.f;
+		Safe_Release(pGameInstance);
+		m_bSceneChange = false;
 	}
 
 

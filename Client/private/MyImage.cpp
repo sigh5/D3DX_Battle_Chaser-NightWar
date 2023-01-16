@@ -84,8 +84,6 @@ void CMyImage::Tick(_double TimeDelta)
 			m_bBanerTimerFinish = true;
 			CCombatController::GetInstance()->Get_CurActor()->
 				Set_FsmState(true, CGameObject::m_Uitimate);
-
-
 		}
 	
 	}
@@ -162,7 +160,7 @@ void CMyImage::MoveTexture(_double TimeDelta)
 		
 		if (iTextureNum >= m_iMaxTextureNum)
 		{
-			CClient_Manager::m_bCombatWin = true;
+			//CClient_Manager::m_bCombatWin = true;
 			return;
 		}
 		if (iTextureNum + 1 == 2)

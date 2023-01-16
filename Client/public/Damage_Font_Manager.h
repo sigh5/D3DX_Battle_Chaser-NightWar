@@ -12,7 +12,7 @@ END
 BEGIN(Client)
 
 class CDamageFont;
-class CDamage_Font_Manager : public CBase
+class CDamage_Font_Manager final: public CBase
 {
 	DECLARE_SINGLETON(CDamage_Font_Manager);
 
@@ -26,7 +26,6 @@ public:
 	void		 Tick(_double TimeDelta);	
 	
 	void		Set_DamageFont(_float4 vPos, _float3 vScale , _int Damage);
-
 	void		Late_Tick(_double TimeDelta);
 
 private:

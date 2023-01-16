@@ -2,7 +2,7 @@
 #include "Damage_Font_Manager.h"
 #include "GameInstance.h"
 #include "DamageFont.h"
-#include <vector>
+
 IMPLEMENT_SINGLETON(CDamage_Font_Manager)
 
 CDamage_Font_Manager::CDamage_Font_Manager()
@@ -95,7 +95,8 @@ void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDa
 
 	m_vFontSecondPos = vPos;
 	m_vFontSecondPos.x += 0.5f;
-	m_vFontSecondPos.z -= 1.3f;
+	m_vFontSecondPos.z -= 1.0f;
+	
 	if (iDamage >= 10)
 	{
 		m_iCalDamage = iDamage / 10;
