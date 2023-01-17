@@ -29,11 +29,14 @@ HRESULT CLight_Manager::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * 
 
 void CLight_Manager::Render_Light(CVIBuffer_Rect * pVIBuffer, CShader * pShader)
 {
-	for (auto& pLight : m_Lights)
-	{
-		if (nullptr != pLight)
-			pLight->Render(pVIBuffer, pShader);
-	}
+	//for (auto& pLight : m_Lights)
+	//{
+	//	if (nullptr != pLight)
+	//		pLight->Render(pVIBuffer, pShader);
+	//}
+
+
+
 }
 
 void CLight_Manager::Clear()
@@ -42,6 +45,11 @@ void CLight_Manager::Clear()
 		Safe_Release(iter);
 
 	m_Lights.clear();
+}
+
+HRESULT CLight_Manager::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, wstring NameTag, const LIGHTDESC & LightDesc)
+{
+	return E_NOTIMPL;
 }
 
 void CLight_Manager::Free()

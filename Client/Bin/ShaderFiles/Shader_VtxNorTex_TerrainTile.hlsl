@@ -5,14 +5,11 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture[40];
 
 /* 지형 셰이딩*/
-texture2D		g_FilterTexture[3];
-
-
 
 texture2D		g_BrushTexture;
 vector			g_vBrushPos;
 float			g_fBrushRange = 5.f;
-
+texture2D		g_FilterTexture[3];
 
 struct VS_IN
 {
@@ -28,6 +25,7 @@ struct VS_OUT
 	float4		vNormal			: NORMAL;
 	float2	    vTexUV			: TEXCOORD0;
 	float4		vWolrdPos		: TEXCOORD1;
+	float4		vProjPos		: TEXCOORD2;
 };
 
 VS_OUT VS_MAIN(VS_IN In)
@@ -45,6 +43,7 @@ VS_OUT VS_MAIN(VS_IN In)
 	// 항상 월드스페이스에서 계산하는지 로컬에서 계산하는지 확인해야한다.
 	Out.vWolrdPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
 	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+	Out.vProjPos = Out.vPosition;
 
 	return Out;
 }
@@ -55,6 +54,7 @@ struct PS_IN
 	float4		vNormal			: NORMAL;
 	float2	    vTexUV			: TEXCOORD0;
 	float4		vWorldPos		: TEXCOORD1;
+	float4		vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -62,6 +62,7 @@ struct PS_OUT
 	/*SV_TARGET0 : 모든 정보가 결정된 픽셀이다. AND 0번째 렌더타겟에 그리기위한 색상이다. */
 	float4		vDiffuse : SV_TARGET0;
 	float4		vNormal : SV_TARGET1;
+	float4		vDepth : SV_TARGET2;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -162,6 +163,7 @@ PS_OUT PS_MAIN_Real(PS_IN In)
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vDiffuse.a = 1.f;
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
 
 	
 	return Out;

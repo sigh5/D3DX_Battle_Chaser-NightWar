@@ -302,7 +302,7 @@ HRESULT CLevel_Combat::Ready_Lights()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
-	LIGHTDESC		LightDesc;
+	/*LIGHTDESC		LightDesc;
 	ZeroMemory(&LightDesc, sizeof(LightDesc));
 
 	LightDesc.eType = LIGHTDESC::TYPE_DIRECTIONAL;
@@ -313,7 +313,7 @@ HRESULT CLevel_Combat::Ready_Lights()
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	RELEASE_INSTANCE(CGameInstance);
 

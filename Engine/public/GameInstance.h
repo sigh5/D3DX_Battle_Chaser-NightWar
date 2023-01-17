@@ -118,6 +118,7 @@ public:/* For.TimeManager */
 public:/* For.Light_Manager */
 	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;
 	HRESULT				Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
+	
 
 public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

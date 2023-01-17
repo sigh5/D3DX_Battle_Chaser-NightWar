@@ -33,6 +33,11 @@ _matrix CPipeLine::Get_TransformMatrix_Inverse(TRANSFORMSTATE eState) const
 	return XMLoadFloat4x4(&m_TransformMatrices_Inverse[eState]);
 }
 
+_float4x4 CPipeLine::Get_TransformFloat4x4_Inverse(TRANSFORMSTATE eState) const
+{
+	return m_TransformMatrices_Inverse[eState];
+}
+
 void CPipeLine::Set_Transform(TRANSFORMSTATE eState, _fmatrix TransformMatrix)
 {
 	XMStoreFloat4x4(&m_TransformMatrices[eState], TransformMatrix);
