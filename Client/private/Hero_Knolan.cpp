@@ -77,7 +77,7 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 		{
 			m_bIsHeavyHit = true;
 		}
-		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 		
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
@@ -232,7 +232,6 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 			++iter;
 	}
 
-
 	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
 	{
 		if ((*iter) != nullptr)
@@ -312,7 +311,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanDungeon"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
-			assert("Change_Level_Data : LEVEL_COMBAT ");
+			assert(!"Change_Level_Data : LEVEL_COMBAT");
 
 		m_bIsCombatScene = false;
 	}
@@ -335,7 +334,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
-			assert("Change_Level_Data : LEVEL_COMBAT ");
+			assert(!"Change_Level_Data : LEVEL_COMBAT");
 		m_bIsCombatScene = true;
 		
 	}
@@ -522,6 +521,12 @@ void CHero_Knolan::Create_Skill_Texture()
 	pSkillParts =	pGameInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT,false);
 	static_cast<CSkill_TextureObj*>(pSkillParts)->Set_Skill_Texture_Client(SkillDesc);
 
+	if (m_SkillDir == Skill_DIR_LISING)
+	{
+		static_cast<CSkill_TextureObj*>(pSkillParts)->Set_Glow(true, TEXT("Prototype_Component_Texture_Knolan_Golf"), 1);
+	}
+
+
 	assert(pSkillParts != nullptr && "Create_SkillFire");
 	m_PlayerParts.push_back(pSkillParts);
 
@@ -566,11 +571,10 @@ void CHero_Knolan::Create_Hit_Effect()
 
 	CGameObject* pGameObject = nullptr;
 
-	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
+	CHitBoxObject::WEAPON_OPTIONAL WeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(m_iHitWeaponOption);
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-
 
 	if (m_bUseDefence)
 	{
@@ -590,38 +594,38 @@ void CHero_Knolan::Create_Hit_Effect()
 	{
 		switch (WeaponOption)
 		{
-		case Client::WEAPON_OPTIONAL_NONE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
 
 			break;
-		case Client::WEAPON_OPTIONAL_BLUE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 			iEffectNum = 5;
 			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
 			iEffectNum = 1;
 			break;
-		case Client::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		case Client::WEAPON_OPTIONAL_PULPLE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		case Client::WEAPON_OPTIONAL_GREEN:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 			break;
-		case Client::WEAPON_OPTIONAL_END:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
 			break;
 		default:
 			break;
@@ -669,11 +673,7 @@ void CHero_Knolan::Create_Hit_Effect()
 
 	}
 	
-
-
 	RELEASE_INSTANCE(CGameInstance);
-
-
 }
 
 void CHero_Knolan::Create_Defence_Effect_And_Action()
@@ -705,8 +705,6 @@ void CHero_Knolan::Create_Defence_Effect_And_Action()
 	m_bOnceCreate = false;
 	m_bCreateDefenceTimer = true;
 	RELEASE_INSTANCE(CGameInstance);
-	
-	
 }
 
 void CHero_Knolan::Create_Defence_Area()
@@ -823,8 +821,6 @@ void CHero_Knolan::Create_Wide_BuffEffect_Second()
 	vPos.y += 4.f;
 	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mana up"));
-
-
 }
 
 void CHero_Knolan::Create_SkillFire()
@@ -883,7 +879,6 @@ void CHero_Knolan::Create_Test_Effect()
 
 void CHero_Knolan::Create_Skill_Ultimate_Effect()
 {
-
 	if (m_pHitTarget == nullptr)
 		return;
 
@@ -912,10 +907,7 @@ void CHero_Knolan::Create_Skill_Ultimate_Effect()
 		m_pEffectParts.push_back(pGameObject);
 		iSign *= -1;
 	}
-	
-
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Knolan::Create_Buff_MainTain_Effect()
@@ -927,11 +919,10 @@ void CHero_Knolan::Create_Buff_MainTain_Effect()
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 
-	pGameObject = pInstance->Load_Effect(TEXT("Texture_Common_Aura_11"), LEVEL_COMBAT, false);
-
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_Buff_Effect_Power"), LEVEL_COMBAT, false);
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(-1.0f, 0.6f, -0.6f, 1.f);
-	BuffDesc.vScale = _float3(4.f, 7.f, 4.f);
+	BuffDesc.vScale = _float3(3.f, 3.f, 3.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
@@ -939,8 +930,10 @@ void CHero_Knolan::Create_Buff_MainTain_Effect()
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
 
-
+	static_cast<CBuff_Effect*>(pGameObject)->Is_Particle_Effect(15);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	
+
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -948,7 +941,6 @@ void CHero_Knolan::Create_Buff_MainTain_Effect()
 
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
-
 	if (!m_bOnceStop && m_pModelCom->Control_KeyFrame_Create(7, 15) )
 	{
 		Create_Skill_Texture();
@@ -1127,11 +1119,6 @@ HRESULT CHero_Knolan::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	/* For.Lights */
-	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
 
 
 
@@ -1202,7 +1189,7 @@ void CHero_Knolan::AnimNormalAttack()
 	m_bOnceCreate = false;
 	m_BoneTag = "Weapon_Staff_Classic";
 	m_TextureTag = TEXT("FireBall_Knolan");
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
 	CCombatController::GetInstance()->Camera_Zoom_In();
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
@@ -1220,11 +1207,11 @@ void CHero_Knolan::Anim_Skill1_Attack()
 	m_vSkill_Pos = _float4(-1.2f, 0.6f, 1.9f, 1.f);
 	m_vSkill_Scale = _float3(4.f, 4.f, 4.f);
 	m_bOnceCreate = false;
-	m_TextureTag = TEXT("FireBall_Knolan");
+	m_TextureTag = TEXT("Texture_Knolan_Golf_Skill_Texture");
 	m_BoneTag = "Bone_Knolan_Hand_L";
 	m_SkillDir = Skill_DIR_LISING;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL1;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1;
 	Create_Skill_Texture();
 	CCombatController::GetInstance()->Camera_Zoom_In();
 	m_iStage_Buff_DamgaeUP = 0;
@@ -1248,7 +1235,7 @@ void CHero_Knolan::Anim_Skill2_Attack()
 	m_BoneTag = "Bone_Knolan_Hand_L";
 	m_SkillDir = SKILL_CREATE_HITER_POS;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
 	CCombatController::GetInstance()->Camera_Zoom_In();
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;

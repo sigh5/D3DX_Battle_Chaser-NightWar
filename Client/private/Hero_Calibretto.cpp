@@ -54,13 +54,13 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
+		vPos.y += 6.f;
 		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
 		
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 		
-		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 		
 	
 		if (pCurActorWepon->Get_HitNum() > 1)
@@ -429,7 +429,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
+		vPos.y += 6.f;
 		_int iRandom = rand() % 5;
 		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum);
 	
@@ -647,13 +647,6 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 		return E_FAIL;
 
 
-
-	/* For.Lights */
-	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -679,7 +672,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(1.7f, 0.f, -1.1f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 3.f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_HAND;
-	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
+	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT;
 
 	Safe_AddRef(WeaponDesc.pSocket);
 	Safe_AddRef(m_pTransformCom);
@@ -726,7 +719,7 @@ void CHero_Calibretto::AnimNormalAttack()
 	m_iStateDamage = rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
-	m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT;
 	m_bOnceCreate = false;
 	m_bRun = false;
 
@@ -751,7 +744,7 @@ void CHero_Calibretto::Anim_Skill1_Attack()
 	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;		// ÆÝÄ¡ÇÏ°í ÃÑ°¥±â±â
 	m_iHitCount = 2;
 	m_eWeaponType = WEAPON_HAND;
-	m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_GUN;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN;
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_bBulletShoot = false;
@@ -1251,11 +1244,11 @@ void CHero_Calibretto::Create_Buff_MainTain_Effect()
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 
-	pGameObject = pInstance->Load_Effect(TEXT("Texture_Common_Aura_9"), LEVEL_COMBAT, false);
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_Buff_Effect_Power_2"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(-1.5f,2.f,-0.5f,1.f);
-	BuffDesc.vScale = _float3(10.f,17.f,10.f);
+	BuffDesc.vScale = _float3(3.f, 3.f, 3.f);
 	BuffDesc.vAngle = -90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
@@ -1263,6 +1256,8 @@ void CHero_Calibretto::Create_Buff_MainTain_Effect()
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
 	m_bLazorStop = false;
+
+	static_cast<CBuff_Effect*>(pGameObject)->Is_Particle_Effect(15);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 
@@ -1512,31 +1507,31 @@ void CHero_Calibretto::Create_Hit_Effect()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = nullptr;
-	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
+	CHitBoxObject::WEAPON_OPTIONAL WeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(m_iHitWeaponOption);
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 
 	switch (WeaponOption)
 	{
-	case Client::WEAPON_OPTIONAL_NONE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
 		break;
-	case Client::WEAPON_OPTIONAL_BLUE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		break;
-	case Client::WEAPON_OPTIONAL_PULPLE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.f, 1.f, 1.5f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 		break;
-	case Client::WEAPON_OPTIONAL_GREEN:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		break;
-	case Client::WEAPON_OPTIONAL_END:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
 		break;
 	default:
 		break;

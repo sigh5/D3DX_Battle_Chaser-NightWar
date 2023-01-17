@@ -1,5 +1,4 @@
 #pragma once
-
 #include "HitBoxObject.h"
 #include "Client_Defines.h"
 
@@ -11,22 +10,21 @@ class CTexture;
 END
 
 BEGIN(Client)
-class CExplain_Font final : public CHitBoxObject
+class CDebuff_Font  final : public CHitBoxObject
 {
 public:
-	typedef struct tag_ExPlainFont_Desc
+	typedef struct tag_Debuff_Font
 	{
 		_tchar		szRepresent;
-	}FONT_EXPLAIN_DESC;
+	}FONT_DEBUFF_DESC;
 
 public:
-	CExplain_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CExplain_Font(const CExplain_Font& rhs);
-	virtual ~CExplain_Font() = default;
+	CDebuff_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CDebuff_Font(const CDebuff_Font& rhs);
+	virtual ~CDebuff_Font() = default;
 
 public:
 	void	Set_RenderActive(_bool bRenderActive) { m_bIsRendering = bRenderActive; }
-
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -42,8 +40,8 @@ private:
 	CTexture*							m_pTextureCom = nullptr;
 
 public:
-	
-	void		Render_Font(_float4 vPos, _float3 vScale,_tchar szChar);
+
+	void		Render_Font(_float4 vPos, _float3 vScale, _tchar szChar);
 
 private:
 	HRESULT		SetUp_Components();
@@ -51,15 +49,16 @@ private:
 
 private:
 	_bool								m_bMoveTrue = false;
-	FONT_EXPLAIN_DESC					m_fontDesc;
+	FONT_DEBUFF_DESC					m_fontDesc;
 
 	_bool								m_bIsRendering = false;
 
 	_float								m_fMoveSpeed = 50.f;
 
 public:
-	static CExplain_Font* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CDebuff_Font* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };
 END
+

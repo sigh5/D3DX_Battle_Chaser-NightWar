@@ -57,12 +57,16 @@ void CVIBuffer_Point_Instancing::Set_Point_Instancing_Num(_int iInstancingNum)
 	VTXMATRIX*			pInstanceVertices = new VTXMATRIX[iInstancingNum];
 	ZeroMemory(pInstanceVertices, sizeof(VTXMATRIX));
 
+	_int iSign = 1;
+	_float Temp = 0.f;
 	for (_int i = 0; i < iInstancingNum; ++i)
 	{
+		iSign *= -1;
 		pInstanceVertices[i].vRight = _float4(1.0f, 0.f, 0.f, 0.f);				// 여기 사이즈가 1, 1 이잖아요 인스턴싱된것들이
 		pInstanceVertices[i].vUp = _float4(0.0f, 1.f, 0.f, 0.f);
 		pInstanceVertices[i].vLook = _float4(0.0f, 0.f, 1.f, 0.f);
-		pInstanceVertices[i].vPosition = _float4(-0.5f +(0.1f *i), 0.1f, -0.5f + (0.1f *i), 1.f);
+
+		pInstanceVertices[i].vPosition = _float4(_float(rand()%2 * iSign), -0.5f, _float(rand() % 2 * iSign), 1.f);
 	}
 
 
@@ -273,6 +277,30 @@ HRESULT CVIBuffer_Point_Instancing::Render()
 
 	/*m_pContext->DrawIndexed(m_iNumIndices, 0, 0);*/
 	m_pContext->DrawIndexedInstanced(m_iIndexCountPerInstance, m_iNumInstance, 0, 0, 0);
+
+	return S_OK;
+}
+
+HRESULT CVIBuffer_Point_Instancing::Tick_UpDown(_double TimeDelta)
+{
+	CONTEXT_LOCK;
+	D3D11_MAPPED_SUBRESOURCE			SubResource;
+	ZeroMemory(&SubResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+
+	m_pContext->Map(m_pInstanceBuffer, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+
+	for (_uint i = 0; i < m_iNumInstance; ++i)
+	{
+		((VTXMATRIX*)SubResource.pData)[i].vPosition.y += _float(2.0f *(i + 0.1f)*0.5f * TimeDelta);
+
+		if (((VTXMATRIX*)SubResource.pData)[i].vPosition.y >= 1.5f)
+		{
+			((VTXMATRIX*)SubResource.pData)[i].vPosition.y = -0.5f;
+		}
+	}
+
+	m_pContext->Unmap(m_pInstanceBuffer, 0);
 
 	return S_OK;
 }

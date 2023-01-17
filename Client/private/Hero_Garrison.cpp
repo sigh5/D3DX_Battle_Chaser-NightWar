@@ -71,7 +71,7 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
-		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
@@ -480,7 +480,7 @@ void CHero_Garrison::Create_Hit_Effect()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = nullptr;
-	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
+	CHitBoxObject::WEAPON_OPTIONAL WeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(m_iHitWeaponOption);
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
@@ -503,21 +503,21 @@ void CHero_Garrison::Create_Hit_Effect()
 	{
 		switch (WeaponOption)
 		{
-		case Client::WEAPON_OPTIONAL_NONE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
 			break;
-		case Client::WEAPON_OPTIONAL_BLUE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 			break;
-		case Client::WEAPON_OPTIONAL_PULPLE:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		case Client::WEAPON_OPTIONAL_GREEN:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 			break;
-		case Client::WEAPON_OPTIONAL_END:
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
 			break;
 		default:
 			break;
@@ -810,13 +810,16 @@ void CHero_Garrison::Create_Defence_Area()
 	_uint iEffectNum = 1;
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 	BuffDesc.vAngle = -90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
 	BuffDesc.iFrameCnt = 6;
 	BuffDesc.bIsUp = false;
+
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	
+	
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -831,11 +834,11 @@ void CHero_Garrison::Create_Buff_MainTain_Effect()
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 
-	pGameObject = pInstance->Load_Effect(TEXT("Texture_Common_Aura_11"), LEVEL_COMBAT, false);
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_Buff_Effect_Power"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(-1.9f, 0.4f, -0.5f, 1.f);
-	BuffDesc.vScale = _float3(7.f, 9.f, 7.f);
+	BuffDesc.vScale = _float3(3.f, 3.f, 3.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
@@ -843,7 +846,7 @@ void CHero_Garrison::Create_Buff_MainTain_Effect()
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
 	
-	
+	static_cast<CBuff_Effect*>(pGameObject)->Is_Particle_Effect(15);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 
@@ -983,10 +986,6 @@ HRESULT CHero_Garrison::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	/* For.Lights */
-	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -1036,7 +1035,7 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -2.f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f,0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
-	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_BLUE;
+	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE;
 
 	Safe_AddRef(WeaponDesc.pSocket);
 	Safe_AddRef(m_pTransformCom);
@@ -1258,6 +1257,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(30, 302))
 	{
 		Create_Ultimate_End_Effect();
+		m_bBuffEffectStop = true;
 		CCombatController::GetInstance()->Wide_Attack(false,73);
 		m_bOnceCreate = true;
 	}
@@ -1301,7 +1301,7 @@ void CHero_Garrison::AnimNormalAttack()
 	m_iStateDamage = rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL;
 	m_bOnceCreate = false;
 	m_bRun = false;
 
@@ -1332,7 +1332,7 @@ void CHero_Garrison::Anim_Skill1_Attack()
 	m_LimitDistance = 10.f;
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 0.9f;
-	m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1;
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
 	
@@ -1358,7 +1358,7 @@ void CHero_Garrison::Anim_Skill2_Attack()
 	m_SpeedRatio = 6.f;
 	m_ReturnDistance = 0.5f;
 	m_setTickForSecond = 0.9f;
-	m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2;
 	m_bBuffEffectStop = true;
 	m_iStage_Buff_DamgaeUP = 0;
 
@@ -1391,7 +1391,7 @@ void CHero_Garrison::Anim_Uitimate()
 	m_SpeedRatio = 6.f;
 	m_ReturnDistance = 0.5f;
 	m_setTickForSecond = 0.9f;
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_NORMAL;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate;
 
 	m_CurAnimqeue.push({ 30,  1.f });	// Key프레임 (뛰는 것)하나 찾기 83~94 는 움직여야함  //Texture_Garrison_Ultimate_Effect
 	m_CurAnimqeue.push({ 11,  m_setTickForSecond });

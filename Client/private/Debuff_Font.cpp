@@ -1,20 +1,19 @@
 #include "stdafx.h"
-#include "..\public\Explain_Font.h"
+#include "..\public\Debuff_Font.h"
 #include "GameInstance.h"
 #include "Client_Manager.h"
 
-
-CExplain_Font::CExplain_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CDebuff_Font::CDebuff_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CHitBoxObject(pDevice, pContext)
 {
 }
 
-CExplain_Font::CExplain_Font(const CExplain_Font & rhs)
+CDebuff_Font::CDebuff_Font(const CDebuff_Font & rhs)
 	: CHitBoxObject(rhs)
 {
 }
 
-HRESULT CExplain_Font::Initialize_Prototype()
+HRESULT CDebuff_Font::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
@@ -22,7 +21,7 @@ HRESULT CExplain_Font::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CExplain_Font::Initialize(void * pArg)
+HRESULT CDebuff_Font::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Explain_Font");
 
@@ -43,23 +42,22 @@ HRESULT CExplain_Font::Initialize(void * pArg)
 	return S_OK;
 }
 
-void CExplain_Font::Tick(_double TimeDelta)
+void CDebuff_Font::Tick(_double TimeDelta)
 {
-	//Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	m_pVIBufferCom->Tick(15.f*TimeDelta);
+	m_pVIBufferCom->Tick(-10.f*TimeDelta);
 }
 
-void CExplain_Font::Late_Tick(_double TimeDelta)
+void CDebuff_Font::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	if (m_bIsRendering  && nullptr != m_pRendererCom)
+	if (m_bIsRendering  && nullptr != m_pRendererCom)	
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
 }
 
-HRESULT CExplain_Font::Render()
+HRESULT CDebuff_Font::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -73,7 +71,7 @@ HRESULT CExplain_Font::Render()
 	return S_OK;
 }
 
-HRESULT CExplain_Font::Last_Initialize()
+HRESULT CDebuff_Font::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
@@ -93,16 +91,15 @@ HRESULT CExplain_Font::Last_Initialize()
 	return S_OK;
 }
 
-void CExplain_Font::Render_Font(_float4 vPos, _float3 vScale, _tchar szChar)
+void CDebuff_Font::Render_Font(_float4 vPos, _float3 vScale, _tchar szChar)
 {
-
 	m_bIsRendering = true;
 	m_pVIBufferCom->Move_Up_Position(_float4(0.f, 0.f, 0.f, 1.f));		//000으로 초기화
 
 
 	if (szChar == L'a')
 	{
-		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION,XMLoadFloat4(&vPos));
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		m_pVIBufferCom->Set_WidthTextureCnt(0.f);
 		m_pVIBufferCom->Set_HeightTextureCnt(0.f);
 	}
@@ -178,13 +175,13 @@ void CExplain_Font::Render_Font(_float4 vPos, _float3 vScale, _tchar szChar)
 		m_pVIBufferCom->Set_WidthTextureCnt(2.f);
 		m_pVIBufferCom->Set_HeightTextureCnt(2.f);
 	}
-	
 	else if (szChar == L'n')
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		m_pVIBufferCom->Set_WidthTextureCnt(3.f);
 		m_pVIBufferCom->Set_HeightTextureCnt(2.f);
 	}
+	
 	else if (szChar == L'o')
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
@@ -255,7 +252,7 @@ void CExplain_Font::Render_Font(_float4 vPos, _float3 vScale, _tchar szChar)
 	else if (szChar == L'z')
 	{
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
-		m_pVIBufferCom->Set_WidthTextureCnt(0.f);
+		m_pVIBufferCom->Set_WidthTextureCnt(2.f);
 		m_pVIBufferCom->Set_HeightTextureCnt(5.f);
 	}
 	else if (szChar == L' ')
@@ -267,9 +264,11 @@ void CExplain_Font::Render_Font(_float4 vPos, _float3 vScale, _tchar szChar)
 
 
 	m_pVIBufferCom->Set_Point_Instancing_Scale(vScale);
+
+
 }
 
-HRESULT CExplain_Font::SetUp_Components()
+HRESULT CDebuff_Font::SetUp_Components()
 {
 	/* For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
@@ -298,7 +297,8 @@ HRESULT CExplain_Font::SetUp_Components()
 	return S_OK;
 }
 
-HRESULT CExplain_Font::SetUp_ShaderResources()
+
+HRESULT CDebuff_Font::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -319,37 +319,37 @@ HRESULT CExplain_Font::SetUp_ShaderResources()
 	if (FAILED(m_pVIBufferCom->Set_UV_RawValue(m_pShaderCom)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 2)))
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", 3)))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-CExplain_Font * CExplain_Font::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CDebuff_Font * CDebuff_Font::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CExplain_Font*		pInstance = new CExplain_Font(pDevice, pContext);
+	CDebuff_Font*		pInstance = new CDebuff_Font(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CExplain_Font");
+		MSG_BOX("Failed to Created : CDebuff_Font");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CExplain_Font::Clone(void * pArg)
+CGameObject * CDebuff_Font::Clone(void * pArg)
 {
-	CExplain_Font*		pInstance = new CExplain_Font(*this);
+	CDebuff_Font*		pInstance = new CDebuff_Font(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX("Failed to Cloned : CExplain_Font");
+		MSG_BOX("Failed to Cloned : CDebuff_Font");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CExplain_Font::Free()
+void CDebuff_Font::Free()
 {
 	__super::Free();
 

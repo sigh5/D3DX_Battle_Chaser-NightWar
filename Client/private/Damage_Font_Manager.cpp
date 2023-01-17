@@ -78,7 +78,7 @@ void CDamage_Font_Manager::Tick(_double TimeDelta)
 	}
 	
 
-	if (m_fFontTimer >= 0.5f)
+	if (m_fFontTimer >= 2.5f)
 	{
 		m_bFontUpdate = false;
 		m_fFontTimer = 0.f;

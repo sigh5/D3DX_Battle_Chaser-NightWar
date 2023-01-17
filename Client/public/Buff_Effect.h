@@ -47,6 +47,10 @@ public:
 	const   _bool  Get_MainTain()const { return m_Client_BuffEffect_Desc.bIsMainTain; }
 	
 	void	Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber);
+	void	Set_ShaderPass(_uint iShaderPass);
+
+
+	void	Is_Particle_Effect(_int iInstanceNum);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -76,6 +80,8 @@ private:
 	_float								m_bMainTainTimer = 0.f;
 	_float								m_fGlowStrength=0.f;
 	_bool								m_bIsChange = false;
+
+	_bool								m_bIsUpdown = false;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

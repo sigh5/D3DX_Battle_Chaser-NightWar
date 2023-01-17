@@ -11,14 +11,17 @@ private:
 	virtual ~CLight_Manager() = default;
 
 public:
-	const LIGHTDESC*	Get_LightDesc(_uint iIndex) const;
+	LIGHTDESC*	Get_LightDesc(wstring NameTag);
 
 public:
 	//HRESULT		Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
 	void		Render_Light(class CVIBuffer_Rect* pVIBuffer, class CShader* pShader);
 	void		Clear();
-	HRESULT			Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, wstring NameTag, const LIGHTDESC& LightDesc);
+	HRESULT		Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, wstring NameTag, const LIGHTDESC& LightDesc);
+	HRESULT		Delete_Light(wstring NameTag);
 
+private:
+	class	CLight*		Find_Light(wstring nameTag);
 
 
 private:

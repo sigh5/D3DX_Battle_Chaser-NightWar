@@ -87,6 +87,22 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 		break;
 	}
 #endif	
+	
+	if (m_bUseGlow)
+	{
+		if (m_fGlowStrength >= 1.f)
+			m_bIsChange = true;
+		else if (m_fGlowStrength <= 0)
+			m_bIsChange = false;
+
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f;
+		else
+			m_fGlowStrength += (_float)TimeDelta;
+	}
+
+
+
 }
 
 void CSkill_TextureObj::Late_Tick(_double TimeDelta)
@@ -111,7 +127,7 @@ HRESULT CSkill_TextureObj::Render()
 		return E_FAIL;
 
 	//m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass;
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass);
 	m_pVIBufferCom->Render();
 
 
@@ -219,6 +235,18 @@ HRESULT CSkill_TextureObj::SetUp_ShaderResources()
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture",m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
 
+
+	if (m_bUseGlow == true)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength, sizeof(_float))))
+			return E_FAIL;
+
+
+		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", m_iGlowTextureNum)))
+			return E_FAIL;
+	}
+
+
 	return S_OK;
 }
 
@@ -280,6 +308,7 @@ void CSkill_TextureObj::Set_Cur_Pos()
 	XMStoreFloat4x4(&m_SocketMatrix, SocketMatrix);
 
 	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	m_pVIBufferCom->Set_Point_Instancing_MainTain();
 	m_pVIBufferCom->Set_Point_Instancing_Scale(m_SkillDesc.vScale);	// 텍스쳐의 크기를 키우는것
 	m_pTransformCom->Set_Scaled(m_SkillDesc.vScale);				// 콜라이더의 크기를 키우는것임
 	m_vScale = m_SkillDesc.vScale;
@@ -307,6 +336,23 @@ void CSkill_TextureObj::Set_Cur_Pos_On_Hiter()
 	m_vScale = m_SkillDesc.vScale;
 	m_bShoot = false;
 
+}
+
+void CSkill_TextureObj::Set_Glow(_bool bUseGlow, wstring GlowTag, _int iGlowTextureNumber)
+{
+	m_bUseGlow = bUseGlow;
+	m_GlowstrTag = GlowTag;
+	m_iGlowTextureNum = iGlowTextureNumber;
+
+	if (true == m_bUseGlow)
+	{
+		/* For.Com_Texture */
+		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, GlowTag.c_str(), TEXT("Com_GlowTexture"),
+			(CComponent**)&m_pGlowTextureCom)))
+			assert(!" CBuff_Effect::Set_Glow");
+
+		m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = 1; //Glow
+	}
 }
 
 void CSkill_TextureObj::Set_Skill_Texture_Client(Skill_Texture_Client & Desc)
@@ -483,6 +529,13 @@ CGameObject * CSkill_TextureObj::Clone(void * pArg)
 void CSkill_TextureObj::Free()
 {
 	__super::Free();
+
+
+	if (m_bUseGlow)
+	{
+		Safe_Release(m_pGlowTextureCom);
+	}
+
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pVIBufferCom);

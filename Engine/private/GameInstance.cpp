@@ -544,20 +544,36 @@ void CGameInstance::Set_Timedelta(const _tchar * pTimerTag, _double Time)
 	m_pTimer_Manager->Set_Timedelta(pTimerTag, Time);
 }
 
-const LIGHTDESC * CGameInstance::Get_LightDesc(_uint iIndex) const
+ LIGHTDESC * CGameInstance::Get_LightDesc(wstring NameTag) 
 {
 	if (nullptr == m_pLight_Manager)
 		return nullptr;
 
-	return m_pLight_Manager->Get_LightDesc(iIndex);
+	return m_pLight_Manager->Get_LightDesc(NameTag);
 }
 
-HRESULT CGameInstance::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const LIGHTDESC & LightDesc)
+HRESULT CGameInstance::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, wstring NameTag, const LIGHTDESC & LightDesc)
 {
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
-	return m_pLight_Manager->Add_Light(pDevice,pContext,LightDesc);
+	return m_pLight_Manager->Add_Light(pDevice,pContext, NameTag,LightDesc);
+}
+
+HRESULT CGameInstance::Delete_Light(wstring NameTag)
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Clear_Light()");
+
+	return m_pLight_Manager->Delete_Light(NameTag);
+}
+
+void CGameInstance::Clear_Light()
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Clear_Light()");
+
+	return m_pLight_Manager->Clear();
 }
 
 HRESULT CGameInstance::Add_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)

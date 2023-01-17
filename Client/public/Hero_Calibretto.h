@@ -96,7 +96,7 @@ private:
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
-	_int					m_iWeaponOption = WEAPON_OPTIONAL_PUNCH_HIT;
+	_int					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT;
 	
 	_bool					m_bRun = false;
 	_bool					m_bBulletShoot = false;

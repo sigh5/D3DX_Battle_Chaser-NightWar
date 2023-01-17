@@ -1,7 +1,7 @@
 #pragma once
 #include "Client_Defines.h"
 #include "Player.h"
-
+#include "HitBoxObject.h"
 
 BEGIN(Engine)
 class CShader;
@@ -149,7 +149,7 @@ private:
 	_float		m_LimitDistance = 8.f;
 	_float		m_ReturnDistance = 0.1f;
 	_float		m_setTickForSecond = 0.9f;
-	_uint		m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	_uint		m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	wstring			m_TextureTag = TEXT("");
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;

@@ -741,9 +741,12 @@ CGameObject* CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCu
 	if (nullptr != pGameObject)
 		return pGameObject;
 	else
-		assert(!  "Error");
+	{
+		assert(!"Error");
+	}
 	
-
+	
+	return nullptr;
 }
 
 CGameObject* CObject_Manager::Load_Effect(const _tchar * pDataFileName, _uint iCurLevel, _bool bIsHaveLayer)

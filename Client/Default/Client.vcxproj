@@ -187,6 +187,7 @@
     <ClInclude Include="..\Public\CombatMap.h" />
     <ClInclude Include="..\Public\DamageFont.h" />
     <ClInclude Include="..\Public\Damage_Font_Manager.h" />
+    <ClInclude Include="..\Public\Debuff_Font.h" />
     <ClInclude Include="..\Public\DungeonMaps.h" />
     <ClInclude Include="..\Public\Dungeon_Canvas.h" />
     <ClInclude Include="..\Public\EffectFrame.h" />
@@ -253,6 +254,7 @@
     <ClCompile Include="..\Private\CombatMap.cpp" />
     <ClCompile Include="..\Private\DamageFont.cpp" />
     <ClCompile Include="..\Private\Damage_Font_Manager.cpp" />
+    <ClCompile Include="..\Private\Debuff_Font.cpp" />
     <ClCompile Include="..\Private\DungeonMaps.cpp" />
     <ClCompile Include="..\Private\Dungeon_Canvas.cpp" />
     <ClCompile Include="..\Private\EffectFrame.cpp" />

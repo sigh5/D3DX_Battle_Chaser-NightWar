@@ -41,19 +41,19 @@ HRESULT CDamageFont::Initialize(void * pArg)
 	if (FAILED(Ready_Font()))
 		return E_FAIL;
 	
-
+	
 	return S_OK;
 }
 
 void CDamageFont::Tick(_double TimeDelta)
 {
-	Last_Initialize();
+	
 	__super::Tick(TimeDelta);
 
 	_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
 
 
-	m_pVIBufferCom->Tick_Shaking(50.f*TimeDelta,ShakefX);
+	m_pVIBufferCom->Tick_Shaking(20.f*TimeDelta,ShakefX);
 	
 }
 
@@ -86,7 +86,6 @@ HRESULT CDamageFont::Last_Initialize()
 		return S_OK;
 
 	
-
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -94,17 +93,18 @@ HRESULT CDamageFont::Last_Initialize()
 
 HRESULT CDamageFont::Ready_Font()
 {
-
 	CVIBuffer_Point_Instancing::VIBUffer_Point_TextureDesc Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
-	
+
 	Desc.m_iFrameCnt = 0;
 	Desc.m_iTextureMax_Width_Cnt = 5.f;
 	Desc.m_iTextureMax_Height_Cnt = 3.f;
-	
+
 	m_pVIBufferCom->Set_Point_Desc(Desc);
 	m_pVIBufferCom->Set_Point_Instancing_MainTain();
 	m_pVIBufferCom->Set_Point_Instancing_Num(1);
+	m_pVIBufferCom->Set_Point_Instancing_Scale(_float3(1.f, 1.f, 1.f));
+
 	switch (m_fontDesc.iRepresentNum)
 	{
 	case 0:
@@ -164,8 +164,6 @@ HRESULT CDamageFont::Ready_Font()
 	default:
 		break;
 	}
-
-
 
 
 

@@ -71,6 +71,17 @@ void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNum
 
 }
 
+void CBuff_Effect::Set_ShaderPass(_uint iShaderPass)
+{
+	m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = iShaderPass;
+}
+
+void CBuff_Effect::Is_Particle_Effect(_int iInstanceNum)
+{
+	m_pVIBufferCom->Set_Point_Instancing_Num(iInstanceNum);
+	m_bIsUpdown = true;
+}
+
 HRESULT CBuff_Effect::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -96,6 +107,23 @@ void CBuff_Effect::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+
+
+
+	if (m_bUseGlow)
+	{
+		if (m_fGlowStrength >= 1.f)
+			m_bIsChange = true;
+		else if (m_fGlowStrength <= 0)
+			m_bIsChange = false;
+
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f;
+		else
+			m_fGlowStrength += (_float)TimeDelta;
+	}
+
+
 
 	if (m_pVIBufferCom->UV_Move_Tick(TimeDelta) && m_Client_BuffEffect_Desc.bIsMainTain ==false)
 	{
@@ -123,22 +151,13 @@ void CBuff_Effect::Tick(_double TimeDelta)
 		}
 	}
 
-
+	if (m_bIsUpdown)
+	{
+		m_pVIBufferCom->Tick_UpDown(TimeDelta);
+	}
 	
 
 
-	if (m_bUseGlow)
-	{
-		if (m_fGlowStrength >= 1.f)
-			m_bIsChange = true;
-		else if (m_fGlowStrength <= 0)
-			m_bIsChange = false;
-
-		if (m_bIsChange == true)
-			m_fGlowStrength += (_float)TimeDelta * -1.f;
-		else
-			m_fGlowStrength += (_float)TimeDelta;
-	}
 
 
 

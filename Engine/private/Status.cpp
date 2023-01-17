@@ -11,6 +11,58 @@ CStatus::CStatus(const CStatus & rhs)
 {
 }
 
+void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
+{
+	if (isFlase)
+	{
+		switch (eType)
+		{
+		case Engine::CStatus::DEBUFF_FIRE:
+			m_StatusDesc.m_tagDesc.isDebuff_FIRE = true;
+			break;
+		case Engine::CStatus::DEBUFF_BLEED:
+			m_StatusDesc.m_tagDesc.isDebuff_BLEED = true;
+			break;
+		case Engine::CStatus::DEBUFF_ARMOR:
+			m_StatusDesc.m_tagDesc.isDebuff_ARMOR = true;
+			break;
+		case Engine::CStatus::DEBUFF_MAGIC:
+			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = true;
+			break;
+		case Engine::CStatus::DEBUFF_NONE:
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (eType)
+		{
+		case Engine::CStatus::DEBUFF_FIRE:
+			m_StatusDesc.m_tagDesc.isDebuff_FIRE = false;
+			break;
+		case Engine::CStatus::DEBUFF_BLEED:
+			m_StatusDesc.m_tagDesc.isDebuff_BLEED = false;
+			break;
+		case Engine::CStatus::DEBUFF_ARMOR:
+			m_StatusDesc.m_tagDesc.isDebuff_ARMOR = false;
+			break;
+		case Engine::CStatus::DEBUFF_MAGIC:
+			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = false;
+			break;
+		case Engine::CStatus::DEBUFF_NONE:
+			break;
+		default:
+			break;
+		}
+	}
+	
+
+
+}
+
+
 void CStatus::Incrase_Hp(_int iAmount)
 {
 	_int iSum = iAmount + m_StatusDesc.iHp;

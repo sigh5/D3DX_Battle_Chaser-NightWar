@@ -9,6 +9,8 @@
 #include "Buff_Effect.h"
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
+#include "Status.h"
+#include "HitBoxObject.h"
 
 CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -51,14 +53,16 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (nullptr == pCurActorWepon)		//나중에 아래것으로
 		return false;
-	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
-		
-		if (pCurActorWepon->Get_HitNum() == 100)
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
+
+		if (pCurActorWepon->Get_HitNum() == 100)	/* 가리손 궁극기 때문에  */
 		{
 			m_fHitPerSecond = 2.5f;
+			m_bIsHeavyHit = false;
 			m_iSign *= -1;
 			return true;
 		}
@@ -67,31 +71,19 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
-		m_iHitWeaponOption = pCurActorWepon->Get_WeaponOption();
-
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
 		
-		_float4 vPos;
-		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-		if (m_iGetDamageNum >= 50)
-		{
-			m_bIsHeavyHit = true;
-			vPos.x -= 2.f;
-			CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
-				_float3(1.f, 1.f, 1.f), TEXT("critical"));
-		}
-		
-	
-		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_fHitPerSecond = 1.f;
 		m_iSign = 1;
+
+		Calculator_HitDamage();
+
+		
 		bResult = true;
 	}
 
@@ -319,77 +311,119 @@ void CSkeleton_Naked::Create_Hit_Effect()
 
 	CGameObject* pGameObject = nullptr;
 
-	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
-	_uint			iEffectNum = 1;
+	_uint			iEffectNum = 0;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-
-	switch (WeaponOption)
+	_bool			IsDebuffing = false;
+	switch (m_iHitWeaponOption)
 	{
-	case Client::WEAPON_OPTIONAL_NONE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
 		RELEASE_INSTANCE(CGameInstance);
 		return;
-	case Client::WEAPON_OPTIONAL_BLUE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 		BuffDesc.vPosition = _float4(0.f, 1.0f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+
 		iEffectNum = 1;
 		break;
-	case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
-		//pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
 		iEffectNum = 5;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_FIRE);		//화염
+		m_DebuffName = TEXT("fire down");
+		IsDebuffing = true;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
 		break;
-	case Client::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
-		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-		BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
+		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
+		BuffDesc.vPosition = _float4(0.f, 1.5f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(6.f, 10.f, 6.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_MAGIC);		// 마방깎
 		iEffectNum = 1;
+		m_DebuffName = TEXT("magic down");
+		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+		IsDebuffing = true;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
 		break;
-	case Client::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
 		break;
-	case Client::WEAPON_OPTIONAL_PULPLE:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
 		break;
-	case Client::WEAPON_OPTIONAL_GREEN:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		break;
-	case Client::WEAPON_OPTIONAL_PUNCH_HIT:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
 		break;
-	case Client::WEAPON_OPTIONAL_PUNCH_GUN:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+		m_DebuffName = TEXT("armor down");
+		IsDebuffing = true;
 		break;
-	case Client::WEAPON_OPTIONAL_END:
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
+		iEffectNum = 0;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1:
+		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+		m_DebuffName = TEXT("armor down");
+		IsDebuffing = true;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
+		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_BLEED);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+		m_DebuffName = TEXT("bleeding");
+		IsDebuffing = true;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
+		m_DebuffName = TEXT("armor break");
+		IsDebuffing = true;
+		iEffectNum = 0;
 		break;
 	default:
 		break;
 	}
+	
+	if (true== IsDebuffing)
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 6.f;
+		vPos.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		IsDebuffing = false;
+	}
 
-	// 3개정도 생성하고 랜덤위치하고 아래에서 위로 올라가는 것처럼 만들기
-
-	if (pGameObject == nullptr)
+	if (iEffectNum == 0)
+	{
 		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
 
-
-
-	if (iEffectNum == 1)
+	if (iEffectNum == 1 && pGameObject != nullptr)
 	{
 		BuffDesc.ParentTransform = m_pTransformCom;
-
 		BuffDesc.vAngle = 90.f;
 		BuffDesc.fCoolTime = 2.f;
 		BuffDesc.bIsMainTain = false;
-		BuffDesc.iFrameCnt = 4;
+		BuffDesc.iFrameCnt = 5;
 		BuffDesc.bIsUp = false;
 		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 		m_MonsterParts.push_back(pGameObject);
@@ -427,7 +461,6 @@ void CSkeleton_Naked::Create_Heacy_Hit_Effect()
 
 	CGameObject* pGameObject = nullptr;
 
-	WEAPON_OPTIONAL WeaponOption = static_cast<WEAPON_OPTIONAL>(m_iHitWeaponOption);
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
@@ -451,7 +484,7 @@ void CSkeleton_Naked::Create_Heacy_Hit_Effect()
 
 void CSkeleton_Naked::Anim_Frame_Create_Control()
 {
-	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 1))
+	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 4))
 	{
 		Create_Hit_Effect();
 		CCombatController::GetInstance()->Camera_Shaking();
@@ -459,9 +492,13 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f),  m_iGetDamageNum);
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
+	
+	/*	vPos.y += 2.f;
+		vPos.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());*/
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 1) )
 	{
@@ -482,10 +519,6 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		
 		m_pStatusCom->Take_Damage(iRandom);
 		CCombatController::GetInstance()->HPMp_Update(this);
-		
-
-
-
 		m_bOnceCreate = true;
 	}
 
@@ -613,7 +646,7 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 10;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 125;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -638,12 +671,6 @@ HRESULT CSkeleton_Naked::SetUp_ShaderResources()
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
 
-	/* For.Lights */
-	const LIGHTDESC* pLightDesc = pGameInstance->Get_LightDesc(0);
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -664,7 +691,7 @@ HRESULT CSkeleton_Naked::Ready_Parts()
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -1.f, 1.f));
 	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 1.5f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
-	WeaponDesc.iWeaponOption = WEAPON_OPTIONAL_PULPLE;
+	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
 	if (nullptr == pPartObject)
 		return E_FAIL;
@@ -677,6 +704,41 @@ HRESULT CSkeleton_Naked::Ready_Parts()
 	RELEASE_INSTANCE(CGameInstance);
 
 	return S_OK;
+}
+
+void CSkeleton_Naked::Calculator_HitDamage()
+{				
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CStatus::DEBUFF_TYPE_Desc	eDebuffType =  m_pStatusCom->Get_DebuffType();
+	
+	if (Is_DebuffBlend(	m_pStatusCom , m_iHitWeaponOption, &m_iGetDamageNum,m_DebuffName ))
+	{
+		_float4 vPos2;
+		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos2.y += 6.f;
+		vPos2.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		
+	}
+	else if(m_iGetDamageNum >= 50)
+	{
+		m_bIsHeavyHit = true;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+	}
+
+
+	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+	
+	
+	m_pStatusCom->Take_Damage(m_iGetDamageNum);
+}
+
+void CSkeleton_Naked::Is_Hit_DebuffSkill()
+{
+
 }
 
 void CSkeleton_Naked::Anim_Idle()
@@ -696,9 +758,9 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = rand() % 10 + 200;
+	m_iStateDamage = 1;	//rand() % 10 + 10;
 	m_pMeHit_Player = nullptr;
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
 	m_bRun = false;
 	m_LimitDistance = 5.f;
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 한대툭
@@ -712,13 +774,13 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = rand() % 10 + 200;
+	m_iStateDamage = 1;//rand() % 10 + 20;
 	m_pStatusCom->Use_SkillMp(30);
 	
 	m_LimitDistance = 6.f;
 	m_pMeHit_Player = nullptr;
 	m_bRun = false;
-	m_iWeaponOption = WEAPON_OPTIONAL_RED_KNOLAN_SKILL2;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2대 툭
 	m_CurAnimqeue.push({ 15, 1.f });
@@ -748,6 +810,7 @@ void CSkeleton_Naked::Anim_Light_Hit()
 	if (m_bIsHeavyHit)
 	{
 		m_CurAnimqeue.push({ 6, 1.f }); //,10
+		m_bIsHeavyHit = false;
 	}
 	else if (true == m_bIs_Multi_Hit)
 	{

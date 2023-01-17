@@ -4,7 +4,7 @@
 #include "Status.h"
 
 CCombatActors::CCombatActors(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CGameObject(pDevice,pContext)
+	:CGameObject(pDevice, pContext)
 {
 }
 
@@ -27,6 +27,14 @@ void CCombatActors::Create_Defence_Effect_And_Action()
 {
 }
 
+void CCombatActors::Calculator_HitDamage()
+{
+}
+
+void CCombatActors::Is_Hit_DebuffSkill()
+{
+}
+
 void CCombatActors::WideBuff_Status(CStatus * pStatus, _int iOption, _int iAmount)
 {
 	if (iOption == 0)
@@ -34,6 +42,121 @@ void CCombatActors::WideBuff_Status(CStatus * pStatus, _int iOption, _int iAmoun
 	else if (iOption == 1)
 		pStatus->Incrase_Mp(iAmount);
 }
+
+_bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag)
+{
+	_int iChangeValue = *iCurDamage;
+
+	CStatus::DEBUFFTYPE		eType = CStatus::DEBUFFTYPE::DEBUFF_NONE;
+
+	if(pStatus->Get_DebuffType().isDebuff_FIRE)
+	{
+		switch (eWeaponOption)
+		{
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
+			pDebuffTag = TEXT("fire critical");
+			(*iCurDamage) += 10;
+			eType= CStatus::DEBUFFTYPE::DEBUFF_FIRE;
+			break;
+	
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("fire critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
+			break;
+	
+		default:
+			break;
+		}
+		
+	}
+	 if (pStatus->Get_DebuffType().isDebuff_BLEED)
+	{
+
+		switch (eWeaponOption)
+		{
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL:
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("bleeding");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL2:
+			(*iCurDamage) += 10;
+			pDebuffTag = TEXT("bleeding");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			break;
+		}
+	}
+	 if (pStatus->Get_DebuffType().isDebuff_MAGIC)
+	{
+		switch (eWeaponOption)
+		{
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
+			(*iCurDamage) += 10;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			break;
+	
+		default:
+			break;
+		}
+	
+	}
+	 if (pStatus->Get_DebuffType().isDebuff_ARMOR)
+	{
+		switch (eWeaponOption)
+		{
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PULPLE:
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL:
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL1:
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_HIT:
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			break;
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_GUN:
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			break;
+		default:
+			break;
+		}
+		
+		
+	}
+
+
+
+	 if (iChangeValue < *iCurDamage)
+	 {
+		 pStatus->Set_DebuffOption(eType, false);
+		 return true;
+	 }
+	return false;
+}
+
+
+
 
 HRESULT CCombatActors::Initialize_Prototype()
 {
@@ -69,6 +192,11 @@ HRESULT CCombatActors::Render()
 	return S_OK;
 }
 
+void CCombatActors::Set_Debuff(CStatus* pStatus, CStatus::DEBUFFTYPE eDebuff)
+{
+	pStatus->Set_DebuffOption(eDebuff);
+
+}
 
 void CCombatActors::CurAnimQueue_Play_Tick(_double Time, CModel * pModel)
 {
@@ -98,11 +226,11 @@ void CCombatActors::CurAnimQueue_Play_LateTick(CModel * pModel)
 		m_bFinishOption = ANIM_CONTROL_SEQUNCE;
 		m_bIsIdle = false;
 	}
-	
+
 	if (m_bIsCombatAndAnimSequnce && m_CurAnimqeue.empty() && pModel->Get_Finished(pModel->Get_AnimIndex()))
 	{
 		pModel->Set_PlayTime(pModel->Get_AnimIndex());
-		m_bIsIdle = true;	
+		m_bIsIdle = true;
 	}
 
 }

@@ -132,14 +132,15 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_SKILL;
 
 	_bool			m_bOnceStop = false;
-
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
-	Skill_DIR	m_SkillDir = Skill_DIR_END;
-
 	string			m_BoneTag = "";
 	wstring			m_TextureTag = TEXT("");
-	_uint			m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	Skill_DIR		m_SkillDir = Skill_DIR_END;
+
+
+
+	CHitBoxObject::WEAPON_OPTIONAL			m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 
 	_bool			m_bCreateDefenceTimer = false;
 	_float			m_fDefenceFsmTimer = 0.f;

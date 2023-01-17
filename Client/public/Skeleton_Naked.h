@@ -2,6 +2,7 @@
 
 #include "Client_Defines.h"
 #include "Monster.h"
+#include "HitBoxObject.h"
 
 BEGIN(Engine)
 class CShader;
@@ -38,20 +39,16 @@ public:
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
-	virtual void	Create_Hit_Effect()override;
-	virtual void	Create_Heacy_Hit_Effect()override;
-
 	void			Anim_Frame_Create_Control();
 
-
-public:
-	void		   Multi_Hit_Effect(class CGameInstance*pInstance);
-	void		   Create_Move_Target_Effect();
+public:		/*Create_EFfect*/
+	virtual void	Create_Hit_Effect()override;
+	virtual void	Create_Heacy_Hit_Effect()override;
+	void			Multi_Hit_Effect(class CGameInstance*pInstance);
+	void			Create_Move_Target_Effect();
 
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
-
-
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -65,6 +62,12 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Ready_Parts();
+
+private:
+	virtual		void		Calculator_HitDamage()override;	/*충돌시 함수*/
+	virtual		void		Is_Hit_DebuffSkill()override; /* 디버프에 걸렸는 지확인해주는 함수*/
+
+
 public:
 	void					Anim_Idle();
 	void					Anim_Intro();
@@ -87,12 +90,16 @@ private:
 	_float					m_LimitDistance = 6.f;
 	_float					m_ReturnDistance = 0.1f;
 	_float					m_setTickForSecond = 1.f;
-	_uint					m_iWeaponOption = WEAPON_OPTIONAL_NONE;
+	_uint					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	_bool					m_bChange_hit_Effect = false;
 	_bool					m_bRun = false;
 	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	_float					m_fHitPerSecond = 1.f;
 	_int					m_iSign = 1;
+
+
+	wstring					m_DebuffName = TEXT("");
+
 
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;
 

@@ -33,7 +33,7 @@ public:
 
 		_float				vAngle;		// 스킬의 크기
 
-		_int				iWeaponOption;
+		CHitBoxObject::WEAPON_OPTIONAL		iWeaponOption;
 		WeaponType			eType;
 		Skill_DIR			eDir;
 	}Skill_Texture_Client;
@@ -49,7 +49,10 @@ public:
 	virtual	 CCollider*		Get_Colider() override { return m_pColliderCom; }
 	virtual _uint			Get_WeaponOption()override {return m_SkillDesc.iWeaponOption;}
 
-
+	void					Set_Glow(_bool bUseGlow, wstring GlowTag, _int iGlowTextureNumber);
+	void	Set_ShaderPass(_uint iShaderPass){
+		m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = iShaderPass;
+	}
 public:
 	const	_bool			Get_IsTargetHit()const { return m_IsHitTarget; }
 	void					Set_Shoot(_bool bShoot) { m_bShoot = bShoot; }
@@ -75,6 +78,7 @@ private:
 	CRenderer*							m_pRendererCom = nullptr;
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
+	CTexture*							m_pGlowTextureCom = nullptr;
 private:
 	Skill_Texture_Client				m_SkillDesc;
 	_bool								m_IsHitTarget = false;
@@ -94,6 +98,13 @@ private:
 	_float								m_fHiter_CreateTimer;
 	_bool								m_bIncreateHit = false;
 	_bool								m_bSignChanger = false;
+
+	_bool								m_bUseGlow = false;
+	wstring								m_GlowstrTag = TEXT("");
+	_int								m_iGlowTextureNum = 0;
+	_float								m_fGlowStrength = 0.f;
+	_bool								m_bIsChange = false;
+
 
 private:
 	HRESULT SetUp_Components();

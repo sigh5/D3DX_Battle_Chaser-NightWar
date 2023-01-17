@@ -2,11 +2,29 @@
 
 #include "Component.h"
 
+
 BEGIN(Engine)
+
+
 
 class ENGINE_DLL CStatus final: public CComponent
 {
 public:
+	enum DEBUFFTYPE { DEBUFF_FIRE , DEBUFF_BLEED , DEBUFF_ARMOR, DEBUFF_MAGIC, DEBUFF_NONE };
+
+	typedef struct tag_DebuffTypeDesc
+	{
+		_bool isDebuff_FIRE = false;
+		_bool isDebuff_BLEED = false;
+		_bool isDebuff_ARMOR = false;
+		_bool isDebuff_MAGIC = false;
+
+
+	}DEBUFF_TYPE_Desc;
+
+
+
+
 	typedef struct tag_StatusDesc
 	{
 		_int				iHp;	
@@ -15,6 +33,10 @@ public:
 		_float3				vDungeon_Scale;
 		_float4				vCombat_Pos;
 		_float3				vCombat_Scale;
+		DEBUFF_TYPE_Desc	m_tagDesc;
+		
+
+
 	}StatusDesc;
 
 protected:
@@ -23,6 +45,12 @@ protected:
 	virtual ~CStatus() = default;
 
 public:
+	DEBUFF_TYPE_Desc	Get_DebuffType() {
+		return m_StatusDesc.m_tagDesc;
+	}
+
+	void		Set_DebuffOption(DEBUFFTYPE eType, _bool isFlase=true);
+
 	void		Set_Dungeon_PosScale(_float4 vPos, _float3 vScale)
 	{
 		m_StatusDesc.vDungeon_Pos = vPos;

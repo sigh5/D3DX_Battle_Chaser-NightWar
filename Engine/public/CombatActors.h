@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include "Bone.h"
+#include "HitBoxObject.h"
+#include "Status.h"
 
 BEGIN(Engine)
 
@@ -10,6 +12,7 @@ class CCollider;
 
 class ENGINE_DLL CCombatActors abstract: public CGameObject
 {
+
 protected:
 	CCombatActors(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	CCombatActors(const CCombatActors& rhs);
@@ -35,6 +38,7 @@ public:
 
 	void			Set_WideAttackDamage(_int iWideAttackDamage) { m_iWideAttackDamgae = iWideAttackDamage; }
 
+	_bool			Is_DebuffBlend(class CStatus* pStatus,CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag);
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -44,6 +48,9 @@ public:
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
 
+public:
+	void	Set_Debuff(class CStatus* pStatus, CStatus::DEBUFFTYPE eDebuff);
+
 public: /*For.Imgui*/
 	virtual _bool Piciking_GameObject() { return false; }
 
@@ -51,7 +58,7 @@ public: /*For.Animamtion*/
 	virtual void	  CurAnimQueue_Play_Tick(_double Time, class CModel* pModel);
 	virtual void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
 	virtual void	  Set_CombatAnim_Index(class CModel* pModel);
-
+	
 
 
 public:
@@ -63,8 +70,12 @@ public:
 	virtual		void		Create_Hit_Effect();
 	virtual		void		Create_Heacy_Hit_Effect();
 	virtual		void		Create_Defence_Effect_And_Action();
-
 	void					WideBuff_Status(class CStatus* pStatus, _int iOption, _int iAmount);
+
+protected:
+	virtual		void		Calculator_HitDamage();
+	virtual		void		Is_Hit_DebuffSkill();
+
 
 protected:
 	CGameObject*					m_pHitTarget = nullptr;		//Combat
@@ -79,6 +90,8 @@ protected:
 	_bool							m_bCombatChaseTarget = false;
 	_bool							m_bUseDefence = false;//디펜스를 사용할때
 	_bool							m_bIsDefenceTimer = false;
+	CStatus::DEBUFFTYPE				m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_NONE;
+
 
 protected:
 	_uint							m_bFinishOption = 0;
@@ -96,7 +109,7 @@ protected:
 
 	_float							m_fDefencTimer = 0.f;
 
-	_int							m_iHitWeaponOption = 0;
+	CHitBoxObject::WEAPON_OPTIONAL	m_iHitWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	_bool							m_bIs_Multi_Hit = false; //맞은놈이 멀티히트를 맞았냐?
 	_bool							m_bIsHeavyHit = false;
 
@@ -111,6 +124,7 @@ protected:
 	_bool							m_bModelRender = true;
 	
 	_int							m_iWideAttackDamgae = 0;
+	
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

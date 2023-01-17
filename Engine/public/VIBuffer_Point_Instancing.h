@@ -46,6 +46,8 @@ public:
 	virtual HRESULT Tick(_double TimeDelta) override;
 	virtual HRESULT Render();
 
+	HRESULT Tick_UpDown(_double TimeDelta);
+
 
 	HRESULT Tick_Shaking(_double TimeDelta,_float fShakex);
 

@@ -178,17 +178,23 @@
     <Filter Include="02.GameObjects\Effect\Buff_Effect">
       <UniqueIdentifier>{19f820af-4b44-4593-8b8f-427a5ee9431e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\DamageFont">
-      <UniqueIdentifier>{5ae434d5-d772-4819-b362-22a2b14031dd}</UniqueIdentifier>
+    <Filter Include="02.GameObjects\Font">
+      <UniqueIdentifier>{c3371bf6-efe5-4fe3-8960-dcfaa4605e8d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\DamageFont\Manager">
-      <UniqueIdentifier>{5989a432-e668-4e01-8edb-4bb8a8b1ba7a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObjects\ExPlain_Font">
+    <Filter Include="02.GameObjects\Font\ExPlain_Font">
       <UniqueIdentifier>{3e63dc48-8b3a-448d-af83-1bc45411d0de}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\ExPlain_Font\Mgr">
+    <Filter Include="02.GameObjects\Font\ExPlain_Font\Mgr">
       <UniqueIdentifier>{142111fd-6934-451c-924b-f4bb0717fa18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Font\DamageFont">
+      <UniqueIdentifier>{5ae434d5-d772-4819-b362-22a2b14031dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Font\DamageFont\Manager">
+      <UniqueIdentifier>{5989a432-e668-4e01-8edb-4bb8a8b1ba7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Font\ExPlain_Font\Debuff_Font">
+      <UniqueIdentifier>{9bf6d3ca-a18d-48fc-975d-677d6f40791e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -379,20 +385,21 @@
       <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\DamageFont.h">
-      <Filter>02.GameObjects\DamageFont</Filter>
+      <Filter>02.GameObjects\Font\DamageFont</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Damage_Font_Manager.h">
-      <Filter>02.GameObjects\DamageFont\Manager</Filter>
+      <Filter>02.GameObjects\Font\DamageFont\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Attack_Effect_Rect.h">
       <Filter>02.GameObjects\Effect\Attack_Effect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Explain_Font.h">
-      <Filter>02.GameObjects\ExPlain_Font</Filter>
+      <Filter>02.GameObjects\Font\ExPlain_Font</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Explain_FontMgr.h">
-      <Filter>02.GameObjects\ExPlain_Font\Mgr</Filter>
+      <Filter>02.GameObjects\Font\ExPlain_Font\Mgr</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Debuff_Font.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -564,20 +571,21 @@
       <Filter>02.GameObjects\Effect\Buff_Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\DamageFont.cpp">
-      <Filter>02.GameObjects\DamageFont</Filter>
+      <Filter>02.GameObjects\Font\DamageFont</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Damage_Font_Manager.cpp">
-      <Filter>02.GameObjects\DamageFont\Manager</Filter>
+      <Filter>02.GameObjects\Font\DamageFont\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Attack_Effect_Rect.cpp">
       <Filter>02.GameObjects\Effect\Attack_Effect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Explain_Font.cpp">
-      <Filter>02.GameObjects\ExPlain_Font</Filter>
+      <Filter>02.GameObjects\Font\ExPlain_Font</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Explain_FontMgr.cpp">
-      <Filter>02.GameObjects\ExPlain_Font\Mgr</Filter>
+      <Filter>02.GameObjects\Font\ExPlain_Font\Mgr</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Debuff_Font.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -64,8 +64,8 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 
 	m_TimeAcc += TimeDelta;
 
-	/*CExplain_FontMgr::GetInstance()->Tick(TimeDelta);
-	*/
+	//CExplain_FontMgr::GetInstance()->Tick(TimeDelta);
+	
 
 
 #ifdef NOMODLES
@@ -81,7 +81,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 	
 
-	/*CExplain_FontMgr::GetInstance()->Late_Tick(TimeDelta);*/
+	//CExplain_FontMgr::GetInstance()->Late_Tick(TimeDelta);
 	//if (GetKeyState(VK_SPACE) & 0x8000)
 	//{
 	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
@@ -331,41 +331,69 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.isEnable = true;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
 
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext,TEXT("Level_Game_Directional") ,LightDesc)))
 		return E_FAIL;
 
-	//ZeroMemory(&LightDesc, sizeof LightDesc);
+	ZeroMemory(&LightDesc, sizeof LightDesc);
 
-	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.isEnable = true;
-	///*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	//LightDesc.vPosition = _float4(5.f, 3.f, 5.f, 1.f);
-	//LightDesc.fRange = 10.0f;
-	//LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	//LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
-	//LightDesc.vSpecular = LightDesc.vDiffuse;
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.isEnable = true;
+	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
+	LightDesc.vPosition = _float4(11.f, 3.f, 2.7f, 1.f);
+	LightDesc.fRange = 5.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
 
-	//if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_One"), LightDesc)))
+		return E_FAIL;
 
 
-	//ZeroMemory(&LightDesc, sizeof LightDesc);
+	ZeroMemory(&LightDesc, sizeof LightDesc);
 
-	//LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	//LightDesc.isEnable = true;
-	///*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	//LightDesc.vPosition = _float4(10.f, 3.f, 5.f, 1.f);
-	//LightDesc.fRange = 10.0f;
-	//LightDesc.vDiffuse = _float4(0.f, 1.f, 0.f, 1.f);
-	//LightDesc.vAmbient = _float4(0.2f, 0.4f, 0.2f, 0.2f);
-	//LightDesc.vSpecular = LightDesc.vDiffuse;
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.isEnable = true;
+	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
+	LightDesc.vPosition = _float4(11.f, 3.f, 9.3f, 1.f);
+	LightDesc.fRange = 5.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
 
-	//if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, LightDesc)))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Two"), LightDesc)))
+		return E_FAIL;
 
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.isEnable = true;
+	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
+	LightDesc.vPosition = _float4(19.f, 3.f, 13.f, 1.f);
+	LightDesc.fRange = 5.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Three"), LightDesc)))
+		return E_FAIL;
+
+	ZeroMemory(&LightDesc, sizeof LightDesc);
+
+	LightDesc.eType = LIGHTDESC::TYPE_POINT;
+	LightDesc.isEnable = true;
+	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
+	LightDesc.vPosition = _float4(11.f, 3.f, 15.f, 1.f);
+	LightDesc.fRange = 5.f;
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Four"), LightDesc)))
+		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 
