@@ -33,7 +33,7 @@ public:
 
 	virtual void	Set_RenderActive(_bool bRenderActive)override;
 
-	void			MoveTexture(_double TimeDelta);				// 텍스쳐 0~ m_iMaxTextureNum 돌리기
+	void			Move_Lose_Texture(_double TimeDelta);				// 텍스쳐 0~ m_iMaxTextureNum 돌리기
 
 	virtual void			ShakingControl(_float fCoolTime)override;
 
@@ -52,7 +52,9 @@ private:
 
 	_uint					m_iMaxTextureNum = 0;
 	_float					m_fTextureMoveTimer = 0.f;
-	_bool					m_bRenderFont = false;
+	_bool					m_bLoseRenderFont = false;
+	_bool					m_bWinRenderFont = false;
+
 
 	_float					m_fFontPosX = 545.f;
 	_float					m_fFontPosY = 400.f;

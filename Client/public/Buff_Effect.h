@@ -50,6 +50,9 @@ public:
 	void	Set_ShaderPass(_uint iShaderPass);
 
 
+	void	Set_CamEffect(BuffEffcet_Client & Desc);
+
+
 	void	Is_Particle_Effect(_int iInstanceNum);
 
 public:

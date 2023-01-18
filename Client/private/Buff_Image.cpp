@@ -14,6 +14,29 @@ CBuff_Image::CBuff_Image(const CBuff_Image & rhs)
 {
 }
 
+void CBuff_Image::Set_TextureIndex(_int iIndex)
+{
+	m_pTextureCom->Set_SelectTextureIndex(iIndex);
+}
+
+void CBuff_Image::Set_BuffImage_PosTransform(_float4 vPos, _float3 vScale)
+{
+	_matrix	 matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+
+	matScale =	XMMatrixScaling(vScale.x, vScale.y, 1.f);
+	matRotX  = XMMatrixRotationX(0.f);
+	matRotY = XMMatrixRotationY(0.f);
+	matRotZ = XMMatrixRotationZ(0.f);
+	matTrans = XMMatrixTranslation(vPos.x, vPos.y, 0.1f);
+
+	matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+	_float4x4 matWorldFloat4x4;
+
+	XMStoreFloat4x4(&matWorldFloat4x4, matWorld);
+	m_pTransformCom->Set_WorldMatrix(matWorldFloat4x4);
+}
+
 HRESULT CBuff_Image::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -24,11 +47,15 @@ HRESULT CBuff_Image::Initialize_Prototype()
 
 HRESULT CBuff_Image::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("BUff_Image");
+
+
 	if (nullptr != pArg)
 		memcpy(&m_UIDesc, pArg, sizeof(UIDESC));
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+	lstrcpy(m_UIDesc.m_pTextureTag, TEXT("Prototype_Component_Texture_Combat_ICON"));
 
 
 	if (FAILED(SetUp_Components()))
@@ -53,6 +80,8 @@ HRESULT CBuff_Image::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
+
+	
 
 	m_bLast_Initlize = true;
 	return S_OK;

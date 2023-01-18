@@ -7,29 +7,20 @@ BEGIN(Engine)
 class CRenderer;
 class CVIBuffer_Point_Instancing;
 class CShader;
+class CBone;
 class CTexture;
 END
 
-
 BEGIN(Client)
-class CDamageFont   final : public CHitBoxObject
+class CCam_Effect final : public CHitBoxObject
 {
-public:
-	typedef struct tag_DamageFont_Desc
-	{
-		_uint		iRepresentNum;
-	}FONT_DESC;
+private:
+	CCam_Effect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCam_Effect(const CCam_Effect& rhs);
+	virtual ~CCam_Effect() = default;
 
 public:
-	CDamageFont(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CDamageFont(const CDamageFont& rhs);
-	virtual ~CDamageFont() = default;
-
-public:
-	void	Set_Shaking(_bool bShaking) {
-		m_bShaking = bShaking;
-	}
-
+	const	_bool	Get_IsFinish()const { return m_bIsFinsishBuffer; }
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -43,26 +34,16 @@ private:
 	CRenderer*							m_pRendererCom = nullptr;
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
-
-
-public:
-	HRESULT		Ready_Font();
-	void		Render_Font(_float4 vPos, _float3 vScale);
-
-
-
-private:
-	_bool								m_bMoveTrue = false;
-	FONT_DESC							m_fontDesc;
 	
-	_float								m_fMagnitude = 3.f;
-	_bool								m_bShaking = true;
+private:
+	_bool								m_bIsFinsishBuffer = false;
+	_float4x4							m_viewMatrix;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 
 public:
-	static CDamageFont* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CCam_Effect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 };

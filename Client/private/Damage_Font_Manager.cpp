@@ -89,7 +89,18 @@ void CDamage_Font_Manager::Tick(_double TimeDelta)
 
 void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDamage)
 {
+	for (auto& pFont : m_DamageTenVec)
+	{
+		pFont->Set_Shaking(true);
+	}
+
+	for (auto& pFont : m_DamageSingleVec)
+	{
+		pFont->Set_Shaking(true);
+	}
+
 	m_bFontUpdate = true;
+	m_bShaking = true;
 	m_vFontFirstPos = vPos;
 	m_vScale = vScale;
 
@@ -124,6 +135,57 @@ void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDa
 	}
 
 
+}
+
+void CDamage_Font_Manager::Set_HPMPFont(_float4 vPos, _float3 vScale, _int iDamage)
+{
+
+	for (auto& pFont : m_DamageTenVec)
+	{
+		pFont->Set_Shaking(false);
+	}
+
+	for (auto& pFont : m_DamageSingleVec)
+	{
+		pFont->Set_Shaking(false);
+	}
+
+
+	m_bFontUpdate = true;
+	m_bShaking = false;
+	m_vFontFirstPos = vPos;
+	m_vScale = vScale;
+
+	m_vFontSecondPos = vPos;
+	m_vFontSecondPos.x += 0.5f;
+	m_vFontSecondPos.z -= 1.0f;
+
+	if (iDamage >= 10)
+	{
+		m_iCalDamage = iDamage / 10;
+		m_iNumTens = m_iCalDamage;
+		m_iNumSingle = iDamage % (10 * m_iCalDamage);
+	}
+	else
+	{
+		m_iNumTens = 0;
+		m_iNumSingle = iDamage % 10;
+	}
+
+	if (0 == m_iNumTens && 0 == m_iNumSingle)
+	{
+		return;
+	}
+	else if (0 == m_iNumTens && 0 != m_iNumSingle)
+	{
+		m_DamageSingleVec[m_iNumSingle]->Render_Font(m_vFontFirstPos, m_vScale);
+	}
+	else
+	{
+		m_DamageTenVec[m_iNumTens]->Render_Font(m_vFontFirstPos, m_vScale);
+		m_DamageSingleVec[m_iNumSingle]->Render_Font(m_vFontSecondPos, m_vScale);
+	
+	}
 }
 
 void CDamage_Font_Manager::Late_Tick(_double TimeDelta)

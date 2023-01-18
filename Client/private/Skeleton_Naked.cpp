@@ -11,6 +11,8 @@
 #include "Explain_FontMgr.h"
 #include "Status.h"
 #include "HitBoxObject.h"
+#include "Buff_Image.h"
+#include "Client_Manager.h"
 
 CSkeleton_Naked::CSkeleton_Naked(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -102,6 +104,9 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Skeleton_Naked");
 
+	m_vecBuffImage.reserve(5);
+
+
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
 	GameObjectDesc.TransformDesc.fSpeedPerSec = 7.0f;
@@ -122,7 +127,7 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 	m_bHaveSkill2 = false;
 	m_bHaveUltimate = false;
 	m_bDefence = true;
-	m_isBuff = true;
+	m_bHaveBuff = true;
 	return S_OK;
 }
 HRESULT CSkeleton_Naked::Last_Initialize()
@@ -155,6 +160,12 @@ void CSkeleton_Naked::Tick(_double TimeDelta)
 		m_bIsDead = true;
 	}
 
+	for (auto& pBuffImage : m_vecBuffImage)
+	{
+		if(pBuffImage != nullptr)
+			pBuffImage->Tick(TimeDelta);
+	}
+		
 	//static float ffPos[3] = {};
 	//static float ffScale[3] = {};
 	//static char  szName[MAX_PATH] = "";
@@ -206,6 +217,27 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 			++iter;
 	}
 
+	CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
+	auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
+
+	for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+	{
+		if (Buff_iter == m_vecBuffImage.end())
+		{
+			if (*iter != nullptr)
+				(*iter)->Late_Tick(TimeDelta);
+
+			++iter;
+		}
+		else
+		{
+			Safe_Release(*iter);
+			iter = m_vecBuffImage.erase(iter);
+			Buff_iter = m_vecBuffImage.end();
+		}
+
+	}
+	
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -310,7 +342,8 @@ void CSkeleton_Naked::Create_Hit_Effect()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = nullptr;
-
+	/*CBuff_Image* pBuffImage = nullptr;
+	*/
 	_uint			iEffectNum = 0;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
@@ -324,7 +357,6 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 		BuffDesc.vPosition = _float4(0.f, 1.0f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
-
 		iEffectNum = 1;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
@@ -333,6 +365,12 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		m_DebuffName = TEXT("fire down");
 		IsDebuffing = true;
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
+	
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 3);
+
+
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
 		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
@@ -344,6 +382,12 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
 		IsDebuffing = true;
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+	
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 2);
+
+
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
@@ -373,6 +417,9 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
 		m_DebuffName = TEXT("armor down");
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
@@ -383,6 +430,9 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
 		m_DebuffName = TEXT("armor down");
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
@@ -391,11 +441,19 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
 		m_DebuffName = TEXT("bleeding");
 		IsDebuffing = true;
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 1);
+		
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
 		m_DebuffName = TEXT("armor break");
 		IsDebuffing = true;
 		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
 		break;
 	default:
 		break;
@@ -522,6 +580,13 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		m_bOnceCreate = true;
 	}
 
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 40))
+	{
+		Create_BuffEffect();
+		m_bOnceCreate = true;
+	}
+
+	
 	else
 	{
 		return;
@@ -582,6 +647,30 @@ void CSkeleton_Naked::Create_Move_Target_Effect()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CSkeleton_Naked::Create_BuffEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_3", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 1.f, 2.f, 1.f);
+	BuffDesc.vScale = _float3(4.f, 6.f, 4.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 8;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CSkeleton_Naked::Create_Test_Effect()
@@ -758,10 +847,13 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 1;	//rand() % 10 + 10;
+	m_iStateDamage = 1;	//rand() % 10 + 10 + m_iStage_Buff_DamgaeUP;
 	m_pMeHit_Player = nullptr;
+	m_iStage_Buff_DamgaeUP = 0;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
 	m_bRun = false;
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+
 	m_LimitDistance = 5.f;
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// ÇÑ´ëÅö
 	m_CurAnimqeue.push({ 9, 1.f });
@@ -774,13 +866,15 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 1;//rand() % 10 + 20;
+	m_iStateDamage = 1;//rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_pStatusCom->Use_SkillMp(30);
-	
+	m_iStage_Buff_DamgaeUP = 0;
 	m_LimitDistance = 6.f;
 	m_pMeHit_Player = nullptr;
 	m_bRun = false;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+
 
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2´ë Åö
 	m_CurAnimqeue.push({ 15, 1.f });
@@ -799,9 +893,19 @@ void CSkeleton_Naked::Anim_Defence()
 
 void CSkeleton_Naked::Anim_Buff()
 {
+	m_iStage_Buff_DamgaeUP = 10;
+
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 0);
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+	m_bOnceCreate = false;
+	m_useBuff = true;
 	m_pStatusCom->Use_SkillMp(10);
 	m_CurAnimqeue.push({ 3, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
+	
 }
 
 void CSkeleton_Naked::Anim_Light_Hit()
@@ -864,7 +968,7 @@ void CSkeleton_Naked::Anim_Die()
 
 void CSkeleton_Naked::Anim_Viroty()
 {
-	/*Á×¾úÀ¸¸é °¡¸¸È÷ ÀÖ±â*/
+	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 
@@ -905,6 +1009,8 @@ void CSkeleton_Naked::Free()
 		iter = m_MonsterParts.erase(iter);
 	}
 	m_MonsterParts.clear();
+
+	
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

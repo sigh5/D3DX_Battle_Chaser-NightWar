@@ -12,6 +12,7 @@ CCombatActors::CCombatActors(const CCombatActors & rhs)
 	: CGameObject(rhs)
 	, m_iAnimIndex(rhs.m_iAnimIndex)
 {
+	
 }
 
 
@@ -84,6 +85,8 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 			(*iCurDamage) += 10;
 			pDebuffTag = TEXT("bleeding");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			break;
+		default:
 			break;
 		}
 	}
@@ -276,4 +279,15 @@ void CCombatActors::Defence_Exit()
 void CCombatActors::Free()
 {
 	__super::Free();
+
+	for (auto& pBuff : m_vecBuffImage)
+	{
+		Safe_Release(pBuff);
+	}
+	m_vecBuffImage.clear();
+
+	while (!m_CurAnimqeue.empty())
+		m_CurAnimqeue.pop();
+
+	m_pHitTarget = nullptr;
 }

@@ -450,7 +450,7 @@ void CSpider_Mana::Anim_Skill2_Attack()
 
 void CSpider_Mana::Anim_Buff()
 {
-	m_isBuff = true;
+	m_useBuff = true;
 	m_pStatusCom->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 3, 0.7f });
 	Set_CombatAnim_Index(m_pModelCom);

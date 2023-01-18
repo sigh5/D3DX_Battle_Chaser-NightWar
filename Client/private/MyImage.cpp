@@ -119,10 +119,17 @@ HRESULT CMyImage::Render()
 	m_pVIBufferCom->Render();
 
 
-	if (m_bRenderFont)
+	if (m_bLoseRenderFont)
 	{
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT(" VicTory !!"), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT("  Lose !!"), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+		RELEASE_INSTANCE(CGameInstance);
+	}
+
+	if (m_bWinRenderFont)
+	{
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT(" Victory !!"), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
 		RELEASE_INSTANCE(CGameInstance);
 	}
 
@@ -149,9 +156,9 @@ void CMyImage::Set_RenderActive(_bool bRenderActive)
 
 }
 
-void CMyImage::MoveTexture(_double TimeDelta)
+void CMyImage::Move_Lose_Texture(_double TimeDelta)
 {
-	m_bRenderFont = true;
+	m_bLoseRenderFont = true;
 	m_fTextureMoveTimer += (_float)TimeDelta;
 
 	if (m_fTextureMoveTimer >= 0.1f)

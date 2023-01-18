@@ -165,6 +165,12 @@ void CHero_Garrison::Tick(_double TimeDelta)
 
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
+
+		for (auto& pBuffImage : m_vecBuffImage)
+		{
+			if (pBuffImage != nullptr)
+				pBuffImage->Tick(TimeDelta);
+		}
 	}
 	
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
@@ -184,34 +190,58 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			pParts->Late_Tick(TimeDelta);
 		}
 	}
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		if ((*iter) != nullptr)
-			(*iter)->Late_Tick(TimeDelta);
-
-		if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+	if(m_bModelRender)
+	{ 
+		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
 		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-		}
-		else if (m_bOriginBuff ==false && m_bUseDefence == false  && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain() )
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-		}
-		else if (m_bOriginBuff == true && m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-			m_bOriginBuff = false;
+			if ((*iter) != nullptr)
+				(*iter)->Late_Tick(TimeDelta);
+
+			if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+			}
+			else if (m_bOriginBuff == false && m_bUseDefence == false && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+			}
+			else if (m_bOriginBuff == true && m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+				m_bOriginBuff = false;
+			}
+
+			else
+				++iter;
 		}
 
-		else
-			++iter;
+		if (m_bIsCombatScene == true)
+		{
+			CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
+			auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
+
+			for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+			{
+				if (Buff_iter == m_vecBuffImage.end())
+				{
+					if (*iter != nullptr)
+						(*iter)->Late_Tick(TimeDelta);
+
+					++iter;
+				}
+				else
+				{
+					Safe_Release(*iter);
+					iter = m_vecBuffImage.erase(iter);
+					Buff_iter = m_vecBuffImage.end();
+				}
+
+			}
+		}
 	}
-
-
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -751,7 +781,6 @@ void CHero_Garrison::Create_Ultimate_End_Effect()
 void CHero_Garrison::Create_BuffEffect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -853,6 +882,29 @@ void CHero_Garrison::Create_Buff_MainTain_Effect()
 	RELEASE_INSTANCE(CGameInstance);
 
 }
+void CHero_Garrison::Create_Ultimate_StartCam_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(15.3f, 0.f, 29.5, 1.f);
+	BuffDesc.vScale = _float3(60.f, 40.f, 60.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+
+	m_pEffectParts.push_back(pGameObject);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	RELEASE_INSTANCE(CGameInstance);
+}
 void CHero_Garrison::Anim_Frame_Create_Control()
 {
 	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(16, 1))
@@ -917,6 +969,85 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 	else
 		return;
 
+
+}
+
+void CHero_Garrison::Use_HpPotion()
+{
+	_int iRandNum = rand() % 20 + 20;
+
+	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
+
+	vPos.y += 2.f;
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_bretto_heal_spread_0_Effect", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 2.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+	m_bOnceCreate = false;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CHero_Garrison::Use_MpPotion()
+{
+	_int iRandNum = rand() % 15 + 30;
+	m_pStatusCom[COMBAT_PLAYER]->Incrase_Mp(iRandNum);
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
+
+	vPos.y += 2.f;
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+	
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_bretto_heal_spread_1_Effect", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 2.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+	m_bOnceCreate = false;
+
+	RELEASE_INSTANCE(CGameInstance);
 
 }
 
@@ -1298,6 +1429,7 @@ void CHero_Garrison::Anim_Intro()
 
 void CHero_Garrison::AnimNormalAttack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_iStateDamage = rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
@@ -1322,6 +1454,7 @@ void CHero_Garrison::AnimNormalAttack()
 
 void CHero_Garrison::Anim_Skill1_Attack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_iHitCount = 1;
@@ -1348,6 +1481,7 @@ void CHero_Garrison::Anim_Skill1_Attack()
 
 void CHero_Garrison::Anim_Skill2_Attack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_eWeaponType = WEAPON_SWORD;
@@ -1373,6 +1507,9 @@ void CHero_Garrison::Anim_Skill2_Attack()
 
 void CHero_Garrison::Anim_Uitimate()
 {	
+
+	Create_Ultimate_StartCam_Effect();
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_bIsUseUltimate = false;
@@ -1409,9 +1546,7 @@ void CHero_Garrison::Anim_Buff()
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 8,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
-	Set_CombatAnim_Index(m_pModelCom);
-	Create_BuffEffect();
-
+	
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
@@ -1420,7 +1555,13 @@ void CHero_Garrison::Anim_Buff()
 	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("damage up"));
 
-
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(-305.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 0);
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+	
+	Set_CombatAnim_Index(m_pModelCom);
+	Create_BuffEffect();
 }
 
 void CHero_Garrison::Anim_Use_Item()

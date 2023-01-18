@@ -160,9 +160,6 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TrunStartUI">
       <UniqueIdentifier>{c866b46b-8fe6-4908-bde4-2a7964f3c68b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\UI\TrunBattle\TrunWinCanvas">
-      <UniqueIdentifier>{90cc5241-ac68-4fc5-9695-af5d8d5ca35f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Player\Skill\Skill_Texture">
       <UniqueIdentifier>{ec6bccd5-bcd3-4262-822c-a30bdd7228dd}</UniqueIdentifier>
     </Filter>
@@ -195,6 +192,12 @@
     </Filter>
     <Filter Include="02.GameObjects\Font\ExPlain_Font\Debuff_Font">
       <UniqueIdentifier>{9bf6d3ca-a18d-48fc-975d-677d6f40791e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Cam_Effect">
+      <UniqueIdentifier>{927dc4ce-1b68-4ee8-931a-806487e6624d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas">
+      <UniqueIdentifier>{90cc5241-ac68-4fc5-9695-af5d8d5ca35f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -376,7 +379,7 @@
       <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TrunWinCanvas.h">
-      <Filter>02.GameObjects\UI\TrunBattle\TrunWinCanvas</Filter>
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Skill_TextureObj.h">
       <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
@@ -399,7 +402,15 @@
     <ClInclude Include="..\Public\Explain_FontMgr.h">
       <Filter>02.GameObjects\Font\ExPlain_Font\Mgr</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Debuff_Font.h" />
+    <ClInclude Include="..\Public\Cam_Effect.h">
+      <Filter>02.GameObjects\Effect\Cam_Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Debuff_Font.h">
+      <Filter>02.GameObjects\Font\ExPlain_Font\Debuff_Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\TrunLoseCanvas.h">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -562,7 +573,7 @@
       <Filter>02.GameObjects\UI\TrunBattle\TrunStartUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TrunWinCanvas.cpp">
-      <Filter>02.GameObjects\UI\TrunBattle\TrunWinCanvas</Filter>
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Skill_TextureObj.cpp">
       <Filter>02.GameObjects\Player\Skill\Skill_Texture</Filter>
@@ -585,7 +596,15 @@
     <ClCompile Include="..\Private\Explain_FontMgr.cpp">
       <Filter>02.GameObjects\Font\ExPlain_Font\Mgr</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Debuff_Font.cpp" />
+    <ClCompile Include="..\Private\Cam_Effect.cpp">
+      <Filter>02.GameObjects\Effect\Cam_Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Debuff_Font.cpp">
+      <Filter>02.GameObjects\Font\ExPlain_Font\Debuff_Font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TrunLoseCanvas.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

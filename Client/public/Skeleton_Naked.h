@@ -46,7 +46,7 @@ public:		/*Create_EFfect*/
 	virtual void	Create_Heacy_Hit_Effect()override;
 	void			Multi_Hit_Effect(class CGameInstance*pInstance);
 	void			Create_Move_Target_Effect();
-
+	void			Create_BuffEffect();
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
 
@@ -80,10 +80,12 @@ public:
 	void					Anim_Die();
 	void					Anim_Viroty();
 
-private:
-	vector<CGameObject*>	m_MonsterParts;
-	WeaponType				m_eWeaponType = WEAPON_SWORD;
 
+private:
+	vector<CGameObject*>			m_MonsterParts;
+	
+
+	
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
@@ -96,11 +98,9 @@ private:
 	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	_float					m_fHitPerSecond = 1.f;
 	_int					m_iSign = 1;
-
-
 	wstring					m_DebuffName = TEXT("");
 
-
+	WeaponType				m_eWeaponType = WEAPON_SWORD;
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;
 
 

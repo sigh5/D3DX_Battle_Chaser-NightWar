@@ -408,7 +408,7 @@ void CSlimeKing::Anim_Uitimate()
 
 void CSlimeKing::Anim_Buff()
 {
-	m_isBuff = true;
+	m_useBuff = true;
 	m_pStatusCom->Use_SkillMp(10);
 	m_CurAnimqeue.push({ 3, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);

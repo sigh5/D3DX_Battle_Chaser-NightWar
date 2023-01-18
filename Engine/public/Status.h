@@ -10,7 +10,7 @@ BEGIN(Engine)
 class ENGINE_DLL CStatus final: public CComponent
 {
 public:
-	enum DEBUFFTYPE { DEBUFF_FIRE , DEBUFF_BLEED , DEBUFF_ARMOR, DEBUFF_MAGIC, DEBUFF_NONE };
+	enum DEBUFFTYPE { DEBUFF_FIRE , DEBUFF_BLEED , DEBUFF_ARMOR, DEBUFF_MAGIC,BUFF_DAMAGE, DEBUFF_NONE };
 
 	typedef struct tag_DebuffTypeDesc
 	{
@@ -18,6 +18,7 @@ public:
 		_bool isDebuff_BLEED = false;
 		_bool isDebuff_ARMOR = false;
 		_bool isDebuff_MAGIC = false;
+		_bool isBuff_Damage = false;
 
 
 	}DEBUFF_TYPE_Desc;

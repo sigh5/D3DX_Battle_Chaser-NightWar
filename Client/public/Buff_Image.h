@@ -18,6 +18,9 @@ private:
 	virtual ~CBuff_Image() = default;
 
 public:
+	void	Set_TextureIndex(_int iIndex);
+	void	Set_BuffImage_PosTransform(_float4 vPos, _float3 vScale);
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual HRESULT Last_Initialize()override;
@@ -35,7 +38,9 @@ private:
 
 private:
 	_float4x4				m_ViewMatrix;
-	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
+	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;	
+	_bool					m_bIs_Parent_Player = true;	// false == Monster
+
 
 private:
 	HRESULT SetUp_Components();

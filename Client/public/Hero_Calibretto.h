@@ -78,10 +78,11 @@ private: /*Create_Effect*/
 	void				Create_Ultimate_End_Effect();
 	void				Create_Move_Target_Effect();
 
-
+	void				Create_Ultimate_StartCam_Effect();
 
 	virtual void		Create_Hit_Effect()override;
-
+	virtual void	    Use_HpPotion()override;
+	virtual void	    Use_MpPotion()override;
 	
 private:
 	CShader*				m_pShaderCom = nullptr;

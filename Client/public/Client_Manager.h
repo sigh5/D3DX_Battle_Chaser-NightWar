@@ -13,6 +13,7 @@ class CNavigation;
 class CCollider;
 class CVIBuffer_Point_Instancing;
 class CRenderer;
+class CStatus;
 END
 
 //bool compare(pair<int, int>a, pair<int, int>b) {
@@ -22,9 +23,11 @@ END
 //}
 
 
+BEGIN(Client)
 enum  DIR { DIR_RIGHT, DIR_UP , DIR_LOOK, DIR_END};
 
 enum COMPARE_UI_POS {COMPARE_UI_POS_X, COMPARE_UI_POS_Y, COMPARE_UI_POS_END,};
+class CBuff_Image;
 
 class CClient_Manager  
 {
@@ -59,6 +62,9 @@ public:
 public: /* For_Player */
 	static void		CaptinPlayer_ColiderUpdate(CGameObject * pGameObject, CCollider * pColider, CTransform* pTransform);
 
+	static void		Create_BuffImage(vector<CGameObject*>& vecBuffImage,  _float4 vPos,  _float3 vScale, wstring ProtoTag, _uint iTextureIndex);	// »ý¼º¸¸
+	static			vector<CGameObject*>::iterator	Delete_BuffImage(vector<CGameObject*>& vecBuffImage, CStatus* pStauts, _bool bIsPlayer);
+	static void		Sort_BuffImage(vector<CGameObject*>& vecBuffImage, _bool bIsPlayer);
 
 public:/*For.Imgui_AnimTool*/
 #ifdef _DEBUG
@@ -68,9 +74,6 @@ public:/*For.Imgui_AnimTool*/
 
 #endif // !_DEBUG
 
-	
-
-
 
 
 public:/*For.GameChange*/
@@ -79,12 +82,13 @@ public:/*For.GameChange*/
 	static	_float			m_CameraEye_Z;
 
 	static	_bool			m_bCombatWin;
-
+	static	_bool			m_bCombatlose;
 	
 
 
 
 };
+
 
 template<typename T>
 static T * CClient_Manager::Get_MaxValue_Pointer(vector<T*>& pVec, _float & fMAX, COMPARE_UI_POS eType)
@@ -172,3 +176,4 @@ inline T * CClient_Manager::Get_SmallValue_Pointer(vector<T*>& pVec, _float & fS
 }
 
 
+END

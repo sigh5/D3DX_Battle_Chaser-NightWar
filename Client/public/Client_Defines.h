@@ -6,11 +6,12 @@
 #include <queue>
 #include <set>
 #include <string>
+#include <array>
 #define EPSILON 0.0001
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
 #define NOMODLES
-
+//#define  FONT_TEST
 
 
 namespace Client

@@ -134,6 +134,16 @@ _bool CPlayer::IsCaptin()
 	return false;
 }
 
+void CPlayer::Use_HpPotion()
+{
+	
+}
+
+void CPlayer::Use_MpPotion()
+{
+	
+}
+
 _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 {
 	if (!m_bControlKeyInput)

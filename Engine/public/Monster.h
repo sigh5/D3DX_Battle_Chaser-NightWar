@@ -14,13 +14,13 @@ protected:
 public:
 	_bool		IsHaveUlitmate()const { return m_bHaveUltimate; }
 	_bool		IsHaveSkill2() const{ return m_bHaveSkill2; }
-	
+	_bool		IsHaveBuff()const { return m_bHaveBuff; }
 public:
 	virtual		_bool	IsCollMouse() = 0;
 
 
 	const _uint		Get_HitNum()const {return m_iHitNum;}
-	const _bool		Get_IsBuff()const { return m_isBuff; }
+	const _bool		Get_UseBuff()const { return m_useBuff; }
 	void			Set_Me_HitPlayer(CGameObject* pHiter) { m_pMeHit_Player = pHiter; }
 	CGameObject*	Get_Me_hitPlayer() { return m_pMeHit_Player; }
 
@@ -41,10 +41,12 @@ public:
 
 protected:
 	_uint			m_iHitNum = 0;
-	_bool			m_isBuff = false;
+	_bool			m_useBuff = false;
 	CGameObject*	m_pMeHit_Player = nullptr;
+	
 	_bool			m_bHaveUltimate = false;
 	_bool			m_bHaveSkill2 = false;
+	_bool			m_bHaveBuff = false;
 
 };
 

@@ -209,10 +209,7 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-	{
-		return m_pCombatController->To_Idle();
-	}))
+	
 
 		.Build();
 
@@ -392,10 +389,7 @@ HRESULT CMonsterFsm::Init_Skelton_Naked(CGameObject * pTarget)
 	{
 		static_cast<CSkeleton_Naked*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-	{
-		return m_pCombatController->To_Idle();
-	}))
+	
 
 	.Build();
 
@@ -574,10 +568,7 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	{
 		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-	{
-		return m_pCombatController->To_Idle();
-	}))
+
 
 
 		.Build();

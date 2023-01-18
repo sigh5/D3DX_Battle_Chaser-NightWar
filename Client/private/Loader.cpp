@@ -41,7 +41,9 @@
 #include "Attack_Effect_Rect.h"
 #include "Explain_Font.h"
 #include "Debuff_Font.h"
+#include "Cam_Effect.h"
 
+#include "TrunLoseCanvas.h"
 /* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -418,6 +420,13 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 		return E_FAIL;
 
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Combat_Reward"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Reward/ReWard_%d.png"),		//exp bar 가지고있음
+			CTexture::TYPE_END, 9))))
+		return E_FAIL;
+
+
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
 		return E_FAIL;
@@ -661,6 +670,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		CTrunWinCanvas::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_TrunLoseCanvas"),
+		CTrunLoseCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_TextureObj"),
 		CSkill_TextureObj::Create(m_pDevice, m_pContext))))
@@ -686,6 +700,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Attack_Effect"),
 		CAttack_Effect_Rect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Cam_Effect"),
+		CCam_Effect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 

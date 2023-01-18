@@ -195,11 +195,13 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	//	}
 
 	//	RELEASE_INSTANCE(CGameInstance);
+
+		for (auto& pBuffImage : m_vecBuffImage)
+		{
+			if (pBuffImage != nullptr)
+				pBuffImage->Tick(TimeDelta);
+		}
 	}
-
-
-
-
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
@@ -218,37 +220,63 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 		}
 	}
 
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		if ((*iter) != nullptr)
-			(*iter)->Late_Tick(TimeDelta);
+	if(m_bModelRender)
+	{ 
+		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		{
+			if ((*iter) != nullptr)
+				(*iter)->Late_Tick(TimeDelta);
 
-		if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-		}
-		else if (true == m_bLazorStop && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-		}
-		else if ( m_bUltimateStop == true && true == static_cast<CAttack_Effect_Rect*>(*iter)->Get_MainTain() )
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-		}
-		else if (m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
-		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
-			m_bLazorStop = true;
-		}
+			if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+			}
+			else if (true == m_bLazorStop && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+			}
+			else if (m_bUltimateStop == true && true == static_cast<CAttack_Effect_Rect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+			}
+			else if (m_bBuffEffectStop == true && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				iter = m_pEffectParts.erase(iter);
+				m_bLazorStop = true;
+			}
 
-		else
-			++iter;
+			else
+				++iter;
+		}
+	
+		if (m_bIsCombatScene == true)
+		{
+			CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
+			auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
+
+			for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+			{
+				if (Buff_iter == m_vecBuffImage.end())
+				{
+					if (*iter != nullptr)
+						(*iter)->Late_Tick(TimeDelta);
+
+					++iter;
+				}
+				else
+				{
+					Safe_Release(*iter);
+					iter = m_vecBuffImage.erase(iter);
+					Buff_iter = m_vecBuffImage.end();
+				}
+
+			}
+		}
 	}
-
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -716,6 +744,7 @@ void CHero_Calibretto::Anim_Intro()
 
 void CHero_Calibretto::AnimNormalAttack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_iStateDamage = rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HAND;
@@ -741,6 +770,7 @@ void CHero_Calibretto::AnimNormalAttack()
 
 void CHero_Calibretto::Anim_Skill1_Attack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;		// ÆÝÄ¡ÇÏ°í ÃÑ°¥±â±â
 	m_iHitCount = 2;
 	m_eWeaponType = WEAPON_HAND;
@@ -771,6 +801,7 @@ void CHero_Calibretto::Anim_Skill1_Attack()
 
 void CHero_Calibretto::Anim_Skill2_Attack()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_iStateDamage = rand() % 10 + 50 + m_iStage_Buff_DamgaeUP;				//·¹ÀÌÀúºö
 	m_SpeedRatio = 8.f;
 	m_LimitDistance = 20.f;
@@ -792,6 +823,8 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 
 void CHero_Calibretto::Anim_Uitimate()
 {
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	Create_Ultimate_StartCam_Effect();
 	m_bBuffEffectStop = true;
 	m_iStateDamage = 50;			// 20*2 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
@@ -807,6 +840,12 @@ void CHero_Calibretto::Anim_Uitimate()
 
 void CHero_Calibretto::Anim_Buff()
 {
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 0);
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+
+
 	m_iStage_Buff_DamgaeUP = 10;
 	m_bOnceCreate = false;
 	m_bOnceCreateBuff = false;
@@ -836,7 +875,6 @@ void CHero_Calibretto::Anim_WideAreaBuff()
 
 void CHero_Calibretto::Anim_Use_Item()
 {
-	m_CurAnimqeue.push({ 19, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -1502,6 +1540,30 @@ void CHero_Calibretto::Create_Move_Target_Effect()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CHero_Calibretto::Create_Ultimate_StartCam_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(29.f, -9.5f, 60.f,1.f);
+	BuffDesc.vScale = _float3(120.f, 120.f, 120.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 8;
+	BuffDesc.bIsUp = false;
+
+	m_pEffectParts.push_back(pGameObject);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CHero_Calibretto::Create_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -1577,6 +1639,86 @@ void CHero_Calibretto::Create_Hit_Effect()
 	}
 
 	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Calibretto::Use_HpPotion()
+{
+	_int iRandNum = rand() % 20 + 20;
+
+	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 9.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
+
+	vPos.y += 3.f;
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+	
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_bretto_heal_spread_0_Effect", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 4.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+	m_bOnceCreate = false;
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CHero_Calibretto::Use_MpPotion()
+{
+	_int iRandNum = rand() % 15 + 30;
+
+	m_pStatusCom[COMBAT_PLAYER]->Incrase_Mp(iRandNum);
+
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 9.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
+
+	vPos.y += 3.f;
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_bretto_heal_spread_1_Effect", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 4.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+	
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 

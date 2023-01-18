@@ -67,8 +67,13 @@ public:	 /*Create_Effect*/
 	void				Create_Move_Target_Effect();
 	void				Create_Defence_Area();
 	void				Create_Buff_MainTain_Effect();
+	void				Create_Ultimate_StartCam_Effect();
 
 	void				Anim_Frame_Create_Control();
+
+	virtual void	    Use_HpPotion()override;
+	virtual void	    Use_MpPotion()override;
+
 public:
 	virtual	  _bool	  Is_Dead()override;
 	_int			  Is_MovingAnim();

@@ -26,6 +26,7 @@ public:
 	void		 Tick(_double TimeDelta);	
 	
 	void		Set_DamageFont(_float4 vPos, _float3 vScale , _int Damage);
+	void		Set_HPMPFont(_float4 vPos, _float3 vScale, _int Damage);
 	void		Late_Tick(_double TimeDelta);
 
 private:
@@ -41,7 +42,10 @@ private:
 	_float4						m_vFontSecondPos;
 	_float3						m_vScale;
 	_bool						m_bFontUpdate = false;
+	_bool						m_bShaking = false;
+	
 	_float						m_fFontTimer = 0.f;
+	
 
 	/*ForImgui*/
 	_float							m_fBetween = 1.f;

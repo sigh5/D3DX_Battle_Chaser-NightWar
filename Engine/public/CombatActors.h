@@ -39,6 +39,10 @@ public:
 	void			Set_WideAttackDamage(_int iWideAttackDamage) { m_iWideAttackDamgae = iWideAttackDamage; }
 
 	_bool			Is_DebuffBlend(class CStatus* pStatus,CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag);
+	
+
+
+
 
 public:
 	virtual HRESULT Initialize_Prototype()override;
@@ -47,6 +51,7 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
+
 
 public:
 	void	Set_Debuff(class CStatus* pStatus, CStatus::DEBUFFTYPE eDebuff);
@@ -59,8 +64,6 @@ public: /*For.Animamtion*/
 	virtual void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
 	virtual void	  Set_CombatAnim_Index(class CModel* pModel);
 	
-
-
 public:
 	virtual		void		Fsm_Exit();
 	virtual		_bool		Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
@@ -81,7 +84,7 @@ protected:
 	CGameObject*					m_pHitTarget = nullptr;		//Combat
 	queue<pair<_uint, _double>>		m_CurAnimqeue;
 	_vector							m_vOriginPos;				// for.Combat
-
+	vector<CGameObject*>			m_vecBuffImage;
 
 protected:
 	_bool							m_bIsIdle = false;;

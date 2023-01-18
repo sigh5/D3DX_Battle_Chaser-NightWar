@@ -45,7 +45,7 @@ private:
 
 
 	_float						m_fSceneChaneTimer = 0.f;
-
+	_float						m_fSceneChaneTimer_lose = 0.f;
 private:
 	_tchar					m_szFPS[MAX_PATH] = TEXT("");
 	_uint					m_iNumCallDraw = 0;

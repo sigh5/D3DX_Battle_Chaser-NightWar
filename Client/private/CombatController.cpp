@@ -357,7 +357,8 @@ void CCombatController::Cal_HitPlayerTarget()
 	{	
 		// 맞은 적이없고 버프를 쓴적이없다.
 		if (static_cast<CMonster*>(m_pCurentActor)->Get_HitNum() == 0
-			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_IsBuff())		
+			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
+			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
 		{
 			To_Buff();
 		}
@@ -991,14 +992,22 @@ void CCombatController::To_Use_Item()
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		static_cast<CPlayer*>(m_pCurentActor)->Use_HpPotion();
+		HPMp_Update(m_pCurentActor);
 		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
 	else if (m_iMonster_Player_Option == 0 &&
-			m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
-			&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
-		{
-			return;
-		}
+		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
+		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
+
+		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
+		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
+		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		static_cast<CPlayer*>(m_pCurentActor)->Use_MpPotion();
+		HPMp_Update(m_pCurentActor);
+	}
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
@@ -1099,9 +1108,21 @@ void CCombatController::To_Flee()
 	if (m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
 		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_FLEE)
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_Flee);
-		m_pTurnCanvas->Move_Children();
+		
+		for (auto& pCurActor : m_CurActorMap)
+		{
+			if (nullptr != dynamic_cast<CPlayer*>(pCurActor.second))
+			{
+				pCurActor.second->Set_FsmState(true, CGameObject::m_Flee);
+				Render_StopCanvas();
+			}
+			else
+				pCurActor.second->Set_FsmState(true, CGameObject::m_Viroty);
+		}
 
+		//m_pTurnCanvas->Move_Children();
+
+		CClient_Manager::m_bCombatlose = true;
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 	}
 	else

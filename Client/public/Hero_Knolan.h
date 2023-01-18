@@ -66,12 +66,15 @@ public:  /*For.Combat*/
 	void			  Create_Wide_BuffEffect_Second();
 	void			  Create_Skill_Ultimate_Effect();
 	void			  Create_Buff_MainTain_Effect();
+	void			  Create_Ultimate_Start_CamEffect();
+
 
 	virtual void	  Create_Hit_Effect()override;
 	virtual void	  Create_Defence_Effect_And_Action()override;
 
 
-
+	virtual void	  Use_HpPotion()override;
+	virtual void	  Use_MpPotion()override;
 							
 	void			  Anim_Frame_Create_Control();
 

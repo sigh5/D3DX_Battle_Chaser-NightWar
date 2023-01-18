@@ -7,7 +7,7 @@
 #include "CombatController.h"
 #include "PlayerController.h"
 #include "TrunWinCanvas.h"
-
+#include "TrunLoseCanvas.h"
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pCombatController(CCombatController::GetInstance())
@@ -84,13 +84,37 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
 			LAYER_UI, TEXT("TurnWinCanvas")));
 		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
-		pWinCanvas->Set_WinRender(true); 
+		pWinCanvas->Set_WinRender(true);
 
 		CClient_Manager::m_bCombatWin = false;
 		m_fSceneChaneTimer = 0.f;
 		m_bSceneChange = true;
 		RELEASE_INSTANCE(CGameInstance);
 	}
+	
+	if (true == CClient_Manager::m_bCombatlose)
+	{
+		m_fSceneChaneTimer_lose += _float(TimeDelta);
+		//m_pCombatController->Render_StopCanvas();
+	}
+	if (m_fSceneChaneTimer_lose >= 5.f)
+	{
+
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		CGameInstance::GetInstance()->Load_Object(TEXT("TrunLoseUI_Data"), LEVEL_COMBAT);
+		CTrunLoseCanvas* pLoseCanvas = static_cast<CTrunLoseCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
+			LAYER_UI, TEXT("Texture_TrunBattle_WinCanvas")));
+		assert(nullptr != pLoseCanvas && "CCombatController::PlayerWin");
+		pLoseCanvas->Set_LoseRender(true);
+
+		CClient_Manager::m_bCombatlose = false;
+		m_fSceneChaneTimer_lose = 0.f;
+		m_bSceneChange = true;
+		RELEASE_INSTANCE(CGameInstance);
+	}
+
+
+
 
 	if (m_bSceneChange &&  GetKeyState(VK_RETURN) & 0x8000)
 	{
@@ -158,7 +182,7 @@ void CLevel_Combat::Combat_Intro()
 	if (m_bIntroFinish)
 		return;
 
-	if (m_dCombatIntroTimer >= 0.2f)
+	if (m_dCombatIntroTimer >= 0.15f)
 	{
 		m_pCombatController->Set_CombatIntro(true);
 		m_bIntroFinish = true;

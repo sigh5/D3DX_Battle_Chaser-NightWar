@@ -29,6 +29,9 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 		case Engine::CStatus::DEBUFF_MAGIC:
 			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = true;
 			break;
+		case Engine::CStatus::BUFF_DAMAGE:
+			m_StatusDesc.m_tagDesc.isBuff_Damage = true;
+			break;
 		case Engine::CStatus::DEBUFF_NONE:
 			break;
 		default:
@@ -50,6 +53,9 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 			break;
 		case Engine::CStatus::DEBUFF_MAGIC:
 			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = false;
+			break;
+		case Engine::CStatus::BUFF_DAMAGE:
+			m_StatusDesc.m_tagDesc.isBuff_Damage = false;
 			break;
 		case Engine::CStatus::DEBUFF_NONE:
 			break;

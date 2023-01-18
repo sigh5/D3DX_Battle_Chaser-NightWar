@@ -1,32 +1,32 @@
 #include "stdafx.h"
-#include "..\public\TrunWinCanvas.h"
+#include "..\public\TrunLoseCanvas.h"
 #include "GameInstance.h"
 
 #include "MyImage.h"
 
-CTrunWinCanvas::CTrunWinCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CTrunLoseCanvas::CTrunLoseCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
 {
 }
 
-CTrunWinCanvas::CTrunWinCanvas(const CTrunWinCanvas & rhs)
+CTrunLoseCanvas::CTrunLoseCanvas(const CTrunLoseCanvas & rhs)
 	: CCanvas(rhs)
 {
 }
 
-HRESULT CTrunWinCanvas::Initialize_Prototype()
+HRESULT CTrunLoseCanvas::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 	return S_OK;
 }
 
-HRESULT CTrunWinCanvas::Initialize(void * pArg)
+HRESULT CTrunLoseCanvas::Initialize(void * pArg)
 {
 	CCanvas::CANVASDESC		CanvasDesc;
 	ZeroMemory(&CanvasDesc, sizeof(CanvasDesc));
 
-	lstrcpy(CanvasDesc.m_pTextureTag, TEXT("Prototype_Component_Texture_TrunBattle_WinCanvas"));
+	lstrcpy(CanvasDesc.m_pTextureTag, TEXT("Prototype_Component_Texture_TrunBattle_LoseCanvas"));
 
 	if (nullptr != pArg)
 		memcpy(&CanvasDesc, pArg, sizeof(CanvasDesc));
@@ -50,22 +50,22 @@ HRESULT CTrunWinCanvas::Initialize(void * pArg)
 	return S_OK;
 }
 
-HRESULT CTrunWinCanvas::Last_Initialize()
+HRESULT CTrunLoseCanvas::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
 #ifdef NOMODLES
-	
+
 
 #else
-	//for (auto &pChild : m_ChildrenVec)
-	//{
-	//	if (nullptr == dynamic_cast<CMyImage*>(pChild))
-	//		continue;;
+	for (auto &pChild : m_ChildrenVec)
+	{
+		if (nullptr == dynamic_cast<CMyImage*>(pChild))
+			continue;;
 
-	//	static_cast<CMyImage*>(pChild)->Set_MaxTextureNum(7);
-	//}
-	
+		static_cast<CMyImage*>(pChild)->Set_MaxTextureNum(7);
+	}
+
 
 #endif
 
@@ -74,7 +74,7 @@ HRESULT CTrunWinCanvas::Last_Initialize()
 	return S_OK;
 }
 
-void CTrunWinCanvas::Tick(_double TimeDelta)
+void CTrunLoseCanvas::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 
@@ -85,17 +85,17 @@ void CTrunWinCanvas::Tick(_double TimeDelta)
 
 
 #else
-	/*for (auto &pChild : m_ChildrenVec)
+	for (auto &pChild : m_ChildrenVec)
 	{
 		if (nullptr == dynamic_cast<CMyImage*>(pChild))
 			continue;;
 
 		static_cast<CMyImage*>(pChild)->Move_Lose_Texture(TimeDelta);
-	}*/
+	}
 #endif	
 }
 
-void CTrunWinCanvas::Late_Tick(_double TimeDelta)
+void CTrunLoseCanvas::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
@@ -103,7 +103,7 @@ void CTrunWinCanvas::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
-HRESULT CTrunWinCanvas::Render()
+HRESULT CTrunLoseCanvas::Render()
 {
 	if (FAILED(__super::Render()))
 		return E_FAIL;
@@ -117,11 +117,11 @@ HRESULT CTrunWinCanvas::Render()
 	return S_OK;
 }
 
-void CTrunWinCanvas::Set_RenderActive(_bool bTrue)
+void CTrunLoseCanvas::Set_RenderActive(_bool bTrue)
 {
 }
 
-HRESULT CTrunWinCanvas::SetUp_Components()
+HRESULT CTrunLoseCanvas::SetUp_Components()
 {
 	/*For.Com_Renderer */
 	if (FAILED(__super::Add_Component(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Renderer"), TEXT("Com_Renderer"),
@@ -142,7 +142,7 @@ HRESULT CTrunWinCanvas::SetUp_Components()
 	return S_OK;
 }
 
-HRESULT CTrunWinCanvas::SetUp_ShaderResources()
+HRESULT CTrunLoseCanvas::SetUp_ShaderResources()
 {
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
@@ -167,24 +167,23 @@ HRESULT CTrunWinCanvas::SetUp_ShaderResources()
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 
-
 }
 
-CTrunWinCanvas * CTrunWinCanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
+CTrunLoseCanvas * CTrunLoseCanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
-	CTrunWinCanvas*		pInstance = new CTrunWinCanvas(pDevice, pContext);
+	CTrunLoseCanvas*		pInstance = new CTrunLoseCanvas(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CTrunWinCanvas");
+		MSG_BOX("Failed to Created : CTrunLoseCanvas");
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject * CTrunWinCanvas::Clone(void * pArg)
+CGameObject * CTrunLoseCanvas::Clone(void * pArg)
 {
-	CTrunWinCanvas*		pInstance = new CTrunWinCanvas(*this);
+	CTrunLoseCanvas*		pInstance = new CTrunLoseCanvas(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
@@ -194,7 +193,7 @@ CGameObject * CTrunWinCanvas::Clone(void * pArg)
 	return pInstance;
 }
 
-void CTrunWinCanvas::Free()
+void CTrunLoseCanvas::Free()
 {
 	__super::Free();
 

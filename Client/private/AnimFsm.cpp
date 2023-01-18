@@ -299,10 +299,10 @@ HRESULT CAnimFsm::Init_Knolan(CGameObject * pTarget)
 			{
 				static_cast<CHero_Knolan*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+				.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Flee To Idle"), [this]()
 			{
-				return m_pCombatController->To_Idle();
-			}))
+				return m_pCombatController->To_Intro();
+			}, 0))
 
 		.AddState(L"Die")
 			.OnStart([this]()
@@ -571,10 +571,11 @@ HRESULT CAnimFsm::Init_Garrison(CGameObject * pTarget)
 			{
 				static_cast<CHero_Garrison*>(m_pTarget)->Combat_Tick(TimeDelta);
 			})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		
+				.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Flee To Idle"), [this]()
 			{
-				return m_pCombatController->To_Idle();		//¾ê´Â µµ¸ÁÄ¡´Â°Å
-			}))
+				return m_pCombatController->To_Intro();
+			}, 0))
 
 		.AddState(L"Die")
 			.OnStart([this]()
@@ -848,10 +849,12 @@ HRESULT CAnimFsm::Init_Calibretto(CGameObject * pTarget)
 		{
 			static_cast<CHero_Calibretto*>(m_pTarget)->Combat_Tick(TimeDelta);
 		})
-			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+	
+			.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Flee To Idle"), [this]()
 		{
-			return m_pCombatController->To_Idle();
-		}))
+			return m_pCombatController->To_Intro();
+		}, 0))
+
 
 		.AddState(L"Die")
 			.OnStart([this]()

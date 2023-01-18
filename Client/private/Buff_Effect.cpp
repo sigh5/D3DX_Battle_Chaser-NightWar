@@ -52,7 +52,6 @@ void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc, CBone * pSocket
 
 }
 
-
 void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber)
 {
 	m_bUseGlow = bUseGlow;
@@ -74,6 +73,27 @@ void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNum
 void CBuff_Effect::Set_ShaderPass(_uint iShaderPass)
 {
 	m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = iShaderPass;
+}
+
+void CBuff_Effect::Set_CamEffect(BuffEffcet_Client & Desc)
+{
+	memcpy(&m_Client_BuffEffect_Desc, &Desc, sizeof(BuffEffcet_Client));
+	_matrix		m_matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+	matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+	matRotX = XMMatrixRotationX(XMConvertToRadians(0.f));
+	matRotY = XMMatrixRotationY(XMConvertToRadians(m_Client_BuffEffect_Desc.vAngle));	//스트레이트는 90 , 골프 -180
+	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+	matTrans = XMMatrixTranslation(m_Client_BuffEffect_Desc.vPosition.x, m_Client_BuffEffect_Desc.vPosition.y, m_Client_BuffEffect_Desc.vPosition.z);
+	m_OriginMatrix = matScale * matRotX * matRotY * matRotZ * matTrans;
+	
+
+	XMStoreFloat4x4(&m_SocketMatrix, m_OriginMatrix);
+	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
+	m_pVIBufferCom->Set_Point_Instancing_MainTain();
+	m_pVIBufferCom->Set_Point_Instancing_Scale(m_Client_BuffEffect_Desc.vScale);	// 텍스쳐의 크기를 키우는것
+	m_pTransformCom->Set_Scaled(m_Client_BuffEffect_Desc.vScale);				// 콜라이더의 크기를 키우는것임
+	m_vScale = m_Client_BuffEffect_Desc.vScale;
+	m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
 }
 
 void CBuff_Effect::Is_Particle_Effect(_int iInstanceNum)

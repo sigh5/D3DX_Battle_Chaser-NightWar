@@ -6,16 +6,21 @@
 #include "Model.h"
 #include "Environment_Object.h"
 #include "UI.h"
-#include <string>
 #include "PlayerController.h"
 
 #include "Model_Instancing.h"
+#include "Buff_Image.h"
+#include "Status.h"
+
 
 _double CClient_Manager::TimeDelta = 0;
 _bool	CClient_Manager::bIsCollPlayerTo3DUI[20] = { false };
 _matrix	CClient_Manager::m_StaticCameraMatrix = XMMatrixIdentity();
 _float	CClient_Manager::m_CameraEye_Z = 0.f;
 _bool	CClient_Manager::m_bCombatWin = false;
+_bool	CClient_Manager::m_bCombatlose = false;
+
+
 
 void CClient_Manager::Client_Manager_Update()
 {
@@ -260,9 +265,125 @@ void CClient_Manager::Navigation_Render(CGameObject * pGameObject, CNavigation *
 }
 
 
+
 #endif
 
 
+void  CClient_Manager::Create_BuffImage(vector<CGameObject*>& vecBuffImage,
+	_float4 vPos,  _float3 vScale, wstring ProtoTag, _uint iTextureIndex)
+{
+
+	for (auto& pBuff : vecBuffImage)
+	{
+		if (nullptr != pBuff)
+		{
+			CTexture* pTexture = static_cast<CTexture*>(pBuff->Get_Component(TEXT("Com_Texture")));
+
+			if (pTexture->Get_SelectTextureIndex() == iTextureIndex)
+				return;
+		}
+	}
+
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	CGameObject*	pBuffImage = nullptr;
+
+	pBuffImage = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_BuffImage"));
+
+	assert(nullptr != pBuffImage && "CClient_Manager::Create_BuffImage");
+
+	vecBuffImage.push_back(pBuffImage);
+	static_cast<CBuff_Image*>(pBuffImage)->Set_BuffImage_PosTransform(vPos, vScale);
+	static_cast<CBuff_Image*>(pBuffImage)->Set_TextureIndex(iTextureIndex);
+
+	RELEASE_INSTANCE(CGameInstance);
+	return;
+}
+
+vector<CGameObject*>::iterator CClient_Manager::Delete_BuffImage(vector<CGameObject*>& vecBuffImage , CStatus * pStauts,_bool bIsPlayer)
+{
+	CStatus::DEBUFF_TYPE_Desc Desc = pStauts->Get_DebuffType();
+	
+	vector<_uint> iIndexs;
+
+	if (Desc.isDebuff_FIRE == false)		//0
+		iIndexs.push_back(3);
+	if (Desc.isDebuff_BLEED == false)
+		iIndexs.push_back(1);
+	if (Desc.isDebuff_ARMOR == false)
+		iIndexs.push_back(4);
+	if (Desc.isDebuff_MAGIC == false)
+		iIndexs.push_back(2);
+	if (Desc.isBuff_Damage == false)
+		iIndexs.push_back(0);
+
+	size_t iBuffSize = vecBuffImage.size();
+
+	if (iBuffSize == 0)
+		return vecBuffImage.end();
+
+	
+	for (auto iter = vecBuffImage.begin(); iter != vecBuffImage.end();)
+	{
+		if(*iter !=nullptr)
+		{ 
+			CTexture* pTexture = static_cast<CTexture*>((*iter)->Get_Component(TEXT("Com_Texture")));
+
+			for (_uint i = 0; i < iIndexs.size(); ++i)
+			{
+				if (pTexture->Get_SelectTextureIndex() == iIndexs[i])
+					return iter;
+			}
+		}
+		++iter;
+	}	
+
+	return vecBuffImage.end();
+}
+
+void CClient_Manager::Sort_BuffImage(vector<CGameObject*>& vecBuffImage,_bool bIsPlayer)
+{
+	
+	if (vecBuffImage.size() == 0)
+		return;
+
+	if (true == bIsPlayer)
+	{
+		_float Xpos = -305.f;
+		for (auto pBuff : vecBuffImage)
+		{
+			if (pBuff != nullptr)
+			{
+				_float4 vPos;
+				XMStoreFloat4(&vPos, pBuff->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+				vPos.x = Xpos;
+
+				pBuff->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+				Xpos -= 30.f;
+			}
+
+		}
+	}
+	else
+	{
+		_float Xpos = 500.f;
+		for (auto pBuff : vecBuffImage)
+		{
+			if (pBuff != nullptr)
+			{
+				_float4 vPos;
+				XMStoreFloat4(&vPos, pBuff->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+				vPos.x = Xpos;
+
+				pBuff->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+				Xpos += 30.f;
+			}
+		
+		}
+
+
+
+	}
+}
 
 
 

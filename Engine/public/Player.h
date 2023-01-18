@@ -44,6 +44,10 @@ public: /*For.PlayerController*/
 	void				SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
 	_bool				IsCaptin();
 
+public: /*For.Combat*/
+	virtual void				Use_HpPotion();
+	virtual void				Use_MpPotion();
+
 protected:
 	_bool				KeyInput(_double TimeDelta, CNavigation* pNavigation);
 	virtual void		Change_Level_Data(_uint iLevleIdx) {}

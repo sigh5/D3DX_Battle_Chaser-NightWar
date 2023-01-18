@@ -12,6 +12,8 @@
 #include "Level_Loading.h"
 #include "UI.h"
 
+
+
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pPlayerController(CPlayerController::GetInstance())
@@ -64,8 +66,31 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 
 	m_TimeAcc += TimeDelta;
 
+#ifdef FONT_TEST
 	//CExplain_FontMgr::GetInstance()->Tick(TimeDelta);
-	
+#else
+
+
+#endif
+
+	//static float BUffPos[3] = { 0.f,0.f,0.f };
+	//ImGui::InputFloat3("BuffPos", BUffPos);
+	//
+	//if (ImGui::Button("Create_Buff_Pos"))
+	//{
+	//	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	//	pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY,LAYER_UI,TEXT("Prototype_GameObject_BuffImage"));
+	//		
+	//	_float4 vPos = _float4(BUffPos[0], BUffPos[1], 0.1f, 1.f);
+	//	_float3 vScale = _float3(30.f,30.f,1.f);
+
+
+	//	static_cast<CBuff_Image*>(pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, LAYER_UI, L"BUff_Image"))->Set_BuffImage_PosTransform(vPos, vScale);
+
+
+	//	RELEASE_INSTANCE(CGameInstance);
+	//}
+
 
 
 #ifdef NOMODLES
@@ -199,8 +224,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Map_3D_UI"))))
-		return E_FAIL;
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Map_3D_UI"))))
+	//	return E_FAIL;
 
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);

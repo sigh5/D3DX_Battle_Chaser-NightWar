@@ -179,6 +179,7 @@
     <ClInclude Include="..\Public\Camera_Combat.h" />
     <ClInclude Include="..\Public\Camera_Dynamic.h" />
     <ClInclude Include="..\Public\Camera_Static.h" />
+    <ClInclude Include="..\Public\Cam_Effect.h" />
     <ClInclude Include="..\Public\ChestBox.h" />
     <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
@@ -225,6 +226,7 @@
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\Public\TrunLoseCanvas.h" />
     <ClInclude Include="..\Public\TrunWinCanvas.h" />
     <ClInclude Include="..\Public\Trun_BattleStart_UI.h" />
     <ClInclude Include="..\Public\TurnCharcterUI.h" />
@@ -247,6 +249,7 @@
     <ClCompile Include="..\private\Camera_Combat.cpp" />
     <ClCompile Include="..\Private\Camera_Dynamic.cpp" />
     <ClCompile Include="..\Private\Camera_Static.cpp" />
+    <ClCompile Include="..\Private\Cam_Effect.cpp" />
     <ClCompile Include="..\Private\ChestBox.cpp" />
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
@@ -291,6 +294,7 @@
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\Private\TrunLoseCanvas.cpp" />
     <ClCompile Include="..\Private\TrunWinCanvas.cpp" />
     <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp" />
     <ClCompile Include="..\Private\TurnCharcterUI.cpp" />

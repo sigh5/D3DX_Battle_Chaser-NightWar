@@ -29,6 +29,7 @@ class CCombatController final :public CBase
 public:
 	CCombatController();
 	virtual ~CCombatController() = default;
+
 public:
 	 CGameObject*		Get_CurActor()const { return m_pCurentActor; }
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
@@ -81,8 +82,6 @@ public:	/*Reset*/
 	void	Camera_Zoom_In();
 	void	UI_Shaking(_bool bShaking);
 	void	Wide_Attack(_bool IsPlayer, _int iDamage);
-
-
 	void	Collison_Event();
 	void	Cal_HitPlayerTarget();
 
@@ -123,8 +122,8 @@ private:
 private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
 	//vector<CCanvas*>		m_CombatMapVec;
-	map<const wstring,  CGameObject*> m_CurActorMap;
-	map<const wstring, CStatus*>	  m_ActorsStatusMap;
+	map<const wstring,  CGameObject*>     m_CurActorMap;
+	map<const wstring, CStatus*>		  m_ActorsStatusMap;
 
 private:
 	CGameObject*			m_pCurentActor	= nullptr;		// 현재 순서인놈
