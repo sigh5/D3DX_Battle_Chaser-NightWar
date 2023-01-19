@@ -144,6 +144,16 @@ void CPlayer::Use_MpPotion()
 	
 }
 
+_int CPlayer::Get_RestHpPotion()
+{
+	return _int();
+}
+
+_int CPlayer::Get_RestMpPotion()
+{
+	return _int();
+}
+
 _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 {
 	if (!m_bControlKeyInput)

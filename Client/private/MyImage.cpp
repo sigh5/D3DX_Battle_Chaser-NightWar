@@ -15,6 +15,13 @@ CMyImage::CMyImage(const CMyImage & rhs)
 {
 }
 
+void CMyImage::Set_CurTextureNum(_uint iTextureNum)
+{
+	 m_pTextureCom->Set_SelectTextureIndex(iTextureNum); 
+}
+
+
+
 HRESULT CMyImage::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -85,11 +92,17 @@ void CMyImage::Tick(_double TimeDelta)
 			CCombatController::GetInstance()->Get_CurActor()->
 				Set_FsmState(true, CGameObject::m_Uitimate);
 		}
-	
 	}
 
 	Shake_Move(TimeDelta);
 #endif
+
+	
+	
+	
+
+
+
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)
@@ -99,8 +112,19 @@ void CMyImage::Late_Tick(_double TimeDelta)
 	if (m_bBanerTimerFinish)
 		return;
 
-	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+	if  (nullptr != m_pRendererCom)
+	{
+		if (m_bIsInventory)
+		{
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_INVENTORY, this);
+		}
+		else
+		{
+			m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+		}
+	}
+	
+	
 }
 
 HRESULT CMyImage::Render()
@@ -126,12 +150,14 @@ HRESULT CMyImage::Render()
 		RELEASE_INSTANCE(CGameInstance);
 	}
 
-	if (m_bWinRenderFont)
+	if (m_bIsInventory && m_bRenderActive)
 	{
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		pGameInstance->Render_Font(TEXT("Font_Comic"), TEXT(" Victory !!"), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(1.f, 1.f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
+		pGameInstance->Render_Font(TEXT("Font_Comic"), m_bItemNumstr.c_str(), _float2(m_fFontPosX, m_fFontPosY), 0.f, _float2(0.5f, 0.5f), XMVectorSet(1.f, 1.f, 1.f, 1.f));
 		RELEASE_INSTANCE(CGameInstance);
 	}
+
+
 
 
 	return S_OK;

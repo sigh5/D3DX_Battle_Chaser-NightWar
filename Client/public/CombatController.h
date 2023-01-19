@@ -33,7 +33,9 @@ public:
 public:
 	 CGameObject*		Get_CurActor()const { return m_pCurentActor; }
 	 const	_bool		Get_CombatIntro()const { return m_bCombatIntro; }
-	
+	 CStatus*			Get_CurActorStatus();
+
+
 	 const _bool		Get_Late_Init()const { return m_bLateInit; }
 
 	 CGameObject*		Get_HitActor()const { return m_pHitActor; }
@@ -43,7 +45,7 @@ public:
 	 void				Set_Ultimate_End(_bool bUltimateEnd) { m_bCurActorUltimateEnd = bUltimateEnd; }
 
 
-	
+	 void				Setting_Win_Canvas(CCanvas* pCanvas);
 
 
 	 map<const wstring, CGameObject*>* Get_CurActorMap() { return &m_CurActorMap; }
@@ -124,6 +126,9 @@ private:
 	//vector<CCanvas*>		m_CombatMapVec;
 	map<const wstring,  CGameObject*>     m_CurActorMap;
 	map<const wstring, CStatus*>		  m_ActorsStatusMap;
+
+
+
 
 private:
 	CGameObject*			m_pCurentActor	= nullptr;		// 현재 순서인놈

@@ -76,14 +76,15 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 		m_fSceneChaneTimer += _float(TimeDelta);
 		//m_pCombatController->Render_StopCanvas();
 	}
-	if (m_fSceneChaneTimer >= 5.f)
+	if (m_fSceneChaneTimer >= 2.f)
 	{
-		
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 		CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
 		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
 			LAYER_UI, TEXT("TurnWinCanvas")));
 		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
+		
+		CCombatController::GetInstance()->Setting_Win_Canvas(pWinCanvas);
 		pWinCanvas->Set_WinRender(true);
 
 		CClient_Manager::m_bCombatWin = false;

@@ -162,28 +162,28 @@ void CHero_Knolan::Tick(_double TimeDelta)
 			m_bIsDead = true;
 		}
 
-		static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
+		//static float ffPos[3] = {};
+		//static float ffScale[3] = {};
+		//static char  szName[MAX_PATH] = "";
+		//ImGui::InputFloat3("SkillPos", ffPos);
+		//ImGui::InputFloat3("SkillScale", ffScale);
 
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);
+		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		//ImGui::InputText("TextureName", szName, MAX_PATH);
 
-		if (ImGui::Button("Create_Skill"))
-		{
-			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		//if (ImGui::Button("Create_Skill"))
+		//{
+		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-			m_TextureTag = Texture_NameTag;
-			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		//	m_TextureTag = Texture_NameTag;
+		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-			Create_Test_Effect();		// Test¿ë
+		//	Create_Test_Effect();		// Test¿ë
 
-		}
-		RELEASE_INSTANCE(CGameInstance);
+		//}
+		//RELEASE_INSTANCE(CGameInstance);
 
 
 
@@ -727,7 +727,7 @@ void CHero_Knolan::Use_HpPotion()
 	_int iRandNum = rand() % 20 + 20;
 
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
-
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_HP_POTION);
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
@@ -765,6 +765,7 @@ void CHero_Knolan::Use_MpPotion()
 {
 	_int iRandNum = rand() % 15 + 30;
 
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_MP_POSION);
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Mp(iRandNum);
 
 	_float4 vPos;
@@ -863,9 +864,10 @@ void CHero_Knolan::Create_WideBuffEffect()
 			BuffDesc.bIsUp = false;
 			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 			m_pEffectParts.push_back(pGameObject);
+			pCombatCtr->HPMp_Update(pActor.second);
 		}
 	}
-
+	
 	RELEASE_INSTANCE(CCombatController);
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -1215,11 +1217,16 @@ HRESULT CHero_Knolan::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
+	ZeroMemory(&StatusDesc, sizeof(StatusDesc));
 	StatusDesc.iHp = 150;
 	StatusDesc.iMp = 250;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
 		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
 		return E_FAIL;
+
+	//m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION,1);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, 20);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_ULTIMATE_BOOK, 1);
 
 	return S_OK;
 }
@@ -1250,8 +1257,12 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 {
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
+	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
 	StatusDesc.iHp = 150;
 	StatusDesc.iMp = 250;
+	StatusDesc.iExp = 0;
+	StatusDesc.iLevel = 1;
+
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
@@ -1430,6 +1441,7 @@ void CHero_Knolan::Anim_WideAreaBuff()
 
 void CHero_Knolan::Anim_Use_Item()
 {
+
 	m_bBuffEffectStop = true;
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1507,6 +1519,7 @@ void CHero_Knolan::Anim_Die()
 
 void CHero_Knolan::Anim_Viroty()
 {
+
 	while (!m_CurAnimqeue.empty())
 	{
 		m_CurAnimqeue.pop();
@@ -1590,6 +1603,16 @@ _bool CHero_Knolan::Is_Dead()
 	}
 
 	return false;
+}
+
+_int CHero_Knolan::Get_RestHpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_HP_POTION);
+}
+
+_int CHero_Knolan::Get_RestMpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_MP_POSION);
 }
 
 

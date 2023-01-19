@@ -76,6 +76,16 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 	return false;
 }
 
+_int CHero_Calibretto::Get_RestHpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_HP_POTION);
+}
+
+_int CHero_Calibretto::Get_RestMpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_MP_POSION);
+}
+
 HRESULT CHero_Calibretto::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -652,7 +662,8 @@ HRESULT CHero_Calibretto::SetUp_Components()
 		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
 		return E_FAIL;
 
-
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 20);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, 10);
 
 
 	return S_OK;
@@ -714,8 +725,12 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
+	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
 	StatusDesc.iHp = 300;
 	StatusDesc.iMp = 250;
+	StatusDesc.iExp = 0;
+	StatusDesc.iLevel = 1;
+
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
@@ -1644,7 +1659,8 @@ void CHero_Calibretto::Create_Hit_Effect()
 void CHero_Calibretto::Use_HpPotion()
 {
 	_int iRandNum = rand() % 20 + 20;
-
+	
+	
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
 
 	_float4 vPos;
@@ -1658,6 +1674,8 @@ void CHero_Calibretto::Use_HpPotion()
 	vPos.y += 3.f;
 	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
 	
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_HP_POTION);
+
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
@@ -1686,6 +1704,7 @@ void CHero_Calibretto::Use_MpPotion()
 {
 	_int iRandNum = rand() % 15 + 30;
 
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_MP_POSION);
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Mp(iRandNum);
 
 	_float4 vPos;

@@ -115,6 +115,24 @@ void CStatus::Use_SkillMp(_int iMp)
 		m_StatusDesc.iMp = 0;
 }
 
+void CStatus::Set_Exp(_int iExp)
+{
+	m_StatusDesc.iExp += iExp;
+
+	if (m_StatusDesc.iExp >= m_iMaxExp)
+	{
+		m_StatusDesc.iExp -= m_iMaxExp;
+
+		m_iMaxExp += 10;
+		++m_StatusDesc.iLevel;
+	}
+}
+
+_float CStatus::Get_ExpRatio()
+{
+	return	(_float)(m_StatusDesc.iExp) / (_float)(m_iMaxExp);
+}
+
 HRESULT CStatus::Initialize_Prototype()
 {
 	return S_OK;
@@ -143,6 +161,66 @@ void CStatus::Final_Update()
 		m_bDead = true;
 		m_StatusDesc.iMp = 0;
 	}
+}
+
+void CStatus::Add_ItemID(ITEMID iItemID, _int iNum)
+{
+	auto iter = find_if(m_mapItem.begin(), m_mapItem.end(), [&](auto MyPair)->bool
+	{
+		if (MyPair.first == iItemID)
+			return true;
+		return false;
+	});
+
+	if (iter != m_mapItem.end())
+	{
+		_int iOldNum = m_mapItem[iter->first];
+		m_mapItem[iter->first] = iNum + iOldNum;
+		return;
+	}
+
+	m_mapItem.emplace(iItemID, iNum);	
+}
+
+void CStatus::Use_Item(ITEMID iItemID)
+{
+	auto iter = find_if(m_mapItem.begin(), m_mapItem.end(), [&](auto MyPair)->bool
+	{
+		if (MyPair.first == iItemID)
+			return true;
+		return false;
+	});
+	if (iter == m_mapItem.end())
+	{
+		return;
+	}
+
+	_int iOldNum = m_mapItem[iter->first] - 1;
+
+	if (iOldNum <= 0)
+	{
+		m_mapItem.erase(iter);
+	}
+
+	m_mapItem[iter->first] =  iOldNum;
+
+
+}
+
+_int CStatus::Rest_iTemNum(ITEMID iItemID)
+{
+	auto iter = find_if(m_mapItem.begin(), m_mapItem.end(), [&](auto MyPair)->bool
+	{
+		if (MyPair.first == iItemID)
+			return true;
+		return false;
+	});
+	if (iter == m_mapItem.end())
+	{
+		return -1;
+	}
+
+	return iter->second;
 }
 
 CStatus * CStatus::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

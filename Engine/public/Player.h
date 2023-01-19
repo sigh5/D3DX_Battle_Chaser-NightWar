@@ -47,7 +47,8 @@ public: /*For.PlayerController*/
 public: /*For.Combat*/
 	virtual void				Use_HpPotion();
 	virtual void				Use_MpPotion();
-
+	virtual _int				Get_RestHpPotion();
+	virtual _int				Get_RestMpPotion();
 protected:
 	_bool				KeyInput(_double TimeDelta, CNavigation* pNavigation);
 	virtual void		Change_Level_Data(_uint iLevleIdx) {}

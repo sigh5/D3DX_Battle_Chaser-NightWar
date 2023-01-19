@@ -68,6 +68,10 @@ HRESULT CRenderer::Draw_RenderGroup()
 	if (FAILED(Render_UI()))
 		return E_FAIL;
 
+	if (FAILED(RENDER_Inventory()))
+		return E_FAIL;
+	
+
 #ifdef _DEBUG
 
 	if (FAILED(Render_DebugObject()))
@@ -329,6 +333,21 @@ HRESULT CRenderer::Render_UI()
 	}
 
 	m_RenderObjects[RENDER_UI].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::RENDER_Inventory()
+{
+	for(auto& pGameObject : m_RenderObjects[RENDER_INVENTORY])
+	{
+		if (nullptr != pGameObject)
+			pGameObject->Render();
+
+		Safe_Release(pGameObject);
+	}
+
+	m_RenderObjects[RENDER_INVENTORY].clear();
 
 	return S_OK;
 }

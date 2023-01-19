@@ -199,6 +199,15 @@
     <Filter Include="02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas">
       <UniqueIdentifier>{90cc5241-ac68-4fc5-9695-af5d8d5ca35f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\ExpBar">
+      <UniqueIdentifier>{60e2431c-7d6f-40cd-83b7-3984c8e47bb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\InventoryCanvas">
+      <UniqueIdentifier>{6fffdbd1-0ff0-4350-9c78-1182c19c7701}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\UI\InventoryCanvas\InventoryButton">
+      <UniqueIdentifier>{7c8b9d36-c719-48b2-a439-8deaf63a2b74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -411,6 +420,15 @@
     <ClInclude Include="..\Public\TrunLoseCanvas.h">
       <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Exp_Bar.h">
+      <Filter>02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\ExpBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Inventory.h">
+      <Filter>02.GameObjects\UI\InventoryCanvas</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Inventory_Button.h">
+      <Filter>02.GameObjects\UI\InventoryCanvas\InventoryButton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -604,6 +622,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\TrunLoseCanvas.cpp">
       <Filter>02.GameObjects\UI\TrunBattle\TrunWin_Lose_Canvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Exp_Bar.cpp">
+      <Filter>02.GameObjects\UI\TrunBattle\Hp_Mp_Buff\ExpBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Inventory.cpp">
+      <Filter>02.GameObjects\UI\InventoryCanvas</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Inventory_Button.cpp">
+      <Filter>02.GameObjects\UI\InventoryCanvas\InventoryButton</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

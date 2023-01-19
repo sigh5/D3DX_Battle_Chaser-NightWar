@@ -12,20 +12,19 @@ class CTexture;
 class CStatus;
 END
 
-
 BEGIN(Client)
-
-class CHpMpBar final : public CUI
+class CExp_Bar final : public CUI
 {
 private:
-	CHpMpBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CHpMpBar(const CHpMpBar& rhs);
-	virtual ~CHpMpBar() = default;
+	CExp_Bar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CExp_Bar(const CExp_Bar& rhs);
+	virtual ~CExp_Bar() = default;
 
 public:
-	void		Set_HpBarStatus(CStatus* pStatus) ;
-	void		Set_MpBarStatus(CStatus* pStatus) ;
-	void		Set_Hit(_bool bHit) { m_bHit = bHit; }
+	void		Set_ExpBarStatus(CStatus* pStatus);
+	void		Set_OldRatio(_float fOldRatio){
+		m_fOldRatio = fOldRatio;
+	}
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -34,12 +33,6 @@ public:
 	virtual void Late_Tick(_double TimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual void	Change_Texture(_uint iLevel, const wstring& NewComPonentTag);
-
-
-	virtual void			ShakingControl(_float fCoolTime)override;
-
-private:
-	virtual void			Shake_Move(_double TimeDelta)override;
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -50,29 +43,27 @@ private:
 private:
 	_float4x4				m_ViewMatrix;
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
-	CStatus*				m_pTaskStatus = nullptr;
-	_bool					m_bHit = false;
-	_uint					m_iOption = 999;		// 0 HP, 1 MP
-	_float					m_fRatio = 1.f;
-	_float					m_fRatioX = 0.f;
+	
+	_float					m_fOldRatio = 0.f;
+	_float					m_fCurRatio = 1.f;
+	
+	CStatus*				m_pMyStatus = nullptr;
 
-/*For_Shaking*/
-	_float					m_fCoolTime = 0.f;
+	wstring					m_strText = L"";
+	_float					m_fFontPosX=0.f, m_fFontPosY=0.f,m_fScale=0.1f;
+
+	_uint					m_iShaderOption = 1;
+
+	_float					m_SubXRatio = 0.f;
 	_bool					m_bMove = false;
-	_float4					m_vOriginPos;
-	_int					m_iSwitching = 1;
-	_float4x4				m_WorldMat;
-/* ~For_Shaking*/
-
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
 
 public:
-	static CHpMpBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CExp_Bar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
-
 
 };
 

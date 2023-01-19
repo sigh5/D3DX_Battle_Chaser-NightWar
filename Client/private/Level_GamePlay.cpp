@@ -25,6 +25,7 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * p
 
 HRESULT CLevel_GamePlay::Initialize()
 {
+
 	if (FAILED(__super::Initialize()))
 		return E_FAIL;
 
@@ -52,7 +53,8 @@ HRESULT CLevel_GamePlay::Initialize()
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
 	
-	
+	m_pPlayerController->Reset_LateInit();
+
 	//CExplain_FontMgr::GetInstance()->Initialize();
 	
 	return S_OK;
@@ -61,8 +63,11 @@ HRESULT CLevel_GamePlay::Initialize()
 
 void CLevel_GamePlay::Tick(_double TimeDelta)
 {
+	m_pPlayerController->Late_Initialize();
+
 	__super::Tick(TimeDelta);
-		
+	
+	m_pPlayerController->Player_Controll_Tick(TimeDelta);
 
 	m_TimeAcc += TimeDelta;
 
@@ -254,8 +259,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
 			return E_FAIL;
 
-		pGameInstance->m_bOnceCreatePlayer = true;
 		m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
+		pGameInstance->m_bOnceCreatePlayer = true;
+		
 	}
 #endif
 
@@ -269,9 +275,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 #ifdef NOMODLES
-
+	pGameInstance->Load_Object(TEXT("Inventory"), LEVEL_GAMEPLAY);
 #else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
+	pGameInstance->Load_Object(TEXT("Inventory"), LEVEL_GAMEPLAY);
+	
+		
+
 #endif
 
 

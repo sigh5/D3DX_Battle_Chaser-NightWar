@@ -26,6 +26,10 @@ private:
 public:
 	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon)override;	//무기 아니면 스킬구체
+
+
+	virtual _int				Get_RestHpPotion()override;
+	virtual _int				Get_RestMpPotion()override;
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

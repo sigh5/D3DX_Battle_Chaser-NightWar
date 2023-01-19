@@ -4,6 +4,8 @@
 #include "Player.h"
 #include "GameInstance.h"
 #include "Layer.h"
+#include "Inventory.h"
+#include "Dungeon_Canvas.h"
 
 IMPLEMENT_SINGLETON(CPlayerController);
 
@@ -30,9 +32,72 @@ HRESULT CPlayerController::Initialize(_uint iLevel)
 				++iIndex;
 			}
 		}
-	}
+	}	
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
+}
+
+HRESULT CPlayerController::Late_Initialize()
+{
+	if (m_bLateInit)
+		return S_OK;
+	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);	
+	
+	m_pInventory = static_cast<CInventory*>(pGameInstace->Get_GameObject(pGameInstace->GetCurLevelIdx(),LAYER_UI,TEXT("Inventory_Canvas")));
+	m_pDungeonCanvas = static_cast<CDungeon_Canvas*>(pGameInstace->Get_GameObject(pGameInstace->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+	
+
+	for (auto& pPlayer : m_pPlayerVec)
+	{
+		if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Gully")))
+		{
+			m_pInventory->Set_Knolan(pPlayer);
+		}
+		else if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Alumon")))
+		{
+			m_pInventory->Set_Garrison(pPlayer);
+		}
+		else if (!lstrcmp(pPlayer->Get_ObjectName(), TEXT("Hero_Calibretto")))
+		{
+			m_pInventory->Set_Calibretto(pPlayer);
+		}
+	}
+
+	
+	
+	RELEASE_INSTANCE(CGameInstance);
+	
+	
+	m_bLateInit = true;
+	
+	return S_OK;
+}
+
+void CPlayerController::Player_Controll_Tick(_double TimeDelta)
+{
+	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);
+#ifdef NOMODLES
+
+#else
+	if (pGameInstace->Key_Down(DIK_I))
+	{
+		m_bInventoryRender = !m_bInventoryRender;
+
+		m_pInventory->Set_RenderActive(m_bInventoryRender);
+		m_pDungeonCanvas->Set_RenderActive(!m_bInventoryRender);
+
+		if (false == m_bInventoryRender)
+		{
+			m_pInventory->Clear_InventoryImage();
+		}
+
+
+	}
+#endif
+
+	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 void CPlayerController::Set_CaptinPlayer()

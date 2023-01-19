@@ -3,6 +3,7 @@
 #include "GameInstance.h"
 
 #include "MyImage.h"
+#include "Exp_Bar.h"
 
 CTrunWinCanvas::CTrunWinCanvas(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCanvas(pDevice, pContext)
@@ -58,15 +59,9 @@ HRESULT CTrunWinCanvas::Last_Initialize()
 	
 
 #else
-	//for (auto &pChild : m_ChildrenVec)
-	//{
-	//	if (nullptr == dynamic_cast<CMyImage*>(pChild))
-	//		continue;;
-
-	//	static_cast<CMyImage*>(pChild)->Set_MaxTextureNum(7);
-	//}
-	
-
+	static_cast<CExp_Bar*>(Find_UI(TEXT("ExpBar_0")))->Set_ExpBarStatus(Find_Status(TEXT("Hero_Gully")));
+	static_cast<CExp_Bar*>(Find_UI(TEXT("ExpBar_1")))->Set_ExpBarStatus(Find_Status(TEXT("Hero_Alumon")));
+	static_cast<CExp_Bar*>(Find_UI(TEXT("ExpBar_2")))->Set_ExpBarStatus(Find_Status(TEXT("Hero_Calibretto")));
 #endif
 
 	m_bLast_Initlize = true;
@@ -112,9 +107,42 @@ HRESULT CTrunWinCanvas::Render()
 		return E_FAIL;
 
 	m_pShaderCom->Begin(1);
-	m_pVIBufferCom->Render();
+	m_pVIBufferCom->Render(); 
 
 	return S_OK;
+}
+
+void CTrunWinCanvas::Exp_Set_Status(map<const wstring, CStatus*>& pStatusMap)
+{
+	for (auto& pChild : m_ChildrenVec)
+	{
+		if (dynamic_cast<CExp_Bar*>(pChild) == nullptr)
+			continue;
+		
+		CStatus* pStatus = nullptr;
+		
+		for (auto StatusValue : pStatusMap)
+		{
+			if (StatusValue.first == TEXT("Hero_Gully"))
+			{
+				pStatus = StatusValue.second;
+				m_StatusMap.emplace(TEXT("Hero_Gully"), pStatus);
+			}
+			else if (StatusValue.first == TEXT("Hero_Alumon"))
+			{
+				pStatus = StatusValue.second;
+				m_StatusMap.emplace(TEXT("Hero_Alumon"), pStatus);
+			}
+			else if (StatusValue.first == TEXT("Hero_Calibretto"))
+			{
+				pStatus = StatusValue.second;
+				m_StatusMap.emplace(TEXT("Hero_Calibretto"), pStatus);
+			}
+			else
+				continue;
+		}
+	}
+	_bool b = false;
 }
 
 void CTrunWinCanvas::Set_RenderActive(_bool bTrue)
@@ -168,6 +196,32 @@ HRESULT CTrunWinCanvas::SetUp_ShaderResources()
 	return S_OK;
 
 
+}
+
+CUI * CTrunWinCanvas::Find_UI(const _tchar * pNameTag)
+{
+	for (auto pChild : m_ChildrenVec)
+	{
+		if (!lstrcmp(pChild->Get_ObjectName(), pNameTag))
+			return pChild;
+	}
+
+	return nullptr;
+}
+
+CStatus * CTrunWinCanvas::Find_Status(const wstring & pNameTag)
+{
+	auto Pair = find_if(m_StatusMap.begin(), m_StatusMap.end(), [&](auto MyPair)->bool
+	{
+		if (MyPair.first == pNameTag)
+			return true;
+		return	false;
+	});
+
+	if (Pair == m_StatusMap.end())
+		assert(!"CHpMpBuffCanvas_Find_CurActor_issue");
+
+	return Pair->second;
 }
 
 CTrunWinCanvas * CTrunWinCanvas::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

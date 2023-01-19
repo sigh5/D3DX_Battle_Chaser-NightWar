@@ -33,8 +33,6 @@ void CHpMpBar::Set_MpBarStatus(CStatus * pStatus)
 
 HRESULT CHpMpBar::Initialize_Prototype()
 {
-
-
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
@@ -94,7 +92,6 @@ void CHpMpBar::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
-	
 	
 	if (m_pTaskStatus != nullptr && m_bHit)
 	{

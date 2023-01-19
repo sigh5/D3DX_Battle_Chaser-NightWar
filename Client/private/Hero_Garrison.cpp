@@ -84,6 +84,16 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 	return false;
 }
 
+_int CHero_Garrison::Get_RestHpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_HP_POTION);
+}
+
+_int CHero_Garrison::Get_RestMpPotion()
+{
+	return m_pStatusCom[DUNGEON_PLAYER]->Rest_iTemNum(CStatus::ITEM_MP_POSION);
+}
+
 HRESULT CHero_Garrison::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -975,7 +985,7 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 void CHero_Garrison::Use_HpPotion()
 {
 	_int iRandNum = rand() % 20 + 20;
-
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_HP_POTION);
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
 
 	_float4 vPos;
@@ -1019,6 +1029,8 @@ void CHero_Garrison::Use_MpPotion()
 
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_MP_POSION);
+
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
@@ -1098,6 +1110,9 @@ HRESULT CHero_Garrison::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
 		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
 		return E_FAIL;
+
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 15);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, 15);
 
 	return S_OK;
 }
@@ -1179,8 +1194,12 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 150;
+	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
+	StatusDesc.iHp = 300;
 	StatusDesc.iMp = 300;
+	StatusDesc.iExp = 0;
+	StatusDesc.iLevel = 1;
+
 
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
@@ -1638,6 +1657,7 @@ void CHero_Garrison::Anim_Die()
 
 void CHero_Garrison::Anim_Viroty()
 {
+	
 	while (!m_CurAnimqeue.empty())
 	{
 		m_CurAnimqeue.pop();

@@ -4,6 +4,8 @@
 #include "GameInstance.h"
 #include "CombatController.h"
 #include "CombatActors.h"
+#include "MyImage.h"
+#include "Player.h"
 
 CUIButton::CUIButton(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CUI(pDevice, pContext)
@@ -27,8 +29,6 @@ void CUIButton::Set_ChildFsmButton(CUIButton * pNodeButton)
 {
 	m_ChildFsmButton.push_back(pNodeButton);
 }
-
-
 
 HRESULT CUIButton::Initialize_Prototype()
 {
@@ -82,9 +82,9 @@ HRESULT CUIButton::Last_Initialize()
 	{
 		m_bRenderActive = true;
 	}
+	
+	
 	RELEASE_INSTANCE(CGameInstance);
-
-
 	m_bLast_Initlize = true;
 	return S_OK;
 }
@@ -105,7 +105,23 @@ void CUIButton::Late_Tick(_double TimeDelta)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 
 	if (nullptr != m_pButtonImage)
+	{
 		m_pButtonImage->Set_RenderActive(m_bRenderActive);
+		
+
+		//if(!lstrcmp(m_pButtonImage->Get_ObjectName(),TEXT("Icon_FsmButton2_Image")))
+		//{ 
+		//	/*CStatus* pStatus = CCombatController::GetInstance()->Get_CurActorStatus();
+
+		//	if (pStatus != nullptr)
+		//	{
+		//		if (pStatus->Get_Level() < 2)
+		//			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(5);
+		//		else
+		//			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
+		//	}*/
+		//}
+	}
 	else
 		return;
 }
@@ -229,6 +245,7 @@ void CUIButton::Change_ICON_Active()
 	{
 		pTexture->Set_SelectTextureIndex(0);
 		m_eFsmState = BUTTON_FSM_NORMALATTACK;
+		static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 
 		if (m_iFontCharOption == 0)
 		{
@@ -259,6 +276,7 @@ void CUIButton::Change_ICON_Active()
 	{
 		if (static_cast<CCombatActors*>(CCombatController::GetInstance()->Get_CurActor())->IsHaveDefence())
 		{
+			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 			pTexture->Set_SelectTextureIndex(1);
 			m_eFsmState = BUTTON_FSM_DEFENCE;
 
@@ -289,9 +307,9 @@ void CUIButton::Change_ICON_Ablity()
 
 	if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button0")))
 	{
+		static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 		pTexture->Set_SelectTextureIndex(2);
 		m_eFsmState = BUTTON_FSM_SKILL1;
-
 
 		m_strPos = _float2(700.f, 575.f);
 		m_vFontColor = _float4(1.f, 1.f, 1.f, 1.f);
@@ -308,12 +326,10 @@ void CUIButton::Change_ICON_Ablity()
 			m_strPos = _float2(695.f, 575.f);
 			m_strSkillName = TEXT("PunchGun");
 		}
-			
-
-		
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
+		static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 		pTexture->Set_SelectTextureIndex(3);
 		m_eFsmState = BUTTON_FSM_SKILL2;
 
@@ -327,19 +343,36 @@ void CUIButton::Change_ICON_Ablity()
 			m_strSkillName = TEXT("Sting");
 		else if (m_iFontCharOption == 2)
 			m_strSkillName = TEXT("Lazor");
-
-		
-
+		else
+			return;
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button2")))
 	{
 		pTexture->Set_SelectTextureIndex(4);
 		m_eFsmState = BUTTON_FSM_ULTIMATE;
 	
-		m_strSkillName = TEXT("Ultimate");
+		
 		m_strPos = _float2(700.f, 675.f);
 		m_vFontColor = _float4(1.f, 0.f, 0.f, 1.f);
 		m_vSFontize = _float2(0.3f, 0.3f);
+
+		CStatus* pStatus = CCombatController::GetInstance()->Get_CurActorStatus();
+
+		if (pStatus != nullptr)
+		{
+			if (pStatus->Get_Level() < 2)
+			{
+				static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(5);
+				m_strSkillName = TEXT("None");
+			}
+			else
+			{
+				static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
+				m_strSkillName = TEXT("Ultimate");
+			}
+		}
+
+
 
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button3")))
@@ -380,17 +413,46 @@ void CUIButton::Change_ICON_Item()
 	if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button0")))
 	{
 		pTexture->Set_SelectTextureIndex(7);
+		
+		_int	iHpNum =	static_cast<CPlayer*>(CCombatController::GetInstance()->
+			Get_CurActor())->Get_RestHpPotion();
+		
+		if (iHpNum <= 0)
+		{
+			m_strSkillName = TEXT("None");
+			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(5);
+		}
+		else
+		{
+			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
+			m_strSkillName = TEXT("HP");
+		}
+		
+		
 		m_eFsmState = BUTTON_FSM_USE_HP_ITEM;		// 체력
-		m_strSkillName = TEXT("HP");
+	
 		m_strPos = _float2(700.f, 575.f);
 		m_vFontColor = _float4(1.f, 0.f, 0.f, 0.f);
 		m_vSFontize = _float2(0.4f, 0.4f);
 	}
 	else if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button1")))
 	{
+		_int	iMpNum = static_cast<CPlayer*>(CCombatController::GetInstance()->
+			Get_CurActor())->Get_RestMpPotion();
+
+		if (iMpNum <= 0)
+		{
+			m_strSkillName = TEXT("None");
+			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(5);
+		}
+		else
+		{
+			m_strSkillName = TEXT("Mana");
+			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
+		}
 		pTexture->Set_SelectTextureIndex(8);
 		m_eFsmState = BUTTON_FSM_USE_MP_ITEM;		// 마나
-		m_strSkillName = TEXT("Mana");
+	
 		m_strPos = _float2(700.f, 625.f);
 		m_vFontColor = _float4(0.f, 0.f, 1.f, 1.f);
 		m_vSFontize = _float2(0.4f, 0.4f);
@@ -404,6 +466,7 @@ void CUIButton::Change_ICON_Item()
 		m_strPos = _float2(700.f, 675.f);
 		m_vFontColor = _float4(1.f, 0.f, 1.f, 1.f);
 		m_vSFontize = _float2(0.4f, 0.4f);
+		static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 	}
 	else
 		Set_RenderActive(false);

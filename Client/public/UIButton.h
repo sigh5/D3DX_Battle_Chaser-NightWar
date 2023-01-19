@@ -53,10 +53,6 @@ public:
 	virtual  void	Set_RenderActive(_bool bActive)override;
 	void			Change_ButtonIcon(const wstring& TextureTag);
 
-
-
-	
-
 private:
 	void			FirstDungeonUIInit();
 
@@ -96,11 +92,11 @@ private:
 	BUTTON_FSM_STATE		m_eFsmState = BUTTON_FSM_STATE_END;
 
 
-	//BUTTON_STATE			m_eActiceType = BUTTON_STATE_END;
+	BUTTON_STATE			m_eActiceType = BUTTON_STATE_END;
 	_uint					m_iFontCharOption = 0;
 private:
 	CUI*					m_pButtonImage = nullptr;
-	vector<CUIButton*>			m_ChildFsmButton;
+	vector<CUIButton*>		m_ChildFsmButton;
 
 	float temp[2] = { 0.f,575.f };
 	float TestSize[2] = { 1.f,1.f };

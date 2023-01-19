@@ -38,6 +38,28 @@ CCombatController::CCombatController()
 	//Safe_AddRef(m_pGameInstace);
 }
 
+CStatus * CCombatController::Get_CurActorStatus() 
+{
+	if (m_pCurentActor == nullptr)
+		return nullptr;
+
+	return Find_CurStatus(m_pCurentActor->Get_ObjectName());
+}
+
+void CCombatController::Setting_Win_Canvas(CCanvas * pCanvas)
+{
+	assert(nullptr != dynamic_cast<CTrunWinCanvas*>(pCanvas)
+		&& "CCombatController::Setting_Win_Canvas");
+
+
+	for (auto& pCurActor : m_CurActorMap)
+	{
+		static_cast<CTrunWinCanvas*>(pCanvas)->Exp_Set_Status(m_ActorsStatusMap);
+	}
+
+
+}
+
 void CCombatController::Scene_Chane_Safe_Release()
 {
 	for (auto& pStatus : m_ActorsStatusMap)
@@ -55,6 +77,7 @@ void CCombatController::Scene_Chane_Safe_Release()
 	}
 	m_CanvasVec.clear();
 
+	
 	m_bVirtory = false;
 	m_pCombatCamera = nullptr;
 	m_pTurnCanvas = nullptr;
@@ -563,6 +586,13 @@ void CCombatController::Mana_Refresh()
 
 void CCombatController::Active_Fsm()
 {
+	if (ImGui::Button("Level 2"))
+	{
+		CStatus* pStatus = Find_CurStatus(m_pCurentActor->Get_ObjectName());
+
+		pStatus->Set_Exp(120);
+	}
+
 
 	
 	To_Idle();
@@ -791,6 +821,8 @@ HRESULT CCombatController::Set_ActorsStatus()
 			assert(!" Error");
 		Safe_AddRef(pStatus);
 		m_ActorsStatusMap.emplace(pActors.second->Get_ObjectName(), pStatus);
+
+	
 	}
 
 	return S_OK;
@@ -902,9 +934,14 @@ void CCombatController::To_Uitimate()
 	if (nullptr == m_pHitActor || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
 		return;
 
-	if (m_iMonster_Player_Option == 0 &&
-		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_ULTIMATE)
+
+	CStatus* pStatus = Find_CurStatus(m_pCurentActor->Get_ObjectName());
+	assert(nullptr != pStatus && "CCombatController::To_Uitimate");
+
+	if (m_iMonster_Player_Option == 0 
+		&&  pStatus->Get_Level() >=2
+		&&  m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ABLILTY
+		&&  m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_ULTIMATE)
 	{
 		Ultimate_Camera_On();
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
@@ -980,15 +1017,16 @@ void CCombatController::To_WideAreaBuff()
 	
 void CCombatController::To_Use_Item()
 {
-	if (m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
-		assert(!"CCombatController::To_Normal_Attack_Issue");
+	if (dynamic_cast<CPlayer*>(m_pCurentActor) == nullptr || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
+		return;
 
-	if (m_iMonster_Player_Option == 0 &&
-		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_HP_ITEM)
+
+	if (static_cast<CPlayer*>(m_pCurentActor)->Get_RestHpPotion() >=0
+		&& m_iMonster_Player_Option == 0 
+		&& m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
+		&& m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_HP_ITEM)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
-
 		m_pTurnStateButtonCanvas->Set_ButtonState(BUTTON_STATE_END);
 		m_pTurnStateButtonCanvas->Set_ButtonFsmState(BUTTON_FSM_STATE_END);
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
@@ -996,9 +1034,10 @@ void CCombatController::To_Use_Item()
 		HPMp_Update(m_pCurentActor);
 		//m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 	}
-	else if (m_iMonster_Player_Option == 0 &&
-		m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
-		&&m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
+	else if (static_cast<CPlayer*>(m_pCurentActor)->Get_RestMpPotion() >= 0
+		&& m_iMonster_Player_Option == 0 
+		&& m_pTurnStateButtonCanvas->Get_ButtonState() == BUTTON_STATE_ITEM
+		&& m_pTurnStateButtonCanvas->Get_ButtonFsmState() == BUTTON_FSM_USE_MP_ITEM)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
 

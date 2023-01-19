@@ -735,7 +735,7 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 1000;
+	StatusDesc.iHp = 500;
 	StatusDesc.iMp = 125;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -953,17 +953,24 @@ void CSkeleton_Naked::Anim_Heavy_Hit()
 
 void CSkeleton_Naked::Anim_Die()
 {
+	
+
 	m_iTurnCanvasOption = 1;
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2, 1.f });
 	m_CurAnimqeue.push({ 18, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+	
 	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
 	{
 		Safe_Release(*iter);
 		iter = m_MonsterParts.erase(iter);
 	}
 	m_MonsterParts.clear();
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
 }
 
 void CSkeleton_Naked::Anim_Viroty()
