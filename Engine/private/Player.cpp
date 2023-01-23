@@ -134,6 +134,19 @@ _bool CPlayer::IsCaptin()
 	return false;
 }
 
+void CPlayer::Get_CaptinPlayer_Item(class CStatus* pStatus)
+{
+	_int iRandNum = rand() % 2;
+	_int iItemNum = rand() % 3 + 1;
+
+	if (0 == iRandNum)		// HP
+		pStatus->Add_ItemID(CStatus::ITEM_HP_POTION, iItemNum);
+	else
+		pStatus->Add_ItemID(CStatus::ITEM_MP_POSION, iItemNum);
+
+
+}
+
 void CPlayer::Use_HpPotion()
 {
 	

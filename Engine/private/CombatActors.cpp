@@ -120,6 +120,9 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 		switch (eWeaponOption)
 		{
 		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PULPLE:
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
 			break;
 		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL:
 			(*iCurDamage) += 8;
@@ -156,6 +159,10 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 		 return true;
 	 }
 	return false;
+}
+
+void CCombatActors::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
+{
 }
 
 

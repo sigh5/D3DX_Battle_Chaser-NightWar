@@ -49,7 +49,7 @@ public: /*For.Dungeon*/
 	virtual	  void		HighLightChar()override;
 	virtual	  void		NormalLightCharUI()override;
 	virtual	  void		Dungeon_Tick(_double TimeDelta)override;;
-
+	
 public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
@@ -76,7 +76,8 @@ public:  /*For.Combat*/
 
 	virtual void	  Use_HpPotion()override;
 	virtual void	  Use_MpPotion()override;
-							
+	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
+
 	void			  Anim_Frame_Create_Control();
 
 private:
@@ -97,7 +98,7 @@ private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Ready_Parts_Combat();
-
+	virtual		void		Calculator_HitDamage()override;	/*충돌시 함수*/
 
 public:
 	void					Anim_Idle();
@@ -136,6 +137,7 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_SKILL;
 
 	_bool			m_bOnceStop = false;
+	_bool			m_bUltimateCam = false;
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
 	string			m_BoneTag = "";

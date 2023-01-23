@@ -198,47 +198,49 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
+	if (m_bModelRender)
 	{
-		if ((*iter) != nullptr)
-			(*iter)->Late_Tick(TimeDelta);
-
-		if (dynamic_cast<CBuff_Effect*>((*iter)) != nullptr)
+		for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
 		{
-			if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+			if ((*iter) != nullptr)
+				(*iter)->Late_Tick(TimeDelta);
+
+			if (dynamic_cast<CBuff_Effect*>((*iter)) != nullptr)
 			{
-				Safe_Release(*iter);
-				iter = m_MonsterParts.erase(iter);
+				if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+				{
+					Safe_Release(*iter);
+					iter = m_MonsterParts.erase(iter);
+				}
+				else
+					++iter;
 			}
 			else
 				++iter;
 		}
-		else
-			++iter;
-	}
 
-	CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
-	auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
+		CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
+		auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
 
-	for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
-	{
-		if (Buff_iter == m_vecBuffImage.end())
+		for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
 		{
-			if (*iter != nullptr)
-				(*iter)->Late_Tick(TimeDelta);
+			if (Buff_iter == m_vecBuffImage.end())
+			{
+				if (*iter != nullptr)
+					(*iter)->Late_Tick(TimeDelta);
 
-			++iter;
-		}
-		else
-		{
-			Safe_Release(*iter);
-			iter = m_vecBuffImage.erase(iter);
-			Buff_iter = m_vecBuffImage.end();
+				++iter;
+			}
+			else
+			{
+				Safe_Release(*iter);
+				iter = m_vecBuffImage.erase(iter);
+				Buff_iter = m_vecBuffImage.end();
+			}
+
 		}
 
 	}
-	
-
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -583,6 +585,18 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 40))
 	{
 		Create_BuffEffect();
+
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 0);
+		m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+
+		CCombatController::GetInstance()->Wide_Debuff(true, CStatus::DEBUFF_ARMOR);
+
+
+
+
+
 		m_bOnceCreate = true;
 	}
 
@@ -847,7 +861,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 {
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_SWORD;
-	m_iStateDamage = 1;	//rand() % 10 + 10 + m_iStage_Buff_DamgaeUP;
+	m_iStateDamage = rand() % 10 + 10 + m_iStage_Buff_DamgaeUP;
 	m_pMeHit_Player = nullptr;
 	m_iStage_Buff_DamgaeUP = 0;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
@@ -866,7 +880,7 @@ void CSkeleton_Naked::Anim_NormalAttack()
 void CSkeleton_Naked::Anim_Skill1_Attack()
 {
 	m_iHitCount = 2;
-	m_iStateDamage = 1;//rand() % 10 + 20 + m_iStage_Buff_DamgaeUP;
+	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;
 	m_pStatusCom->Use_SkillMp(30);
 	m_iStage_Buff_DamgaeUP = 0;
 	m_LimitDistance = 6.f;
@@ -895,10 +909,7 @@ void CSkeleton_Naked::Anim_Buff()
 {
 	m_iStage_Buff_DamgaeUP = 10;
 
-	CClient_Manager::Create_BuffImage(m_vecBuffImage,
-		_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
-		TEXT("Prototype_GameObject_BuffImage"), 0);
-	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+	
 	m_bOnceCreate = false;
 	m_useBuff = true;
 	m_pStatusCom->Use_SkillMp(10);
@@ -978,6 +989,17 @@ void CSkeleton_Naked::Anim_Viroty()
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
+
+	for (auto& pParts : m_MonsterParts)
+		Safe_Release(pParts);
+
+	m_MonsterParts.clear();
+
 
 }
 

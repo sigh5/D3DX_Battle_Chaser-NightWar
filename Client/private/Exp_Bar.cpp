@@ -21,7 +21,10 @@ void CExp_Bar::Set_ExpBarStatus(CStatus * pStatus)
 	m_pMyStatus = pStatus;
 
 	m_fOldRatio = m_pMyStatus->Get_ExpRatio();
-	_int iRandomExp =  max(rand() % 100, 30);
+
+	_int iRandRand = rand() % 150;
+
+	_int iRandomExp =  max(iRandRand, 40);
 	pStatus->Set_Exp(iRandomExp);
 	m_fCurRatio = m_pMyStatus->Get_ExpRatio();
 

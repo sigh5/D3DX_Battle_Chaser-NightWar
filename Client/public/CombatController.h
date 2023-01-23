@@ -2,7 +2,7 @@
 #include "Client_Defines.h"
 #include "Base.h"
 #include "BaseDelegater.h"
-
+#include "Status.h"
 /* 
 	Combat_Level의 전체적인 턴적용
 	몬스터와 플레이어의 순서(정하기) 
@@ -47,6 +47,9 @@ public:
 
 	 void				Setting_Win_Canvas(CCanvas* pCanvas);
 
+/*for_Tool*/
+	 CGameObject*				Get_Player(wstring pName);
+
 
 	 map<const wstring, CGameObject*>* Get_CurActorMap() { return &m_CurActorMap; }
 
@@ -61,6 +64,8 @@ public:  /*Combat Logic*/
 	void	Status_CanvasInit();
 	void	Late_Tick(_double TimeDelta);
 	void	Active_Fsm();
+
+	void	Wide_Debuff(_bool bIsPlayer, CStatus::DEBUFFTYPE eDebuffOption);
 
 
 	void	HPMp_Update(CGameObject* pHiter);
@@ -80,6 +85,7 @@ public:	/*Reset*/
 	
 	/*Camera*/
 	void	Camera_Shaking();
+	void	Camera_ShortShaking();
 	void	Camera_Zoom_Out();
 	void	Camera_Zoom_In();
 	void	UI_Shaking(_bool bShaking);

@@ -9,17 +9,24 @@ class CGameObject;
 END
 
 BEGIN(Client)
-class CCamera_Combat final: public CCamera
+class CCamera_Combat final : public CCamera
 {
 public:
 	enum	CameraTarget {
-		CameraTarget_CurActor, CameraTarget_Hiter, CameraTarget_recover, CameraTarget_END};
+		CameraTarget_CurActor, CameraTarget_Hiter, CameraTarget_recover, CameraTarget_END
+	};
+
+	enum	UlTIMATE_TARGET
+	{
+		UlTIMATE_TARGET_KNOLAN, UlTIMATE_TARGET_ALUMON, UlTIMATE_TARGET_CALLIBRETTO, UlTIMATE_TARGET_BOSS, UlTIMATE_TARGET_END
+	};
+
 
 private:
 	CCamera_Combat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCamera_Combat(const CCamera_Combat& rhs);
 	virtual ~CCamera_Combat() = default;
-
+	
 public:
 	void	Set_ZoomMoveOption(_int iZoomMove) {
 		m_bZoomMoveOption = (CameraTarget)(iZoomMove);
@@ -27,8 +34,9 @@ public:
 	}
 
 	void	Set_CameraShaking_Active(_bool bCameraShaking) { m_bCameraShakingActive = bCameraShaking; }
-	void	Ready_CameraShaking(_float fShakeTime, _float fMagnitude)
+	void	Ready_CameraShaking(_float fShakeTime, _float fMagnitude,_bool bX=true)
 	{
+		m_bXShaking = bX;
 		m_fCurShakeTime = 0.f;
 		m_fShakeTime = fShakeTime;
 		m_fMagnitude = fMagnitude;
@@ -46,16 +54,28 @@ public:
 	void	Camera_ZoomIn_CurActor(_double TimeDelta);
 	void	Camera_ZoomIn_HitActor(_double TimeDelta);
 	void	Camera_ZoomOut(_double TimeDelta);
-	
+
 
 	void	UltimateStart_CameraWork(CGameObject* pCurActor);
 	void	Ultimate_EndCameraWork();
+
+	void	Camera_UltiMate_ZoomTick(_double TimeDelta);
 
 
 
 private:
 	HRESULT SetUp_Components();
 	void	Camera_Shaking(_double TimeDelta);
+
+	void	Reset_Ultimate_Cam()
+	{
+		for (_uint i = 0; i < UlTIMATE_TARGET_END; ++i)
+		{
+			m_bUltimateCamWorkTick[i] = false;
+		}
+	}
+
+
 
 private:
 	_float					m_CameraDistanceX = 0.f;
@@ -73,15 +93,15 @@ private:
 
 	_bool					m_bZoomHiter = false;
 	_float					m_fZoomActor_to_Hiter_Timer = 0.f;
-	
+
 	_float					m_fZoomHiter_to_Actor_Timer = 0.f;
 	_bool					m_bZoomFinish = false;
 	_float4					m_vOriginPos;
-	_bool					m_bAlumonCameraOn = false;
-
-
 	_float4					m_vUltimatePos;
 
+
+	_bool					m_bUltimateCamWorkTick[UlTIMATE_TARGET_END] = {false};
+	_bool					m_bXShaking = false;
 	// shake
 	_float m_fShakeTime=0.f;
 	_float m_fCurShakeTime=0.f;

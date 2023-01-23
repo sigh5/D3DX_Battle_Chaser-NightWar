@@ -56,6 +56,7 @@ void CChestBox::Tick(_double TimeDelta)
 	if (m_pColliderCom->Collision(pCaptinColl) && pGameInstance->Key_Down(DIK_F))
 	{
 		m_pModelCom->Set_AnimIndex(2);
+		Get_Captin_Player_Item();
 	}
 
 	RELEASE_INSTANCE(CPlayerController);
@@ -85,12 +86,18 @@ HRESULT CChestBox::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
-
-#ifdef _DEBUG
-	m_pColliderCom->Render();
-
-#endif // !_DEBUG
 	return S_OK;
+}
+
+void CChestBox::Get_Captin_Player_Item()
+{
+	CPlayer* pCaptinPlayer = 		CPlayerController::GetInstance()->Get_Captin();
+
+	CStatus* pCaptinStatus = static_cast<CStatus*>(pCaptinPlayer->Get_Component(TEXT("Com_StatusDungeon")));
+
+	assert(nullptr != pCaptinStatus && "CChestBox::Get_Captin_Player_Item");
+
+	pCaptinPlayer->Get_CaptinPlayer_Item(pCaptinStatus);
 }
 
 HRESULT CChestBox::SetUp_Components()

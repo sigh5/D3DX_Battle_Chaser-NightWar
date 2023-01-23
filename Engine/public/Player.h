@@ -43,6 +43,8 @@ public: /*For.PlayerController*/
 	virtual _uint		Get_AnimationIndex() { return 0; }
 	void				SyncAnimation(_uint iAnimIndex) { m_iAnimIndex = iAnimIndex; }
 	_bool				IsCaptin();
+	void				Get_CaptinPlayer_Item(class CStatus* pStatus);
+
 
 public: /*For.Combat*/
 	virtual void				Use_HpPotion();

@@ -57,6 +57,8 @@ public:  /*For.Combat*/
 	void			  MovingAnimControl(_double TimeDelta);
 	virtual	   void	  Fsm_Exit()override;
 	void			  Intro_Exit();
+	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
+	virtual		void  Calculator_HitDamage()override;	/*충돌시 함수*/
 
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
@@ -88,6 +90,8 @@ private: /*Create_Effect*/
 	virtual void	    Use_HpPotion()override;
 	virtual void	    Use_MpPotion()override;
 	
+
+
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -107,6 +111,7 @@ private:
 	_bool					m_bBulletShoot = false;
 	_bool					m_bCreateSmoke = true;
 	_bool					m_bLazorStop = true;
+	_bool					m_bUltimateCam = false;
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();

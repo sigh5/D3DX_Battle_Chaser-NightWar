@@ -52,6 +52,8 @@ void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc, CBone * pSocket
 
 }
 
+
+
 void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber)
 {
 	m_bUseGlow = bUseGlow;
@@ -130,19 +132,6 @@ void CBuff_Effect::Tick(_double TimeDelta)
 
 
 
-	if (m_bUseGlow)
-	{
-		if (m_fGlowStrength >= 1.f)
-			m_bIsChange = true;
-		else if (m_fGlowStrength <= 0)
-			m_bIsChange = false;
-
-		if (m_bIsChange == true)
-			m_fGlowStrength += (_float)TimeDelta * -1.f;
-		else
-			m_fGlowStrength += (_float)TimeDelta;
-	}
-
 
 
 	if (m_pVIBufferCom->UV_Move_Tick(TimeDelta) && m_Client_BuffEffect_Desc.bIsMainTain ==false)
@@ -177,6 +166,19 @@ void CBuff_Effect::Tick(_double TimeDelta)
 	}
 	
 
+
+	if (m_bUseGlow)
+	{
+		if (m_fGlowStrength >= 1.f)
+			m_bIsChange = true;
+		else if (m_fGlowStrength <= 0)
+			m_bIsChange = false;
+
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f;
+		else
+			m_fGlowStrength += (_float)TimeDelta;
+	}
 
 
 

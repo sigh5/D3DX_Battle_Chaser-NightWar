@@ -41,7 +41,7 @@ public:
 	_bool			Is_DebuffBlend(class CStatus* pStatus,CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag);
 	
 
-
+	virtual void			Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption);
 
 
 public:
@@ -127,7 +127,7 @@ protected:
 	_bool							m_bModelRender = true;
 	
 	_int							m_iWideAttackDamgae = 0;
-	
+	wstring							m_DebuffName = TEXT("");
 
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

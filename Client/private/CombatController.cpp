@@ -23,6 +23,8 @@
 #include "Explain_FontMgr.h"
 #include "CombatMap.h"
 
+
+
 #include "MyImage.h"
 
 
@@ -58,6 +60,11 @@ void CCombatController::Setting_Win_Canvas(CCanvas * pCanvas)
 	}
 
 
+}
+
+CGameObject* CCombatController::Get_Player(wstring pName)
+{
+	return	Find_CurActor(pName);
 }
 
 void CCombatController::Scene_Chane_Safe_Release()
@@ -459,7 +466,6 @@ void CCombatController::Ultimate_Camera_On()
 	{
 		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
 		{
-			//m_CombatMapVec.push_back(pCanvas);
 			continue;
 		}
 		else
@@ -616,6 +622,35 @@ void CCombatController::Active_Fsm()
 	
 }
 
+void CCombatController::Wide_Debuff(_bool bIsPlayer, CStatus::DEBUFFTYPE eDebuffOption)
+{
+	if (bIsPlayer == true)
+	{
+		
+		for (auto& pPlayer : m_CurActorMap)
+		{
+			if (dynamic_cast<CPlayer*>(pPlayer.second) == nullptr)
+				continue;
+
+			static_cast<CCombatActors*>(pPlayer.second)->Create_Wide_Debuff(eDebuffOption);
+		}
+
+	}
+	else
+	{
+		/*	for (auto& pMonster : m_CurActorMap)
+			{
+				if (dynamic_cast<CMonster*>(pMonster.second) == nullptr)
+					continue;
+
+				pMonster.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
+				static_cast<CCombatActors*>(pMonster.second)->Set_WideAttackDamage(iDamage);
+			}*/
+	}
+
+
+}
+
 void CCombatController::HPMp_Update(CGameObject* pHiter)
 {
 	for (auto &Canvas : m_CanvasVec)
@@ -652,6 +687,12 @@ void CCombatController::Render_StopCanvas()
 void CCombatController::Camera_Shaking()
 {
 	m_pCombatCamera->Ready_CameraShaking(0.5f, 0.1f);
+	m_pCombatCamera->Set_CameraShaking_Active(true);
+}
+
+void CCombatController::Camera_ShortShaking()
+{
+	m_pCombatCamera->Ready_CameraShaking(0.25f, 0.1f,true);
 	m_pCombatCamera->Set_CameraShaking_Active(true);
 }
 

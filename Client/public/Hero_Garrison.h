@@ -58,7 +58,7 @@ public:  /*For.Combat*/
 	virtual	  void		Fsm_Exit()override;
 	virtual	  void		Defence_Exit()override;
 	void				MovingAnimControl(_double TimeDelta);
-
+	virtual void		Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 public:	 /*Create_Effect*/
 	virtual void		Create_Hit_Effect()override;
 	virtual void		Create_Defence_Effect_And_Action()override;
@@ -78,6 +78,8 @@ public:	 /*Create_Effect*/
 	virtual void	    Use_HpPotion()override;
 	virtual void	    Use_MpPotion()override;
 
+	virtual		void		Calculator_HitDamage();
+	virtual		void		Is_Hit_DebuffSkill();
 public:
 	virtual	  _bool	  Is_Dead()override;
 	_int			  Is_MovingAnim();
@@ -119,6 +121,7 @@ private:
 	_bool			m_bRun = false;
 	_bool			m_bCreateDefenceTimer = false;
 	_float			m_fDefenceFsmTimer = 0.f;
+	_bool			m_bUltimateCam = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;

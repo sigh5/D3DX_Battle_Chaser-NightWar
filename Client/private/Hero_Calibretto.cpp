@@ -50,27 +50,27 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
+		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 6.f;
-		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(pCurActorWepon->Get_WeaponDamage());
 		
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 		
-		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 		
-	
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		//CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+	
 		CCombatController::GetInstance()->UI_Shaking(true);
-		
+		Calculator_HitDamage();
+
 		return true;
 	}
 	return false;
@@ -166,16 +166,28 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			}*/
 
 
-		/*static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
+		//static float ffPos[3] = {};
+		//static float ffScale[3] = {};
+		//static char  szName[MAX_PATH] = "";
+		//ImGui::InputFloat3("SkillPos", ffPos);
+		//ImGui::InputFloat3("SkillScale", ffScale);
 
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);*/
+		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		//ImGui::InputText("TextureName", szName, MAX_PATH);
 
-		//if (ImGui::Button("Create_Skill"))
+		////if (ImGui::Button("Create_Skill"))
+		////{
+		////	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		////	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+
+		////	m_TextureTag = Texture_NameTag;
+		////	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		////	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+
+		////	Create_Test_TextureObj();		// Test
+
+		////}
+		//if (ImGui::Button("Create_Effect"))
 		//{
 		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
 		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
@@ -184,27 +196,15 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
 		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-		//	Create_Test_TextureObj();		// Test
+		//	//Create_Skill2_Beam();
 
+		//	Create_Test_Effect();		// Test
+		//	//Create_Skill1_Bullet();
+		//	//Create_Skill1_Bullet_End();
+		//	//Create_Test_Rect_Effect();
 		//}
-	//	if (ImGui::Button("Create_Effect"))
-	//	{
-	//		_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-	//		MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-	//		m_TextureTag = Texture_NameTag;
-	//		m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-	//		m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
-
-	//		//Create_Skill2_Beam();
-
-	//		Create_Test_Effect();		// Test
-	//		//Create_Skill1_Bullet();
-	//		//Create_Skill1_Bullet_End();
-	//		//Create_Test_Rect_Effect();
-	//	}
-
-	//	RELEASE_INSTANCE(CGameInstance);
+		//RELEASE_INSTANCE(CGameInstance);
 
 		for (auto& pBuffImage : m_vecBuffImage)
 		{
@@ -510,6 +510,11 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		m_bLazorStop = true;
 		CCombatController::GetInstance()->Wide_Attack(false,86);
 	}
+	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(46, 92))
+	{
+		Create_Ultimate_StartCam_Effect();
+		m_bUltimateCam = true;
+	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	
 	{
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
@@ -662,8 +667,8 @@ HRESULT CHero_Calibretto::SetUp_Components()
 		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
 		return E_FAIL;
 
-	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 20);
-	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, 10);
+	/*m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 20);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, 10);*/
 
 
 	return S_OK;
@@ -828,7 +833,8 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 	m_bBulletShoot = false;
 	m_bCreateSmoke = false;
 	m_iStage_Buff_DamgaeUP = 0;
-	m_bLazorStop = true;
+	//m_bLazorStop = true;
+	m_bLazorStop = false;
 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 28, 1.f });		// Âð °ø°Ý±Ã Brust??
@@ -839,7 +845,8 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 void CHero_Calibretto::Anim_Uitimate()
 {
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
-	Create_Ultimate_StartCam_Effect();
+	//Create_Ultimate_StartCam_Effect();
+	m_bUltimateCam = false;
 	m_bBuffEffectStop = true;
 	m_iStateDamage = 50;			// 20*2 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(100);
@@ -927,6 +934,18 @@ void CHero_Calibretto::Anim_Heavy_Hit()
 
 void CHero_Calibretto::Anim_Flee()
 {
+
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
+	m_pEffectParts.clear();
+
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+
 	m_CurAnimqeue.push({ 43, 1.f });
 	m_CurAnimqeue.push({ 42, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -949,11 +968,27 @@ void CHero_Calibretto::Anim_Die()
 	}
 	m_pEffectParts.clear();
 
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
 }
 
 void CHero_Calibretto::Anim_Viroty()
 {
 	
+	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+	}
+	m_pEffectParts.clear();
+
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
+
 
 	while (!m_CurAnimqeue.empty())
 	{
@@ -1142,7 +1177,7 @@ void CHero_Calibretto::Create_Test_Effect()
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
 
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
 	RELEASE_INSTANCE(CGameInstance);
 
 }
@@ -1566,12 +1601,12 @@ void CHero_Calibretto::Create_Ultimate_StartCam_Effect()
 	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(29.f, -9.5f, 60.f,1.f);
-	BuffDesc.vScale = _float3(120.f, 120.f, 120.f);
+	BuffDesc.vPosition = _float4(13.f, 1.6f, 29.5f, 1.f);
+	BuffDesc.vScale = _float3(60.f, 30.f, 60.f);
 	BuffDesc.vAngle = 90.f;
-	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.fCoolTime = 7.f;
 	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 8;
+	BuffDesc.iFrameCnt = 10;
 	BuffDesc.bIsUp = false;
 
 	m_pEffectParts.push_back(pGameObject);
@@ -1738,6 +1773,67 @@ void CHero_Calibretto::Use_MpPotion()
 	
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CHero_Calibretto::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
+{
+	_uint iTextureNum = 0;
+
+	switch (eDebuffOption)
+	{
+	case Engine::CStatus::DEBUFF_FIRE:
+		break;
+	case Engine::CStatus::DEBUFF_BLEED:
+		break;
+	case Engine::CStatus::DEBUFF_ARMOR:
+		iTextureNum = 4;
+		m_DebuffName = TEXT("armor down");
+		break;
+	case Engine::CStatus::DEBUFF_MAGIC:
+		break;
+	case Engine::CStatus::BUFF_DAMAGE:
+		break;
+	case Engine::CStatus::DEBUFF_NONE:
+		break;
+	default:
+		break;
+	}
+
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), iTextureNum);
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(eDebuffOption, true);
+	
+
+}
+
+void CHero_Calibretto::Calculator_HitDamage()
+{
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.y += 8.f;
+	CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
+
+	if (Is_DebuffBlend(m_pStatusCom[COMBAT_PLAYER], m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
+	{
+		_float4 vPos2;
+		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos2.y += 8.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+
+	}
+	else if (m_iGetDamageNum >= 50)
+	{
+		m_bIsHeavyHit = true;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+	}
+
+
+	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+
+
+	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 }
 
 

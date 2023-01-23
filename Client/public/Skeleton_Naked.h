@@ -98,7 +98,7 @@ private:
 	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	_float					m_fHitPerSecond = 1.f;
 	_int					m_iSign = 1;
-	wstring					m_DebuffName = TEXT("");
+
 
 	WeaponType				m_eWeaponType = WEAPON_SWORD;
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;

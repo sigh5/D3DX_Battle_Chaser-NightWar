@@ -27,6 +27,10 @@ public:
 	virtual HRESULT Render();
 
 private:
+	void	Get_Captin_Player_Item();
+
+
+private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;

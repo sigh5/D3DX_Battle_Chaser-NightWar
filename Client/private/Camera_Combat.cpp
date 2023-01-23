@@ -77,9 +77,10 @@ void CCamera_Combat::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+	Camera_UltiMate_ZoomTick(TimeDelta);
+
 	Camera_Shaking(TimeDelta);
 
-	
 	switch (m_bZoomMoveOption)
 	{
 	case Client::CCamera_Combat::CameraTarget_CurActor:
@@ -97,29 +98,37 @@ void CCamera_Combat::Tick(_double TimeDelta)
 		break;
 	}
 
-	//if (m_bAlumonCameraOn)
-	//{
-	//	CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
-	//	_vector pTargetPos = pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-	//	m_pTransformCom->Chase(pTargetPos, CClient_Manager::TimeDelta, 5.f);
-	//	RELEASE_INSTANCE(CCombatController);
-	//}
 
-	//CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+	if (ImGui::Button("Knoaln CameraWork"))
+	{
 
-	//if (pCombatCotroller->Get_CurActor() != nullptr)
-	//{
-	//	_vector vPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
-
-	//	_vector vTargetPos = pCombatCotroller->Get_CurActor()->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
-
-	//	_float vDir = XMVectorGetX(XMVector3Length(vTargetPos - vPos));
-
-	//	_bool b = false;
+		
+	}
 
 
-	//}
-	//RELEASE_INSTANCE(CCombatController);
+	/*if(m_bUltimateCamWorkTick)
+	{
+
+		CGameObject* pPlayer = CCombatController::GetInstance()->Get_Player(TEXT("Hero_Gully"));
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, pPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+
+		m_pTransformCom->Chase(XMLoadFloat4(&vPos), TimeDelta* 10.f, 10.f);
+	}
+	else
+	{
+		m_LeprFov += _float(TimeDelta * 10.f);
+		if (m_fFov <= m_fFixFov)
+		{
+			m_fFov += m_LeprFov;
+		}
+
+		m_pTransformCom->Chase(XMLoadFloat4(&m_vOriginPos), TimeDelta, 3.f);
+	}*/
+
+
+	
 
 
 #ifdef _DEBUG
@@ -198,8 +207,6 @@ void CCamera_Combat::Tick(_double TimeDelta)
 void CCamera_Combat::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-
-	
 }
 
 HRESULT CCamera_Combat::Last_Initialize()
@@ -226,14 +233,22 @@ void CCamera_Combat::Camera_Shaking(_double TimeDelta)
 
 	_float4		vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
+	
 
 	if (m_fShakeTime > m_fCurShakeTime)
 	{
 		m_fCurShakeTime += _float(TimeDelta);
-		_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
-		_float ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
-
+		_float ShakefX = 0.f;
+		_float ShakefY = 0.f;
+		if (false==m_bXShaking)
+		{ 
+			ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+			ShakefY = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+		}
+		else
+		{
+			ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
+		}
 		_matrix matLocal = XMMatrixTranslation(ShakefX, ShakefY, 0.f);
 		
 		_matrix matWorld = m_pTransformCom->Get_WorldMatrix();
@@ -250,6 +265,7 @@ void CCamera_Combat::Camera_Shaking(_double TimeDelta)
 	{
 		m_pTransformCom->Set_WorldMatrix(m_WorldMat);
 		m_bCameraShakingActive = false;
+		m_bXShaking = false;
 	}
 
 
@@ -287,7 +303,6 @@ void CCamera_Combat::Camera_ZoomIn_CurActor(_double TimeDelta)
 
 	RELEASE_INSTANCE(CCombatController);
 }
-
 
 void CCamera_Combat::Camera_ZoomIn_HitActor(_double TimeDelta)
 {
@@ -339,7 +354,7 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 	_float4x4 UntiMat;
 	if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Gully")))
 	{
-		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+		/*matScale = XMMatrixScaling(1.f, 1.f, 1.f);
 
 		matRotX = XMMatrixRotationX(XMConvertToRadians(18.f));
 		matRotY = XMMatrixRotationY(XMConvertToRadians(21.7f));
@@ -349,11 +364,14 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 
 		XMStoreFloat4x4(&UntiMat, matWorld);
-		m_pTransformCom->Set_WorldMatrix(UntiMat);
+		m_pTransformCom->Set_WorldMatrix(UntiMat);*/
+
+		m_bUltimateCamWorkTick[UlTIMATE_TARGET_KNOLAN] = true;
+
 	}
 	else if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Alumon")))
 	{
-		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+		/*matScale = XMMatrixScaling(1.f, 1.f, 1.f);
 
 		matRotX = XMMatrixRotationX(XMConvertToRadians(20.115f));
 		matRotY = XMMatrixRotationY(XMConvertToRadians(18.5f));
@@ -363,12 +381,13 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 
 		XMStoreFloat4x4(&UntiMat, matWorld);
-		m_pTransformCom->Set_WorldMatrix(UntiMat);
-		m_bAlumonCameraOn = true;
+		m_pTransformCom->Set_WorldMatrix(UntiMat);*/
+		m_bUltimateCamWorkTick[UlTIMATE_TARGET_ALUMON] = true;
+
 	}
 	else if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
 	{
-		matScale = XMMatrixScaling(1.f, 1.f, 1.f);
+	/*	matScale = XMMatrixScaling(1.f, 1.f, 1.f);
 
 		matRotX = XMMatrixRotationX(XMConvertToRadians(34.f));
 		matRotY = XMMatrixRotationY(XMConvertToRadians(48.2f));
@@ -378,9 +397,9 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 		matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 
 		XMStoreFloat4x4(&UntiMat, matWorld);
-		m_pTransformCom->Set_WorldMatrix(UntiMat);
-		m_bAlumonCameraOn = true;
-		
+		m_pTransformCom->Set_WorldMatrix(UntiMat);*/
+	
+		m_bUltimateCamWorkTick[UlTIMATE_TARGET_CALLIBRETTO] = true;
 	}
 	else
 		return;
@@ -396,13 +415,53 @@ void CCamera_Combat::Ultimate_EndCameraWork()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	pGameInstance->Set_Timedelta(TEXT("Timer_60"), 1.0);
 	RELEASE_INSTANCE(CGameInstance);
-	m_bAlumonCameraOn = false;
-
+	Reset_Ultimate_Cam();
 	
 	
 }
 
+void CCamera_Combat::Camera_UltiMate_ZoomTick(_double TimeDelta)
+{
+	if (   !m_bUltimateCamWorkTick[UlTIMATE_TARGET_KNOLAN] 
+		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_ALUMON]
+		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_CALLIBRETTO]
+		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS])
+		return;
+	
+	CGameObject* pPlayer = CCombatController::GetInstance()->Get_CurActor();
 
+
+	_float4 vPos;
+	_float	vRange = 0.f;
+	XMStoreFloat4(&vPos, pPlayer->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+
+	if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_KNOLAN])
+	{
+		vPos.x -= 5.f;
+		vRange = 10.f;
+		
+	}
+	else if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_ALUMON])
+	{
+		vPos.x -= 2.f;		// Alumon ÀºÇÕ°Ý
+		vRange = 10.f;
+		
+	}
+	else if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_CALLIBRETTO])
+	{
+		vPos.x -= 5.f;
+		vRange = 20.f;
+
+	}
+	else if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS])
+	{
+
+	}
+	
+	m_pTransformCom->Chase(XMLoadFloat4(&vPos), TimeDelta* 20.f, vRange);
+
+	//m_pTransformCom->Chase(XMLoadFloat4(&vPos), TimeDelta* 30.f, 10.f);
+}
 
 HRESULT CCamera_Combat::SetUp_Components()
 {
