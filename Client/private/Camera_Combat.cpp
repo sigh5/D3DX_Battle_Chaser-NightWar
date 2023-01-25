@@ -58,7 +58,7 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 	matRotX = XMMatrixRotationX(XMConvertToRadians(17.f));
 	matRotY = XMMatrixRotationY(XMConvertToRadians(47.f));
 	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
-	matTrans = XMMatrixTranslation(-7.f, 21.7f, -11.88f);
+	matTrans = XMMatrixTranslation(-6.5f, 21.7f, -13.5f);
 
 	m_matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 
@@ -67,7 +67,7 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 	m_pTransformCom->Set_WorldMatrix(m_WorldMat);
 
 
-	m_vOriginPos = _float4(-7.f, 21.7f, -11.88f, 1.f);
+	m_vOriginPos = _float4(-6.5f, 21.7f, -13.5f, 1.f);
 
 	return S_OK;
 }
@@ -98,12 +98,6 @@ void CCamera_Combat::Tick(_double TimeDelta)
 		break;
 	}
 
-
-	if (ImGui::Button("Knoaln CameraWork"))
-	{
-
-		
-	}
 
 
 	/*if(m_bUltimateCamWorkTick)

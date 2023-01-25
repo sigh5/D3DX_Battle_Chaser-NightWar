@@ -225,6 +225,26 @@ HRESULT CModel::Render(CShader * pShader, _uint iMeshIndex, _uint iShaderIndex, 
 	return S_OK;
 }
 
+HRESULT CModel::Render_BG(CShader * pShader, _uint iMeshIndex, const char * pBoneConstantName, const char * pRenderName)
+{
+	if (!strcmp(m_Meshes[iMeshIndex]->Get_MeshName(), pRenderName))
+	{ 
+		if (nullptr != m_Meshes[iMeshIndex])
+		{
+			if (nullptr != pBoneConstantName)
+			{
+				_float4x4		BoneMatrices[256];
+				m_Meshes[iMeshIndex]->SetUp_BoneMatrices(BoneMatrices, XMLoadFloat4x4(&m_PivotMatrix));
+				pShader->Set_MatrixArray(pBoneConstantName, BoneMatrices, 256);
+			}
+
+			pShader->Begin(1);
+			m_Meshes[iMeshIndex]->Render();
+		}
+	}
+	return S_OK;
+}
+
 _bool CModel::Get_Finished(_uint iAnimIndex)
 {
 	return m_Animations[iAnimIndex]->Get_Finished();

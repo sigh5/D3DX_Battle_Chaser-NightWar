@@ -50,14 +50,14 @@ void CDamageFont::Tick(_double TimeDelta)
 	
 	__super::Tick(TimeDelta);
 
-	if (m_bShaking)
+	/*if (m_bShaking)
 	{
 		_float ShakefX = CClient_Manager::GetRandomFloat(-1.f, 1.f) * m_fMagnitude;
 		m_pVIBufferCom->Tick_Shaking(20.f*TimeDelta, ShakefX);
 	}
-	else
+	else*/
 	{
-		m_pVIBufferCom->Tick(15.f*TimeDelta);
+		m_pVIBufferCom->Tick(25.f*TimeDelta);
 	}
 }
 

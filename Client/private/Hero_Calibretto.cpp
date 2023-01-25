@@ -65,8 +65,7 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
-		}
-		//CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		}		
 	
 		CCombatController::GetInstance()->UI_Shaking(true);
 		Calculator_HitDamage();
@@ -467,9 +466,10 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 6.f;
+		vPos.x -= 1.f;
+		vPos.y += 9.f;
 		_int iRandom = rand() % 5;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum);
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum,1.5f, 1.2f);
 	
 		m_bOnceCreate = true;
 	}
@@ -1309,7 +1309,7 @@ void CHero_Calibretto::Create_Skill2_Beam()
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 10.f;
 	BuffDesc.bIsMainTain = true;
-	BuffDesc.iFrameCnt = 3;
+	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
@@ -1643,8 +1643,11 @@ void CHero_Calibretto::Create_Hit_Effect()
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
-		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 1.5f, 1.f);		// 이미지 교체필요
+		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 	default:
 		break;
 	}
@@ -1701,14 +1704,16 @@ void CHero_Calibretto::Use_HpPotion()
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
-	vPos.x -= 2.f;
+	vPos.x -= 1.f;
 	vPos.y += 9.f;
 	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
 
-	vPos.y += 3.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(2.f, 2.f, 2.f), iRandNum);
 	
+
+
 	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_HP_POTION);
 
 
@@ -1745,13 +1750,13 @@ void CHero_Calibretto::Use_MpPotion()
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
-	vPos.x -= 2.f;
+	vPos.x -= 1.f;
 	vPos.y += 9.f;
 	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
 
-	vPos.y += 3.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(2.f, 2.f, 2.f), iRandNum);
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
@@ -1790,6 +1795,8 @@ void CHero_Calibretto::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 		m_DebuffName = TEXT("armor down");
 		break;
 	case Engine::CStatus::DEBUFF_MAGIC:
+		iTextureNum = 2;
+		m_DebuffName = TEXT("magic down");
 		break;
 	case Engine::CStatus::BUFF_DAMAGE:
 		break;
@@ -1811,8 +1818,8 @@ void CHero_Calibretto::Calculator_HitDamage()
 {
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-
-	vPos.y += 8.f;
+	vPos.x -= 1.f;
+	vPos.y += 9.f;
 	CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
 
 	if (Is_DebuffBlend(m_pStatusCom[COMBAT_PLAYER], m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
@@ -1829,9 +1836,7 @@ void CHero_Calibretto::Calculator_HitDamage()
 		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
 
-
-	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-
+	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum, 1.5f, 1.2f);
 
 	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 }

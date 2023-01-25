@@ -78,7 +78,7 @@ void CDamage_Font_Manager::Tick(_double TimeDelta)
 	}
 	
 
-	if (m_fFontTimer >= 2.5f)
+	if (m_fFontTimer >= 2.0f)
 	{
 		m_bFontUpdate = false;
 		m_fFontTimer = 0.f;
@@ -87,7 +87,7 @@ void CDamage_Font_Manager::Tick(_double TimeDelta)
 
 }
 
-void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDamage)
+void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDamage,_float vSecontPosX, _float vSecontPosY)
 {
 	for (auto& pFont : m_DamageTenVec)
 	{
@@ -105,8 +105,8 @@ void CDamage_Font_Manager::Set_DamageFont(_float4 vPos, _float3 vScale, _int iDa
 	m_vScale = vScale;
 
 	m_vFontSecondPos = vPos;
-	m_vFontSecondPos.x += 0.5f;
-	m_vFontSecondPos.z -= 1.0f;
+	m_vFontSecondPos.x += vSecontPosX;
+	m_vFontSecondPos.z -= vSecontPosY;
 	
 	if (iDamage >= 10)
 	{

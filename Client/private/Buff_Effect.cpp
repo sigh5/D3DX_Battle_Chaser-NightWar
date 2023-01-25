@@ -16,6 +16,7 @@ CBuff_Effect::CBuff_Effect(const CBuff_Effect & rhs)
 void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc)
 {
 	memcpy(&m_Client_BuffEffect_Desc, &Desc, sizeof(BuffEffcet_Client)); 
+	m_bIsFinsishBuffer = false;
 	Reset_CurMartirx();
 }
 

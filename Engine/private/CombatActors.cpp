@@ -65,7 +65,7 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 			pDebuffTag = TEXT("fire critical");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
 			break;
-	
+		
 		default:
 			break;
 		}
@@ -109,7 +109,11 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 			pDebuffTag = TEXT("magic critical");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
 			break;
-	
+		case Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_ATTACK:
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			break;
 		default:
 			break;
 		}
@@ -153,7 +157,7 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIO
 
 
 
-	 if (iChangeValue < *iCurDamage)
+	 if (iChangeValue < (*iCurDamage))
 	 {
 		 pStatus->Set_DebuffOption(eType, false);
 		 return true;

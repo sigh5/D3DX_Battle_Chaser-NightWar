@@ -20,6 +20,9 @@ private:
 	virtual ~CCombatMap() = default;
 
 public:
+	void	Set_ShaderPass(_int iNumber) { m_iShaderPass = iNumber; }
+
+public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
 	virtual HRESULT Last_Initialize()override;
@@ -43,7 +46,7 @@ private:
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
-
+	_uint					m_iShaderPass = 1;
 public:
 	static CCombatMap* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

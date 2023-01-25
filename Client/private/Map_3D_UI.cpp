@@ -91,7 +91,7 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 		m_SceneChaneTimer += (_float)(TimeDelta);
 	}
 
-	if (m_SceneChaneTimer >=1.f)
+	if (m_SceneChaneTimer >= 2.f)
 	{
 		CGameInstance::GetInstance()->Scene_Change();
 	}
@@ -142,11 +142,12 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 			pGameInstance->Load_Object(TEXT("OneMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
 
-			CUI*pCanvas  =static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
-			pGameInstance->Setting_MonsterScene(0);
+			pGameInstance->Setting_MonsterScene(1);		// ¿ø·¡´Â 0
 			CClient_Manager::bIsCollPlayerTo3DUI[0] = true;
-
+			if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
+				assert(!"Coll_CaptinPlayer");
 		}
 		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI1")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[1])
 		{
@@ -156,34 +157,43 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 			pCanvas->Set_RenderActive(false);
 			pGameInstance->Setting_MonsterScene(1);
 			CClient_Manager::bIsCollPlayerTo3DUI[1] = true;
+			if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
+				assert(!"Coll_CaptinPlayer");
 		}
 		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI2")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[2])
 		{
 			pGameInstance->Load_Object(TEXT("twoMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			
+
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
 			pGameInstance->Setting_MonsterScene(2);
+			if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
+				assert(!"Coll_CaptinPlayer");
 			CClient_Manager::bIsCollPlayerTo3DUI[2] = true;
 		}
-		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && !m_bOnce &&  !CClient_Manager::bIsCollPlayerTo3DUI[3])
+		else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI3")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[3])
 		{
 			pGameInstance->Load_Object(TEXT("ThirdMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-			
+
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
 			pGameInstance->Setting_MonsterScene(3);
+			if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
+				assert(!"Coll_CaptinPlayer");
 			CClient_Manager::bIsCollPlayerTo3DUI[3] = true;
 		}
+
+		
+			
 	}
 
-	if (ImGui::IsMouseClicked(1))
+	/*if (ImGui::IsMouseClicked(1))
 	{
 		CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 		pCanvas->Set_RenderActive(true);
-	}
+	}*/
 
 
 	RELEASE_INSTANCE(CPlayerController);
@@ -311,3 +321,26 @@ void CMap_3D_UI::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

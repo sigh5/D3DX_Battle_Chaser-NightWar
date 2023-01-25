@@ -35,7 +35,8 @@ CGameObject * CSkeleton_Naked::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_MonsterParts)
 	{
-		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr
+			&& m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
 
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
@@ -593,10 +594,6 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 
 		CCombatController::GetInstance()->Wide_Debuff(true, CStatus::DEBUFF_ARMOR);
 
-
-
-
-
 		m_bOnceCreate = true;
 	}
 
@@ -839,10 +836,7 @@ void CSkeleton_Naked::Calculator_HitDamage()
 	m_pStatusCom->Take_Damage(m_iGetDamageNum);
 }
 
-void CSkeleton_Naked::Is_Hit_DebuffSkill()
-{
 
-}
 
 void CSkeleton_Naked::Anim_Idle()
 {
@@ -956,16 +950,10 @@ void CSkeleton_Naked::Anim_Heavy_Hit()
 	Set_CombatAnim_Index(m_pModelCom);
 	
 	Create_Heacy_Hit_Effect();
-	
-	
-	
-	
 }
 
 void CSkeleton_Naked::Anim_Die()
 {
-	
-
 	m_iTurnCanvasOption = 1;
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2, 1.f });

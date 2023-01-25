@@ -10,7 +10,6 @@ class CTexture;
 END
 
 BEGIN(Client)
-
 class CMyImage final : public CUI
 {
 

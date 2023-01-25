@@ -633,11 +633,12 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
-			break;
-		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
-			break;
+		
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		default:
 			break;
 		}
@@ -815,6 +816,8 @@ void CHero_Knolan::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 		m_DebuffName = TEXT("armor down");
 		break;
 	case Engine::CStatus::DEBUFF_MAGIC:
+		iTextureNum = 2;
+		m_DebuffName = TEXT("magic down");
 		break;
 	case Engine::CStatus::BUFF_DAMAGE:
 		break;
@@ -1138,7 +1141,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceStop = true;
 
 	}
-	else if (!m_bOnceCreate  && m_pModelCom->Control_KeyFrame_Create(24, 71))
+	else if (!m_bOnceCreate  && m_pModelCom->Control_KeyFrame_Create(24, 68))
 	{
 		m_bOnceCreate = true;
 		m_bOnceStop = false;

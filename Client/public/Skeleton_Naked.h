@@ -65,8 +65,7 @@ private:
 
 private:
 	virtual		void		Calculator_HitDamage()override;	/*충돌시 함수*/
-	virtual		void		Is_Hit_DebuffSkill()override; /* 디버프에 걸렸는 지확인해주는 함수*/
-
+	
 
 public:
 	void					Anim_Idle();

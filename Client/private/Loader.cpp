@@ -47,6 +47,8 @@
 #include "Exp_Bar.h"
 #include "Inventory.h"
 #include "Inventory_Button.h"
+#include "Broken_Image.h"
+
 
 /* For.CombatScene*/
 
@@ -158,8 +160,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 		/* Model */
 #ifdef NOMODLES
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);	
-			
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);
 #else  
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
+		/*CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);*/
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
@@ -436,6 +444,12 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			CTexture::TYPE_END, 19))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Blocker"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/MapBlocker/MapBlocker_%d.png"),		//exp bar 가지고있음
+			CTexture::TYPE_END, 4))))
+		return E_FAIL;
+
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -483,6 +497,11 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Point"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPoint.hlsl"), VTXPOINT_DECLARATION::Elements, VTXPOINT_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Broken_Image"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_Deferred_Test.hlsl"), VTXANIMMODEL_DECLARATION::Elements, VTXANIMMODEL_DECLARATION::iNumElements))))
 		return E_FAIL;
 
 
@@ -734,7 +753,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		CInventory::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Broken_Image"),
+		CBroken_Image::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
+	
 	
 
 	return S_OK;

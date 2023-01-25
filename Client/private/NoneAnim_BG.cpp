@@ -71,6 +71,7 @@ HRESULT CNoneAnim_BG::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		
 		m_pModelCom->Render(m_pShaderCom, i, 0);
 	}
 

@@ -156,7 +156,7 @@ void CExplain_FontMgr::Tick(_double TimeDelta)
 		for (auto& pFont : m_vecExplainFont)
 			pFont->Tick(TimeDelta);
 	}
-	if (m_fFontTimer >= 2.5f)
+	if (m_fFontTimer >= 2.0f)
 	{
 		Reset_Explain_Font();
 		m_bFontExplain_Update = false;
@@ -170,7 +170,7 @@ void CExplain_FontMgr::Tick(_double TimeDelta)
 		for (auto& pFont : m_vecDeBuffFont)
 			pFont->Tick(TimeDelta);
 	}
-	if (m_fDebuffFontTimer >= 2.5f)
+	if (m_fDebuffFontTimer >= 2.0f)
 	{
 		Reset_Debuff_Font();
 		m_bFontDebuff_Update = false;

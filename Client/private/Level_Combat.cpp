@@ -253,6 +253,11 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 	case 1:
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
+
+		pGameInstance->
+			Get_GameObject(LEVEL_COMBAT,
+				pLayerTag, TEXT("Spider_Mana"))->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
+
 		break;
 
 	case 2:

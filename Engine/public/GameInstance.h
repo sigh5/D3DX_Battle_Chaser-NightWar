@@ -88,6 +88,8 @@ public: /* For.Object_Manager */
 	
 	
 	void	Change_Level(_uint iLevleIdx);
+	void	All_Object_RenderActive(_bool bRenderActive);
+
 
 public: /* For.Component_Manager */
 	HRESULT Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, class CComponent* pPrototype);
@@ -129,6 +131,13 @@ public: /* For.Font_Manager */
 public: /* For.Frustum */
 	_bool isInFrustum_WorldSpace(_fvector vWorldPos, _float fRange = 0.f);
 	_bool isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange = 0.f);
+
+
+public: /* For.Target_Manager */
+	ID3D11ShaderResourceView* Get_DepthTargetSRV();
+	ID3D11ShaderResourceView* Get_DiffuseTargetSRV();
+	ID3D11ShaderResourceView* Get_ShadeTargetSRV();
+	ID3D11ShaderResourceView* Get_SpecularTargetSRV();
 
 
 private:

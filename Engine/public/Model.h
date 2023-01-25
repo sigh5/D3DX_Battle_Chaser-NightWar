@@ -43,6 +43,8 @@ public:
 	HRESULT Bind_Material(class CShader* pShader, _uint iMeshIndex, aiTextureType eType, const char* pConstantName);
 	HRESULT Render(CShader* pShader, _uint iMeshIndex, _uint iShaderIndex = 0, const char* pBoneConstantName = nullptr, const char* pNoRenderName = nullptr);
 	
+	HRESULT Render_BG(CShader* pShader, _uint iMeshIndex,const char* pBoneConstantName = nullptr, const char* pRenderName = nullptr);
+
 	_bool	 Get_Finished(_uint iAnimIndex);
 	void	Set_Finished(_uint iAnimIndex,_bool bFinish);
 	

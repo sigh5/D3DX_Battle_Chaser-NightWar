@@ -43,7 +43,9 @@ HRESULT CPlayerController::Late_Initialize()
 	if (m_bLateInit)
 		return S_OK;
 	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);	
-	
+#ifdef NOMODLES
+
+#else
 	m_pInventory = static_cast<CInventory*>(pGameInstace->Get_GameObject(pGameInstace->GetCurLevelIdx(),LAYER_UI,TEXT("Inventory_Canvas")));
 	m_pDungeonCanvas = static_cast<CDungeon_Canvas*>(pGameInstace->Get_GameObject(pGameInstace->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 	
@@ -64,7 +66,7 @@ HRESULT CPlayerController::Late_Initialize()
 		}
 	}
 
-	
+#endif
 	
 	RELEASE_INSTANCE(CGameInstance);
 	

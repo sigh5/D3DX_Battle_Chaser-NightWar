@@ -25,7 +25,11 @@ public:
 	HRESULT		Initialize();			// vector 0~10 ¿˙¿Â
 	void		 Tick(_double TimeDelta);	
 	
-	void		Set_DamageFont(_float4 vPos, _float3 vScale , _int Damage);
+	void		Set_DamageFont(_float4 vPos, _float3 vScale, _int Damage, _float vSecontPosX = 0.5f, _float vSecontPosY = 1.0f);
+
+
+
+
 	void		Set_HPMPFont(_float4 vPos, _float3 vScale, _int Damage);
 	void		Late_Tick(_double TimeDelta);
 

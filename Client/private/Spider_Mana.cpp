@@ -2,10 +2,17 @@
 #include "..\public\Spider_Mana.h"
 
 #include "GameInstance.h"
-#include "Client_Manager.h"
 #include "MonsterFsm.h"
+
 #include "CombatController.h"
 #include "Weapon.h"
+#include "Buff_Effect.h"
+#include "Damage_Font_Manager.h"
+#include "Explain_FontMgr.h"
+#include "Status.h"
+#include "HitBoxObject.h"
+#include "Buff_Image.h"
+#include "Client_Manager.h"
 
 CSpider_Mana::CSpider_Mana(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -28,31 +35,57 @@ CGameObject * CSpider_Mana::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_MonsterParts)
 	{
-		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr 
+			&& m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
+			static_cast<CHitBoxObject*>(pParts)->Set_WeaponOption(m_iWeaponOption);
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
 			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
 			return pParts;
 		}
 	}
-
 	return nullptr;
 }
 
 _bool CSpider_Mana::Calculator_HitColl(CGameObject * pWeapon)
 {
+	_bool bResult = false;
 	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
-	if (nullptr == pCurActorWepon)		//나중에 아래것으로
+	if (nullptr == pCurActorWepon)		
 		return false;
-	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
-
+	
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
-		m_pStatusCom->Take_Damage(pCurActorWepon->Get_WeaponDamage());
-		return true;
+		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
+		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
+
+		if (pCurActorWepon->Get_HitNum() == 100)	/* 가리손 궁극기 때문에  */
+		{
+			m_fHitPerSecond = 2.5f;
+			m_bIsHeavyHit = false;
+			m_iSign *= -1;
+			return true;
+		}
+
+		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
+			m_bIsHeavyHit = true;
+
+		if (pCurActorWepon->Get_HitNum() > 1)
+		{
+			m_bIs_Multi_Hit = true;
+			m_bOnceCreate = false;
+		}
+
+		CCombatController::GetInstance()->UI_Shaking(true);
+		m_fHitPerSecond = 1.f;
+		m_iSign = 1;
+
+		Calculator_HitDamage();
+
+		bResult=  true;
 	}
-	return false;
+	return bResult;
 }
 
 HRESULT CSpider_Mana::Initialize_Prototype()
@@ -65,6 +98,8 @@ HRESULT CSpider_Mana::Initialize_Prototype()
 HRESULT CSpider_Mana::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Spider_Mana");
+
+	m_vecBuffImage.reserve(5);
 
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
@@ -84,6 +119,8 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 	m_bHaveSkill2 = true;
 	m_bHaveUltimate = false;
 	m_bDefence = false;
+	m_bHaveBuff = true;
+	m_bUseDefence = false;
 	return S_OK;
 }
 
@@ -107,16 +144,45 @@ void CSpider_Mana::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-
-	for (auto &pParts : m_MonsterParts)
-		pParts->Tick(TimeDelta);
-
 	m_pFsmCom->Tick(TimeDelta);
+	for (auto &pParts : m_MonsterParts)
+	{
+		pParts->Tick(TimeDelta);
+	}
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 	if (m_pStatusCom->Get_Dead() && !m_bIsDead)
+	{
 		m_bIsDead = true;
-	
+	}
+	for (auto& pBuffImage : m_vecBuffImage)
+	{
+		if (pBuffImage != nullptr)
+			pBuffImage->Tick(TimeDelta);
+	}
+
+	//static float ffPos[3] = {};
+	//static float ffScale[3] = {};
+	//static char  szName[MAX_PATH] = "";
+	//ImGui::InputFloat3("SkillPos", ffPos);
+	//ImGui::InputFloat3("SkillScale", ffScale);
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//ImGui::InputText("TextureName", szName, MAX_PATH);
+	//if (ImGui::Button("Create_Effect"))
+	//{
+	//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+	//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+
+	//	m_TextureTag = Texture_NameTag;
+	//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+	//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+
+	//	Create_Test_Effect();		// Test
+
+	//}
+
+	//RELEASE_INSTANCE(CGameInstance);
+
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
 
@@ -126,9 +192,48 @@ void CSpider_Mana::Late_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	for (auto &pParts : m_MonsterParts)
-		pParts->Late_Tick(TimeDelta);
+	if (m_bModelRender)
+	{ 
+		for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
+		{
+			if ((*iter) != nullptr)
+				(*iter)->Late_Tick(TimeDelta);
 
+			if (dynamic_cast<CBuff_Effect*>((*iter)) != nullptr)
+			{
+				if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+				{
+					Safe_Release(*iter);
+					iter = m_MonsterParts.erase(iter);
+				}
+				else
+					++iter;
+			}
+			else
+				++iter;
+		}
+
+		CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
+		auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
+
+		for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+		{
+			if (Buff_iter == m_vecBuffImage.end())
+			{
+				if (*iter != nullptr)
+					(*iter)->Late_Tick(TimeDelta);
+
+				++iter;
+			}
+			else
+			{
+				Safe_Release(*iter);
+				iter = m_vecBuffImage.erase(iter);
+				Buff_iter = m_vecBuffImage.end();
+			}
+
+		}
+	}
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -150,22 +255,24 @@ HRESULT CSpider_Mana::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
-
-
 	return S_OK;
 }
 
 void CSpider_Mana::Combat_Tick(_double TimeDelta)
 {
-	Is_MovingAnim();
-	CombatAnim_Move(TimeDelta);
 	if (m_iMovingDir == ANIM_DIR_STRAIGHT || m_iMovingDir == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
+	Anim_Frame_Create_Control();
+	
+	Is_MovingAnim();
+	CombatAnim_Move(TimeDelta);
 }
+		
 
 _int CSpider_Mana::Is_MovingAnim()
 {
@@ -203,6 +310,8 @@ void CSpider_Mana::CombatAnim_Move(_double TImeDelta)
 				m_pHitTarget->Set_FsmState(true, CGameObject::m_Defence);
 			}
 		}
+		CCombatController::GetInstance()->Camera_Zoom_In();
+
 	}
 	else
 		return;
@@ -226,11 +335,394 @@ void CSpider_Mana::MovingAnimControl(_double TimeDelta)
 	}
 }
 
+void CSpider_Mana::Create_Hit_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	/*CBuff_Image* pBuffImage = nullptr;
+	*/
+	_uint			iEffectNum = 0;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	_bool			IsDebuffing = false;
+	switch (m_iHitWeaponOption)
+	{
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
+		BuffDesc.vPosition = _float4(0.f, 1.0f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+		iEffectNum = 1;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
+		iEffectNum = 5;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_FIRE);		//화염
+		m_DebuffName = TEXT("fire down");
+		IsDebuffing = true;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
+
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 3);
+
+
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
+		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
+		BuffDesc.vPosition = _float4(0.f, 1.5f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(6.f, 10.f, 6.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_MAGIC);		// 마방깎
+		iEffectNum = 1;
+		m_DebuffName = TEXT("magic down");
+		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+		IsDebuffing = true;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 2);
+
+
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT:
+		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
+		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN:
+		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
+		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+		m_DebuffName = TEXT("armor down");
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
+		IsDebuffing = true;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
+		iEffectNum = 0;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1:
+		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+		m_DebuffName = TEXT("armor down");
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
+		IsDebuffing = true;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
+		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_BLEED);
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+		m_DebuffName = TEXT("bleeding");
+		IsDebuffing = true;
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 1);
+
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
+		m_DebuffName = TEXT("armor break");
+		IsDebuffing = true;
+		iEffectNum = 0;
+		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
+		break;
+	default:
+		break;
+	}
+
+	if (true == IsDebuffing)
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 6.f;
+		vPos.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		IsDebuffing = false;
+	}
+
+	if (iEffectNum == 0)
+	{
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+
+	if (iEffectNum == 1 && pGameObject != nullptr)
+	{
+		BuffDesc.ParentTransform = m_pTransformCom;
+		BuffDesc.vAngle = 90.f;
+		BuffDesc.fCoolTime = 2.f;
+		BuffDesc.bIsMainTain = false;
+		BuffDesc.iFrameCnt = 5;
+		BuffDesc.bIsUp = false;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+		m_MonsterParts.push_back(pGameObject);
+	}
+
+	else
+	{
+		_int iSignNum = 1;
+		_int iRandScaleNum = rand() % 10 + 5;
+		for (_uint i = 0; i < iEffectNum; ++i)
+		{
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
+			BuffDesc.ParentTransform = m_pTransformCom;
+			BuffDesc.vPosition = _float4(_float(rand() % 2 * iSignNum), 1, _float(rand() % 2 * iSignNum), 1.f);
+			BuffDesc.vScale = _float3(_float(iRandScaleNum), _float(iRandScaleNum), _float(iRandScaleNum));
+			BuffDesc.vAngle = 90.f;
+			BuffDesc.fCoolTime = 2.f;
+			BuffDesc.bIsMainTain = false;
+			BuffDesc.iFrameCnt =  rand()%10+ 5;
+			BuffDesc.bIsUp = false;
+			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+			m_MonsterParts.push_back(pGameObject);
+			iSignNum *= -1;
+		}
+	}
+
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CSpider_Mana::Create_Heacy_Hit_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	pGameObject = pInstance->Load_Effect(L"Texture_Die_Effect_3", LEVEL_COMBAT, false);
+	BuffDesc.vPosition = _float4(0.f, 2.0f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+	BuffDesc.ParentTransform = m_pTransformCom;
+
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 2.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+
+void CSpider_Mana::Anim_Frame_Create_Control()
+{
+	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 20))
+	{
+		Create_BuffEffect();
+
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 0);
+		m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+
+		CCombatController::GetInstance()->Wide_Debuff(true, CStatus::DEBUFF_MAGIC);
+		m_bOnceCreate = true;
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 20))
+	{
+		_int iRandom = rand() % 10 + m_iWideAttackDamgae;
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom);
+
+		vPos.x -= 2.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+			_float3(2.f, 2.f, 2.f), TEXT("critical"));
+
+		m_pStatusCom->Take_Damage(iRandom);
+		CCombatController::GetInstance()->HPMp_Update(this);
+		m_bOnceCreate = true;
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(7, 4))
+	{
+		Create_Hit_Effect();
+		CCombatController::GetInstance()->Camera_Shaking();
+		
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		
+		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		m_pStatusCom->Take_Damage(m_iGetDamageNum);
+		m_bOnceCreate = true;
+	}
+
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 2))
+	{
+		Create_Move_Target_Effect();
+		m_bRun = true;
+	}
+
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(13, 2))
+	{
+		Create_Move_Target_Effect();
+		m_bRun = true;
+	}
+
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(17, 69))
+	{
+		_float4 Target;
+		XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+		Target.y += 1.f;
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION,XMLoadFloat4(&Target));
+		m_bRun = true;
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(18, 10))
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos,m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y -= 1.f;
+
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+		m_bOnceCreate = true;
+	}
+	else
+	{
+		return;
+	}
+}
+
+void CSpider_Mana::Multi_Hit_Effect(CGameInstance * pInstance)
+{
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(CBuff_Effect::BuffEffcet_Client));
+	_int iSignNum = 1;
+	CGameObject* pGameObject = nullptr;
+	for (_uint i = 0; i < 5; ++i)
+	{
+		_int iRandomNum = rand() % 5;
+		pGameObject = pInstance->Load_Effect(L"Texture_bretto_Real_Bullet_Effect_0", LEVEL_COMBAT, false);
+		BuffDesc.ParentTransform = m_pTransformCom;
+		BuffDesc.vPosition = _float4(_float(iRandomNum*0.2f * iSignNum), 0.3f, 1.2f, 1.f);
+		BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
+		BuffDesc.vAngle = 90.f;
+		BuffDesc.fCoolTime = 2.f;
+		BuffDesc.bIsMainTain = false;
+		BuffDesc.iFrameCnt = rand() % 4 + 3;
+		BuffDesc.bIsUp = false;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+		m_MonsterParts.push_back(pGameObject);
+		iSignNum *= -1;
+	}
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+		_float3(1.f, 1.f, 1.f), TEXT("critical"));
+}
+
+void CSpider_Mana::Create_Move_Target_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Jump_Right_To_Left_3", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 0.5f, -1.f, 1.f);
+	BuffDesc.vScale = _float3(4.f, 4.f, 4.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 1;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CSpider_Mana::Create_BuffEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_3", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.f, 1.f, 2.f, 1.f);
+	BuffDesc.vScale = _float3(4.f, 6.f, 4.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 8;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_MonsterParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CSpider_Mana::Create_Test_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = m_vSkill_Pos;
+	BuffDesc.vScale = m_vTestScale;
+	BuffDesc.vAngle = -90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
 void CSpider_Mana::Fsm_Exit()
 {
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 }
 
 _bool CSpider_Mana::IsCollMouse()
@@ -266,7 +758,8 @@ HRESULT CSpider_Mana::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 150;
+	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
+	StatusDesc.iHp = 500;
 	StatusDesc.iMp = 150;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -393,6 +886,34 @@ HRESULT CSpider_Mana::Ready_Parts()
 	return S_OK;
 }
 
+void CSpider_Mana::Calculator_HitDamage()
+{
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom->Get_DebuffType();
+
+	if (Is_DebuffBlend(m_pStatusCom, m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
+	{
+		_float4 vPos2;
+		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos2.y += 6.f;
+		vPos2.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+
+	}
+	else if (m_iGetDamageNum >= 50)
+	{
+		m_bIsHeavyHit = true;
+		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+	}
+
+	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum,0.5f,1.0f);
+
+	m_pStatusCom->Take_Damage(m_iGetDamageNum);
+}
+
 void CSpider_Mana::Anim_Idle()
 {
 	m_CurAnimqeue.push({ 0, 1.f });
@@ -408,49 +929,73 @@ void CSpider_Mana::Anim_Intro()
 
 void CSpider_Mana::Anim_NormalAttack()
 {
-	m_eWeaponType = WEAPON_HAND;
 	m_iHitCount = 1;
-	m_iStateDamage = 30;
+	m_eWeaponType = WEAPON_HAND;
+	m_iStateDamage = rand() % 10 + 25 + m_iStage_Buff_DamgaeUP;
+	m_pMeHit_Player = nullptr;
+	m_iStage_Buff_DamgaeUP = 0;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK;
+	m_bRun = false;
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+
+
 	m_CurAnimqeue.push({ 8, 1.f });
 	m_CurAnimqeue.push({ 9, m_setTickForSecond });
 	m_CurAnimqeue.push({ 10, 1.f });
 	m_CurAnimqeue.push({ 4, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	m_pMeHit_Player = nullptr;
+	
 }
 
 void CSpider_Mana::Anim_Skill1_Attack()
 {
-	m_eWeaponType = WEAPON_HEAD;
 	m_iHitCount = 1;
-	m_iStateDamage = 40;
+	m_eWeaponType = WEAPON_HEAD;
+	
+	m_iStateDamage = rand() % 15 + 40 + m_iStage_Buff_DamgaeUP;
 	m_pStatusCom->Use_SkillMp(30);
+	m_iStage_Buff_DamgaeUP = 0;
+	m_pMeHit_Player = nullptr;
+	m_bRun = false;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK;
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	
+
 	m_CurAnimqeue.push({ 13, m_setTickForSecond });	//깨물기
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	m_pMeHit_Player = nullptr;
 }
 
 void CSpider_Mana::Anim_Skill2_Attack()
 {
-	m_iStateDamage = 40;
+	m_eWeaponType = WEAPON_HEAD;
 	m_iHitCount = 1;
-	m_pStatusCom->Use_SkillMp(40);
-	m_CurAnimqeue.push({ 13, m_setTickForSecond });	//깨물기
-	m_CurAnimqeue.push({ 14, 1.f });
-	m_CurAnimqeue.push({ 15, 0.8f });	// 거미줄 발사
+	m_iStateDamage = rand() % 15 + 45 + m_iStage_Buff_DamgaeUP;
+	m_pStatusCom->Use_SkillMp(30);
+	m_pMeHit_Player = nullptr;
+	m_bRun = false;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK;
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	m_iStage_Buff_DamgaeUP = 0;
+	m_bOnceCreate = false;
+
+	m_CurAnimqeue.push({ 17, 0.6f });
+	m_CurAnimqeue.push({ 18, 0.8f });	
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	m_pMeHit_Player = nullptr;
 }
 
 void CSpider_Mana::Anim_Buff()
 {
+	m_iStage_Buff_DamgaeUP = 10;
+
+	m_bOnceCreate = false;
 	m_useBuff = true;
+
 	m_pStatusCom->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 3, 0.7f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -459,15 +1004,38 @@ void CSpider_Mana::Anim_Buff()
 void CSpider_Mana::Anim_Light_Hit()
 {
 	++m_iHitNum;
-	m_CurAnimqeue.push({ 1, 1.f });
+	if (m_bIsHeavyHit)
+	{
+		m_CurAnimqeue.push({ 6,1.f });
+		m_bIsHeavyHit = false;
+		
+	}
+	else if (true == m_bIs_Multi_Hit)
+	{
+		m_CurAnimqeue.push({ 1,  1.f });
+		m_CurAnimqeue.push({ 7,  1.f });
+		
+		m_bIs_Multi_Hit = false;
+		m_bOnceCreate = false;
+	}
+	else
+	{
+		m_CurAnimqeue.push({ 1 , m_fHitPerSecond });
+	}
+
 	Set_CombatAnim_Index(m_pModelCom);
+	Create_Hit_Effect();
 }
 
 void CSpider_Mana::Anim_Heavy_Hit()
 {
 	++m_iHitNum;
+	m_bOnceCreate = false;
+
 	m_CurAnimqeue.push({ 6,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
+	Create_Heacy_Hit_Effect();
 }
 
 void CSpider_Mana::Anim_Die()
@@ -477,6 +1045,17 @@ void CSpider_Mana::Anim_Die()
 	m_CurAnimqeue.push({ 2,1.f });
 	m_CurAnimqeue.push({ 19,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
+	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
+	{
+		Safe_Release(*iter);
+		iter = m_MonsterParts.erase(iter);
+	}
+	m_MonsterParts.clear();
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
 }
 
 void CSpider_Mana::Anim_Viroty()
@@ -486,6 +1065,15 @@ void CSpider_Mana::Anim_Viroty()
 	m_CurAnimqeue.push({ 18,1.f });
 	m_CurAnimqeue.push({ 0,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
+
+	for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+	m_vecBuffImage.clear();
+
+	for (auto& pParts : m_MonsterParts)
+		Safe_Release(pParts);
+
+	m_MonsterParts.clear();
 
 }
 

@@ -659,6 +659,7 @@ void CCombatController::HPMp_Update(CGameObject* pHiter)
 		{
 			static_cast<CHpMpBuffCanvas*>(Canvas)->Set_HitEvent(pHiter, true);
 			static_cast<CHpMpBuffCanvas*>(Canvas)->Set_MpEvent(true);
+			
 		}
 	}
 }

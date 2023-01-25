@@ -75,12 +75,11 @@ HRESULT CInventory::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 #ifdef NOMODLES
-	CInventory::Set_RenderActive(true);
-
-#else
-	Set_RenderActive(false);
-#endif
 	
+	CInventory::Set_RenderActive(false);
+#else
+
+	Set_RenderActive(false);
 	for (auto& pChild : m_ChildrenVec)
 	{
 		if (!lstrcmp(pChild->Get_ObjectName(), TEXT("Inventory_Button_Icon_0")))
@@ -98,6 +97,9 @@ HRESULT CInventory::Last_Initialize()
 		else
 			continue;
 	}
+#endif
+	
+	
 
 	
 	m_bLast_Initlize = true;
@@ -109,23 +111,28 @@ void CInventory::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
+#ifdef NOMODLES
 
+#else
 	ICon_Button_Click();
 	Cur_BigImageCast();
 	
 	Owner_KNOLAN_Tick(TimeDelta);
 	Owner_GARRISON_Tick(TimeDelta);
 	Owner_CALIBRETTO_Tick(TimeDelta);
+#endif
 }
 
 void CInventory::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+#ifdef NOMODLES
 
+#else
 	Owner_KNOLAN_LateTick( TimeDelta);
 	Owner_GARRISON_LateTick( TimeDelta);
 	Owner_CALIBRETTO_LateTick( TimeDelta);
-
+#endif
 	if (nullptr != m_pRendererCom)
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }

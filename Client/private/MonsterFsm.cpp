@@ -412,15 +412,24 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	{
 		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() {return m_pCombatController->To_Intro(); }))
-		.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Normal_Attack(); }))
-		.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Skill1_Attack(); }))
-		.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Skill2_Attack(); }))
-		.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Buff(); }))
-		.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Light_Hit(); }))
-		.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Heavy_Hit(); }))
-		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Die(); }))
-		.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), [this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Viroty(); }))
+		.Transition(TEXT("Intro"), FSM_TRANSITION(TEXT("Idle To Intro"), [this]() 
+	{return m_pCombatController->To_Intro(); }))
+		.Transition(TEXT("NormalAttack"), FSM_TRANSITION(TEXT("Idle To NormalAttack"),
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Normal_Attack(); }))
+		.Transition(TEXT("SkillAttack1"), FSM_TRANSITION(TEXT("Idle To SkillAttack1"),
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Skill1_Attack(); }))
+		.Transition(TEXT("SkillAttack2"), FSM_TRANSITION(TEXT("Idle To SkillAttack2"), 
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Skill2_Attack(); }))
+		.Transition(TEXT("Buff"), FSM_TRANSITION(TEXT("Idle To Buff"), 
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Buff(); }))
+		.Transition(TEXT("Light_Hit"), FSM_TRANSITION(TEXT("Idle To Light_Hit"), 
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Light_Hit(); }))
+		.Transition(TEXT("Heavy_Hit"), FSM_TRANSITION(TEXT("Idle To Heavy_Hit"), 
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Heavy_Hit(); }))
+		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Idle To Die"),
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Die(); }))
+		.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Idle To Viroty"), 
+			[this]() {return static_cast<CSpider_Mana*>(m_pTarget)->To_Viroty(); }))
 
 	.AddState(L"Intro")
 		.OnStart([this]()
@@ -516,7 +525,7 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	})
 		.Tick([this](_double TimeDelta)
 	{
-		static_cast<CSkeleton_Naked*>(m_pTarget)->Combat_Tick(TimeDelta);
+		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
@@ -568,7 +577,6 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	{
 		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-
 
 
 		.Build();

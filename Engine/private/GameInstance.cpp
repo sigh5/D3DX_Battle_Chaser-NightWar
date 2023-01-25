@@ -404,6 +404,11 @@ void CGameInstance::Change_Level(_uint iLevleIdx)
 
 }
 
+void CGameInstance::All_Object_RenderActive(_bool bRenderActive)
+{
+
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iLevelIndex, const wstring& pPrototypeTag, CComponent * pPrototype)
 {
 	if (nullptr == m_pComponent_Manager)
@@ -606,6 +611,38 @@ _bool CGameInstance::isInFrustum_LocalSpace(_fvector vLocalPos, _float fRange)
 		return false;
 
 	return m_pFrustum->isInFrustum_LocalSpace(vLocalPos, fRange);
+}
+
+ID3D11ShaderResourceView * CGameInstance::Get_DepthTargetSRV()
+{
+	if (nullptr == m_pTarget_Manager)
+		return nullptr;
+
+	return m_pTarget_Manager->Get_SRV(TEXT("Target_Depth"));
+}
+
+ID3D11ShaderResourceView * CGameInstance::Get_DiffuseTargetSRV()
+{
+	if (nullptr == m_pTarget_Manager)
+		return nullptr;
+
+	return m_pTarget_Manager->Get_SRV(TEXT("Target_Diffuse"));
+}
+
+ID3D11ShaderResourceView * CGameInstance::Get_ShadeTargetSRV()
+{
+	if (nullptr == m_pTarget_Manager)
+		return nullptr;
+
+	return m_pTarget_Manager->Get_SRV(TEXT("Target_Shade"));
+}
+
+ID3D11ShaderResourceView * CGameInstance::Get_SpecularTargetSRV()
+{
+	if (nullptr == m_pTarget_Manager)
+		return nullptr;
+
+	return m_pTarget_Manager->Get_SRV(TEXT("Target_Specular"));
 }
 
 

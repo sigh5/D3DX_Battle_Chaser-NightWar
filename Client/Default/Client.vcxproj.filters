@@ -208,6 +208,9 @@
     <Filter Include="02.GameObjects\UI\InventoryCanvas\InventoryButton">
       <UniqueIdentifier>{7c8b9d36-c719-48b2-a439-8deaf63a2b74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Image_Broken">
+      <UniqueIdentifier>{c4c87d7f-389d-40ae-9e01-940004ecf939}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -429,6 +432,9 @@
     <ClInclude Include="..\Public\Inventory_Button.h">
       <Filter>02.GameObjects\UI\InventoryCanvas\InventoryButton</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Broken_Image.h">
+      <Filter>02.GameObjects\Image_Broken</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -632,6 +638,9 @@
     <ClCompile Include="..\Private\Inventory_Button.cpp">
       <Filter>02.GameObjects\UI\InventoryCanvas\InventoryButton</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Broken_Image.cpp">
+      <Filter>02.GameObjects\Image_Broken</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -684,6 +693,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPoint.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Deferred_Test.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

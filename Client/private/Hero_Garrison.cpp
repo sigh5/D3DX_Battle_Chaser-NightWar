@@ -550,11 +550,11 @@ void CHero_Garrison::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
-			break;
-		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_END:
-			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);	// 이미지 교체필요
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		default:
 			break;
 		}
@@ -1106,6 +1106,8 @@ void CHero_Garrison::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 		m_DebuffName = TEXT("armor down");
 		break;
 	case Engine::CStatus::DEBUFF_MAGIC:
+		iTextureNum = 2;
+		m_DebuffName = TEXT("magic down");
 		break;
 	case Engine::CStatus::BUFF_DAMAGE:
 		break;
@@ -1473,7 +1475,6 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[12] && m_pModelCom->Control_KeyFrame_Create(30, 243))
 	{
 		Create_Ultimate_Effect();
-	
 		m_bUltimateHit[12] = true;
 	}
 	else if (!m_bUltimateHit[13] && m_pModelCom->Control_KeyFrame_Create(30, 255))

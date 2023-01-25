@@ -66,7 +66,7 @@ void CTrun_BattleStart_UI::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 }
 
 HRESULT CTrun_BattleStart_UI::Render()
@@ -77,9 +77,7 @@ HRESULT CTrun_BattleStart_UI::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-
-
-	m_pShaderCom->Begin(1);		// UI 1번 알파블랜딩
+	m_pShaderCom->Begin(6);		// UI 1번 알파블랜딩
 	m_pVIBufferCom->Render();
 
 
@@ -137,13 +135,11 @@ HRESULT CTrun_BattleStart_UI::SetUp_ShaderResources()
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
-
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
-
 
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;

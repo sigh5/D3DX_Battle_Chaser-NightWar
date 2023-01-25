@@ -42,7 +42,7 @@ VS_OUT VS_MAIN(VS_IN In)
 
 	// 항상 월드스페이스에서 계산하는지 로컬에서 계산하는지 확인해야한다.
 	Out.vWolrdPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
-	Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+	Out.vNormal =	normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
 	Out.vProjPos = Out.vPosition;
 
 	return Out;
@@ -54,7 +54,7 @@ struct PS_IN
 	float4		vNormal			: NORMAL;
 	float2	    vTexUV			: TEXCOORD0;
 	float4		vWorldPos		: TEXCOORD1;
-	float4		vProjPos : TEXCOORD2;
+	float4		vProjPos		: TEXCOORD2;
 };
 
 struct PS_OUT

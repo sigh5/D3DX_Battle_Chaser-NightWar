@@ -27,12 +27,7 @@ struct VS_OUT
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
-};
-
-struct VS_GS_OUT
-{
-	float3		vPosition : POSITION;
-	float2		vTexUV : TEXCOORD0;
+	
 };
 
 
@@ -56,6 +51,7 @@ struct PS_IN
 {
 	float4		vPosition : SV_POSITION;
 	float2		vTexUV : TEXCOORD0;
+	
 };
 
 struct PS_OUT
@@ -63,6 +59,9 @@ struct PS_OUT
 	/*SV_TARGET0 : 모든 정보가 결정된 픽셀이다. AND 0번째 렌더타겟에 그리기위한 색상이다. */
 	float4		vColor : SV_TARGET0;
 };
+
+
+
 
 PS_OUT PS_MAIN(PS_IN In)
 {
@@ -114,6 +113,22 @@ PS_OUT PS_MAIN_NoUltimate(PS_IN In)
 
 	return Out;
 }
+
+PS_OUT PS_MAIN_NONALPHABLEND(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexUV);
+
+	if (Out.vColor.a < 0.25f)
+		discard;
+
+
+
+	return Out;
+}
+
+
 
 technique11 DefaultTechnique
 {
@@ -199,6 +214,20 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_NoUltimate();
 	}
 
+
+	pass NONALPHABLEND
+	{
+
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_NONALPHABLEND();
+	}
 	
 
 }
