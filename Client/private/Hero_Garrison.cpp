@@ -14,7 +14,7 @@
 #include "Explain_FontMgr.h"
 
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
-	:CPlayer(pDevice,pContext)
+	:CPlayer(pDevice, pContext)
 {
 }
 
@@ -32,7 +32,7 @@ CGameObject * CHero_Garrison::Get_Weapon_Or_SkillBody()
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponOption(m_iWeaponOption);
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
 			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
-			
+
 			return pParts;
 		}
 	}
@@ -44,9 +44,7 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 {
 	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
 
-	if (nullptr == pCurActorWepon)		//나중에 아래것으로
-		return false;
-	//	assert(pCurActorWepon != nullptr && "CSkeleton_Naked::Calculator_HitColl");
+	assert(pCurActorWepon != nullptr && "CHero_Garrison::Calculator_HitColl");
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
@@ -59,11 +57,12 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 		if (m_bUseDefence == true)
 		{
 			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5));
-			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
+			CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
 
 			Create_Hit_Effect();
+			return true;
 		}
-		
+
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
@@ -72,7 +71,7 @@ _bool CHero_Garrison::Calculator_HitColl(CGameObject * pWeapon)
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-		
+
 		CCombatController::GetInstance()->UI_Shaking(true);
 		Calculator_HitDamage();
 		return true;
@@ -116,14 +115,14 @@ HRESULT CHero_Garrison::Initialize(void * pArg)
 	return S_OK;
 }
 
-HRESULT CHero_Garrison::Last_Initialize() 
+HRESULT CHero_Garrison::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(0.21f, 0.f, 0.21f, 1.f));
 	m_pTransformCom->Set_Scaled(_float3(0.1f, 0.1f, 0.1f));
 	m_bLast_Initlize = true;
-	
+
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(0.21f, 0.f, 0.21f, 1.f));
 	m_pNavigationCom->Set_OldPos(vPos);
@@ -139,15 +138,23 @@ void CHero_Garrison::Tick(_double TimeDelta)
 	{
 		LookAtTarget(TimeDelta, m_pNavigationCom);
 		Dungeon_Tick(TimeDelta);
-	}	
+	}
 	else
 	{
 		Combat_Init();
 		m_pAnimFsm->Tick(TimeDelta);
 		m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-		
+
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead() && !m_bIsDead)
 			m_bIsDead = true;
+		else
+		{
+			for (auto& pBuffImage : m_vecBuffImage)
+			{
+				if (pBuffImage != nullptr)
+					pBuffImage->Tick(TimeDelta);
+			}
+		}
 
 		//static float ffPos[3] = {};
 		//static float ffScale[3] = {};
@@ -172,13 +179,9 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
 
-		for (auto& pBuffImage : m_vecBuffImage)
-		{
-			if (pBuffImage != nullptr)
-				pBuffImage->Tick(TimeDelta);
-		}
+
 	}
-	
+
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -196,8 +199,8 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			pParts->Late_Tick(TimeDelta);
 		}
 	}
-	if(m_bModelRender)
-	{ 
+	if (m_bModelRender)
+	{
 		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
 		{
 			if ((*iter) != nullptr)
@@ -226,27 +229,32 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 
 		if (m_bIsCombatScene == true)
 		{
-			CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
-			auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
-
-			for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+			if (!m_bIsDead && false == m_bUltimateBuffRenderStop && CClient_Manager::m_bCombatWin == false)
 			{
-				if (Buff_iter == m_vecBuffImage.end())
+				CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
+				for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
 				{
 					if (*iter != nullptr)
 						(*iter)->Late_Tick(TimeDelta);
 
 					++iter;
 				}
-				else
-				{
-					Safe_Release(*iter);
-					iter = m_vecBuffImage.erase(iter);
-					Buff_iter = m_vecBuffImage.end();
-				}
-
+				CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
 			}
 		}
+
+
+		/*for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+		}
+		m_pEffectParts.clear();
+
+		for (auto& pBuffImage : m_vecBuffImage)
+			Safe_Release(pBuffImage);*/
+
+
 	}
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -271,7 +279,7 @@ HRESULT CHero_Garrison::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0,"g_BoneMatrices","DN_FR_FishingRod");
+		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
 	return S_OK;
@@ -300,13 +308,13 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 	}
 	else if (LEVEL_COMBAT == iLevleIdx)
 	{
-		
+
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-		
+
 
 		if (m_bCombatInit)
 		{
@@ -323,7 +331,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
 
 		m_bIsCombatScene = true;
-		
+
 	}
 	else
 		return;
@@ -371,7 +379,7 @@ void CHero_Garrison::NormalLightCharUI()
 
 void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta,m_pNavigationCom))
+	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
 		m_iAnimIndex = 0;
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -382,14 +390,14 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 {
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
-	
+
 	if (bResult == ANIM_DIR_STRAIGHT || bResult == ANIM_DIR_BACK)
 	{
 		MovingAnimControl(TimeDelta);
 	}
 	else
-		CurAnimQueue_Play_Tick(TimeDelta,m_pModelCom);
-	
+		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+
 	Anim_Frame_Create_Control();
 
 	for (auto &pEffect : m_pEffectParts)
@@ -413,7 +421,7 @@ void CHero_Garrison::Combat_Tick(_double TimeDelta)
 		Fsm_Exit();
 	}
 
-	
+
 }
 
 void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
@@ -427,7 +435,7 @@ void CHero_Garrison::Combat_Ultimate(_double TimeDelta)
 	}
 	else
 		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-	
+
 	Ultimate_Anim_Frame_Control();
 
 	for (auto &pEffect : m_pEffectParts)
@@ -503,7 +511,7 @@ void CHero_Garrison::MovingAnimControl(_double TimeDelta)
 		m_pModelCom->Set_AnimTickTime(m_CurAnimqeue.front().second);
 		m_CurAnimqeue.pop();
 		m_bFinishOption = ANIM_CONTROL_NEXT;
-		
+
 		if (m_CurAnimqeue.empty())
 		{
 			m_bIsCombatAndAnimSequnce = true;
@@ -551,10 +559,18 @@ void CHero_Garrison::Create_Hit_Effect()
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			pGameObject = pInstance->Load_Effect(L"Texture_Bleeding_Effect_3", LEVEL_COMBAT, false);
 			iEffectNum = 1;
-			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);	// 이미지 교체필요
-			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.5f, 1.f);
+			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
+			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.25f, 1.5f, 0.25f, 1.f);
+			BuffDesc.vScale = _float3(7.f, 7.f, 7.f);
+			break;
 		default:
 			break;
 		}
@@ -635,10 +651,10 @@ void CHero_Garrison::Create_Defence_Effect_And_Action()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 6.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target1_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("damage up"));
 
-	
+
 }
 
 void CHero_Garrison::Create_Normal_Attack_Effect()
@@ -743,7 +759,7 @@ void CHero_Garrison::Create_Ultimate_Effect()
 	BuffDesc.bIsStraight = true;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Garrison_Ultimate_Effect"), 0);
-	
+
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -853,8 +869,8 @@ void CHero_Garrison::Create_Defence_Area()
 	BuffDesc.bIsUp = false;
 
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-	
-	
+
+
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -880,7 +896,7 @@ void CHero_Garrison::Create_Buff_MainTain_Effect()
 	BuffDesc.iFrameCnt = 4;
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
-	
+
 	static_cast<CBuff_Effect*>(pGameObject)->Is_Particle_Effect(15);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
@@ -913,7 +929,37 @@ void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 }
 void CHero_Garrison::Anim_Frame_Create_Control()
 {
-	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(16, 1))
+
+	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 9))
+	{
+		Create_Normal_Attack_Effect();
+		m_bOnceCreate = true;
+	}
+
+	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(4, 1))
+	{
+		Create_Move_Target_Effect();
+		m_bRun = true;
+	}
+
+	else if (m_bUseDefence == true && !m_bOnceCreate &&
+		m_pModelCom->Control_KeyFrame_Create(8, 20))
+	{
+		Create_Defence_Area();
+		m_bOnceCreate = true;
+	}
+	else if (m_bOriginBuff == true && !m_bOnceCreateBuff &&
+		m_pModelCom->Control_KeyFrame_Create(8, 40))
+	{
+		Create_Buff_MainTain_Effect();
+		m_bOnceCreateBuff = true;
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(10, 30))
+	{
+		Create_Skill1_Attack_Effect();
+		m_bOnceCreate = true;
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(16, 4))
 	{
 		CCombatController::GetInstance()->Camera_Shaking();
 
@@ -921,56 +967,38 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
 		_int iRandom = rand() % 5;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom +m_iGetDamageNum);
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
 
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
 	}
-	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(4, 1))
-	{
-		Create_Move_Target_Effect();
-		m_bRun = true;
-	}
+
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(17, 14))
 	{
 		Create_Move_Target_Effect();
 		m_bRun = true;
 	}
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 9))
-	{
-		Create_Normal_Attack_Effect();
-		m_bOnceCreate = true;
-	}
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(10, 30))
-	{
-		Create_Skill1_Attack_Effect();
-		m_bOnceCreate = true;
-	}
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(19, 20) )
+
+
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(19, 20))
 	{
 		Create_Skill2_Attack_Effect();
 		m_bOnceCreate = true;
 	}
-	else if (m_bUseDefence == true && m_pModelCom->Control_KeyFrame_Create(8, 20) && !m_bOnceCreate)
-	{
-		Create_Defence_Area();
-		m_bOnceCreate = true;
-	}
-	else if (m_bOriginBuff ==true && !m_bOnceCreateBuff && m_pModelCom->Control_KeyFrame_Create(8, 40))
-	{
-		Create_Buff_MainTain_Effect();
-		m_bOnceCreateBuff = true;
-	}
 
-	else if (m_bUseDefence == true && !m_bOnceCreate &&m_pModelCom->Control_KeyFrame_Create(32, 43))
+
+
+	else if (m_bUseDefence == true && !m_bOnceCreate &&
+		m_pModelCom->Control_KeyFrame_Create(32, 43))
 	{
 		Create_Hit_Effect();
+		m_bOnceCreate = true;
+		m_bIs_Multi_Hit = false;
+
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
-		m_bOnceCreate = true;
-		m_bIs_Multi_Hit = false;
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
 	}
 	else
 		return;
@@ -989,11 +1017,11 @@ void CHero_Garrison::Use_HpPotion()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target1_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
 
 	vPos.y += 2.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont_0(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
@@ -1030,12 +1058,12 @@ void CHero_Garrison::Use_MpPotion()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target1_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
 
 	vPos.y += 2.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
-	
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont_0(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
@@ -1065,7 +1093,7 @@ void CHero_Garrison::Calculator_HitDamage()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
+	//CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
 
 	if (Is_DebuffBlend(m_pStatusCom[COMBAT_PLAYER], m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
 	{
@@ -1073,17 +1101,16 @@ void CHero_Garrison::Calculator_HitDamage()
 		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos2.y += 6.f;
 		vPos2.x -= 6.f;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
-
+		CExplain_FontMgr::GetInstance()->
+			Set_Debuff_Target1_Font(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 	}
 	else if (m_iGetDamageNum >= 50)
 	{
 		m_bIsHeavyHit = true;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+		CExplain_FontMgr::GetInstance()->Set_Explain_Target1_Font1(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
 
-	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-
+	CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 }
 
@@ -1100,6 +1127,8 @@ void CHero_Garrison::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 	case Engine::CStatus::DEBUFF_FIRE:
 		break;
 	case Engine::CStatus::DEBUFF_BLEED:
+		iTextureNum = 1;
+		m_DebuffName = TEXT("bleeding");
 		break;
 	case Engine::CStatus::DEBUFF_ARMOR:
 		iTextureNum = 4;
@@ -1126,7 +1155,7 @@ void CHero_Garrison::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 6.f;
-	CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+	CExplain_FontMgr::GetInstance()->Set_Debuff_Target1_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 }
 
 HRESULT CHero_Garrison::SetUp_Components()
@@ -1245,7 +1274,7 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -2.f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f,0.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE;
 
@@ -1334,7 +1363,7 @@ _int CHero_Garrison::Is_MovingAnim()
 	if (m_pModelCom->Get_AnimIndex() == 4)
 	{
 		bResult = ANIM_DIR_STRAIGHT;
-		
+
 	}
 	else if (m_pModelCom->Get_AnimIndex() == 18)
 	{
@@ -1343,7 +1372,7 @@ _int CHero_Garrison::Is_MovingAnim()
 	else if (m_pModelCom->Get_AnimIndex() == 11)
 	{
 		bResult = ANIM_DIR_BACK;
-	
+
 	}
 	else
 		bResult = ANIM_EMD;
@@ -1394,6 +1423,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(30, 70))
 	{
+		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		CCombatController::GetInstance()->Camera_Zoom_In();
 		m_bIsUseUltimate = true;
@@ -1413,7 +1443,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[2] && m_pModelCom->Control_KeyFrame_Create(30, 140))
 	{
 		Create_Ultimate_Effect();
-		
+
 		m_bUltimateHit[2] = true;
 	}
 	else if (!m_bUltimateHit[3] && m_pModelCom->Control_KeyFrame_Create(30, 150))
@@ -1425,7 +1455,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[4] && m_pModelCom->Control_KeyFrame_Create(30, 160))
 	{
 		Create_Ultimate_Effect();
-	
+
 		m_bUltimateHit[4] = true;
 	}
 	else if (!m_bUltimateHit[5] && m_pModelCom->Control_KeyFrame_Create(30, 170))
@@ -1433,12 +1463,12 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[5] = true;
-		
+
 	}
 	else if (!m_bUltimateHit[6] && m_pModelCom->Control_KeyFrame_Create(30, 183))
 	{
 		Create_Ultimate_Effect();
-	
+
 		m_bUltimateHit[6] = true;
 	}
 
@@ -1451,7 +1481,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[8] && m_pModelCom->Control_KeyFrame_Create(30, 201))
 	{
 		Create_Ultimate_Effect();
-	
+
 		m_bUltimateHit[8] = true;
 	}
 	else if (!m_bUltimateHit[9] && m_pModelCom->Control_KeyFrame_Create(30, 215))
@@ -1463,7 +1493,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[10] && m_pModelCom->Control_KeyFrame_Create(30, 223))
 	{
 		Create_Ultimate_Effect();
-		
+
 		m_bUltimateHit[10] = true;
 	}
 	else if (!m_bUltimateHit[11] && m_pModelCom->Control_KeyFrame_Create(30, 235))
@@ -1488,13 +1518,13 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 		m_iHitCount = 0;
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[14] = true;
-		
+
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(30, 302))
 	{
 		Create_Ultimate_End_Effect();
 		m_bBuffEffectStop = true;
-		CCombatController::GetInstance()->Wide_Attack(false,73);
+		CCombatController::GetInstance()->Wide_Attack(false, 73);
 		m_bOnceCreate = true;
 	}
 	else
@@ -1526,7 +1556,7 @@ void CHero_Garrison::Anim_Idle()
 }
 
 void CHero_Garrison::Anim_Intro()
-{	
+{
 	m_CurAnimqeue.push({ 21, m_IntroTimer });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1573,8 +1603,8 @@ void CHero_Garrison::Anim_Skill1_Attack()
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1;
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
-	
-	
+
+
 	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
@@ -1603,7 +1633,7 @@ void CHero_Garrison::Anim_Skill2_Attack()
 
 	m_CurAnimqeue.push({ 17, 1.0f });
 	m_CurAnimqeue.push({ 18, 0.5f });
-	m_CurAnimqeue.push({ 19, 1.f });		
+	m_CurAnimqeue.push({ 19, 1.f });
 	m_CurAnimqeue.push({ 11, m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1611,9 +1641,8 @@ void CHero_Garrison::Anim_Skill2_Attack()
 }
 
 void CHero_Garrison::Anim_Uitimate()
-{	
-
-	//Create_Ultimate_StartCam_Effect();
+{
+	m_bUltimateBuffRenderStop = true;
 	m_bUltimateCam = false;
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
@@ -1652,20 +1681,20 @@ void CHero_Garrison::Anim_Buff()
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 	m_CurAnimqeue.push({ 8,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
-	
+
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
 	vPos.x -= 2.f;
 	vPos.y += 6.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target1_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("damage up"));
 
 	CClient_Manager::Create_BuffImage(m_vecBuffImage,
 		_float4(-305.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 		TEXT("Prototype_GameObject_BuffImage"), 0);
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
-	
+
 	Set_CombatAnim_Index(m_pModelCom);
 	Create_BuffEffect();
 }
@@ -1689,32 +1718,31 @@ void CHero_Garrison::Anim_Light_Hit()
 {
 	if (m_bIsHeavyHit)
 	{
-		_uint iHitRand = 13;			// 13 ,14 ,15
-		m_CurAnimqeue.push({ iHitRand ,  1.f });
+		m_CurAnimqeue.push({ 13 ,  1.f });
+		m_bIsHeavyHit = false;
 	}
 	else if (true == m_bIs_Multi_Hit)
 	{
-		m_CurAnimqeue.push({ 6,  1.f });	
-		m_CurAnimqeue.push({ 16,  1.f });	
+		m_CurAnimqeue.push({ 6,  1.f });
+		m_CurAnimqeue.push({ 16,  1.f });
 		m_CurAnimqeue.push({ 1,  1.f });
 		m_bOnceCreate = false;
 		m_bIs_Multi_Hit = false;
 	}
 	else
 	{
-		m_CurAnimqeue.push({ 26, 1.f });
+		m_CurAnimqeue.push({ 26, 1.f });	//6,26,27
 		m_CurAnimqeue.push({ 1,  1.f });
 	}
-	
+
 	Set_CombatAnim_Index(m_pModelCom);
 	Create_Hit_Effect();
 }
 
 void CHero_Garrison::Anim_Heavy_Hit()
 {
-	_uint iHitRand = rand() % 4 + 13;
-	m_CurAnimqeue.push({ iHitRand ,  1.f });
-	
+	m_bIsHeavyHit = false;
+	m_CurAnimqeue.push({ 15 ,  1.f });	//13 ,14,15,16
 	Create_Hit_Effect();
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -1754,7 +1782,7 @@ void CHero_Garrison::Anim_Die()
 		iter = m_pEffectParts.erase(iter);
 	}
 	m_pEffectParts.clear();
-	
+
 	for (auto& pBuffImage : m_vecBuffImage)
 		Safe_Release(pBuffImage);
 	m_vecBuffImage.clear();
@@ -1763,7 +1791,12 @@ void CHero_Garrison::Anim_Die()
 
 void CHero_Garrison::Anim_Viroty()
 {
-	
+	_int iRandHp = rand() % 3 + 1;
+	_int iRandMp = rand() % 2 + 1;
+
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, iRandHp);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, iRandMp);
+
 	while (!m_CurAnimqeue.empty())
 	{
 		m_CurAnimqeue.pop();
@@ -1773,15 +1806,13 @@ void CHero_Garrison::Anim_Viroty()
 	{
 		m_CurAnimqeue.push({ 44,  1.f });
 		m_CurAnimqeue.push({ 45, 1.f });
-		
+
 	}
 	else
 	{
 		m_CurAnimqeue.push({ 22,  1.f });
 		m_CurAnimqeue.push({ 43, 1.f });
 	}
-
-	Set_CombatAnim_Index(m_pModelCom);
 
 	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
 	{
@@ -1793,7 +1824,11 @@ void CHero_Garrison::Anim_Viroty()
 
 	for (auto& pBuffImage : m_vecBuffImage)
 		Safe_Release(pBuffImage);
-	
+	m_vecBuffImage.clear();
+
+
+	Set_CombatAnim_Index(m_pModelCom);
+
 }
 
 void CHero_Garrison::Create_Test_Effect()
@@ -1804,7 +1839,7 @@ void CHero_Garrison::Create_Test_Effect()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject =	pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = m_vSkill_Pos;
@@ -1815,23 +1850,14 @@ void CHero_Garrison::Create_Test_Effect()
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-	
-
-
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-
-
 _bool CHero_Garrison::Is_Dead()
 {
-	
 	if (__super::Is_Dead())
 	{
-		//Anim_Die();
 		return true;
 	}
-
 	return false;
 }

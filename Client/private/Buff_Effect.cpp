@@ -159,6 +159,17 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			vPos.z -= (_float)(25.f * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
+
+		if (m_Client_BuffEffect_Desc.bIsBack)
+		{
+			_float4 vPos;
+			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+			vPos.x -= (_float)(10.f * TimeDelta);
+			vPos.y += (_float)(0.5f * TimeDelta);
+			vPos.z += (_float)(10.f * TimeDelta);
+			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+		}
+
 	}
 
 	if (m_bIsUpdown)

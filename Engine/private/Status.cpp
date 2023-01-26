@@ -40,7 +40,30 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 	}
 	else
 	{
-		switch (eType)
+		if (CStatus::DEBUFF_FIRE == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDebuff_FIRE = false;
+		}
+		else if (CStatus::DEBUFF_BLEED == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDebuff_BLEED = false;
+		}
+		else if (CStatus::DEBUFF_ARMOR == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDebuff_ARMOR = false;
+		}
+		else if (CStatus::DEBUFF_MAGIC == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = false;
+		}
+		else if (CStatus::BUFF_DAMAGE == eType)
+		{
+			m_StatusDesc.m_tagDesc.isBuff_Damage = false;
+		}
+		else
+			return;
+		
+		/*switch (eType)
 		{
 		case Engine::CStatus::DEBUFF_FIRE:
 			m_StatusDesc.m_tagDesc.isDebuff_FIRE = false;
@@ -61,7 +84,7 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 	
 

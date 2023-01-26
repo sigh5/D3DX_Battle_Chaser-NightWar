@@ -70,7 +70,6 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 			return true;
 		}
 		
-		
 		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
 			m_bIsHeavyHit = true;
 
@@ -85,12 +84,8 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 		m_iSign = 1;
 
 		Calculator_HitDamage();
-
-		
 		bResult = true;
 	}
-
-
 	return bResult;
 }
 
@@ -121,7 +116,6 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
-
 	m_pModelCom->Set_AnimIndex(0);
 
 
@@ -129,6 +123,7 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 	m_bHaveUltimate = false;
 	m_bDefence = true;
 	m_bHaveBuff = true;
+	m_bIsDefenceTimer = false;
 	return S_OK;
 }
 HRESULT CSkeleton_Naked::Last_Initialize()
@@ -145,27 +140,35 @@ HRESULT CSkeleton_Naked::Last_Initialize()
 	m_bLast_Initlize = true;
 	return S_OK;
 }
-
+// 데미지 추가적으로 들어가는것
 void CSkeleton_Naked::Tick(_double TimeDelta)
 {
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
 	m_pFsmCom->Tick(TimeDelta);
-	for (auto &pParts : m_MonsterParts)
-		pParts->Tick(TimeDelta);
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
-	if (m_pStatusCom->Get_Dead() && !m_bIsDead)
+	if (m_pStatusCom->Get_Dead())
 	{
 		m_bIsDead = true;
 	}
-
-	for (auto& pBuffImage : m_vecBuffImage)
+	else 
 	{
-		if(pBuffImage != nullptr)
-			pBuffImage->Tick(TimeDelta);
+		for (auto &pParts : m_MonsterParts)
+		{
+			if (nullptr != pParts)
+				pParts->Tick(TimeDelta);
+		}
+		for (auto& pBuffImage : m_vecBuffImage)
+		{
+			if (pBuffImage != nullptr)
+				pBuffImage->Tick(TimeDelta);
+		}
+
 	}
+
+	
 		
 	//static float ffPos[3] = {};
 	//static float ffScale[3] = {};
@@ -201,47 +204,51 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 
 	if (m_bModelRender)
 	{
-		for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
-		{
-			if ((*iter) != nullptr)
-				(*iter)->Late_Tick(TimeDelta);
-
-			if (dynamic_cast<CBuff_Effect*>((*iter)) != nullptr)
+		if( false==m_bIsDead)
+		{ 
+			for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
 			{
-				if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+				if ((*iter) != nullptr)
+					(*iter)->Late_Tick(TimeDelta);
+
+				if (dynamic_cast<CBuff_Effect*>((*iter)) != nullptr)
 				{
-					Safe_Release(*iter);
-					iter = m_MonsterParts.erase(iter);
+					if (true == static_cast<CBuff_Effect*>(*iter)->Get_IsFinish())
+					{
+						Safe_Release(*iter);
+						*iter = nullptr;
+						iter = m_MonsterParts.erase(iter);
+					}
+					else
+						++iter;
 				}
 				else
 					++iter;
 			}
-			else
-				++iter;
-		}
-
-		CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
-		auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
-
-		for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
-		{
-			if (Buff_iter == m_vecBuffImage.end())
+			CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
+			for (auto& pVecBuffImage : m_vecBuffImage)
 			{
-				if (*iter != nullptr)
-					(*iter)->Late_Tick(TimeDelta);
-
-				++iter;
+				if (pVecBuffImage != nullptr)
+					pVecBuffImage->Late_Tick(TimeDelta);
 			}
-			else
-			{
-				Safe_Release(*iter);
-				iter = m_vecBuffImage.erase(iter);
-				Buff_iter = m_vecBuffImage.end();
-			}
-
+			CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom, false);
 		}
-
 	}
+
+	if(m_bIsDead && !m_bClearScene)
+	{
+		for (auto& pBuffImage : m_MonsterParts)
+			Safe_Release(pBuffImage);
+		m_MonsterParts.clear();
+
+		for (auto& pBuffImage : m_vecBuffImage)
+			Safe_Release(pBuffImage);
+		m_vecBuffImage.clear();
+
+		m_bClearScene = true;
+	}
+
+	
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -281,6 +288,11 @@ void CSkeleton_Naked::Combat_Tick(_double TimeDelta)
 	CombatAnim_Move(TimeDelta);
 }
 
+void CSkeleton_Naked::Combat_DeadTick(_double TimeDelta)
+{
+	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+}
+
 _int CSkeleton_Naked::Is_MovingAnim()
 {
 	if (m_pModelCom->Get_AnimIndex() == 9)
@@ -316,7 +328,6 @@ void CSkeleton_Naked::CombatAnim_Move(_double TImeDelta)
 			}
 		}
 		CCombatController::GetInstance()->Camera_Zoom_In();
-
 	}
 	else
 		return;
@@ -343,10 +354,8 @@ void CSkeleton_Naked::MovingAnimControl(_double TimeDelta)
 void CSkeleton_Naked::Create_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
-	/*CBuff_Image* pBuffImage = nullptr;
-	*/
+	
 	_uint			iEffectNum = 0;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
@@ -468,7 +477,8 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 6.f;
 		vPos.x -= 6.f;
-		CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		CExplain_FontMgr::GetInstance()->
+			Set_Debuff_Target0_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 		IsDebuffing = false;
 	}
 
@@ -519,7 +529,6 @@ void CSkeleton_Naked::Create_Hit_Effect()
 void CSkeleton_Naked::Create_Heacy_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 
 	_uint			iEffectNum = 1;
@@ -539,8 +548,21 @@ void CSkeleton_Naked::Create_Heacy_Hit_Effect()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_MonsterParts.push_back(pGameObject);
 
-	RELEASE_INSTANCE(CGameInstance);
 
+	_int iRandom = rand() % 10 + m_iWideAttackDamgae;
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y += 4.f;
+	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom);
+
+	vPos.x -= 2.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
+		_float3(2.f, 2.f, 2.f), TEXT("critical"));
+
+	m_pStatusCom->Take_Damage(iRandom);
+	CCombatController::GetInstance()->HPMp_Update(this);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CSkeleton_Naked::Anim_Frame_Create_Control()
@@ -549,40 +571,34 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 	{
 		Create_Hit_Effect();
 		CCombatController::GetInstance()->Camera_Shaking();
-		//_int iRandom = rand() % 5 + 10;
+		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
+		
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
-	
-	/*	vPos.y += 2.f;
-		vPos.x -= 6.f;
-		CExplain_FontMgr::GetInstance()->Set_Debuff_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());*/
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 1) )
 	{
 		Create_Move_Target_Effect();
 		m_bRun = true;
 	}
-	else if(!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(17, 20))
-	{
-		_int iRandom = rand() % 10 + m_iWideAttackDamgae;
-		_float4 vPos;
-		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom);
-	
-		vPos.x -= 2.f;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
-			_float3(2.f, 2.f, 2.f), TEXT("critical"));
-		
-		m_pStatusCom->Take_Damage(iRandom);
-		CCombatController::GetInstance()->HPMp_Update(this);
-		m_bOnceCreate = true;
-	}
-
+	//else if(!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(17, 20))
+	//{
+	//	_int iRandom = rand() % 10 + m_iWideAttackDamgae;
+	//	_float4 vPos;
+	//	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	//	
+	//	vPos.x += 2.f;
+	//	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font1(vPos,
+	//		_float3(2.f, 2.f, 2.f), TEXT("critical"));
+	//	
+	//	m_pStatusCom->Take_Damage(iRandom);
+	//	CCombatController::GetInstance()->HPMp_Update(this);
+	//	m_bOnceCreate = true;
+	//}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 40))
 	{
 		Create_BuffEffect();
@@ -631,7 +647,7 @@ void CSkeleton_Naked::Multi_Hit_Effect(CGameInstance* pInstance)
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("critical"));
 }
 
@@ -671,13 +687,14 @@ void CSkeleton_Naked::Create_BuffEffect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_3", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(0.f, 1.f, 2.f, 1.f);
-	BuffDesc.vScale = _float3(4.f, 6.f, 4.f);
+	BuffDesc.vPosition = _float4(1.f, 1.f, 1.5f, 1.f);
+	BuffDesc.vScale = _float3(13.f, 13.f, 13.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 8;
-	BuffDesc.bIsUp = false;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsStraight = false;
+	BuffDesc.bIsBack = true;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_MonsterParts.push_back(pGameObject);
 
@@ -714,9 +731,25 @@ void CSkeleton_Naked::Fsm_Exit()
 	CCombatController::GetInstance()->Camera_Zoom_Out();
 }
 
+void CSkeleton_Naked::UltiHeavyHitExit()
+{
+	if(false==m_bIsDead)
+		CCombatController::GetInstance()->Set_MonsterSetTarget(false);
+}
+
 _bool CSkeleton_Naked::IsCollMouse()
 {
 	return m_pColliderCom->Collision_Mouse(g_hWnd);
+}
+
+_bool CSkeleton_Naked::Is_Dead()
+{
+	if (__super::Is_Dead())
+	{
+		return true;
+	}
+
+	return false;
 }
 
 HRESULT CSkeleton_Naked::SetUp_Components()
@@ -733,8 +766,8 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
-	CCollider::COLLIDERDESC			ColliderDesc;
 	/* For.Com_AABB */
+	CCollider::COLLIDERDESC			ColliderDesc;
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
 	ColliderDesc.vSize = _float3(1.2f, 1.7f, 1.2f);
 	ColliderDesc.vRotation = _float3(0.f, 0.f, 0.f);
@@ -746,12 +779,12 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
-	StatusDesc.iHp = 500;
-	StatusDesc.iMp = 125;
+	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
+	StatusDesc.iHp = 100;
+	StatusDesc.iMp = 250;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -778,14 +811,12 @@ HRESULT CSkeleton_Naked::SetUp_ShaderResources()
 HRESULT CSkeleton_Naked::Ready_Parts()
 {
 	CGameObject*		pPartObject = nullptr;
-
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 	CWeapon::WEAPONDESC			WeaponDesc;
 	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
 
 	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
-
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Club");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -1.f, 1.f));
@@ -812,7 +843,6 @@ void CSkeleton_Naked::Calculator_HitDamage()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CStatus::DEBUFF_TYPE_Desc	eDebuffType =  m_pStatusCom->Get_DebuffType();
 	
 	if (Is_DebuffBlend(	m_pStatusCom , m_iHitWeaponOption, &m_iGetDamageNum,m_DebuffName ))
 	{
@@ -820,23 +850,19 @@ void CSkeleton_Naked::Calculator_HitDamage()
 		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos2.y += 6.f;
 		vPos2.x -= 6.f;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Target0_Font(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 		
 	}
 	else if(m_iGetDamageNum >= 50)
 	{
 		m_bIsHeavyHit = true;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+		CExplain_FontMgr::GetInstance()->
+			Set_Explain_Target0_Font0(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
 
-
-	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-	
-	
+	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom->Take_Damage(m_iGetDamageNum);
 }
-
-
 
 void CSkeleton_Naked::Anim_Idle()
 {
@@ -883,7 +909,6 @@ void CSkeleton_Naked::Anim_Skill1_Attack()
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 
-
 	m_CurAnimqeue.push({ 8, m_setTickForSecond });	// 2대 툭
 	m_CurAnimqeue.push({ 15, 1.f });
 	m_CurAnimqeue.push({ 16, 0.5f });
@@ -902,15 +927,12 @@ void CSkeleton_Naked::Anim_Defence()
 void CSkeleton_Naked::Anim_Buff()
 {
 	m_iStage_Buff_DamgaeUP = 10;
-
-	
 	m_bOnceCreate = false;
 	m_useBuff = true;
 	m_pStatusCom->Use_SkillMp(10);
+
 	m_CurAnimqeue.push({ 3, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-
-	
 }
 
 void CSkeleton_Naked::Anim_Light_Hit()
@@ -918,7 +940,7 @@ void CSkeleton_Naked::Anim_Light_Hit()
 	++m_iHitNum;
 	if (m_bIsHeavyHit)
 	{
-		m_CurAnimqeue.push({ 6, 1.f }); //,10
+		m_CurAnimqeue.push({ 1, 1.f }); 
 		m_bIsHeavyHit = false;
 	}
 	else if (true == m_bIs_Multi_Hit)
@@ -944,8 +966,9 @@ void CSkeleton_Naked::Anim_Light_Hit()
 void CSkeleton_Naked::Anim_Heavy_Hit()
 {
 	++m_iHitNum;
-	m_bOnceCreate = false;
-	
+	//m_bOnceCreate = false;
+	m_bIsHeavyHit = false;
+
 	m_CurAnimqeue.push({ 17, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 	
@@ -954,22 +977,13 @@ void CSkeleton_Naked::Anim_Heavy_Hit()
 
 void CSkeleton_Naked::Anim_Die()
 {
+	//CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 	m_iTurnCanvasOption = 1;
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2, 1.f });
 	m_CurAnimqeue.push({ 18, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 	
-	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_MonsterParts.erase(iter);
-	}
-	m_MonsterParts.clear();
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
 }
 
 void CSkeleton_Naked::Anim_Viroty()
@@ -985,7 +999,6 @@ void CSkeleton_Naked::Anim_Viroty()
 
 	for (auto& pParts : m_MonsterParts)
 		Safe_Release(pParts);
-
 	m_MonsterParts.clear();
 
 
@@ -1023,11 +1036,10 @@ void CSkeleton_Naked::Free()
 	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
 	{
 		Safe_Release(*iter);
+		*iter = nullptr;
 		iter = m_MonsterParts.erase(iter);
 	}
 	m_MonsterParts.clear();
-
-	
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

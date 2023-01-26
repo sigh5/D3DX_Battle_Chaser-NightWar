@@ -25,6 +25,7 @@ public:
 	virtual class CGameObject*	 Get_Weapon_Or_SkillBody();
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체
 	virtual		_bool	IsCollMouse()override;
+	virtual	  _bool	  Is_Dead()override;
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -35,7 +36,10 @@ public:
 
 public:
 	virtual	void	Fsm_Exit()override;
+	void			UltiHeavyHitExit();
+
 	void			Combat_Tick(_double TimeDelta);
+	virtual	  void  Combat_DeadTick(_double TimeDelta)override;
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
@@ -97,7 +101,7 @@ private:
 	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	_float					m_fHitPerSecond = 1.f;
 	_int					m_iSign = 1;
-
+	_bool					m_bClearScene = false;
 
 	WeaponType				m_eWeaponType = WEAPON_SWORD;
 	UI_REPRESENT	m_Represnt = REPRESENT_SKELTON_NAKED;

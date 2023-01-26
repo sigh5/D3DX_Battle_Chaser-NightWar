@@ -25,6 +25,8 @@ public:
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);
 	virtual		_bool	IsCollMouse()override;
 
+	void		Set_buff_Image_Height() { m_fBuffImage_Height = -245.f; }
+	virtual	  _bool	  Is_Dead()override;
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -35,15 +37,23 @@ public:
 
 public:
 	virtual		void	Fsm_Exit()override;
+	void				UltiHeavyHitExit();
 	void				Combat_Tick(_double TimeDelta);
 	_int				Is_MovingAnim();
 	void				CombatAnim_Move(_double TImeDelta);
 	void				MovingAnimControl(_double TimeDelta);
 	void				Anim_Frame_Create_Control();
-	
+	virtual	  void      Combat_DeadTick(_double TimeDelta)override;
 public:		/*Create_EFfect*/
 	virtual void		Create_Hit_Effect()override;
 	virtual void		Create_Heacy_Hit_Effect()override;
+	
+
+	/*void				Create_NormalAttack_Effect();
+	void				Create_Skill1_Effect();*/
+	void				Create_Skill2_Up_Pos_Effect();
+	void				Create_Skill2_Attack_Effect();
+
 	void				Multi_Hit_Effect(class CGameInstance*pInstance);
 	void				Create_Move_Target_Effect();
 	void				Create_BuffEffect();
@@ -96,8 +106,10 @@ private:
 	_uint					m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	_float					m_fHitPerSecond = 1.f;
 	_int					m_iSign = 1;
-
-	
+	_bool					m_bSkill2UpPos = false;
+	_bool					m_bSkill2_AttackEffect = false;
+	_bool					m_bClearScene = false;
+	_float					m_fBuffImage_Height = -285.f;
 
 
 	WeaponType		m_eWeaponType = WEAPON_END;

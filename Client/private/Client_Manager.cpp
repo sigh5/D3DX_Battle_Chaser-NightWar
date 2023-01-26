@@ -301,7 +301,11 @@ void  CClient_Manager::Create_BuffImage(vector<CGameObject*>& vecBuffImage,
 
 vector<CGameObject*>::iterator CClient_Manager::Delete_BuffImage(vector<CGameObject*>& vecBuffImage , CStatus * pStauts,_bool bIsPlayer)
 {
-	CStatus::DEBUFF_TYPE_Desc Desc = pStauts->Get_DebuffType();
+	size_t iBuffSize = vecBuffImage.size();
+	if (iBuffSize == 0)
+		return vecBuffImage.end();
+
+	const CStatus::DEBUFF_TYPE_Desc Desc = pStauts->Get_DebuffType();
 	
 	vector<_uint> iIndexs;
 
@@ -316,26 +320,30 @@ vector<CGameObject*>::iterator CClient_Manager::Delete_BuffImage(vector<CGameObj
 	if (Desc.isBuff_Damage == false)
 		iIndexs.push_back(0);
 
-	size_t iBuffSize = vecBuffImage.size();
-
-	if (iBuffSize == 0)
-		return vecBuffImage.end();
-
-	
-	for (auto iter = vecBuffImage.begin(); iter != vecBuffImage.end();)
+	for (_uint i = 0; i < iIndexs.size(); ++i)
 	{
-		if(*iter !=nullptr)
-		{ 
-			CTexture* pTexture = static_cast<CTexture*>((*iter)->Get_Component(TEXT("Com_Texture")));
-
-			for (_uint i = 0; i < iIndexs.size(); ++i)
+		for (auto iter = vecBuffImage.begin(); iter != vecBuffImage.end();)
+		{
+			if (*iter != nullptr)
 			{
+				CTexture* pTexture = static_cast<CTexture*>((*iter)->Get_Component(TEXT("Com_Texture")));
+			
 				if (pTexture->Get_SelectTextureIndex() == iIndexs[i])
-					return iter;
+				{
+					Safe_Release(*iter);
+					*iter = nullptr;
+					iter = vecBuffImage.erase(iter);
+					
+				}
+				else
+					++iter;
 			}
 		}
-		++iter;
-	}	
+	}
+
+
+
+	iIndexs.clear();
 
 	return vecBuffImage.end();
 }

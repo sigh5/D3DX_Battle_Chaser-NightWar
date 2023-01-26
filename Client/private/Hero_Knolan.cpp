@@ -51,7 +51,7 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
-		
+
 		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 
 		_float4 vPos;
@@ -61,30 +61,22 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 		if (m_bUseDefence == true)
 		{
 			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5f));
-			CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
+			CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
 
 			Create_Hit_Effect();
 			return true;
 		}
-		
+
 		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 		{
 			m_bIsHeavyHit = true;
 		}
-	
+
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-
-		/*	if (m_pStatusCom[COMBAT_PLAYER]->Get_Dead())
-			{
-				m_bIsDead = true;
-				Set_FsmState(true, m_Die);
-			}*/
-		
-
 
 		CCombatController::GetInstance()->UI_Shaking(true);
 		Calculator_HitDamage();
@@ -157,6 +149,14 @@ void CHero_Knolan::Tick(_double TimeDelta)
 		{
 			m_bIsDead = true;
 		}
+		else
+		{
+			for (auto& pBuffImage : m_vecBuffImage)
+			{
+				if (pBuffImage != nullptr)
+					pBuffImage->Tick(TimeDelta);
+			}
+		}
 
 		//static float ffPos[3] = {};
 		//static float ffScale[3] = {};
@@ -183,11 +183,7 @@ void CHero_Knolan::Tick(_double TimeDelta)
 
 
 
-		for (auto& pBuffImage : m_vecBuffImage)
-		{
-			if (pBuffImage != nullptr)
-				pBuffImage->Tick(TimeDelta);
-		}
+
 
 
 
@@ -247,27 +243,20 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 
 		if (m_bIsCombatScene == true)
 		{
-			CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
-			auto Buff_iter = CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
-
-			for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
+			if (!m_bIsDead && false ==m_bUltimateBuffRenderStop && CClient_Manager::m_bCombatWin == false)
 			{
-				if (Buff_iter == m_vecBuffImage.end())
+				CClient_Manager::Sort_BuffImage(m_vecBuffImage, true);
+				for (auto iter = m_vecBuffImage.begin(); iter != m_vecBuffImage.end();)
 				{
 					if (*iter != nullptr)
 						(*iter)->Late_Tick(TimeDelta);
 
 					++iter;
 				}
-				else
-				{
-					Safe_Release(*iter);
-					iter = m_vecBuffImage.erase(iter);
-					Buff_iter = m_vecBuffImage.end();
-				}
-
+				CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
 			}
 		}
+
 	}
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
@@ -633,12 +622,22 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
-		
+
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
-			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			pGameObject = pInstance->Load_Effect(L"Texture_Bleeding_Effect_3", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);		// 이미지 교체필요
+			BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+			static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
+			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
+			break;
+
+
 		default:
 			break;
 		}
@@ -730,11 +729,11 @@ void CHero_Knolan::Use_HpPotion()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
 
 	vPos.y += 2.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont_0(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
 
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -754,7 +753,7 @@ void CHero_Knolan::Use_HpPotion()
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
-	
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -770,11 +769,11 @@ void CHero_Knolan::Use_MpPotion()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
 
 	vPos.y += 2.f;
-	CDamage_Font_Manager::GetInstance()->Set_HPMPFont(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
+	CDamage_Font_Manager::GetInstance()->Set_HPMPFont_0(vPos, _float3(1.5f, 1.5f, 1.5f), iRandNum);
 
 
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -797,7 +796,7 @@ void CHero_Knolan::Use_MpPotion()
 
 	RELEASE_INSTANCE(CGameInstance);
 
-	
+
 
 }
 
@@ -810,6 +809,8 @@ void CHero_Knolan::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 	case Engine::CStatus::DEBUFF_FIRE:
 		break;
 	case Engine::CStatus::DEBUFF_BLEED:
+		iTextureNum = 1;
+		m_DebuffName = TEXT("bleeding");
 		break;
 	case Engine::CStatus::DEBUFF_ARMOR:
 		iTextureNum = 4;
@@ -826,14 +827,18 @@ void CHero_Knolan::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 	default:
 		break;
 	}
-	
+
 	CClient_Manager::Create_BuffImage(m_vecBuffImage,
 		_float4(-305.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 		TEXT("Prototype_GameObject_BuffImage"), iTextureNum);
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(eDebuffOption, true);
 
-	
-
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.x -= 2.f;
+	vPos.y += 4.f;
+	CExplain_FontMgr::GetInstance()->
+		Set_Debuff_Target0_Font(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 }
 
 void CHero_Knolan::Create_Defence_Area()
@@ -863,7 +868,7 @@ void CHero_Knolan::Create_Defence_Area()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("shiled"));
 
 
@@ -899,7 +904,7 @@ void CHero_Knolan::Create_WideBuffEffect()
 			pCombatCtr->HPMp_Update(pActor.second);
 		}
 	}
-	
+
 	RELEASE_INSTANCE(CCombatController);
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -949,7 +954,7 @@ void CHero_Knolan::Create_Wide_BuffEffect_Second()
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mana up"));
 }
 
@@ -1095,7 +1100,21 @@ void CHero_Knolan::Create_Ultimate_Start_CamEffect()
 
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
-	if (!m_bOnceStop && m_pModelCom->Control_KeyFrame_Create(7, 15))
+
+	if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 43))
+	{
+		Create_Hit_Effect();
+		m_bOnceCreate = true;
+		m_bIs_Multi_Hit = false;
+
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		_int iRandom = rand() % 5;
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + _int(m_iGetDamageNum*0.5));
+
+	}
+	else if (!m_bOnceStop && m_pModelCom->Control_KeyFrame_Create(7, 15))
 	{
 		Create_Skill_Texture();
 		m_bOnceStop = true;
@@ -1113,7 +1132,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
 	}
-	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(9, 1))
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(9, 4))
 	{
 		CCombatController::GetInstance()->Camera_Shaking();
 		Create_Hit_Effect();
@@ -1122,7 +1141,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.y += 4.f;
 		_int iRandom = rand() % 5;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
 
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
@@ -1172,6 +1191,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
 	{
+		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		m_bIsUseUltimate = true;
 	}
@@ -1198,19 +1218,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_bOnceCreate = true;
 	}
 
-	else if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 43))
-	{
-		Create_Hit_Effect();
-		m_bOnceCreate = true;
-		m_bIs_Multi_Hit = false;
 
-		_float4 vPos;
-		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
-		_int iRandom = rand() % 5;
-		CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), iRandom + _int(m_iGetDamageNum*0.5));
-
-	}
 	else
 		return;
 }
@@ -1314,27 +1322,25 @@ void CHero_Knolan::Calculator_HitDamage()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
-	CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
+	//CStatus::DEBUFF_TYPE_Desc	eDebuffType = m_pStatusCom[COMBAT_PLAYER]->Get_DebuffType();
 
 	if (Is_DebuffBlend(m_pStatusCom[COMBAT_PLAYER], m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
 	{
 		_float4 vPos2;
 		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos2.y += 6.f;
-		vPos2.x -= 6.f;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
-
+		vPos2.x -= 2.f;
+		vPos2.y += 5.f;
+		CExplain_FontMgr::GetInstance()->
+			Set_Debuff_Target0_Font(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 	}
 	else if (m_iGetDamageNum >= 50)
 	{
 		m_bIsHeavyHit = true;
-		CExplain_FontMgr::GetInstance()->Set_Explain_Font2(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
+		CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font1(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
 
 
-	CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-
-
+	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 }
 
@@ -1449,8 +1455,7 @@ void CHero_Knolan::Anim_Skill2_Attack()
 
 void CHero_Knolan::Anim_Uitimate()
 {
-	//Create_Ultimate_Start_CamEffect();
-	
+	m_bUltimateBuffRenderStop = true;
 	m_bUltimateCam = false;
 	m_bBuffEffectStop = true;
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
@@ -1483,7 +1488,7 @@ void CHero_Knolan::Anim_Buff()
 	vPos.y += 4.f;
 
 
-	CExplain_FontMgr::GetInstance()->Set_Explain_Font(vPos,
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("damage up"));
 
 	CClient_Manager::Create_BuffImage(m_vecBuffImage,
@@ -1528,10 +1533,10 @@ void CHero_Knolan::Anim_Defence()
 
 void CHero_Knolan::Anim_Light_Hit()
 {
-
 	if (m_bIsHeavyHit)
 	{
 		m_CurAnimqeue.push({ 8,  1.f });	// 8,9,10
+		m_bIsHeavyHit = false;
 	}
 	else if (true == m_bIs_Multi_Hit)
 	{
@@ -1554,7 +1559,9 @@ void CHero_Knolan::Anim_Light_Hit()
 
 void CHero_Knolan::Anim_Heavy_Hit()
 {
-	m_CurAnimqeue.push({ 8,  1.f });	// 8,9,10
+	m_bIsHeavyHit = false;
+
+	m_CurAnimqeue.push({ 10,  1.f });	// 8,9,10
 	Set_CombatAnim_Index(m_pModelCom);
 	Create_Hit_Effect();
 }
@@ -1601,6 +1608,12 @@ void CHero_Knolan::Anim_Die()
 
 void CHero_Knolan::Anim_Viroty()
 {
+	_int iRandHp = rand() % 3 + 1;
+	_int iRandMp = rand() % 2 + 1;
+
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, iRandHp);
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_MP_POSION, iRandMp);
+
 
 	while (!m_CurAnimqeue.empty())
 	{
@@ -1620,7 +1633,6 @@ void CHero_Knolan::Anim_Viroty()
 		m_CurAnimqeue.push({ 36, 1.f });
 	}
 
-
 	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
 	{
 		Safe_Release(*iter);
@@ -1631,7 +1643,7 @@ void CHero_Knolan::Anim_Viroty()
 
 	for (auto& pBuffImage : m_vecBuffImage)
 		Safe_Release(pBuffImage);
-
+	m_vecBuffImage.clear();
 
 	Set_CombatAnim_Index(m_pModelCom);
 }

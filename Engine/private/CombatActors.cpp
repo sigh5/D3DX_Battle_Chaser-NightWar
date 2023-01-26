@@ -12,7 +12,7 @@ CCombatActors::CCombatActors(const CCombatActors & rhs)
 	: CGameObject(rhs)
 	, m_iAnimIndex(rhs.m_iAnimIndex)
 {
-	
+
 }
 
 
@@ -44,124 +44,135 @@ void CCombatActors::WideBuff_Status(CStatus * pStatus, _int iOption, _int iAmoun
 		pStatus->Incrase_Mp(iAmount);
 }
 
-_bool CCombatActors::Is_DebuffBlend(CStatus* pStatus,CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag)
+_bool CCombatActors::Is_DebuffBlend(CStatus* pStatus, CHitBoxObject::WEAPON_OPTIONAL eWeaponOption, OUT _int* iCurDamage, OUT wstring& pDebuffTag)
 {
 	_int iChangeValue = *iCurDamage;
 
 	CStatus::DEBUFFTYPE		eType = CStatus::DEBUFFTYPE::DEBUFF_NONE;
 
-	if(pStatus->Get_DebuffType().isDebuff_FIRE)
+	if (pStatus->Get_DebuffType().isDebuff_FIRE)
 	{
-		switch (eWeaponOption)
+		if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2)
 		{
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
 			pDebuffTag = TEXT("fire critical");
 			(*iCurDamage) += 10;
-			eType= CStatus::DEBUFFTYPE::DEBUFF_FIRE;
-			break;
-	
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
+			eType = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL)
+		{
 			(*iCurDamage) += 5;
 			pDebuffTag = TEXT("fire critical");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
-			break;
-		
-		default:
-			break;
+			pStatus->Set_DebuffOption(eType, false);
 		}
-		
+
 	}
-	 if (pStatus->Get_DebuffType().isDebuff_BLEED)
+	if (pStatus->Get_DebuffType().isDebuff_BLEED)
 	{
 
-		switch (eWeaponOption)
+		if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL)
 		{
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL:
 			(*iCurDamage) += 5;
 			pDebuffTag = TEXT("bleeding");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL2:
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL2)
+		{
 			(*iCurDamage) += 10;
 			pDebuffTag = TEXT("bleeding");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
-			break;
-		default:
-			break;
+			pStatus->Set_DebuffOption(eType, false);
 		}
-	}
-	 if (pStatus->Get_DebuffType().isDebuff_MAGIC)
-	{
-		switch (eWeaponOption)
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_ATTACK)
 		{
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2:
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_HEAD)
+		{
+			(*iCurDamage) += 10;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+
+	}
+	if (pStatus->Get_DebuffType().isDebuff_MAGIC)
+	{
+
+		if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL2)
+		{
 			(*iCurDamage) += 10;
 			pDebuffTag = TEXT("magic critical");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
-			(*iCurDamage) += 8;
-			pDebuffTag = TEXT("magic critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
-			(*iCurDamage) += 5;
-			pDebuffTag = TEXT("magic critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_ATTACK:
-			(*iCurDamage) += 5;
-			pDebuffTag = TEXT("magic critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
-			break;
-		default:
-			break;
+			pStatus->Set_DebuffOption(eType, false);
 		}
-	
-	}
-	 if (pStatus->Get_DebuffType().isDebuff_ARMOR)
-	{
-		switch (eWeaponOption)
+		else  if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1)
 		{
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PULPLE:
 			(*iCurDamage) += 8;
-			pDebuffTag = TEXT("armor critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL:
-			(*iCurDamage) += 8;
-			pDebuffTag = TEXT("armor critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL1:
-			(*iCurDamage) += 15;
-			pDebuffTag = TEXT("armor critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_HIT:
-			(*iCurDamage) += 8;
-			pDebuffTag = TEXT("armor critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
-			break;
-		case Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_GUN:
-			(*iCurDamage) += 15;
-			pDebuffTag = TEXT("armor critical");
-			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
-			break;
-		default:
-			break;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			pStatus->Set_DebuffOption(eType, false);
 		}
-		
+		else  if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL)
+		{
+			(*iCurDamage) += 5;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			pStatus->Set_DebuffOption(eType, false);
+		}
 		
 	}
 
+	if (pStatus->Get_DebuffType().isDebuff_ARMOR)
+	{
+		if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_PULPLE)
+		{
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
 
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_NORMAL)
+		{
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_GARRISON_SKILL1)
+		{
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_HIT)
+		{
+			(*iCurDamage) += 8;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_GUN)
+		{
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
+		}
 
-	 if (iChangeValue < (*iCurDamage))
-	 {
-		 pStatus->Set_DebuffOption(eType, false);
-		 return true;
-	 }
+	}
+
+	if (iChangeValue < (*iCurDamage))
+	{
+		return true;
+	}
 	return false;
 }
 
@@ -260,6 +271,10 @@ void CCombatActors::Set_CombatAnim_Index(CModel * pModel)
 	pModel->Set_AnimTickTime(m_CurAnimqeue.front().second);
 	m_bIsIdle = false;
 	m_CurAnimqeue.pop();
+}
+
+void CCombatActors::Combat_DeadTick(_double TimeDelta)
+{
 }
 
 CGameObject * CCombatActors::Get_Weapon_Or_SkillBody()

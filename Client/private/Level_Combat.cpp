@@ -8,6 +8,9 @@
 #include "PlayerController.h"
 #include "TrunWinCanvas.h"
 #include "TrunLoseCanvas.h"
+#include "Spider_Mana.h"
+
+
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pCombatController(CCombatController::GetInstance())
@@ -254,9 +257,16 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
 
+		
+
 		pGameInstance->
 			Get_GameObject(LEVEL_COMBAT,
 				pLayerTag, TEXT("Spider_Mana"))->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
+
+		static_cast<CSpider_Mana*>(pGameInstance->
+			Get_GameObject(LEVEL_COMBAT,
+				pLayerTag, TEXT("Spider_Mana")))->Set_buff_Image_Height();
+
 
 		break;
 

@@ -75,7 +75,7 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
 	}))
 
-		.AddState(L"NormalAttack")
+	.AddState(L"NormalAttack")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->AnimNormalAttack();
@@ -86,15 +86,15 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 	.OnExit([this]()
 	{
-		static_cast<CMonster*>(m_pTarget)->Fsm_Exit();
+		static_cast<CSlimeKing*>(m_pTarget)->Fsm_Exit();
 	})
 
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Get_IsIdle();
 	}))
 
-		.AddState(L"SkillAttack1")
+	.AddState(L"SkillAttack1")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Anim_Skill1_Attack();
@@ -105,15 +105,15 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 		.OnExit([this]()
 	{
-		static_cast<CMonster*>(m_pTarget)->Fsm_Exit();
+		static_cast<CSlimeKing*>(m_pTarget)->Fsm_Exit();
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Get_IsIdle();
 	}))
 
 
-		.AddState(L"Uitimate")
+	.AddState(L"Uitimate")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Anim_Uitimate();
@@ -124,14 +124,14 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 		.OnExit([this]()
 	{
-		static_cast<CMonster*>(m_pTarget)->Fsm_Exit();
+		static_cast<CSlimeKing*>(m_pTarget)->Fsm_Exit();
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
 		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
 	}))
 
-		.AddState(L"Buff")
+	.AddState(L"Buff")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Anim_Buff();
@@ -142,14 +142,14 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 		.OnExit([this]()
 	{
-		static_cast<CMonster*>(m_pTarget)->Fsm_Exit();
+		static_cast<CSlimeKing*>(m_pTarget)->Fsm_Exit();
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Get_IsIdle();
 	}))
 
-		.AddState(L"Light_Hit")
+	.AddState(L"Light_Hit")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Anim_Light_Hit();
@@ -160,11 +160,11 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Light_Hit To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Get_IsIdle();
 	},1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Light_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Is_Dead();
 	}, 0))
 
 		.AddState(L"Heavy_Hit")
@@ -178,27 +178,31 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Get_IsIdle();
 	},1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSlimeKing*>(m_pTarget)->Is_Dead();
 	}, 0))
+		.OnExit([this]()
+	{
+		static_cast<CSkeleton_Naked*>(m_pTarget)->UltiHeavyHitExit();
+	})
 
 
-		.AddState(L"Die")
+	.AddState(L"Die")
 		.OnStart([this]()
 	{
 		static_cast<CSlimeKing*>(m_pTarget)->Anim_Die();
 	})
 		.Tick([this](_double TimeDelta)
 	{
-		static_cast<CSlimeKing*>(m_pTarget)->Combat_Tick(TimeDelta);
+		static_cast<CSlimeKing*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 	})
-	//	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
-	//{
-	//	return m_pCombatController->To_Idle();
-	//}))
+		/*	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		{
+			return m_pCombatController->To_Idle();
+		}))*/
 
 		.AddState(L"Viroty")
 		.OnStart([this]()
@@ -340,13 +344,13 @@ HRESULT CMonsterFsm::Init_Skelton_Naked(CGameObject * pTarget)
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Light_Hit To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSkeleton_Naked*>(m_pTarget)->Get_IsIdle();
 	},1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Light_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSkeleton_Naked*>(m_pTarget)->Is_Dead();
 	}, 0))
-
+		
 
 	.AddState(L"Heavy_Hit")
 		.OnStart([this]()
@@ -363,8 +367,12 @@ HRESULT CMonsterFsm::Init_Skelton_Naked(CGameObject * pTarget)
 	},1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSkeleton_Naked*>(m_pTarget)->Is_Dead();
 	}, 0))
+		.OnExit([this]()
+	{
+		static_cast<CSkeleton_Naked*>(m_pTarget)->UltiHeavyHitExit();
+	})
 
 	.AddState(L"Die")
 		.OnStart([this]()
@@ -373,12 +381,18 @@ HRESULT CMonsterFsm::Init_Skelton_Naked(CGameObject * pTarget)
 	})
 		.Tick([this](_double TimeDelta)
 	{
-		static_cast<CSkeleton_Naked*>(m_pTarget)->Combat_Tick(TimeDelta);
+		static_cast<CSkeleton_Naked*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 	})
-	//	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+	//	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 	//{
-	//	return m_pCombatController->To_Idle();
+	//	return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
 	//}))
+
+	//.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
+	//{
+	//	return static_cast<CSkeleton_Naked*>(m_pTarget)->To_Viroty();
+	//}))
+	//
 
 	.AddState(L"Viroty")
 		.OnStart([this]()
@@ -511,11 +525,11 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	})
 		.OnExit([this]()
 	{
-		static_cast<CMonster*>(m_pTarget)->Fsm_Exit();
+		static_cast<CSpider_Mana*>(m_pTarget)->Fsm_Exit();
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
+		return  static_cast<CSpider_Mana*>(m_pTarget)->Get_IsIdle();
 	}))
 
 	.AddState(L"Light_Hit")
@@ -527,14 +541,15 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	{
 		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
-	},1))
+		return  static_cast<CSpider_Mana*>(m_pTarget)->Get_IsIdle();
+	}, 1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSpider_Mana*>(m_pTarget)->Is_Dead();
 	}, 0))
+
 
 	.AddState(L"Heavy_Hit")
 		.OnStart([this]()
@@ -545,14 +560,19 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	{
 		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
 	})
-		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("Heavy_Hit To Idle"), [this]()
 	{
-		return  static_cast<CMonster*>(m_pTarget)->Get_IsIdle();
-	},1))
+		return  static_cast<CSpider_Mana*>(m_pTarget)->Get_IsIdle();
+	}, 1))
 		.Transition(TEXT("Die"), FSM_TRANSITION(TEXT("Heavy_Hit To Die"), [this]()
 	{
-		return  static_cast<CCombatActors*>(m_pTarget)->Is_Dead();
+		return  static_cast<CSpider_Mana*>(m_pTarget)->Is_Dead();
 	}, 0))
+		.OnExit([this]()
+	{
+		static_cast<CSpider_Mana*>(m_pTarget)->UltiHeavyHitExit();
+	})
+
 
 	.AddState(L"Die")
 		.OnStart([this]()
@@ -561,11 +581,16 @@ HRESULT CMonsterFsm::Init_Spider_Mana(CGameObject * pTarget)
 	})
 		.Tick([this](_double TimeDelta)
 	{
-		static_cast<CSpider_Mana*>(m_pTarget)->Combat_Tick(TimeDelta);
+		static_cast<CSpider_Mana*>(m_pTarget)->Combat_DeadTick(TimeDelta);
 	})
-	/*	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		/*	.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("NormalAttack To Idle"), [this]()
+		{
+			return m_pCombatController->To_Idle();
+		}, 0))*/
+
+	/*	.Transition(TEXT("Viroty"), FSM_TRANSITION(TEXT("Die To Viroty"), [this]()
 	{
-		return m_pCombatController->To_Idle();
+		return static_cast<CSpider_Mana*>(m_pTarget)->To_Viroty();
 	}))*/
 
 	.AddState(L"Viroty")

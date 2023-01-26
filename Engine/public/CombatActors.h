@@ -63,7 +63,7 @@ public: /*For.Animamtion*/
 	virtual void	  CurAnimQueue_Play_Tick(_double Time, class CModel* pModel);
 	virtual void	  CurAnimQueue_Play_LateTick(class CModel* pModel);
 	virtual void	  Set_CombatAnim_Index(class CModel* pModel);
-	
+	virtual	  void    Combat_DeadTick(_double TimeDelta);
 public:
 	virtual		void		Fsm_Exit();
 	virtual		_bool		Calculator_HitColl(CGameObject* pWeapon);	//무기 아니면 스킬구체

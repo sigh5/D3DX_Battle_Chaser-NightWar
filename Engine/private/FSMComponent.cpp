@@ -152,7 +152,7 @@ void CFSMComponent::Tick(_double TimeDelta)
 		}
 	}
 
-	assert(iLoopCnt > 0); // 公茄风橇 眉农
+	assert(iLoopCnt > 0 && " sibal"); // 公茄风橇 眉农
 }
 
 HRESULT CFSMComponent::Initialize(void* pArg)

@@ -53,7 +53,7 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	void			  Combat_DeadTick(_double TimeDelta);
+	virtual	  void	  Combat_DeadTick(_double TimeDelta)override;
 
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
 	void			 Create_Test_Effect();		//Test_Effect
@@ -138,6 +138,8 @@ private:
 
 	_bool			m_bOnceStop = false;
 	_bool			m_bUltimateCam = false;
+	_bool			m_bUltimateBuffRenderStop = false;
+
 	_float3			m_vSkill_Scale;
 	_float4			m_vSkill_Pos;
 	string			m_BoneTag = "";

@@ -52,7 +52,7 @@ public: /*For.Dungeon*/
 public:  /*For.Combat*/
 	virtual	  void		Combat_Tick(_double TimeDelta)override;
 	virtual	  void		Combat_Ultimate(_double TimeDelta);
-	void				Combat_DeadTick(_double TimeDelta);
+	virtual   void		Combat_DeadTick(_double TimeDelta)override;
 
 	virtual   void		Combat_BlendAnimTick(_double TimeDelta);
 	virtual	  void		Fsm_Exit()override;
@@ -122,6 +122,7 @@ private:
 	_bool			m_bCreateDefenceTimer = false;
 	_float			m_fDefenceFsmTimer = 0.f;
 	_bool			m_bUltimateCam = false;
+	_bool			m_bUltimateBuffRenderStop = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -131,6 +132,7 @@ private:
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
 
 	class CAnimFsm*				m_pAnimFsm = nullptr;
+
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;

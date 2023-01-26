@@ -50,7 +50,7 @@ public: /*For.Dungeon*/
 
 public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
-	void			  Combat_DeadTick(_double TimeDelta);
+	virtual   void	  Combat_DeadTick(_double TimeDelta)override;
 	virtual	  _bool	  Is_Dead()override;
 	_int			  Is_MovingAnim();
 	void			  CombatAnim_Move(_double TImeDelta);
@@ -105,13 +105,14 @@ private:
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
-	_int					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT;
+	_int					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	
 	_bool					m_bRun = false;
 	_bool					m_bBulletShoot = false;
 	_bool					m_bCreateSmoke = true;
 	_bool					m_bLazorStop = true;
 	_bool					m_bUltimateCam = false;
+	_bool					m_bUltimateBuffRenderStop = false;
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
@@ -160,6 +161,9 @@ public:
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
+
+	CGameObject*			m_pLazorEffect = nullptr;
+
 	WeaponType		m_eWeaponType= WEAPON_END;
 
 

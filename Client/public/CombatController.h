@@ -154,7 +154,7 @@ private:
 	_bool					m_bisHitTimer_Alive = false;
 
 	_float					m_fHitTimer = 0.0f;
-	_float					m_fHitRecoverTime =0.01f;		// 모든 연속공격일때 특단의 조치가 필요
+	_float					m_fHitRecoverTime =0.02f;		// 모든 연속공격일때 특단의 조치가 필요
 
 	_bool					m_bMonsterSelect_Target = false;			
 	_uint					m_iMonster_Player_Option=0;

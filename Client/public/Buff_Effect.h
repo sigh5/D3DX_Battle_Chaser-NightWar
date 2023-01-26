@@ -30,7 +30,7 @@ public:
 		_int				iFrameCnt;
 		_bool				bIsUp;
 		_bool				bIsStraight;
-	
+		_bool				bIsBack;
 	}BuffEffcet_Client;
 
 

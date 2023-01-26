@@ -72,6 +72,9 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+#ifdef NOMODLES
+
+#else
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Gully"));
 	dynamic_cast<CHero_Knolan*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
@@ -102,6 +105,9 @@ HRESULT CTurnUICanvas::Last_Initialize()
 
 	SetUp_ChildrenPosition();
 	RELEASE_INSTANCE(CGameInstance);
+#endif
+	
+	
 
 
 	m_bLast_Initlize = true;

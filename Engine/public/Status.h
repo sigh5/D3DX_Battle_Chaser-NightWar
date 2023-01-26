@@ -48,7 +48,7 @@ protected:
 	virtual ~CStatus() = default;
 
 public:
-	DEBUFF_TYPE_Desc	Get_DebuffType() {
+	DEBUFF_TYPE_Desc&	Get_DebuffType() {
 		return m_StatusDesc.m_tagDesc;
 	}
 	void		Set_Dungeon_PosScale(_float4 vPos, _float3 vScale) {

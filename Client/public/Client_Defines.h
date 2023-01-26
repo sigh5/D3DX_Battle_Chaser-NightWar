@@ -11,7 +11,7 @@
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
 //#define NOMODLES
-//#define  FONT_TEST
+//#define FONT_TEST
 
 
 namespace Client

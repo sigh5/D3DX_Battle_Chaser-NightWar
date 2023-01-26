@@ -396,7 +396,8 @@ void CCombatController::Cal_HitPlayerTarget()
 		{
 			To_Skill1_Attack();
 		}
-		else		{
+		else		
+		{
 			To_Normal_Attack();
 		}
 		
@@ -762,7 +763,11 @@ void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 
 void CCombatController::MonsterSetTarget()
 {
-	if (nullptr == m_pCurentActor  || nullptr == dynamic_cast<CMonster*>(m_pCurentActor))
+	if (nullptr == dynamic_cast<CMonster*>(m_pCurentActor) )
+		return;
+
+	CStatus* pStatus = Find_CurStatus(m_pCurentActor->Get_ObjectName());
+	if (pStatus->Get_CurStatusHpRatio() <= 0.f)
 		return;
 
 	Cal_HitPlayerTarget();
