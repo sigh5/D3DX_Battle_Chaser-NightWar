@@ -51,6 +51,8 @@ public: /*For.Combat*/
 	virtual void				Use_MpPotion();
 	virtual _int				Get_RestHpPotion();
 	virtual _int				Get_RestMpPotion();
+	virtual void				Boss_Ultimate_Anim();
+
 protected:
 	_bool				KeyInput(_double TimeDelta, CNavigation* pNavigation);
 	virtual void		Change_Level_Data(_uint iLevleIdx) {}

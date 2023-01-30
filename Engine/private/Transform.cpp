@@ -253,7 +253,7 @@ void CTransform::LookAt(_fvector vTargetPos)
 	Set_State(CTransform::STATE_LOOK, vLook);
 }
 
-void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit )
+_bool CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit )
 {
 
 	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
@@ -265,7 +265,10 @@ void CTransform::Chase(_fvector vTargetPos, _double TimeDelta, _float fLimit )
 	{
 		vPosition += XMVector3Normalize(vDir) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
 		Set_State(CTransform::STATE_TRANSLATION, vPosition);
+		return false;
 	}
+	else
+		return true;
 }
 
 _bool CTransform::JudgeChaseState(_fvector vTargetPos, _float fLimit)
@@ -362,6 +365,12 @@ void CTransform::Go_Up(_double TimeDelta)
 
 void CTransform::Go_Down(_double TimeDelta)
 {
+	_vector		vPosition = Get_State(CTransform::STATE_TRANSLATION);
+	_vector		vUp = Get_State(CTransform::STATE_UP);
+	/* 이렇게 얻어온 VlOOK은 Z축 스케일을 포함하낟. */
+	vPosition -= XMVector3Normalize(vUp) * m_TransformDesc.fSpeedPerSec *  (_float)TimeDelta;
+
+	Set_State(CTransform::STATE_TRANSLATION, vPosition);
 }
 
 HRESULT CTransform::Bind_ShaderResource(CShader * pShaderCom, const char * pConstantName)

@@ -56,11 +56,13 @@ public:		/*Create_EFfect*/
 	void				Create_Move_Target_Effect();
 	void				Create_BuffEffect();
 
-	void				Create_Skill_Ultimate_Effect();
+	void				Create_Skill_Ultimate_Effect0();
+	void				Create_Skill_Ultimate_Effect1();
+	void				Create_Skill_Ultimate_Effect2();
 
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
-
+	void				Create_Test_MeshEffect();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -93,6 +95,7 @@ public:
 
 private:
 	vector<CGameObject*>	m_MonsterParts;
+	list<CGameObject*>		m_UltimateBullet;
 	CGameObject*			m_pCamEffectObj = nullptr;
 private:
 	_int					m_iMovingDir = ANIM_EMD;
@@ -116,6 +119,18 @@ private:
 	_bool					m_bUltimateCam = false;
 	_bool					m_bUltimateRun = false;
 	_bool					m_bUltiWideAttack = false;
+	_bool					m_bUltiAttackStart = false;
+	_bool					m_bUltiAttackStop = false;
+	_float					m_fCreatePosX = 1.5f;
+	_float					m_fCreatePosY = 2.2f;
+	_float					m_fCreatePosZ = 2.0f;
+	_float					m_fCreateScale = 0.5f;
+
+	_int					m_iFrameCnt = 0;
+	_int					m_iMaxCnt = 0;
+	_bool					m_bUltimate_AttackEffect = false;
+	_float					m_fUltimateTimer = 0.f;
+
 
 
 	WeaponType				m_eWeaponType = WEAPON_HEAD;

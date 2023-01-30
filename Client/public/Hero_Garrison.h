@@ -72,7 +72,11 @@ public:	 /*Create_Effect*/
 	void				Create_Defence_Area();
 	void				Create_Buff_MainTain_Effect();
 	void				Create_Ultimate_StartCam_Effect();
+	void			    Create_Ultimate_StartFog_CamEffect();
+	void			    Create_FullScreenEffect();
+
 	virtual void		Create_Heavy_Hit_Effect()override;
+	virtual void		Boss_Ultimate_Anim()override;
 
 
 public:
@@ -124,6 +128,8 @@ private:
 	_float			m_fDefenceFsmTimer = 0.f;
 	_bool			m_bUltimateCam = false;
 	_bool			m_bUltimateBuffRenderStop = false;
+	_bool			m_bFogStart = false;
+	_bool			m_bFullScreenEffect = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -131,8 +137,11 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
+	class CAnimFsm*			m_pAnimFsm = nullptr;
 
-	class CAnimFsm*				m_pAnimFsm = nullptr;
+	CGameObject*			m_pFog = nullptr;
+	CGameObject*			m_pFullscreenEffect = nullptr;
+
 
 private:
 	vector<CGameObject*>	m_PlayerParts;

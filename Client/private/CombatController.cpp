@@ -562,9 +562,10 @@ void CCombatController::Ultimate_End_LateTick(_double TimeDelta)
 	m_bBannerClose = false;
 	m_bCurActorUltimateEnd = false;
 	m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCombatBG->Get_ObjectName());
+	m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCombatBG2->Get_ObjectName());
 	Ultimate_Camera_Off();
 	m_pCombatBG = nullptr;
-	
+	m_pCombatBG2 = nullptr;
 }
 
 void CCombatController::Refresh_CurActor()
@@ -621,6 +622,24 @@ void CCombatController::Active_Fsm()
 
 	//To_Die();
 	
+}
+
+void CCombatController::Load_CamBG2()
+{
+	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	{
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_3"), LEVEL_COMBAT);
+	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Alumon")))
+	{
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_1"), LEVEL_COMBAT);
+	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Gully")))
+	{
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
+	}
+	else
+		return;
 }
 
 void CCombatController::Wide_Debuff(_bool bIsPlayer, CStatus::DEBUFFTYPE eDebuffOption)

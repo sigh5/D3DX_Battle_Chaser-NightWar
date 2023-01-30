@@ -60,6 +60,9 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 #ifdef NOMODLES
 	m_HitBoxDesc.Poing_Desc = m_pVIBufferCom->Get_Point_TextureDesc();
 #else
+
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 	Skill_DIR eDir = m_SkillDesc.eDir;
 
 	switch (eDir)
@@ -109,7 +112,7 @@ void CSkill_TextureObj::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+
 
 	if (nullptr != m_pRendererCom)
 	{

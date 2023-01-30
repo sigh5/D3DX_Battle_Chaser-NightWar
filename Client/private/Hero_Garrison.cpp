@@ -150,6 +150,12 @@ void CHero_Garrison::Tick(_double TimeDelta)
 			}
 		}
 
+		if (nullptr != m_pFog)
+			m_pFog->Tick(TimeDelta);
+
+		if (nullptr != m_pFullscreenEffect)
+			m_pFullscreenEffect->Tick(TimeDelta);
+
 		//static float ffPos[3] = {};
 		//static float ffScale[3] = {};
 		//static char  szName[MAX_PATH] = "";
@@ -172,6 +178,10 @@ void CHero_Garrison::Tick(_double TimeDelta)
 
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
+
+		
+
+	
 
 
 	}
@@ -237,16 +247,25 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			}
 		}
 
-
-		/*for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		if (nullptr != m_pFog)
 		{
-			Safe_Release(*iter);
-			iter = m_pEffectParts.erase(iter);
+			m_pFog->Late_Tick(TimeDelta);
+			if (static_cast<CBuff_Effect*>(m_pFog)->Get_IsFinish())
+			{
+				Safe_Release(m_pFog);
+				m_pFog = nullptr;
+			}
 		}
-		m_pEffectParts.clear();
 
-		for (auto& pBuffImage : m_vecBuffImage)
-			Safe_Release(pBuffImage);*/
+		if (nullptr != m_pFullscreenEffect)
+		{
+			m_pFullscreenEffect->Late_Tick(TimeDelta);
+			if (static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Get_IsFinish())
+			{
+				Safe_Release(m_pFullscreenEffect);
+				m_pFullscreenEffect = nullptr;
+			}
+		}
 
 
 	}
@@ -572,10 +591,10 @@ void CHero_Garrison::Create_Hit_Effect()
 			BuffDesc.vScale = _float3(7.f, 7.f, 7.f);
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_BREATH:
-			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 			iEffectNum = 1;
-			BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
-			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
 
 
@@ -935,6 +954,55 @@ void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
 	RELEASE_INSTANCE(CGameInstance);
 }
+void CHero_Garrison::Create_Ultimate_StartFog_CamEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	m_pFog = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFog = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Cloud"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(11.f, 4.5f, 16.f, 1.f);
+	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 6;
+	BuffDesc.bIsUp = false;
+
+
+	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+void CHero_Garrison::Create_FullScreenEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	m_pFullscreenEffect = nullptr;
+
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFullscreenEffect = pInstance->Load_Effect(TEXT("Blood_Rect_Effect"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(-3.56f, 19.115f, -10.524f, 1.f);
+	BuffDesc.vScale = _float3(1.f, 1.f, 1.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 4;
+	BuffDesc.bIsUp = false;
+
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_ShaderPass(7);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
 void CHero_Garrison::Create_Heavy_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -972,6 +1040,12 @@ void CHero_Garrison::Create_Heavy_Hit_Effect()
 	CCombatController::GetInstance()->HPMp_Update(this);
 
 	RELEASE_INSTANCE(CGameInstance);
+}
+void CHero_Garrison::Boss_Ultimate_Anim()
+{
+	m_CurAnimqeue.push({ 27,3.f });	//6,26,27
+	Set_CombatAnim_Index(m_pModelCom);
+
 }
 void CHero_Garrison::Anim_Frame_Create_Control()
 {
@@ -1456,8 +1530,16 @@ void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 
 void CHero_Garrison::Ultimate_Anim_Frame_Control()
 {
-	if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(30, 45))
+	if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(30, 3))
 	{
+		Create_Ultimate_StartFog_CamEffect();
+		CCombatController::GetInstance()->Load_CamBG2();
+		m_bFogStart = true;
+	}
+	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(30, 45))
+	{
+		Safe_Release(m_pFog);
+		m_pFog = nullptr;
 		Create_Ultimate_StartCam_Effect();
 		m_bUltimateCam = true;
 	}
@@ -1495,7 +1577,6 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[4] && m_pModelCom->Control_KeyFrame_Create(30, 160))
 	{
 		Create_Ultimate_Effect();
-
 		m_bUltimateHit[4] = true;
 	}
 	else if (!m_bUltimateHit[5] && m_pModelCom->Control_KeyFrame_Create(30, 170))
@@ -1508,7 +1589,6 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[6] && m_pModelCom->Control_KeyFrame_Create(30, 183))
 	{
 		Create_Ultimate_Effect();
-
 		m_bUltimateHit[6] = true;
 	}
 
@@ -1556,9 +1636,14 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	else if (!m_bUltimateHit[14] && m_pModelCom->Control_KeyFrame_Create(30, 270))
 	{
 		m_iHitCount = 0;
-		CCombatController::GetInstance()->UI_Shaking(true);
+		//CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[14] = true;
 
+	}
+	else if (!m_bFullScreenEffect && m_pModelCom->Control_KeyFrame_Create(30, 294))
+	{
+		Create_FullScreenEffect();
+		m_bFullScreenEffect = true;
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(30, 302))
 	{
@@ -1683,13 +1768,14 @@ void CHero_Garrison::Anim_Skill2_Attack()
 void CHero_Garrison::Anim_Uitimate()
 {
 	m_bUltimateBuffRenderStop = true;
+	m_bFullScreenEffect = false;
 	m_bUltimateCam = false;
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
 	m_bRun = false;
 	m_bIsUseUltimate = false;
 	m_bBuffEffectStop = true;
-
+	m_bFogStart = false;
 	for (_uint i = 0; i < 15; ++i)
 		m_bUltimateHit[i] = false;
 
@@ -1887,11 +1973,13 @@ void CHero_Garrison::Create_Test_Effect()
 	BuffDesc.vPosition = m_vSkill_Pos;
 	BuffDesc.vScale = m_vTestScale;
 	BuffDesc.vAngle = 90.f;
-	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.fCoolTime = 4.f;
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 }
 

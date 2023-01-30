@@ -79,17 +79,20 @@ private: /*Create_Effect*/
 	void				Create_Buff_Effect();
 	void			    Create_WideBuffEffect();
 	void			    Create_Wide_BuffEffect_Second();
-	void			    Create_Skill_Ultimate_Effect();
+	void			    Create_Skill_Ultimate_Effect0();
 	void				Create_Ultimate_End_Effect();
 	void				Create_Move_Target_Effect();
 	virtual void		Create_Heavy_Hit_Effect()override;
 	void				Create_Ultimate_StartCam_Effect();
+	void			    Create_Ultimate_StartFog_CamEffect();
+	void			    Create_FullScreenEffect();
+
 
 	virtual void		Create_Hit_Effect()override;
 	virtual void	    Use_HpPotion()override;
 	virtual void	    Use_MpPotion()override;
 	
-
+	virtual void				Boss_Ultimate_Anim()override;
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -98,9 +101,11 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
-	
 	class CAnimFsm*			m_pFsmCom = nullptr;
 	
+	CGameObject*			m_pFog = nullptr;
+	CGameObject*			m_pFullscreenEffect = nullptr;
+	CGameObject*			m_pUltimateEffect = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
@@ -112,6 +117,8 @@ private:
 	_bool					m_bLazorStop = true;
 	_bool					m_bUltimateCam = false;
 	_bool					m_bUltimateBuffRenderStop = false;
+	_bool					m_bFogStart = false;
+	_bool					m_bFullScreenEffect = false;
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();

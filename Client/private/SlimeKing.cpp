@@ -13,6 +13,8 @@
 #include "Buff_Image.h"
 #include "Client_Manager.h"
 #include "Attack_Effect_Rect.h"
+#include "Mesh_Effect.h"
+
 
 CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice,pContext)
@@ -154,35 +156,62 @@ void CSlimeKing::Tick(_double TimeDelta)
 		m_pCamEffectObj->Tick(TimeDelta);
 	}
 
-
-	static float ffPos[3] = {};
-	static float ffScale[3] = {};
-	static char  szName[MAX_PATH] = "";
-	ImGui::InputFloat3("SkillPos", ffPos);
-	ImGui::InputFloat3("SkillScale", ffScale);
-	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	ImGui::InputText("TextureName", szName, MAX_PATH);
-	if (ImGui::Button("Create_Effect"))
+	if (true == m_bUltimate_AttackEffect)
 	{
-		_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		m_fUltimateTimer += (_float)TimeDelta;
 
-		m_TextureTag = Texture_NameTag;
-		m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-		m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		if (m_fUltimateTimer >= 0.25f)
+		{
+			m_fCreatePosX -= 0.2f;
+			m_fCreatePosY -= 0.2f;
+			m_fCreatePosZ -= 0.2f;
+			m_fCreatePosX = fmax(m_fCreatePosX, 0.3f);
+			m_fCreatePosY = fmax(m_fCreatePosY, 0.5f);
+			m_fCreatePosZ = fmax(m_fCreatePosZ, 0.1f);
+			m_fCreateScale -= 0.05f;
+			m_fCreateScale = fmax(m_fCreateScale, 0.2f);
 
-		Create_Test_Effect();		// Test
+			Create_Skill_Ultimate_Effect0();
+			Create_Skill_Ultimate_Effect1();
+			Create_Skill_Ultimate_Effect2();
+			m_fUltimateTimer = 0.f;
+		}
+	}
 
+		
+
+	for (auto& pBullet : m_UltimateBullet)
+	{
+		if (nullptr != pBullet)
+			pBullet->Tick(TimeDelta);
 	}
 
 
-	RELEASE_INSTANCE(CGameInstance);
+	//static float ffPos[3] = {};
+	//static float ffScale[3] = {};
+	//static char  szName[MAX_PATH] = "";
+	//ImGui::InputFloat3("SkillPos", ffPos);
+	//ImGui::InputFloat3("SkillScale", ffScale);
+	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	//ImGui::InputText("TextureName", szName, MAX_PATH);
+	//ImGui::InputInt("iFrameCnt", &m_iFrameCnt);
+	//ImGui::InputInt("iMaxCnt", &m_iMaxCnt);
 
-	if(ImGui::Button("Test Ultimate"))
-	{
-		Create_Skill_Ultimate_Effect();
-	}
+	//if (ImGui::Button("Create_Effect"))
+	//{
+	//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+	//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
+	//	m_TextureTag = Texture_NameTag;
+	//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+	//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+
+	//	//Create_Test_Effect();		// Test
+	//	Create_Test_MeshEffect();
+	//}
+
+
+	//RELEASE_INSTANCE(CGameInstance);
 
 	m_pModelCom->Play_Animation(TimeDelta,true);
 }
@@ -225,6 +254,7 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 				else
 					++iter;
 			}
+
 			CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
 			for (auto& pBuffImage : m_vecBuffImage)
 			{
@@ -244,6 +274,22 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 			Safe_Release(pBuffImage);
 		m_vecBuffImage.clear();
 		m_bClearScene = true;
+	}
+
+
+	for (auto iter = m_UltimateBullet.begin(); iter != m_UltimateBullet.end();)
+	{
+		if ((*iter) != nullptr)
+			(*iter)->Late_Tick(TimeDelta);
+
+		if (static_cast<CMesh_Effect*>(*iter)->Get_IsFinish())
+		{
+			Safe_Release(*iter);
+			iter = m_UltimateBullet.erase(iter);
+		}
+		else
+			++iter;
+
 	}
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
@@ -494,14 +540,14 @@ void CSlimeKing::Create_Ultimate_StartCam_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	m_pCamEffectObj = nullptr;
-	
+
 
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 	m_pCamEffectObj = pInstance->Load_Effect(L"Slime_Ultimate_CamEffect_Base", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(16.88, 3.5f, 11.5f, 1.f);
+	BuffDesc.vPosition = _float4(16.88f, 3.5f, 11.5f, 1.f);
 	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -569,10 +615,92 @@ void CSlimeKing::Create_BuffEffect()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CSlimeKing::Create_Skill_Ultimate_Effect()
+void CSlimeKing::Create_Skill_Ultimate_Effect0()
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CMesh_Effect::MeshEffcet_Client MeshDesc;
+	ZeroMemory(&MeshDesc, sizeof(MeshDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect_Origin"), LEVEL_COMBAT, false);
 
+	MeshDesc.ParentTransform = m_pTransformCom;
+	MeshDesc.vPosition = _float4(m_fCreatePosX, m_fCreatePosY, m_fCreatePosZ,1.f);
+	MeshDesc.vScale = _float3(m_fCreateScale, m_fCreateScale, m_fCreateScale);
+	MeshDesc.vAngle = 0.f;
+	MeshDesc.iFrameCnt = 5;
+	MeshDesc.iMaxNum = 16;
+	MeshDesc.bSlimeUltimate = true;
+	MeshDesc.bKnolan = true;
+	MeshDesc.eType = WEAPON_HEAD;
+	MeshDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_Ultimate;
+	MeshDesc.iHitNum = 100;
+
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Client_BuffDesc(MeshDesc);
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Slime_Ultimate_BubbleOrigin2"));
+	m_UltimateBullet.push_back(pGameObject);
+	
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CSlimeKing::Create_Skill_Ultimate_Effect1()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CMesh_Effect::MeshEffcet_Client MeshDesc;
+	ZeroMemory(&MeshDesc, sizeof(MeshDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect_Origin"), LEVEL_COMBAT, false);
+
+	MeshDesc.ParentTransform = m_pTransformCom;
+	MeshDesc.vPosition = _float4(m_fCreatePosX, m_fCreatePosY, m_fCreatePosZ, 1.f);
+	MeshDesc.vScale = _float3(m_fCreateScale, m_fCreateScale, m_fCreateScale);
+	MeshDesc.vAngle = 0.f;
+	MeshDesc.iFrameCnt = 5;
+	MeshDesc.iMaxNum = 16;
+	MeshDesc.bSlimeUltimate = true;
+	MeshDesc.bGarrison = true;
+	MeshDesc.eType = WEAPON_HEAD;
+	MeshDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_Ultimate;
+	MeshDesc.iHitNum = 100;
+
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Client_BuffDesc(MeshDesc);
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Slime_Ultimate_BubbleOrigin2"));
+	m_UltimateBullet.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CSlimeKing::Create_Skill_Ultimate_Effect2()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CMesh_Effect::MeshEffcet_Client MeshDesc;
+	ZeroMemory(&MeshDesc, sizeof(MeshDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect_Origin"), LEVEL_COMBAT, false);
+
+	MeshDesc.ParentTransform = m_pTransformCom;
+	MeshDesc.vPosition = _float4(m_fCreatePosX, m_fCreatePosY, m_fCreatePosZ, 1.f);
+	MeshDesc.vScale = _float3(m_fCreateScale, m_fCreateScale, m_fCreateScale);
+	MeshDesc.vAngle = 0.f;
+	MeshDesc.iFrameCnt = 5;
+	MeshDesc.iMaxNum = 16;
+	MeshDesc.bSlimeUltimate = true;
+	MeshDesc.bBretto = true;
+	MeshDesc.eType = WEAPON_HEAD;
+	MeshDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_Ultimate;
+	MeshDesc.iHitNum = 100;
+
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Client_BuffDesc(MeshDesc);
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Slime_Ultimate_BubbleOrigin2"));
+	m_UltimateBullet.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CSlimeKing::Create_Test_Effect()
@@ -595,6 +723,32 @@ void CSlimeKing::Create_Test_Effect()
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CSlimeKing::Create_Test_MeshEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CMesh_Effect::MeshEffcet_Client MeshDesc;
+	ZeroMemory(&MeshDesc, sizeof(MeshDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	MeshDesc.ParentTransform = m_pTransformCom;
+	MeshDesc.vPosition = m_vSkill_Pos;
+	MeshDesc.vScale = m_vTestScale;
+	MeshDesc.vAngle = 0.f;
+	MeshDesc.iFrameCnt = m_iFrameCnt;
+	MeshDesc.iMaxNum = m_iMaxCnt;
+	
+	/*MeshDesc.bIsMainTain = false;
+	MeshDesc.bIsStraight = false;
+	MeshDesc.bIsBack = false;
+	MeshDesc.bIsUp = false;*/
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Client_BuffDesc(MeshDesc);
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Glow(true,TEXT("Prototype_Component_Texture_Slime_Ultimate_BubbleOrigin2"));
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -714,8 +868,19 @@ void CSlimeKing::Anim_Frame_Create_Control()
 		
 		m_bIsUseUltimate = true;
 	}
-	
-	else if (!m_bUltiWideAttack && m_pModelCom->Control_KeyFrame_Create(15, 270))
+	else if (false == m_bUltiAttackStart&& m_pModelCom->Control_KeyFrame_Create(15, 130))
+	{
+		m_bUltiAttackStart = true;
+		m_bUltimate_AttackEffect = true;
+	}
+
+	else if (!m_bUltiAttackStop && m_pModelCom->Control_KeyFrame_Create(15, 240))
+	{
+		m_bUltiAttackStop = true;
+		m_bUltimate_AttackEffect = false;
+	}
+
+	else if (!m_bUltiWideAttack && m_pModelCom->Control_KeyFrame_Create(15, 283))
 	{
 		CCombatController::GetInstance()->Wide_Attack(true, 83);
 		m_bUltiWideAttack = true;
@@ -814,7 +979,7 @@ HRESULT CSlimeKing::Ready_Parts()
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Slime_Head");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, -0.0f, -0.0f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.f, 1.f, 1.f, 0.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(3.f, 3.f, 3.f, 0.f));
 	WeaponDesc.eType = WEAPON_HEAD;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK;
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
@@ -915,14 +1080,14 @@ void CSlimeKing::Anim_Skill1_Attack()
 	m_bRun = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 
-	m_LimitDistance = 5.f;
+	m_LimitDistance = 3.f;
 	m_SpeedRatio = 6.f;
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 1.f;
 
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
-	m_CurAnimqeue.push({ 16,1.f }); // 브레쓰
+	m_CurAnimqeue.push({ 13,1.f }); // 아프게 깨물기
 	m_CurAnimqeue.push({ 4,1.f });
 	m_CurAnimqeue.push({ 5,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -930,7 +1095,6 @@ void CSlimeKing::Anim_Skill1_Attack()
 
 void CSlimeKing::Anim_Uitimate()
 {
-	
 	m_bUltimateCam = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_pStatusCom->Use_SkillMp(50);
@@ -938,13 +1102,23 @@ void CSlimeKing::Anim_Uitimate()
 	m_bUltimateRun = true;
 	m_bOnceCreate = false;
 	m_SpeedRatio = 6.f;
-	m_LimitDistance = 3.f;
+	m_LimitDistance = 4.f;
 	m_ReturnDistance = 0.1f;
 	m_setTickForSecond = 1.f;
 	m_pMeHit_Player = nullptr;
 	m_bIsUseUltimate = false;
 	m_bUltimateBuffRenderStop = true;
 	m_bUltiWideAttack = false;
+	m_bUltiAttackStart = false;
+	m_bUltiAttackStop = false;
+	m_fUltimateTimer = 0.f;
+	m_fCreatePosX = 1.5f;
+	m_fCreatePosY = 2.2f;
+	m_fCreatePosZ = 2.0f;
+	m_fCreateScale = 0.5f;
+	m_eWeaponType = WEAPON_END;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_Ultimate;
+
 
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
@@ -1049,6 +1223,11 @@ void CSlimeKing::Free()
 		Safe_Release(pPart);
 	m_MonsterParts.clear();	
 	
+	for (auto& pBullet : m_UltimateBullet)
+		Safe_Release(pBullet);
+	m_UltimateBullet.clear();
+
+
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);

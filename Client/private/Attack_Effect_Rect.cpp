@@ -95,8 +95,8 @@ void CAttack_Effect_Rect::Tick(_double TimeDelta)
 		{
 			m_iTextureNum = 0;
 
-			/*	m_bIsFinsishBuffer = true;
-				m_bGlowEnd = true;*/
+			m_bIsFinsishBuffer = true;
+			m_bGlowEnd = true;
 		}
 	}
 

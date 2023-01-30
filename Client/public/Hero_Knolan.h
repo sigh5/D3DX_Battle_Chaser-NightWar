@@ -56,7 +56,7 @@ public:  /*For.Combat*/
 	virtual	  void	  Combat_DeadTick(_double TimeDelta)override;
 
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
-	void			 Create_Test_Effect();		//Test_Effect
+	void			  Create_Test_Effect();		//Test_Effect
 
 
 	void			  Create_Buff_Effect();
@@ -65,9 +65,11 @@ public:  /*For.Combat*/
 	void			  Create_Defence_Area();
 	void			  Create_WideBuffEffect();
 	void			  Create_Wide_BuffEffect_Second();
-	void			  Create_Skill_Ultimate_Effect();
+	void			  Create_Skill_Ultimate_Effect0();
 	void			  Create_Buff_MainTain_Effect();
 	void			  Create_Ultimate_Start_CamEffect();
+	void			  Create_Ultimate_StartFog_CamEffect();
+
 	virtual void	  Create_Heavy_Hit_Effect()override;
 
 
@@ -81,6 +83,7 @@ public:  /*For.Combat*/
 
 	void			  Anim_Frame_Create_Control();
 	
+	virtual void	  Boss_Ultimate_Anim()override;
 
 
 private:
@@ -92,7 +95,9 @@ private:
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
 
 	class CAnimFsm*			m_pFsmCom = nullptr;
-	
+	CGameObject*			m_pFog = nullptr;
+	CGameObject*			m_pFullscreenEffect = nullptr;
+
 private:
 	_bool					m_bCombat_LastInit = false;
 
@@ -156,6 +161,7 @@ private:
 	_bool			m_bCreateDefenceTimer = false;
 	_float			m_fDefenceFsmTimer = 0.f;
 	_bool			m_bOriginBuff = false;
+	_bool			m_bFogStart = false;
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;

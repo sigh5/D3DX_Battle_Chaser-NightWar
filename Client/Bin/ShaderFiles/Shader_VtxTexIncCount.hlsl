@@ -23,7 +23,6 @@ float				g_iUV_Cur_Height_Num;
 
 float				G_Power;
 
-int				g_iPlayType = 0;		// 0 :가로로 그린다 ,1: 세로로 그린다 ,2: 가로가 끝나면 세로로 그린다. 3 :
 
 
 struct VS_IN
@@ -546,5 +545,17 @@ technique11 DefaultTechnique
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
+	
+	pass Test_AlpahBlending
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
 
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = compile gs_5_0 GS_MAIN();
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN();
+	}
 }

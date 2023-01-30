@@ -281,9 +281,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 #ifdef NOMODLES
-	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Glow_Ultimate_Rect"), LEVEL_GAMEPLAY, true);
 
-	
 
 #else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
@@ -305,7 +303,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
+	pGameInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_GAMEPLAY,true);
 
+	//pGameInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect"), LEVEL_GAMEPLAY, true);
 #else
 
 #endif

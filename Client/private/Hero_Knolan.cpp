@@ -31,7 +31,8 @@ CGameObject * CHero_Knolan::Get_Weapon_Or_SkillBody()
 {
 	for (auto& pParts : m_PlayerParts)
 	{
-		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
+		if (dynamic_cast<CHitBoxObject*>(pParts) != nullptr && 
+			m_eWeaponType == dynamic_cast<CHitBoxObject*>(pParts)->Get_Type())
 		{
 			static_cast<CHitBoxObject*>(pParts)->Set_WeaponDamage(m_iStateDamage);
 			static_cast<CHitBoxObject*>(pParts)->Set_HitNum(m_iHitCount);
@@ -146,6 +147,12 @@ void CHero_Knolan::Tick(_double TimeDelta)
 			}
 		}
 
+		if (nullptr != m_pFog)
+			m_pFog->Tick(TimeDelta);
+
+		if (nullptr != m_pFullscreenEffect)
+			m_pFullscreenEffect->Tick(TimeDelta);
+
 		//static float ffPos[3] = {};
 		//static float ffScale[3] = {};
 		//static char  szName[MAX_PATH] = "";
@@ -168,13 +175,6 @@ void CHero_Knolan::Tick(_double TimeDelta)
 
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
-
-
-
-
-
-
-
 	}
 
 
@@ -245,6 +245,26 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 			}
 		}
 
+	}
+
+	if (nullptr != m_pFog)
+	{
+		m_pFog->Late_Tick(TimeDelta);
+		if (static_cast<CBuff_Effect*>(m_pFog)->Get_IsFinish())
+		{
+			Safe_Release(m_pFog);
+			m_pFog = nullptr;
+		}
+	}
+
+	if (nullptr != m_pFullscreenEffect)
+	{
+		m_pFullscreenEffect->Late_Tick(TimeDelta);
+		if (static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Get_IsFinish())
+		{
+			Safe_Release(m_pFullscreenEffect);
+			m_pFullscreenEffect = nullptr;
+		}
 	}
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
@@ -512,6 +532,7 @@ void CHero_Knolan::Create_Skill_Texture()
 	if (m_SkillDir == Skill_DIR_LISING)
 	{
 		static_cast<CSkill_TextureObj*>(pSkillParts)->Set_Glow(true, TEXT("Prototype_Component_Texture_Knolan_Golf"), 1);
+		static_cast<CSkill_TextureObj*>(pSkillParts)->Set_ShaderPass(6);
 	}
 
 
@@ -631,10 +652,10 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_BREATH:
-			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 			iEffectNum = 1;
-			BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
-			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
 
 
@@ -1003,16 +1024,17 @@ void CHero_Knolan::Create_Test_Effect()
 	BuffDesc.vPosition = m_vSkill_Pos;
 	BuffDesc.vScale = m_vTestScale;
 	BuffDesc.vAngle = 90.f;
-	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.fCoolTime = 4.f;
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-	//static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CHero_Knolan::Create_Skill_Ultimate_Effect()
+void CHero_Knolan::Create_Skill_Ultimate_Effect0()
 {
 	if (m_pHitTarget == nullptr)
 		return;
@@ -1077,24 +1099,52 @@ void CHero_Knolan::Create_Buff_MainTain_Effect()
 void CHero_Knolan::Create_Ultimate_Start_CamEffect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	m_pFullscreenEffect = nullptr;
 
-	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
+	m_pFullscreenEffect = pInstance->Load_Effect(L"Blood_Rect_Effect", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(2.f, 1.f, 25.f, 1.f);
-	BuffDesc.vScale = _float3(40.f, 20.f, 40.f);
+	BuffDesc.vPosition = _float4(-6.18f,21.552f,-12.71f,1.f);
+	BuffDesc.vScale = _float3(1.f, 1.f, 1.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 3;
+	BuffDesc.iFrameCnt = 4;
 	BuffDesc.bIsUp = false;
 
-	m_pEffectParts.push_back(pGameObject);
-	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_ShaderPass(7);
+
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
+void CHero_Knolan::Create_Ultimate_StartFog_CamEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	m_pFog = nullptr; 
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFog = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Cloud"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(3.15f, 4.64f, 23.84f, 1.f);
+	BuffDesc.vScale = _float3(40.f, 30.f, 40.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+
+
+	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -1223,35 +1273,47 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		Create_Wide_BuffEffect_Second();
 		m_bOnceCreate = true;
 	}
-	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(28, 30))
+	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(28, 10))
 	{
-		Create_Ultimate_Start_CamEffect();
-		m_bUltimateCam = true;
+		Create_Ultimate_StartFog_CamEffect();
+		CCombatController::GetInstance()->Load_CamBG2();
+		m_bFogStart = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
 	{
+		Safe_Release(m_pFog);
+		m_pFog = nullptr;
 		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		m_bIsUseUltimate = true;
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 60))
 	{
-		Create_Skill_Ultimate_Effect();
+		Create_Skill_Ultimate_Effect0();
 		m_bOnceCreate = true;
 		m_bIsUseUltimate = false;
+	}
+	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(28, 85))
+	{
+		Create_Ultimate_Start_CamEffect();
+		m_bUltimateCam = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 100))
 	{
 		CCombatController::GetInstance()->Wide_Attack(false, 83);
 		m_bIsUseUltimate = true;
 	}
-	else if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(26, 20))
+
+
+	else if (m_bUseDefence == true && !m_bOnceCreate 
+		&& m_pModelCom->Control_KeyFrame_Create(26, 20))
 	{
 		Create_Defence_Area();
 		CCombatController::GetInstance()->Camera_Zoom_Out();
 		m_bOnceCreate = true;
 	}
-	else if (m_bOriginBuff == true && !m_bOnceCreateBuff && m_pModelCom->Control_KeyFrame_Create(26, 40))
+	else if (m_bOriginBuff == true && !m_bOnceCreateBuff 
+		&& m_pModelCom->Control_KeyFrame_Create(26, 40))
 	{
 		Create_Buff_MainTain_Effect();
 		CCombatController::GetInstance()->Camera_Zoom_Out();
@@ -1259,6 +1321,12 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	}
 	else
 		return;
+}
+
+void CHero_Knolan::Boss_Ultimate_Anim()
+{
+	m_CurAnimqeue.push({ 4,  3.f });	// 3 or 4
+	Set_CombatAnim_Index(m_pModelCom);
 }
 
 HRESULT CHero_Knolan::SetUp_Components()
@@ -1506,6 +1574,7 @@ void CHero_Knolan::Anim_Uitimate()
 	m_bUltimateCam = false;
 	m_bBuffEffectStop = true;
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	m_bFogStart = false;
 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(50);
 	m_CurAnimqeue.push({ 28, 1.f }); // 	60프레임때 광역기 시전
@@ -1738,7 +1807,7 @@ void CHero_Knolan::Free()
 	}
 	m_pEffectParts.clear();
 
-
+	Safe_Release(m_pFog);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);

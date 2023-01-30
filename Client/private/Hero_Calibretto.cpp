@@ -141,6 +141,16 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			}
 		}
 
+		if (nullptr != m_pFog)
+			m_pFog->Tick(TimeDelta);
+		
+		if (nullptr != m_pUltimateEffect)
+			m_pUltimateEffect->Tick(TimeDelta);
+		
+
+		if (nullptr != m_pFullscreenEffect)
+			m_pFullscreenEffect->Tick(TimeDelta);
+
 		/*	_float4 vPos;
 			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 			static int iDamage = 30;
@@ -160,14 +170,14 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			}*/
 
 
-			/*static float ffPos[3] = {};
-			static float ffScale[3] = {};
-			static char  szName[MAX_PATH] = "";
-			ImGui::InputFloat3("SkillPos", ffPos);
-			ImGui::InputFloat3("SkillScale", ffScale);
+		static float ffPos[3] = {};
+		static float ffScale[3] = {};
+		static char  szName[MAX_PATH] = "";
+		ImGui::InputFloat3("SkillPos", ffPos);
+		ImGui::InputFloat3("SkillScale", ffScale);
 
-			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-			ImGui::InputText("TextureName", szName, MAX_PATH);*/
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		ImGui::InputText("TextureName", szName, MAX_PATH);
 
 		////if (ImGui::Button("Create_Skill"))
 		////{
@@ -181,27 +191,29 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		////	Create_Test_TextureObj();		// Test
 
 		////}
-		//if (ImGui::Button("Create_Effect"))
-		//{
-		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		if (ImGui::Button("Create_Effect"))
+		{
+			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-		//	m_TextureTag = Texture_NameTag;
-		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+			m_TextureTag = Texture_NameTag;
+			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-		//	//Create_Skill2_Beam();
+			Create_Test_Effect();		// Test
+		}
 
-		//	Create_Test_Effect();		// Test
-		//	//Create_Skill1_Bullet();
-		//	//Create_Skill1_Bullet_End();
-		//	//Create_Test_Rect_Effect();
-		//}
-
-		//RELEASE_INSTANCE(CGameInstance);
+		RELEASE_INSTANCE(CGameInstance);
 
 	
 	}
+
+	if (ImGui::Button("Test_BG"))
+	{
+		Create_Ultimate_StartCam_Effect();
+		Create_Ultimate_StartFog_CamEffect();
+	}
+
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
@@ -267,6 +279,29 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 						pBuffImage->Late_Tick(TimeDelta);
 				}
 				CClient_Manager::Delete_BuffImage(m_vecBuffImage, m_pStatusCom[COMBAT_PLAYER], false);
+			}
+		}
+
+		if (nullptr != m_pFog)
+		{
+			m_pFog->Late_Tick(TimeDelta);
+			if (static_cast<CBuff_Effect*>(m_pFog)->Get_IsFinish())
+			{
+				Safe_Release(m_pFog);
+				m_pFog = nullptr;
+			}
+		}
+
+		if (nullptr != m_pUltimateEffect)
+			m_pUltimateEffect->Late_Tick(TimeDelta);
+
+		if (nullptr != m_pFullscreenEffect)
+		{
+			m_pFullscreenEffect->Late_Tick(TimeDelta);
+			if (static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Get_IsFinish())
+			{
+				Safe_Release(m_pFullscreenEffect);
+				m_pFullscreenEffect = nullptr;
 			}
 		}
 	}
@@ -493,13 +528,19 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		Create_Wide_BuffEffect_Second();
 		m_bRun = true;
 	}
-	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(46, 92))
+	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(46, 3))
 	{
+		Create_Ultimate_StartFog_CamEffect();
 		Create_Ultimate_StartCam_Effect();
-		m_bUltimateCam = true;
+		CCombatController::GetInstance()->Load_CamBG2();
+		m_bFogStart = true;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	
 	{
+		Safe_Release(m_pFog);
+		Safe_Release(m_pUltimateEffect);
+		m_pFog = nullptr;
+		m_pUltimateEffect = nullptr;
 		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		CCombatController::GetInstance()->Camera_Zoom_In();
@@ -513,14 +554,21 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(46, 210))	
 	{
 		m_bOnceCreate = true;
-		Create_Skill_Ultimate_Effect();
+		Create_Skill_Ultimate_Effect0();
 		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 0.5f);
 	}
 	else if (!m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 250))	
 	{
 		m_bUltimateStop = true;
 		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 1.0f);
+		Create_FullScreenEffect();
 	}
+	//else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(46, 250))
+	//{
+	//	Create_FullScreenEffect();
+	//	m_bUltimateCam = true;
+	//}
+
 	else if (m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 260))	
 	{
 		Create_Ultimate_End_Effect();
@@ -824,8 +872,9 @@ void CHero_Calibretto::Anim_Skill2_Attack()
 void CHero_Calibretto::Anim_Uitimate()
 {
 	m_bUltimateBuffRenderStop = true;
+	m_bFogStart = false;
+	m_bFullScreenEffect = false;
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
-	//Create_Ultimate_StartCam_Effect();
 	m_bUltimateCam = false;
 	m_bBuffEffectStop = true;
 	m_iStateDamage = 50;			// 20*2 
@@ -835,6 +884,7 @@ void CHero_Calibretto::Anim_Uitimate()
 	m_bIsUseUltimate = false;
 	m_bRecoverHeight = false;
 	m_bUltimateStop = false;
+	
 	m_CurAnimqeue.push({ 46, 1.f }); // 위에서 로켓쏘기
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1143,21 +1193,19 @@ void CHero_Calibretto::Create_Test_Effect()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	
-	CBone* pSocket = m_pModelCom->Get_BonePtr("Bone_Calibretto_Hand_L");
 	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = m_vSkill_Pos;
-	BuffDesc.vScale =	 m_vTestScale;
+	BuffDesc.vScale = m_vTestScale;
 	BuffDesc.vAngle = 90.f;
-	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.fCoolTime = 4.f;
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	BuffDesc.bIsStraight = false;
-
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 
 }
@@ -1487,7 +1535,7 @@ void CHero_Calibretto::Create_Wide_BuffEffect_Second()
 
 }
 
-void CHero_Calibretto::Create_Skill_Ultimate_Effect()
+void CHero_Calibretto::Create_Skill_Ultimate_Effect0()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
@@ -1613,23 +1661,76 @@ void CHero_Calibretto::Create_Ultimate_StartCam_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject* pGameObject = nullptr;
+	m_pUltimateEffect = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
+	m_pUltimateEffect = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(13.f, 1.6f, 29.5f, 1.f);
-	BuffDesc.vScale = _float3(60.f, 30.f, 60.f);
+	BuffDesc.vPosition = _float4(36.5f, -3.18f, 25.f, 1.f);
+	BuffDesc.vScale = _float3(50.f, 50.f, 50.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 7.f;
-	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 10;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 4;
 	BuffDesc.bIsUp = false;
 
-	m_pEffectParts.push_back(pGameObject);
-	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pUltimateEffect)->Set_CamEffect(BuffDesc);
+	//static_cast<CBuff_Effect*>(m_pUltimateEffect)->Set_ShaderPass(7);
+	RELEASE_INSTANCE(CGameInstance);
+
+
+
+}
+
+void CHero_Calibretto::Create_Ultimate_StartFog_CamEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	m_pFog = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFog = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Cloud"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(28.5f, 5.787f, 42.918f, 1.f);
+	BuffDesc.vScale = _float3(120.f, 100.f, 120.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 8;
+	BuffDesc.bIsUp = false;
+
+	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CHero_Calibretto::Create_FullScreenEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	m_pFullscreenEffect = nullptr;
+
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFullscreenEffect = pInstance->Load_Effect(TEXT("Blood_Rect_Effect"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(-5.422f, 20.646f, -9.382f, 1.f);
+	BuffDesc.vScale = _float3(1.f, 1.f, 1.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 3;
+	BuffDesc.bIsUp = false;
+
+
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFullscreenEffect)->Set_ShaderPass(7);
+
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -1682,7 +1783,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_BREATH:
-		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
@@ -1820,6 +1921,12 @@ void CHero_Calibretto::Use_MpPotion()
 	
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CHero_Calibretto::Boss_Ultimate_Anim()
+{
+	m_CurAnimqeue.push({ 5 , 3.f });
+	Set_CombatAnim_Index(m_pModelCom);
 }
 
 void CHero_Calibretto::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)

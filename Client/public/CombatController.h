@@ -65,10 +65,14 @@ public:  /*Combat Logic*/
 	void	Late_Tick(_double TimeDelta);
 	void	Active_Fsm();
 
+
+	void	Load_CamBG2();
 	void	Wide_Debuff(_bool bIsPlayer, CStatus::DEBUFFTYPE eDebuffOption);
 
 
 	void	HPMp_Update(CGameObject* pHiter);
+
+
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
@@ -149,6 +153,7 @@ private:
 	class CTurnStateCanvas*	m_pTurnStateButtonCanvas = nullptr;
 	class CMyImage*			m_pCurBannerImage = nullptr;
 	class CGameObject*		m_pCombatBG = nullptr;
+	class CGameObject*		m_pCombatBG2 = nullptr;
 
 private:
 	_bool					m_bCombatIntro = false;
