@@ -167,6 +167,19 @@ HRESULT CGameObject::Remove_component(const wstring & pComponentTag)
 	return S_OK;
 }
 
+void CGameObject::Compute_CamDistance()
+{
+	_vector		vWorldPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
+
+	CPipeLine*		pPipeLine = GET_INSTANCE(CPipeLine);
+
+	_vector		vCamPos = XMLoadFloat4(&pPipeLine->Get_CamPositon());
+
+	m_fCamDistance = XMVectorGetX(XMVector3Length(vWorldPos - vCamPos));
+
+	RELEASE_INSTANCE(CPipeLine);
+}
+
 void CGameObject::Free()
 {
 //	Safe_Release(m_pParentObject);

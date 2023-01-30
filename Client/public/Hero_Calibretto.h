@@ -65,7 +65,6 @@ private: /*Create_Effect*/
 	void				Create_Test_Rect_Effect();		// Test
 	void				Create_Test_TextureObj();		// Test
 
-
 	void			    Create_Skill1_Bullet();	
 	void			    Create_Skill1_Bullet_End();
 	
@@ -83,7 +82,7 @@ private: /*Create_Effect*/
 	void			    Create_Skill_Ultimate_Effect();
 	void				Create_Ultimate_End_Effect();
 	void				Create_Move_Target_Effect();
-
+	virtual void		Create_Heavy_Hit_Effect()override;
 	void				Create_Ultimate_StartCam_Effect();
 
 	virtual void		Create_Hit_Effect()override;

@@ -58,6 +58,10 @@ HRESULT CAttack_Effect_Rect::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 	
+#ifdef  NOMODLES
+	Set_Glow(true, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"), 0);
+#endif //  NOMODLES
+
 
 	return S_OK;
 }
@@ -77,6 +81,8 @@ void CAttack_Effect_Rect::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+
+
 	m_iPlayOnFrameCnt++;
 
 	if (m_iPlayOnFrameCnt == m_Client_AttackEffect_Desc.iFrameCnt)
@@ -84,20 +90,15 @@ void CAttack_Effect_Rect::Tick(_double TimeDelta)
 
 		m_iPlayOnFrameCnt = 0;
 		++m_iTextureNum;
-		
+
 		if (m_iTextureNum >= 7)
 		{
 			m_iTextureNum = 0;
-		
-			m_bIsFinsishBuffer = true;
-			m_bGlowEnd = true;
+
+			/*	m_bIsFinsishBuffer = true;
+				m_bGlowEnd = true;*/
 		}
-
-
-		
-
 	}
-
 
 	if (m_bUseGlow)
 	{
@@ -111,6 +112,7 @@ void CAttack_Effect_Rect::Tick(_double TimeDelta)
 		else
 			m_fGlowStrength += (_float)TimeDelta;
 	}
+
 }
 
 void CAttack_Effect_Rect::Late_Tick(_double TimeDelta)
@@ -130,9 +132,9 @@ HRESULT CAttack_Effect_Rect::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
+
 	m_pShaderCom->Begin(4);
 	m_pVIBufferCom->Render();
-
 	return S_OK;
 }
 

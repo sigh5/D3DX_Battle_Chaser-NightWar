@@ -132,9 +132,6 @@ void CBuff_Effect::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 
-
-
-
 	if (m_pVIBufferCom->UV_Move_Tick(TimeDelta) && m_Client_BuffEffect_Desc.bIsMainTain ==false)
 	{
 		m_bIsFinsishBuffer = true;

@@ -317,6 +317,11 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_AlphaBlend()
 {
+	m_RenderObjects[RENDER_ALPHABLEND].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+	{
+		return pSour->Get_CamDistance() > pDest->Get_CamDistance();
+	});
+
 	for (auto& pGameObject : m_RenderObjects[RENDER_ALPHABLEND])
 	{
 		if (nullptr != pGameObject)

@@ -97,12 +97,6 @@ void CMyImage::Tick(_double TimeDelta)
 	Shake_Move(TimeDelta);
 #endif
 
-	
-	
-	
-
-
-
 }
 
 void CMyImage::Late_Tick(_double TimeDelta)

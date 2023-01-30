@@ -72,7 +72,7 @@ public:  /*Combat Logic*/
 
 private:
 	void	PickingTarget();		//플레이어의 턴일때
-	void	MonsterSetTarget();
+	void	MonsterSetTarget(_double TimeDelta);
 
 public:	/*Reset*/
 	void	Refresh_CurActor();
@@ -102,8 +102,13 @@ private:
 	void	Ultimate_Start_LateTick(_double TimeDelta);
 	void	Ultimate_Timedelta_Tick(_double TimeDelta);
 	void	Ultimate_End_LateTick(_double TimeDelta);
+
+public:
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
+
+
+
 
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
@@ -172,7 +177,9 @@ private:
 	_bool					m_bCurActorUltimateEnd = false;
 	_bool					m_bBannerClose = false;
 
-
+	_bool					bMonsterSkill1_Normal = false;
+	_bool					m_bMonsterUseUltimate = false;
+	
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();

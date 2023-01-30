@@ -46,7 +46,7 @@ public:
 	virtual	  void      Combat_DeadTick(_double TimeDelta)override;
 public:		/*Create_EFfect*/
 	virtual void		Create_Hit_Effect()override;
-	virtual void		Create_Heacy_Hit_Effect()override;
+	virtual void		Create_Heavy_Hit_Effect()override;
 	
 
 	/*void				Create_NormalAttack_Effect();
@@ -109,7 +109,7 @@ private:
 	_bool					m_bSkill2UpPos = false;
 	_bool					m_bSkill2_AttackEffect = false;
 	_bool					m_bClearScene = false;
-	_float					m_fBuffImage_Height = -285.f;
+	_float					m_fBuffImage_Height = -330.f;
 
 
 	WeaponType		m_eWeaponType = WEAPON_END;

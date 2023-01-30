@@ -444,7 +444,7 @@ PS_OUT PS_MAIN_Glow(PS_IN In)
 	
 	Out.vColor = saturate(TexturColor + ( GlowColor* G_Power));
 		
-	if (Out.vColor.a < 0.1f)
+	if (Out.vColor.a < 0.25f)
 		discard;
 
 	return Out;

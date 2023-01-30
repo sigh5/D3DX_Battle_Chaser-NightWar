@@ -71,7 +71,7 @@ public:
 	virtual		void		Defence_Exit();
 
 	virtual		void		Create_Hit_Effect();
-	virtual		void		Create_Heacy_Hit_Effect();
+	virtual		void		Create_Heavy_Hit_Effect();
 	virtual		void		Create_Defence_Effect_And_Action();
 	void					WideBuff_Status(class CStatus* pStatus, _int iOption, _int iAmount);
 

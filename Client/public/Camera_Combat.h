@@ -15,12 +15,9 @@ public:
 	enum	CameraTarget {
 		CameraTarget_CurActor, CameraTarget_Hiter, CameraTarget_recover, CameraTarget_END
 	};
-
-	enum	UlTIMATE_TARGET
-	{
+	enum	UlTIMATE_TARGET{
 		UlTIMATE_TARGET_KNOLAN, UlTIMATE_TARGET_ALUMON, UlTIMATE_TARGET_CALLIBRETTO, UlTIMATE_TARGET_BOSS, UlTIMATE_TARGET_END
 	};
-
 
 private:
 	CCamera_Combat(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -50,18 +47,13 @@ public:
 	virtual HRESULT Last_Initialize()override;
 	virtual HRESULT Render() override;
 
-
 	void	Camera_ZoomIn_CurActor(_double TimeDelta);
 	void	Camera_ZoomIn_HitActor(_double TimeDelta);
 	void	Camera_ZoomOut(_double TimeDelta);
 
-
 	void	UltimateStart_CameraWork(CGameObject* pCurActor);
 	void	Ultimate_EndCameraWork();
-
 	void	Camera_UltiMate_ZoomTick(_double TimeDelta);
-
-
 
 private:
 	HRESULT SetUp_Components();
@@ -74,8 +66,6 @@ private:
 			m_bUltimateCamWorkTick[i] = false;
 		}
 	}
-
-
 
 private:
 	_float					m_CameraDistanceX = 0.f;
@@ -103,9 +93,9 @@ private:
 	_bool					m_bUltimateCamWorkTick[UlTIMATE_TARGET_END] = {false};
 	_bool					m_bXShaking = false;
 	// shake
-	_float m_fShakeTime=0.f;
-	_float m_fCurShakeTime=0.f;
-	_float m_fMagnitude=0.f;
+	_float					m_fShakeTime=0.f;
+	_float					m_fCurShakeTime=0.f;
+	_float					m_fMagnitude=0.f;
 	// shake
 	_float4x4				m_WorldMat;
 

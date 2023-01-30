@@ -7,6 +7,7 @@
 #include "Light_Manager.h"
 #include "Font_Manager.h"
 #include "Target_Manager.h"
+#include  "Sound_Manager.h"
 #include "Frustum.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
@@ -28,6 +29,7 @@ CGameInstance::CGameInstance()
 	, m_pFont_Manager(CFont_Manager::GetInstance())
 	, m_pFrustum(CFrustum::GetInstance())
 	, m_pTarget_Manager(CTarget_Manager::GetInstance())
+	, m_pSound_Manager(CSound_Manager::GetInstance())
 {
 	Safe_AddRef(m_pTarget_Manager);
 	Safe_AddRef(m_pFrustum);
@@ -41,6 +43,7 @@ CGameInstance::CGameInstance()
 	Safe_AddRef(m_pInput_Device);
 	Safe_AddRef(m_pGraphic_Device);
 	Safe_AddRef(m_pImgui_Manager);
+	Safe_AddRef(m_pSound_Manager);
 }
 
 HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, const GRAPHIC_DESC& GraphicDesc, ID3D11Device** ppDeviceOut, ID3D11DeviceContext** ppContextOut)
@@ -645,14 +648,45 @@ ID3D11ShaderResourceView * CGameInstance::Get_SpecularTargetSRV()
 	return m_pTarget_Manager->Get_SRV(TEXT("Target_Specular"));
 }
 
+void CGameInstance::Play_Sound(const _tchar * pSoundKey, _float fVolume, _bool bIsBGM, _int iManualChannelIndex)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Play_Sound");
+	return m_pSound_Manager->Play_Sound(pSoundKey, fVolume, bIsBGM, iManualChannelIndex);
+}
+
+void CGameInstance::Stop_Sound(_uint iManualChannelIndex)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Stop_Sound");
+	return m_pSound_Manager->Stop_Sound(iManualChannelIndex);
+}
+
+void CGameInstance::Set_Volume(_uint iManualChannelIndex, _float fVolume)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Set_Volume");
+	return m_pSound_Manager->Set_Volume(iManualChannelIndex,fVolume);
+}
+
+void CGameInstance::Set_MasterVolume(_float fVolume)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Set_MasterVolume");
+	return m_pSound_Manager->Set_MasterVolume(fVolume);
+}
+
+void CGameInstance::Set_SoundDesc(const _tchar * pSoundKey, CSound::SOUND_DESC & SoundDesc)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Set_SoundDesc");
+	return m_pSound_Manager->Set_SoundDesc(pSoundKey,SoundDesc);
+}
 
 void CGameInstance::Release_Engine()
 {
-	CTimer_Manager::GetInstance()->DestroyInstance();
-
 	CImgui_Manager::GetInstance()->DestroyInstance();
 
 	CGameInstance::GetInstance()->DestroyInstance();
+
+	CSound_Manager::GetInstance()->DestroyInstance();
+
+	CTimer_Manager::GetInstance()->DestroyInstance();
 
 	CPipeLine::GetInstance()->DestroyInstance();
 
@@ -677,6 +711,7 @@ void CGameInstance::Release_Engine()
 
 void CGameInstance::Free()
 {
+	Safe_Release(m_pSound_Manager);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pFrustum);

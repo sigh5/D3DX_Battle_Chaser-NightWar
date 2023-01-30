@@ -141,10 +141,9 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 		{
 			pGameInstance->Load_Object(TEXT("OneMonsterStart"), LEVEL_GAMEPLAY);
 			m_bOnce = true;
-
 			CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
 			pCanvas->Set_RenderActive(false);
-			pGameInstance->Setting_MonsterScene(0);		// 원래는 0
+			pGameInstance->Setting_MonsterScene(3);		// 원래는 0
 			CClient_Manager::bIsCollPlayerTo3DUI[0] = true;
 			if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
 				assert(!"Coll_CaptinPlayer");

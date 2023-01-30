@@ -91,23 +91,6 @@ void CMainApp::Tick(_double TimeDelta)
 	m_pToolManager->Imgui_SelectParentViewer();
 
 	CClient_Manager::TimeDelta = TimeDelta;
-
-	//static double TimeSlow = 1.0;
-	//ImGui::InputDouble("Time : ", &TimeSlow);
-
-
-	//if (ImGui::Button("TimeSLow"))
-	//{
-	//	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-
-	//	pGameInstance->Set_Timedelta(TEXT("Timer_60"), TimeSlow);
-
-	//	RELEASE_INSTANCE(CGameInstance);
-	//}
-
-	//
-
-
 }
 
 HRESULT CMainApp::Render()
@@ -193,8 +176,6 @@ HRESULT CMainApp::Start_Level(LEVEL eLevelID)
 
 	if (FAILED(m_pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, eLevelID))))
 		return E_FAIL;
-
-
 
 	return S_OK;
 }

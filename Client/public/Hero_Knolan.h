@@ -68,6 +68,7 @@ public:  /*For.Combat*/
 	void			  Create_Skill_Ultimate_Effect();
 	void			  Create_Buff_MainTain_Effect();
 	void			  Create_Ultimate_Start_CamEffect();
+	virtual void	  Create_Heavy_Hit_Effect()override;
 
 
 	virtual void	  Create_Hit_Effect()override;
@@ -79,6 +80,8 @@ public:  /*For.Combat*/
 	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 
 	void			  Anim_Frame_Create_Control();
+	
+
 
 private:
 	CShader*				m_pShaderCom = nullptr;

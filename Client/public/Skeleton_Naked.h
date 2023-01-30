@@ -47,7 +47,7 @@ public:
 
 public:		/*Create_EFfect*/
 	virtual void	Create_Hit_Effect()override;
-	virtual void	Create_Heacy_Hit_Effect()override;
+	virtual void	Create_Heavy_Hit_Effect()override;
 	void			Multi_Hit_Effect(class CGameInstance*pInstance);
 	void			Create_Move_Target_Effect();
 	void			Create_BuffEffect();

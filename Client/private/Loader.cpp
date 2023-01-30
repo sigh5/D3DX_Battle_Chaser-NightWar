@@ -163,11 +163,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Bubble_Sphere"), LEVEL_GAMEPLAY);
+
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
 		/*CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);*/
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Bubble_Sphere"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
@@ -1017,7 +1020,18 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 		return E_FAIL;
 
 
-	
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slime_Ultimate_paricle"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Breath/bubble_pop_particles_%d.png"),
+			CTexture::TYPE_END, 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Slime_Ultimate_Bubble"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Breath/bubble_pop_%d.png"),
+			CTexture::TYPE_END, 12))))
+		return E_FAIL;
+
 
 
 	return S_OK;

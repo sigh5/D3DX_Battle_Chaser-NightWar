@@ -66,6 +66,5 @@ void CTimer_Manager::Free(void)
 {
 	for (auto& Pair : m_mapTimers)
 		Safe_Release(Pair.second);
-
 	m_mapTimers.clear();
 }

@@ -51,12 +51,12 @@ public:
 
 public:		/*Create_EFfect*/
 	virtual void		Create_Hit_Effect()override;
-	virtual void		Create_Heacy_Hit_Effect()override;
-
+	virtual void		Create_Heavy_Hit_Effect()override;
+	void				Create_Ultimate_StartCam_Effect();
 	void				Create_Move_Target_Effect();
 	void				Create_BuffEffect();
 
-
+	void				Create_Skill_Ultimate_Effect();
 
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
@@ -93,7 +93,7 @@ public:
 
 private:
 	vector<CGameObject*>	m_MonsterParts;
-
+	CGameObject*			m_pCamEffectObj = nullptr;
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
@@ -109,11 +109,14 @@ private:
 	_bool					m_bSkill2UpPos = false;
 	_bool					m_bSkill2_AttackEffect = false;
 	_bool					m_bClearScene = false;
-	_float					m_fBuffImage_Height = -285.f;
-
+						
+	
 	// Ultimate
-	_bool			m_bUltimateBuffRenderStop = false;
-	_bool			m_bUltimateCam = false;
+	_bool					m_bUltimateBuffRenderStop = false;
+	_bool					m_bUltimateCam = false;
+	_bool					m_bUltimateRun = false;
+	_bool					m_bUltiWideAttack = false;
+
 
 	WeaponType				m_eWeaponType = WEAPON_HEAD;
 	UI_REPRESENT			m_Represnt = REPRESENT_SLIMEKING;

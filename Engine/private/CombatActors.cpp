@@ -20,7 +20,7 @@ void CCombatActors::Create_Hit_Effect()
 {
 }
 
-void CCombatActors::Create_Heacy_Hit_Effect()
+void CCombatActors::Create_Heavy_Hit_Effect()
 {
 }
 
@@ -88,14 +88,14 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus, CHitBoxObject::WEAPON_OPTI
 		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_ATTACK)
 		{
 			(*iCurDamage) += 5;
-			pDebuffTag = TEXT("magic critical");
+			pDebuffTag = TEXT("bleeding");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
 			pStatus->Set_DebuffOption(eType, false);
 		}
 		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_HEAD)
 		{
 			(*iCurDamage) += 10;
-			pDebuffTag = TEXT("magic critical");
+			pDebuffTag = TEXT("bleeding");
 			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
 			pStatus->Set_DebuffOption(eType, false);
 		}
@@ -125,7 +125,20 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus, CHitBoxObject::WEAPON_OPTI
 			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
 			pStatus->Set_DebuffOption(eType, false);
 		}
-		
+		else  if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SLIME_KING_HEAD)
+		{
+			(*iCurDamage) += 10;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else  if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SLIME_KING_BREATH)
+		{
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("magic critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+			pStatus->Set_DebuffOption(eType, false);
+		}
 	}
 
 	if (pStatus->Get_DebuffType().isDebuff_ARMOR)

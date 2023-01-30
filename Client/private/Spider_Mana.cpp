@@ -65,16 +65,12 @@ _bool CSpider_Mana::Calculator_HitColl(CGameObject * pWeapon)
 			m_iSign *= -1;
 			return true;
 		}
-
-		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
-			m_bIsHeavyHit = true;
-
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-		CCombatController::GetInstance()->UI_Shaking(true);
+		
 		m_fHitPerSecond = 1.f;
 		m_iSign = 1;
 
@@ -119,7 +115,7 @@ HRESULT CSpider_Mana::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(37.f, 0.f, -8.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(35.f, 0.f, -4.5f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
 	m_bHaveSkill2 = true;
@@ -508,7 +504,7 @@ void CSpider_Mana::Create_Hit_Effect()
 			BuffDesc.vAngle = 90.f;
 			BuffDesc.fCoolTime = 2.f;
 			BuffDesc.bIsMainTain = false;
-			BuffDesc.iFrameCnt =  rand()%5+ 5;
+			BuffDesc.iFrameCnt =  rand()%5+ 3;
 			BuffDesc.bIsUp = false;
 			static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 			m_MonsterParts.push_back(pGameObject);
@@ -520,7 +516,7 @@ void CSpider_Mana::Create_Hit_Effect()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
-void CSpider_Mana::Create_Heacy_Hit_Effect()
+void CSpider_Mana::Create_Heavy_Hit_Effect()
 {
 	CGameInstance* pInstance   = GET_INSTANCE(CGameInstance);
 	CGameObject*   pGameObject = nullptr;
@@ -572,6 +568,7 @@ void CSpider_Mana::Anim_Frame_Create_Control()
 		m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
 
 		CCombatController::GetInstance()->Wide_Debuff(true, CStatus::DEBUFF_BLEED);
+		CCombatController::GetInstance()->Camera_Zoom_Out();
 		m_bOnceCreate = true;
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(7, 4))
@@ -742,7 +739,6 @@ void CSpider_Mana::Create_Move_Target_Effect()
 void CSpider_Mana::Create_BuffEffect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -967,11 +963,20 @@ void CSpider_Mana::Calculator_HitDamage()
 	CDamage_Font_Manager::GetInstance()->
 		Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum,0.5f,1.0f);
 	m_pStatusCom->Take_Damage(m_iGetDamageNum);
+	
+	if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
+	{
+		CCombatController::GetInstance()->Camera_Shaking();
+		m_bIsHeavyHit = true;
+	}
+	else
+		CCombatController::GetInstance()->UI_Shaking(true);
+
 }
 
 void CSpider_Mana::Anim_Idle()
 {
-	m_CurAnimqeue.push({ 0, 4.f });
+	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -1044,8 +1049,8 @@ void CSpider_Mana::Anim_Skill2_Attack()
 
 	m_CurAnimqeue.push({ 17, 0.6f });
 	m_CurAnimqeue.push({ 18, 0.8f });	
-	m_CurAnimqeue.push({ 12, m_setTickForSecond });
-	m_CurAnimqeue.push({ 5, 1.f });
+	m_CurAnimqeue.push({ 12, 1.f });
+	m_CurAnimqeue.push({ 5, 0.9f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
@@ -1094,7 +1099,7 @@ void CSpider_Mana::Anim_Heavy_Hit()
 	m_CurAnimqeue.push({ 6,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 
-	Create_Heacy_Hit_Effect();
+	Create_Heavy_Hit_Effect();
 }
 
 void CSpider_Mana::Anim_Die()

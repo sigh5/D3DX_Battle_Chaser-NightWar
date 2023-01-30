@@ -45,42 +45,30 @@ CGameObject * CHero_Knolan::Get_Weapon_Or_SkillBody()
 _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 {
 	CHitBoxObject* pCurActorWepon = static_cast<CHitBoxObject*>(pWeapon);
-
 	assert(pCurActorWepon != nullptr && "CHero_Knolan::Calculator_HitColl");
 
 	if (pCurActorWepon->Get_Colider()->Collision(m_pColliderCom))
 	{
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
-
 		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
-
-		_float4 vPos;
-		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
 
 		if (m_bUseDefence == true)
 		{
+			_float4 vPos;
+			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+			vPos.y += 4.f;
 			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5f));
 			CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
 
 			Create_Hit_Effect();
 			return true;
 		}
-
-		if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
-		{
-			m_bIsHeavyHit = true;
-		}
-
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-
-		CCombatController::GetInstance()->UI_Shaking(true);
 		Calculator_HitDamage();
-
 		return true;
 	}
 	return false;
@@ -636,6 +624,18 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
 			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_HEAD:
+			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_4", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_BREATH:
+			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
+			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+			break;
 
 
 		default:
@@ -853,7 +853,7 @@ void CHero_Knolan::Create_Defence_Area()
 	_uint iEffectNum = 1;
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vScale = _float3(7.f, 7.f, 7.f);
 	BuffDesc.vAngle = -90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
@@ -1057,7 +1057,7 @@ void CHero_Knolan::Create_Buff_MainTain_Effect()
 	pGameObject = pInstance->Load_Effect(TEXT("Texture_Buff_Effect_Power"), LEVEL_COMBAT, false);
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(-1.0f, 0.6f, -0.6f, 1.f);
-	BuffDesc.vScale = _float3(3.f, 3.f, 3.f);
+	BuffDesc.vScale = _float3(1.5f, 1.5f, 1.5f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
@@ -1098,10 +1098,51 @@ void CHero_Knolan::Create_Ultimate_Start_CamEffect()
 	RELEASE_INSTANCE(CGameInstance);
 }
 
+void CHero_Knolan::Create_Heavy_Hit_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject*   pGameObject = nullptr;
+
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+
+	pGameObject = pInstance->Load_Effect(L"Texture_Die_Effect_0", LEVEL_COMBAT, false);
+	BuffDesc.vPosition = _float4(0.f, 1.f, 1.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.ParentTransform = m_pTransformCom;
+
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 2.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 7;
+	BuffDesc.bIsUp = true;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	m_pEffectParts.push_back(pGameObject);
+
+
+	_int iRandom = rand() % 10 + m_iWideAttackDamgae;
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.y += 4.f;
+	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom);
+
+	vPos.x -= 2.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font0(vPos,
+		_float3(2.f, 2.f, 2.f), TEXT("critical"));
+
+	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(iRandom);
+	CCombatController::GetInstance()->HPMp_Update(this);
+
+	RELEASE_INSTANCE(CGameInstance);
+
+}
+
 void CHero_Knolan::Anim_Frame_Create_Control()
 {
 
-	if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(6, 43))
+	if (m_bUseDefence == true && !m_bOnceCreate && 
+		m_pModelCom->Control_KeyFrame_Create(6, 43))
 	{
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
@@ -1158,7 +1199,6 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 			}
 		}
 		m_bOnceStop = true;
-
 	}
 	else if (!m_bOnceCreate  && m_pModelCom->Control_KeyFrame_Create(24, 68))
 	{
@@ -1172,7 +1212,6 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 				dynamic_cast<CSkill_TextureObj*>(m_PlayerParts[i])->Set_Shoot(true);
 			}
 		}
-
 	}
 	else if (!m_bOnceCreate &&m_pModelCom->Control_KeyFrame_Create(21, 53))
 	{
@@ -1209,16 +1248,15 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	else if (m_bUseDefence == true && !m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(26, 20))
 	{
 		Create_Defence_Area();
+		CCombatController::GetInstance()->Camera_Zoom_Out();
 		m_bOnceCreate = true;
 	}
-
 	else if (m_bOriginBuff == true && !m_bOnceCreateBuff && m_pModelCom->Control_KeyFrame_Create(26, 40))
 	{
 		Create_Buff_MainTain_Effect();
+		CCombatController::GetInstance()->Camera_Zoom_Out();
 		m_bOnceCreate = true;
 	}
-
-
 	else
 		return;
 }
@@ -1338,10 +1376,19 @@ void CHero_Knolan::Calculator_HitDamage()
 		m_bIsHeavyHit = true;
 		CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font1(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
-
-
 	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
+
+	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
+
+	if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
+	{
+		CCombatController::GetInstance()->Camera_Shaking();
+		m_bIsHeavyHit = true;
+	}
+	else
+		CCombatController::GetInstance()->UI_Shaking(true);
+
 }
 
 void CHero_Knolan::Create_Buff_Effect()
@@ -1562,8 +1609,9 @@ void CHero_Knolan::Anim_Heavy_Hit()
 	m_bIsHeavyHit = false;
 
 	m_CurAnimqeue.push({ 10,  1.f });	// 8,9,10
+	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	Create_Hit_Effect();
+	Create_Heavy_Hit_Effect();
 }
 
 void CHero_Knolan::Anim_Flee()

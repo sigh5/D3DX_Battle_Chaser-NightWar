@@ -61,7 +61,6 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 	{
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
 		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
-
 		if (pCurActorWepon->Get_HitNum() == 100)	/* °¡¸®¼Õ ±Ã±Ø±â ¶§¹®¿¡  */
 		{
 			m_fHitPerSecond = 2.5f;
@@ -69,17 +68,11 @@ _bool CSkeleton_Naked::Calculator_HitColl(CGameObject * pWeapon)
 			m_iSign *= -1;
 			return true;
 		}
-		
-		if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
-			m_bIsHeavyHit = true;
-
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}
-		
-		CCombatController::GetInstance()->UI_Shaking(true);
 		m_fHitPerSecond = 1.f;
 		m_iSign = 1;
 
@@ -526,7 +519,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 
 }
 
-void CSkeleton_Naked::Create_Heacy_Hit_Effect()
+void CSkeleton_Naked::Create_Heavy_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
@@ -609,7 +602,7 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
 
 		CCombatController::GetInstance()->Wide_Debuff(true, CStatus::DEBUFF_ARMOR);
-
+		CCombatController::GetInstance()->Camera_Zoom_Out();
 		m_bOnceCreate = true;
 	}
 
@@ -859,9 +852,17 @@ void CSkeleton_Naked::Calculator_HitDamage()
 		CExplain_FontMgr::GetInstance()->
 			Set_Explain_Target0_Font0(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
-
 	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom->Take_Damage(m_iGetDamageNum);
+
+	if (m_pStatusCom->Get_CurStatusHpRatio() <= 0.f)
+	{
+		CCombatController::GetInstance()->Camera_Shaking();
+		m_bIsHeavyHit = true;
+	}
+	else
+		CCombatController::GetInstance()->UI_Shaking(true);
+
 }
 
 void CSkeleton_Naked::Anim_Idle()
@@ -966,24 +967,20 @@ void CSkeleton_Naked::Anim_Light_Hit()
 void CSkeleton_Naked::Anim_Heavy_Hit()
 {
 	++m_iHitNum;
-	//m_bOnceCreate = false;
 	m_bIsHeavyHit = false;
-
 	m_CurAnimqeue.push({ 17, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 	
-	Create_Heacy_Hit_Effect();
+	Create_Heavy_Hit_Effect();
 }
 
 void CSkeleton_Naked::Anim_Die()
 {
-	//CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 	m_iTurnCanvasOption = 1;
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 2, 1.f });
 	m_CurAnimqeue.push({ 18, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-	
 }
 
 void CSkeleton_Naked::Anim_Viroty()

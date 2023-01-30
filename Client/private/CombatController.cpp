@@ -227,12 +227,9 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 		PickingTarget();
 	}
 
-
-	MonsterSetTarget();
+	MonsterSetTarget(TimeDelta);
 	Active_Fsm();
 	Collison_Event();
-	
-
 }
 
 void CCombatController::Status_CanvasInit()
@@ -247,13 +244,11 @@ void CCombatController::Status_CanvasInit()
 			continue;
 
 	}
-
 }
 
 void CCombatController::PlayerWin()
 {
 	_float fHPRatio = 0.f;
-
 	for (auto& pMonster : m_CurActorMap)
 	{
 		if (nullptr == dynamic_cast<CMonster*>(pMonster.second))
@@ -264,22 +259,6 @@ void CCombatController::PlayerWin()
 		fHPRatio += fMonsterHpRatio;
 	}
 	
-	/*if (fHPRatio <= 0.f && !m_bVirtory)
-	{
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
-		m_bVirtory = true;
-
-		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
-			LAYER_UI, TEXT("TurnWinCanvas")));
-
-		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
-		pWinCanvas->Set_WinRender(true);
-		RELEASE_INSTANCE(CGameInstance);
-	}
-*/
-
-
 	if (fHPRatio <= 0.f && !m_bVirtory)
 	{
 		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
@@ -287,24 +266,12 @@ void CCombatController::PlayerWin()
 		CClient_Manager::m_bCombatWin = true;
 		m_bVirtory = true;
 
-	/*	CGameInstance::GetInstance()->Load_Object(TEXT("TrunWinUI_Data"), LEVEL_COMBAT);
-		CTrunWinCanvas* pWinCanvas = static_cast<CTrunWinCanvas*>(CGameInstance::GetInstance()->Get_GameObject(pGameInstance->GetCurLevelIdx(),
-			LAYER_UI, TEXT("TurnWinCanvas")));
-		assert(nullptr != pWinCanvas && "CCombatController::PlayerWin");
-		pWinCanvas->Set_WinRender(true);*/
-		
-		
 		for (auto& pPlayer : m_CurActorMap)
 		{
 			pPlayer.second->Set_FsmState(true, CGameObject::m_Viroty);
 		}
-		
-		
 		RELEASE_INSTANCE(CGameInstance);
 	}
-
-	
-
 }
 
 void CCombatController::Late_Tick(_double TimeDelta)
@@ -382,40 +349,64 @@ void CCombatController::Cal_HitPlayerTarget()
 	_float fCurActorHpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusHpRatio();
 	_float fCurActorMpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusMpRatio();
 
-	//// 1) 본인 피가 절반인가?
-	if (fCurActorHpRatio >= 0.5f)
+	if (fCurActorHpRatio <= 0.f)
+	{
+		To_Normal_Attack();
+	}
+	else if (fCurActorHpRatio >= 0.5f) // 1) 본인 피가 절반인가? 
 	{	
 		// 맞은 적이없고 버프를 쓴적이없다.
 		if (static_cast<CMonster*>(m_pCurentActor)->Get_HitNum() == 0
 			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
 			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
 		{
-			To_Buff();
+			if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+				To_Uitimate();
+			else
+				To_Buff();
 		}
-		else if(fCurActorMpRatio >= 0.8f) // 스킬 // 스킬 공격? 
+		else
 		{
-			To_Skill1_Attack();
+			if (true== bMonsterSkill1_Normal)
+				To_Skill1_Attack();
+			else
+				To_Normal_Attack();
+
+			bMonsterSkill1_Normal = !bMonsterSkill1_Normal;
 		}
-		else		
-		{
-			To_Normal_Attack();
-		}
+
+		//else if(fCurActorMpRatio >= 0.8f) // 스킬 // 스킬 공격? 
+		//{
+		//	To_Skill1_Attack();
+		//}
+		//else		
+		//{
+		//	To_Normal_Attack();
+		//}
 		
 	}
 	else   // 본인 피가 절반 이하다.
 	{
-		
 		//본인 피가 절반 20%이하고 마나가 50퍼 이상 높을때 궁극기 사용
-		if (fCurActorHpRatio <= 0.2f)
+		if (fCurActorHpRatio <= 0.45f)		// 나중에 0.3f 로 바꾸기
 		{	
 			if (fCurActorMpRatio >= 0.5f)
 			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate() && !m_bMonsterUseUltimate)
+				{
+					m_bMonsterUseUltimate = true;
 					To_Uitimate();
+				}
 				else if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
 					To_Skill2_Attack();
 				else
+				{
 					To_Skill1_Attack();
+					if(static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+					{
+						m_bMonsterUseUltimate = false;
+					}
+				}
 			}
 			else //마나가 50퍼 공격 스킬사용
 			{
@@ -455,12 +446,10 @@ void CCombatController::Set_Player_StateCanvas()
 	{
 		m_pTurnStateButtonCanvas->Set_RenderActive(true);
 	}
-
 }
 
 void CCombatController::Ultimate_Camera_On()
 {
-
 	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_END);
 
 	for (auto& pCanvas : m_CanvasVec)
@@ -473,8 +462,6 @@ void CCombatController::Ultimate_Camera_On()
 			pCanvas->Set_RenderActive(false);
 	}
 
-
-
 	m_bCurActorUltimateUse = true;
 
 	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Gully")))
@@ -485,10 +472,16 @@ void CCombatController::Ultimate_Camera_On()
 	{
 		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Garrison"), LEVEL_COMBAT));
 	}
-	else if(!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
 	{
 		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Caibretto"), LEVEL_COMBAT));
 	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+	{
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_SlimeKing"), LEVEL_COMBAT));
+	}
+	else
+		return;
 
 }
 
@@ -509,11 +502,13 @@ void CCombatController::Ultimate_LateTick(_double TimeDelta)
 {
 	if (m_bVirtory)
 		return;
-
+	
 	Ultimate_Start_LateTick(TimeDelta);
 	Ultimate_Timedelta_Tick(TimeDelta);
 	Ultimate_End_LateTick(TimeDelta);
+	
 }
+	
 
 void CCombatController::Ultimate_Start_LateTick(_double TimeDelta)
 {
@@ -543,14 +538,19 @@ void CCombatController::Ultimate_Timedelta_Tick(_double TimeDelta)
 	if (false == m_bBannerClose)
 		return;
 	
+	m_fTimeSlowRatio -= _float(TimeDelta);
+	m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.3f);
+
 	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
 	{
 		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 1.0f);
 		return;
 	}
-
-	m_fTimeSlowRatio -= _float(TimeDelta);
-	m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.3f);
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+	{
+		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.4f);
+	}
+	
 	m_pGameInstace->Set_Timedelta(TEXT("Timer_60"), m_fTimeSlowRatio);	
 	
 }
@@ -719,7 +719,16 @@ void CCombatController::Wide_Attack(_bool IsPlayer, _int iDamage)
 {
 	if (true == IsPlayer)
 	{
+		for (auto& pPlayer : m_CurActorMap)
+		{
+			if (dynamic_cast<CPlayer*>(pPlayer.second) == nullptr)
+				continue;
 
+			pPlayer.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
+			static_cast<CCombatActors*>(pPlayer.second)->Set_WideAttackDamage(iDamage);
+		}
+
+		Camera_Shaking();
 	}
 	else
 	{
@@ -761,16 +770,18 @@ void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 	}
 }
 
-void CCombatController::MonsterSetTarget()
+void CCombatController::MonsterSetTarget(_double TimeDelta)
 {
 	if (nullptr == dynamic_cast<CMonster*>(m_pCurentActor) )
 		return;
+
 
 	CStatus* pStatus = Find_CurStatus(m_pCurentActor->Get_ObjectName());
 	if (pStatus->Get_CurStatusHpRatio() <= 0.f)
 		return;
 
 	Cal_HitPlayerTarget();
+	
 }
 
 void CCombatController::Collison_Event()
@@ -999,6 +1010,7 @@ void CCombatController::To_Uitimate()
 	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Uitimate);
+		Mana_Refresh();
 		m_bMonsterTurnEnd = true;
 	}
 	else

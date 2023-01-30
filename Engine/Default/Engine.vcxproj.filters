@@ -208,6 +208,12 @@
     <Filter Include="01.Utility\09.RenderTargets\Manager">
       <UniqueIdentifier>{5b3b52af-5bbd-47ed-a747-bad9c4cad07b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\10.Sound">
+      <UniqueIdentifier>{c557e223-f0a3-4766-b2cd-83bde65fd529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\10.Sound\Mgr">
+      <UniqueIdentifier>{f96d02a2-7225-430b-b22d-f75f36c4aaf0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\public\GameInstance.h">
@@ -465,6 +471,12 @@
     <ClInclude Include="..\Public\RenderTarget.h">
       <Filter>01.Utility\09.RenderTargets</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Sound.h">
+      <Filter>01.Utility\10.Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Sound_Manager.h">
+      <Filter>01.Utility\10.Sound\Mgr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\GameInstance.cpp">
@@ -694,6 +706,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\RenderTarget.cpp">
       <Filter>01.Utility\09.RenderTargets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Sound.cpp">
+      <Filter>01.Utility\10.Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Sound_Manager.cpp">
+      <Filter>01.Utility\10.Sound\Mgr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

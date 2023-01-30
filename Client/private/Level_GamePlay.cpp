@@ -12,7 +12,7 @@
 #include "Level_Loading.h"
 #include "UI.h"
 #include "Broken_Image.h"
-
+#include "Attack_Effect_Rect.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -281,8 +281,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 #ifdef NOMODLES
-	pGameInstance->Load_Object(TEXT("UI_TrunTwoMonster"), LEVEL_GAMEPLAY);
+	//pGameInstance->Load_Effect(TEXT("Texture_bretto_Glow_Ultimate_Rect"), LEVEL_GAMEPLAY, true);
+
 	
+
 #else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 	pGameInstance->Load_Object(TEXT("Inventory"), LEVEL_GAMEPLAY);

@@ -211,6 +211,9 @@
     <Filter Include="02.GameObjects\Image_Broken">
       <UniqueIdentifier>{c4c87d7f-389d-40ae-9e01-940004ecf939}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Effect\Mesh_Effect">
+      <UniqueIdentifier>{7256517b-6a11-4e4e-aa8c-13a853ea53ad}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />

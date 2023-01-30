@@ -29,6 +29,9 @@ protected:
 public:
 	static	const wstring			m_pTransformComTag;
 
+	_float Get_CamDistance() const {
+		return m_fCamDistance;
+	}
 public:
 	class CComponent* Find_Component(const wstring& pComponentTag);
 	const	 _tchar*				Get_ProtoName() const { return m_ProtoName; }
@@ -80,7 +83,7 @@ public:
 protected:
 	CGameObject*			m_pParentObject = nullptr;
 	_bool					m_bClone = false;
-
+	_float					m_fCamDistance = { 0.0 };
 protected:
 	ID3D11Device*			m_pDevice = nullptr;
 	ID3D11DeviceContext*	m_pContext = nullptr;
@@ -93,6 +96,7 @@ protected:
 	HRESULT Add_Component(_uint iLevelIndex, const wstring& pPrototypeTag, const wstring& pComponentTag, class CComponent** ppOut, void* pArg = nullptr);
 
 	HRESULT Remove_component(const wstring& pComponentTag);
+	void Compute_CamDistance();
 
 protected:
 	const					_tchar*					m_ObjectName = TEXT("");
