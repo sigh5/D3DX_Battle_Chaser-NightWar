@@ -75,6 +75,11 @@ CBone * CModel::Get_BonePtr(const char * pBoneName)
 
 }
 
+_float CModel::Get_Ratio()
+{
+	return m_Animations[m_iCurrentAnimIndex]->Get_Channles()[0]->Get_Ratio();
+}
+
 HRESULT CModel::Initialize_Prototype(LOAD_TYPE eType, const char * pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile)
 {
 	_uint			iFlag = 0;

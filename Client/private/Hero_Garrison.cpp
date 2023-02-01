@@ -12,6 +12,8 @@
 #include "Buff_Effect.h"
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
+#include "Trail_Effect.h"
+#include "HitBoxObject.h"
 
 CHero_Garrison::CHero_Garrison(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -179,8 +181,14 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
 
+		if (ImGui::Button("TestTraill"))
+		{
+			m_bTraillEffectStartCheck = false;
 		
+		}
 
+
+		Create_Sword_Trail();
 	
 
 
@@ -706,7 +714,6 @@ void CHero_Garrison::Create_Normal_Attack_Effect()
 	BuffDesc.bIsUp = true;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -732,7 +739,6 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -741,7 +747,6 @@ void CHero_Garrison::Create_Skill2_Attack_Effect()
 	if (m_pHitTarget == nullptr)
 		return;
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -760,7 +765,6 @@ void CHero_Garrison::Create_Skill2_Attack_Effect()
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Create_Ultimate_Effect()
@@ -768,7 +772,6 @@ void CHero_Garrison::Create_Ultimate_Effect()
 	if (m_pHitTarget == nullptr)
 		return;
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -786,11 +789,8 @@ void CHero_Garrison::Create_Ultimate_Effect()
 	BuffDesc.bIsStraight = true;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Garrison_Ultimate_Effect"), 0);
-
 	m_pEffectParts.push_back(pGameObject);
-
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Create_Ultimate_End_Effect()
@@ -823,7 +823,6 @@ void CHero_Garrison::Create_Ultimate_End_Effect()
 		m_pEffectParts.push_back(pGameObject);
 		iSign *= -1;
 	}
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -846,15 +845,12 @@ void CHero_Garrison::Create_BuffEffect()
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
-
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Create_Move_Target_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
@@ -873,13 +869,11 @@ void CHero_Garrison::Create_Move_Target_Effect()
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Create_Defence_Area()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
@@ -894,26 +888,19 @@ void CHero_Garrison::Create_Defence_Area()
 	BuffDesc.bIsMainTain = true;
 	BuffDesc.iFrameCnt = 6;
 	BuffDesc.bIsUp = false;
-
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-
-
 	m_pEffectParts.push_back(pGameObject);
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CHero_Garrison::Create_Buff_MainTain_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-
 	pGameObject = pInstance->Load_Effect(TEXT("Texture_Buff_Effect_Power"), LEVEL_COMBAT, false);
-
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(-1.9f, 0.4f, -0.5f, 1.f);
 	BuffDesc.vScale = _float3(2.f, 2.f, 2.f);
@@ -923,24 +910,21 @@ void CHero_Garrison::Create_Buff_MainTain_Effect()
 	BuffDesc.iFrameCnt = 4;
 	BuffDesc.bIsUp = false;
 	BuffDesc.bIsStraight = false;
-
 	static_cast<CBuff_Effect*>(pGameObject)->Is_Particle_Effect(15);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
-
 }
+
 void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
-
 	CGameObject* pGameObject = nullptr;
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
-
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(10.f, 1.f, 16.f, 1.f);
 	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
@@ -949,11 +933,11 @@ void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-
 	m_pEffectParts.push_back(pGameObject);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
 	RELEASE_INSTANCE(CGameInstance);
 }
+
 void CHero_Garrison::Create_Ultimate_StartFog_CamEffect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -972,13 +956,11 @@ void CHero_Garrison::Create_Ultimate_StartFog_CamEffect()
 	BuffDesc.bIsMainTain = true;
 	BuffDesc.iFrameCnt = 6;
 	BuffDesc.bIsUp = false;
-
-
 	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
 	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
-
 }
+
 void CHero_Garrison::Create_FullScreenEffect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -1003,6 +985,7 @@ void CHero_Garrison::Create_FullScreenEffect()
 
 	RELEASE_INSTANCE(CGameInstance);
 }
+
 void CHero_Garrison::Create_Heavy_Hit_Effect()
 {
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
@@ -1041,12 +1024,13 @@ void CHero_Garrison::Create_Heavy_Hit_Effect()
 
 	RELEASE_INSTANCE(CGameInstance);
 }
+
 void CHero_Garrison::Boss_Ultimate_Anim()
 {
 	m_CurAnimqeue.push({ 27,3.f });	//6,26,27
 	Set_CombatAnim_Index(m_pModelCom);
-
 }
+
 void CHero_Garrison::Anim_Frame_Create_Control()
 {
 	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(3, 9))
@@ -1156,7 +1140,6 @@ void CHero_Garrison::Use_HpPotion()
 	m_bOnceCreate = false;
 
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Use_MpPotion()
@@ -1167,7 +1150,6 @@ void CHero_Garrison::Use_MpPotion()
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_MP_POSION);
-
 
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
@@ -1197,7 +1179,6 @@ void CHero_Garrison::Use_MpPotion()
 	m_bOnceCreate = false;
 
 	RELEASE_INSTANCE(CGameInstance);
-
 }
 
 void CHero_Garrison::Calculator_HitDamage()
@@ -1398,21 +1379,38 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
 	if (nullptr == pPartObject)
 		return E_FAIL;
-
+	
+	
 	m_PlayerParts.push_back(pPartObject);
 
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 300;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 300;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;
-
-
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
+
+	_float3 vCenter = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider()->Get_Center();
+
+	CHitBoxObject::HitBoxObject  hitBoxDesc;
+	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+
+	pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
+
+	m_pTrailEffect = pGameInstance->
+		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
+
+
+
+	
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -1530,7 +1528,7 @@ void CHero_Garrison::CombatAnim_Move(_double TImeDelta)
 
 void CHero_Garrison::Ultimate_Anim_Frame_Control()
 {
-	if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(30, 3))
+	if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(30, 7))
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		CCombatController::GetInstance()->Load_CamBG2();
@@ -1564,9 +1562,9 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 	}
 	else if (!m_bUltimateHit[2] && m_pModelCom->Control_KeyFrame_Create(30, 140))
 	{
-		Create_Ultimate_Effect();
+	Create_Ultimate_Effect();
 
-		m_bUltimateHit[2] = true;
+	m_bUltimateHit[2] = true;
 	}
 	else if (!m_bUltimateHit[3] && m_pModelCom->Control_KeyFrame_Create(30, 150))
 	{
@@ -1658,6 +1656,96 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 
 }
 
+void CHero_Garrison::Create_Sword_Trail()
+{
+	if (nullptr != m_pTrailEffect)
+	{
+		if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(3, 4))
+		{
+			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+			TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+			TrailDesc.pModel = m_pModelCom;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc,9);
+			m_bTraillEffectStartCheck = true;
+			m_bTrailEndCheck = false;
+		
+
+		}
+		else if(!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(3, 12))
+		{
+			//static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+
+
+		/*else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 7))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->New_StartPos();
+			m_bTraillEffectStartCheck = true;
+			m_bTrailEndCheck = false;
+
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 13))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim();
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+			m_bTrailStop = false;
+		}
+
+		else if (!m_bTrailStop&& m_pModelCom->Control_KeyFrame_Create(19, 16))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
+			m_bTrailStop = true;
+		}
+
+
+		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 17))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->New_StartPos();
+			m_bTraillEffectStartCheck = true;
+			m_bTrailEndCheck = false;
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 23))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim();
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+			m_bTrailStop = false;
+		}
+
+		else if (!m_bTrailStop&& m_pModelCom->Control_KeyFrame_Create(19, 27))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
+			m_bTrailStop = true;
+		}
+*/
+
+		/*else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 4))
+		{
+			CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
+
+			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+			TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->NoUVMoveSet(TrailDesc, 10);
+			m_bTraillEffectStartCheck = true;
+			RELEASE_INSTANCE(CGameInstance);
+
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 10))
+		{
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim_NoUVMove();
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}*/
+
+	}
+
+}
+
 void CHero_Garrison::CombatAnim_Move_Ultimate(_double TImeDelta)
 {
 	if (m_pHitTarget == nullptr)
@@ -1705,7 +1793,7 @@ void CHero_Garrison::AnimNormalAttack()
 	m_bBuffEffectStop = true;
 
 	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
-	m_CurAnimqeue.push({ 3,  1.f });		// 3에서		// 3 22에 이펙트 생성
+	m_CurAnimqeue.push({ 3,  0.7f });		// 3에서		// 3 22에 이펙트 생성
 	m_CurAnimqeue.push({ 11, m_setTickForSecond });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
@@ -1755,6 +1843,8 @@ void CHero_Garrison::Anim_Skill2_Attack()
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2;
 	m_bBuffEffectStop = true;
 	m_iStage_Buff_DamgaeUP = 0;
+	m_bTraillEffectStartCheck = false;
+
 
 	m_CurAnimqeue.push({ 17, 1.0f });
 	m_CurAnimqeue.push({ 18, 0.5f });
@@ -1977,9 +2067,8 @@ void CHero_Garrison::Create_Test_Effect()
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
-	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(0);
 	RELEASE_INSTANCE(CGameInstance);
 }
 

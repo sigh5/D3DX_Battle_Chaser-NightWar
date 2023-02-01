@@ -206,6 +206,9 @@ HRESULT CMapOneTree::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_EnviromentDesc.m_pModelTag, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
+	
+
 	return S_OK;
 }
 

@@ -30,6 +30,9 @@ public:
 		return m_PivotMatrix;
 	}
 
+
+	_float	Get_Ratio();
+
 public:
 	virtual HRESULT Initialize_Prototype(LOAD_TYPE eType, const char* pModelFilePath, _fmatrix PivotMatrix, HANDLE hFile);
 	virtual HRESULT Initialize(void* pArg);

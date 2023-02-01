@@ -4,7 +4,7 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D		g_DiffuseTexture;
-texture2D		g_NormalTexture;
+
 
 struct VS_IN
 {
@@ -79,8 +79,11 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	Out.vDiffuse = vDiffuse;
 
+	
+	vector vNormal = vector(-1.f, 1.f, -1.f, 0.f);
+
 	/* -1 ~ 1 => 0 ~ 1 */
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = 	normalize(vNormal);//vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
 
 	return Out;

@@ -24,7 +24,11 @@ public:
 	HRESULT Set_MatrixArray(const char* pConstantName, const _float4x4* pMatrix, _uint iNumMatrices);
 	HRESULT Set_ShaderResourceViewArray(const char* pConstantName, ID3D11ShaderResourceView** ppSRV, _uint iNumTextures);
 	HRESULT Set_ShaderResourceView(const char* pConstantName, ID3D11ShaderResourceView* pSRV);
+
+
 	virtual		void	Final_Update()override {}
+
+
 private:
 	ID3DX11Effect*				m_pEffect = nullptr;
 	vector<ID3D11InputLayout*>	m_InputLayouts;

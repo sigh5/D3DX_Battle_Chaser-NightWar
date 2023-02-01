@@ -151,33 +151,15 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		if (nullptr != m_pFullscreenEffect)
 			m_pFullscreenEffect->Tick(TimeDelta);
 
-		/*	_float4 vPos;
-			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-			static int iDamage = 30;
+	
+		//static float ffPos[3] = {};
+		//static float ffScale[3] = {};
+		//static char  szName[MAX_PATH] = "";
+		//ImGui::InputFloat3("SkillPos", ffPos);
+		//ImGui::InputFloat3("SkillScale", ffScale);
 
-			static float Pos[3] = { vPos.x,vPos.y,vPos.z };
-			ImGui::InputInt("Damage", &iDamage);
-			ImGui::InputFloat3("VPos", Pos);
-
-			if (ImGui::Button("Create_Font"))
-			{
-				vPos.x = Pos[0];
-				vPos.y = Pos[1];
-				vPos.z = Pos[2];
-
-
-				CDamage_Font_Manager::GetInstance()->Set_DamageFont(vPos, _float3(3.f, 3.f, 3.f), iDamage);
-			}*/
-
-
-		static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
-
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);
+		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		//ImGui::InputText("TextureName", szName, MAX_PATH);
 
 		////if (ImGui::Button("Create_Skill"))
 		////{
@@ -191,30 +173,22 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		////	Create_Test_TextureObj();		// Test
 
 		////}
-		if (ImGui::Button("Create_Effect"))
-		{
-			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		//if (ImGui::Button("Create_Effect"))
+		//{
+		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-			m_TextureTag = Texture_NameTag;
-			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		//	m_TextureTag = Texture_NameTag;
+		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-			Create_Test_Effect();		// Test
-		}
+		//	Create_Test_Effect();		// Test
+		//}
 
-		RELEASE_INSTANCE(CGameInstance);
+		//RELEASE_INSTANCE(CGameInstance);
 
 	
 	}
-
-	if (ImGui::Button("Test_BG"))
-	{
-		Create_Ultimate_StartCam_Effect();
-		Create_Ultimate_StartFog_CamEffect();
-	}
-
-
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -759,7 +733,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 300;
+	StatusDesc.iHp = 10;
 	StatusDesc.iMp = 250;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;

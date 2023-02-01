@@ -3,6 +3,8 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D		g_DiffuseTexture[40];
+texture2D		g_NormalTexture;
+
 
 /* 지형 셰이딩*/
 
@@ -160,9 +162,14 @@ PS_OUT PS_MAIN_Real(PS_IN In)
 	//	vMtrlDiffuse = vDestDiffuse2;
 	//}
 
+
+	vector vNormal = g_NormalTexture.Sample(LinearSampler, In.vTexUV*30.f);
+	
+	vNormal = vector(-1.f, 1.f, -1.f, 0.f);
+
 	Out.vDiffuse = vMtrlDiffuse;
 	Out.vDiffuse.a = 1.f;
-	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vNormal = normalize(vNormal); //g_NormalTexture.Sample(LinearSampler, In.vTexUV*5.f);//vector(vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
 
 	

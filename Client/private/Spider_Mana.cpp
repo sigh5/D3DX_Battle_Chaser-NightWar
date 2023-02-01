@@ -512,6 +512,7 @@ void CSpider_Mana::Create_Hit_Effect()
 		}
 	}
 
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -830,7 +831,7 @@ HRESULT CSpider_Mana::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 100;
+	StatusDesc.iHp = 500;
 	StatusDesc.iMp = 300;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))

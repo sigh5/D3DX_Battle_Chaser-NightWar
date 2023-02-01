@@ -514,7 +514,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		}
 	}
 
-
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 	RELEASE_INSTANCE(CGameInstance);
 
 }

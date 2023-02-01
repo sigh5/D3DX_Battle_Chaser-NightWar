@@ -95,16 +95,25 @@ void CCollider::Update(_fmatrix TransformMatrix)
 	{
 	case CCollider::TYPE_AABB:
 		m_pAABB_Original->Transform(*m_pAABB, Remove_Rotation(TransformMatrix));
+		m_vCenter = m_pAABB_Original->Center;
+		m_vExtention = m_pAABB_Original->Extents;
 		break;
 
 	case CCollider::TYPE_OBB:
 		m_pOBB_Original->Transform(*m_pOBB, TransformMatrix);
+		m_vCenter = m_pOBB_Original->Center;
+		m_vExtention = m_pOBB_Original->Extents;
 		break;
 
 	case CCollider::TYPE_SPHERE:
 		m_pSphere_Original->Transform(*m_pSphere, TransformMatrix);
+		m_vCenter = m_pSphere->Center;
+		m_Radius = m_pSphere->Radius;
 		break;
 	}
+
+	
+
 }
 
 _bool CCollider::Collision(CCollider * pTargetCollider)

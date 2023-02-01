@@ -6,6 +6,9 @@ BEGIN(Engine)
 class CCollider;
 class CBone;
 class CRenderer;
+class CTexture;
+class CShader;
+class CVIBuffer_Point_Instancing;
 END
 
 BEGIN(Client)
@@ -35,6 +38,7 @@ public:
 	virtual WeaponType				Get_Type()const override { return m_WeaponDesc.eType; }
 	virtual _uint					Get_WeaponOption()override { return m_WeaponDesc.iWeaponOption; }
 	virtual  void 					Set_WeaponOption(_uint iOption)override { m_WeaponDesc.iWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(iOption); }
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -44,13 +48,13 @@ public:
 	virtual HRESULT Last_Initialize()override;
 
 private:
-	CCollider*				m_pColliderCom = nullptr;
-	CRenderer*				m_pRendererCom = nullptr;
+	CCollider*							m_pColliderCom = nullptr;
+	CRenderer*							m_pRendererCom = nullptr;
+
 
 protected:
 	_float4x4				m_SocketMatrix;
 	WEAPONDESC				m_WeaponDesc;
-
 
 private:
 	HRESULT SetUp_Components();

@@ -206,8 +206,8 @@ void CSlimeKing::Tick(_double TimeDelta)
 	//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
 	//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-	//	//Create_Test_Effect();		// Test
-	//	Create_Test_MeshEffect();
+	//	Create_Test_Effect();		// Test
+	//	//Create_Test_MeshEffect();
 	//}
 
 
@@ -494,6 +494,7 @@ void CSlimeKing::Create_Hit_Effect()
 			iSignNum *= -1;
 		}
 	}
+	CCombatController::GetInstance()->Camera_Zoom_Out();
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -541,13 +542,12 @@ void CSlimeKing::Create_Ultimate_StartCam_Effect()
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	m_pCamEffectObj = nullptr;
 
-
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 	m_pCamEffectObj = pInstance->Load_Effect(L"Slime_Ultimate_CamEffect_Base", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(16.88f, 3.5f, 11.5f, 1.f);
+	BuffDesc.vPosition = _float4(17.213f, 2.5f, 10.8f, 1.f);
 	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -716,13 +716,14 @@ void CSlimeKing::Create_Test_Effect()
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = m_vSkill_Pos;
 	BuffDesc.vScale = m_vTestScale;
-	BuffDesc.vAngle = -90.f;
-	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 4.f;
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
-	
+	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -858,6 +859,7 @@ void CSlimeKing::Anim_Frame_Create_Control()
 	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(15, 43))
 	{
 		Create_Ultimate_StartCam_Effect();
+		CCombatController::GetInstance()->Load_CamBG2();
 		m_bUltimateCam = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(15, 75))

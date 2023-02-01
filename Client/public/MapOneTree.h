@@ -36,8 +36,7 @@ private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel_Instancing*		m_pModelCom = nullptr;
-
-
+	
 	int						m_iCreateRadioButton = 0;
 	char					szName[MAX_PATH] = "";
 private:

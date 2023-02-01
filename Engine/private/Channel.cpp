@@ -71,7 +71,7 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 				++m_iCurrentKeyFrameIndex;
 			}
 
-			_double			Ratio = (PlayTime - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
+			m_Ratio = (PlayTime - m_KeyFrames[m_iCurrentKeyFrameIndex].Time) /
 				(m_KeyFrames[m_iCurrentKeyFrameIndex + 1].Time - m_KeyFrames[m_iCurrentKeyFrameIndex].Time);
 
 			_vector			vSourScale, vDestScale;
@@ -86,9 +86,9 @@ void CChannel::Update_TransformMatrix(_double PlayTime)
 			vDestRotation = XMLoadFloat4(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vRotation);
 			vDestPosition = XMLoadFloat3(&m_KeyFrames[m_iCurrentKeyFrameIndex + 1].vPosition);
 
-			vScale = XMVectorLerp(vSourScale, vDestScale, (_float)Ratio);
-			vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)Ratio);
-			vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)Ratio);
+			vScale = XMVectorLerp(vSourScale, vDestScale, (_float)m_Ratio);
+			vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, (_float)m_Ratio);
+			vPosition = XMVectorLerp(vSourPosition, vDestPosition, (_float)m_Ratio);
 			vPosition = XMVectorSetW(vPosition, 1.f);
 		}
 	

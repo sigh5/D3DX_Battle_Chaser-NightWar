@@ -166,9 +166,6 @@
     <Filter Include="02.GameObjects\Effect\Attack_Effect">
       <UniqueIdentifier>{0312608a-7bed-4e06-b412-2c1f8d74dcde}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObjects\Effect\Hit_Effect">
-      <UniqueIdentifier>{304f5892-b1ef-4558-bd51-2615b4633908}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObjects\Effect\Test_Effect_">
       <UniqueIdentifier>{de48838b-8abc-4144-9f07-7b99d5ee56c1}</UniqueIdentifier>
     </Filter>
@@ -213,6 +210,9 @@
     </Filter>
     <Filter Include="02.GameObjects\Effect\Mesh_Effect">
       <UniqueIdentifier>{7256517b-6a11-4e4e-aa8c-13a853ea53ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Effect\Trail_Effect">
+      <UniqueIdentifier>{304f5892-b1ef-4558-bd51-2615b4633908}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -441,6 +441,9 @@
     <ClInclude Include="..\Public\Mesh_Effect.h">
       <Filter>02.GameObjects\Effect\Mesh_Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Trail_Effect.h">
+      <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -650,6 +653,9 @@
     <ClCompile Include="..\Private\Mesh_Effect.cpp">
       <Filter>02.GameObjects\Effect\Mesh_Effect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Trail_Effect.cpp">
+      <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -708,6 +714,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxModelUV_Move.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrail.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

@@ -231,6 +231,7 @@
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\Public\Trail_Effect.h" />
     <ClInclude Include="..\Public\TrunLoseCanvas.h" />
     <ClInclude Include="..\Public\TrunWinCanvas.h" />
     <ClInclude Include="..\Public\Trun_BattleStart_UI.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\Private\Trail_Effect.cpp" />
     <ClCompile Include="..\Private\TrunLoseCanvas.cpp" />
     <ClCompile Include="..\Private\TrunWinCanvas.cpp" />
     <ClCompile Include="..\Private\Trun_BattleStart_UI.cpp" />
@@ -344,6 +346,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxRectInstance.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTexIncCount.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrail.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -235,8 +235,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Map_3D_UI"))))
-	//	return E_FAIL;
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
+		return E_FAIL;
 
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
@@ -330,7 +330,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = _float4(0.5f, 0.5f, 0.5f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext,TEXT("Level_Game_Directional") ,LightDesc)))
 		return E_FAIL;

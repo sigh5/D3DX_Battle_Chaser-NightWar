@@ -29,7 +29,9 @@ public:
 
 public:
 	const _bool		Get_Coll()const { return m_isColl; }
-
+	_float3			Get_Center()const { return m_vCenter; }
+	_float3			Get_Extention()const { return m_vExtention; }
+	_float			Get_Radius()const { return m_Radius; }
 public:
 	virtual HRESULT Initialize_Prototype(TYPE eType);
 	virtual HRESULT Initialize(void* pArg);
@@ -59,6 +61,9 @@ private:
 	BoundingSphere*				m_pSphere = nullptr;
 	_bool						m_isColl = false;
 
+	_float3						m_vCenter;
+	_float3						m_vExtention;
+	_float						m_Radius = 0.f;
 #ifdef _DEBUG
 private:
 	PrimitiveBatch<VertexPositionColor>*				m_pBatch = nullptr;

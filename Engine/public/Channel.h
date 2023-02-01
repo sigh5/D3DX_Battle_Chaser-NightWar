@@ -12,6 +12,9 @@ public:
 public:
 	const char*		GetName()const { return m_szName; }
 	void			Set_DurationTime(_double Ratio);
+	_float			Get_Ratio()const { return (_float)m_Ratio; }
+
+
 public:
 	HRESULT Initialize(HANDLE hFile, class CModel* pModel);
 	void	Update_TransformMatrix(_double PlayTime);
@@ -44,7 +47,7 @@ private:
 	KEYFRAME			m_OldFrame;
 	_double				m_FixTime = 0.5;
 	_double				m_newFixTime = 0.0;
-
+	_double				m_Ratio = 0.f;
 public:
 	static CChannel* Create(HANDLE hFile, class CModel* pModel);
 	virtual void Free() override;

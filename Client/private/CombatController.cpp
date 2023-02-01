@@ -638,6 +638,10 @@ void CCombatController::Load_CamBG2()
 	{
 		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
 	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+	{
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
+	}
 	else
 		return;
 }

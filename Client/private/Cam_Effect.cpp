@@ -170,7 +170,4 @@ void CCam_Effect::Free()
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
-
-
-
 }

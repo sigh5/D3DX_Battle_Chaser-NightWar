@@ -23,6 +23,7 @@ HRESULT CMainLogo::Initialize_Prototype()
 
 HRESULT CMainLogo::Initialize(void * pArg)
 {
+	m_ObjectName = TEXT("Main_LOGO");
 
 	CUI::UIDESC Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
@@ -39,13 +40,14 @@ HRESULT CMainLogo::Initialize(void * pArg)
 	m_fX = m_fSizeX * 0.5f;
 	m_fY = m_fSizeY * 0.5f;
 
-	m_pTransformCom->Set_Scaled(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(m_fX - m_fSizeX * 0.5f , -m_fY + m_fSizeY * 0.5f+ 50.f , 0.1f, 1.f));
-
+	
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
+	m_pTransformCom->Set_Scaled(_float3(450.f, 240.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(400.f, 220.f, 0.1f, 1.f));
+
+
+
 
 	return S_OK;
 }

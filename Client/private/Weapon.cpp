@@ -13,7 +13,6 @@ CWeapon::CWeapon(const CWeapon & rhs)
 {
 }
 
-
 HRESULT CWeapon::Initialize_Prototype()
 {
 	if (FAILED(__super::Initialize_Prototype()))
@@ -46,7 +45,7 @@ HRESULT CWeapon::Initialize(void * pArg)
 
 void CWeapon::Tick(_double TimeDelta)
 {
-	__super::Tick(TimeDelta);	
+	__super::Tick(TimeDelta);
 }
 
 void CWeapon::Late_Tick(_double TimeDelta)
@@ -75,8 +74,6 @@ void CWeapon::Late_Tick(_double TimeDelta)
 HRESULT CWeapon::Render()
 {
 	
-
-
 	return S_OK;
 }
 

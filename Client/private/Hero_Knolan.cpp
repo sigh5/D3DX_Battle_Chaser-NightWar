@@ -1409,7 +1409,7 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 150;
+	StatusDesc.iHp = 20;
 	StatusDesc.iMp = 250;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;

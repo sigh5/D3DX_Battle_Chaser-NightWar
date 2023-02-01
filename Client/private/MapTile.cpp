@@ -364,7 +364,8 @@ HRESULT CMapTile::SetUp_Components()
 		(CComponent**)&m_pTextureCom[TYPE_FILTER])))
 		return E_FAIL;
 
-
+	
+	
 	///* For.Prototype_Component_Texture_MapOneTile_FilterCanvas */
 	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_FilterCanvas"), TEXT("Com_Filter"),
 	//	(CComponent**)&m_pTextureCom[TYPE_FILTER])))
@@ -399,6 +400,8 @@ HRESULT CMapTile::SetUp_ShaderResources()
 
 	RELEASE_INSTANCE(CGameInstance);
 
+
+
 	if (FAILED(m_pTextureCom[TYPE_DIFFUSE]->Bind_ShaderResources(m_pShaderCom, "g_DiffuseTexture")))
 		return E_FAIL;
 	if (FAILED(m_pTextureCom[TYPE_BRUSH]->Bind_ShaderResource(m_pShaderCom, "g_BrushTexture")))
@@ -406,6 +409,8 @@ HRESULT CMapTile::SetUp_ShaderResources()
 
 	if (FAILED(m_pTextureCom[TYPE_FILTER]->Bind_ShaderResources(m_pShaderCom, "g_FilterTexture")))
 		return E_FAIL;
+
+
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_vBrushPos", &m_vBrushPos, sizeof(_float4))))
 		return E_FAIL;
@@ -448,6 +453,7 @@ void CMapTile::Free()
 
 	for (auto& pTextureCom : m_pTextureCom)
 		Safe_Release(pTextureCom);
+
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pVIBufferCom);

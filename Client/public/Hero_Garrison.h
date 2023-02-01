@@ -94,6 +94,8 @@ public:
 	void			  CombatAnim_Move(_double TImeDelta);
 	void		      Ultimate_Anim_Frame_Control();
 
+	/*For.Imgui*/
+	void			 Create_Sword_Trail();
 
 public:
 	void				Anim_Idle();
@@ -130,6 +132,7 @@ private:
 	_bool			m_bUltimateBuffRenderStop = false;
 	_bool			m_bFogStart = false;
 	_bool			m_bFullScreenEffect = false;
+	_bool			m_bTrailStop = false;
 private:
 	CShader*				m_pShaderCom = nullptr;
 	CRenderer*				m_pRendererCom = nullptr;
@@ -141,7 +144,8 @@ private:
 
 	CGameObject*			m_pFog = nullptr;
 	CGameObject*			m_pFullscreenEffect = nullptr;
-
+	CGameObject*			m_pTrailEffect = nullptr;
+	CGameObject*			m_pTrailUVMoveEffect = nullptr;
 
 private:
 	vector<CGameObject*>	m_PlayerParts;
@@ -180,7 +184,8 @@ private:
 
 	_bool		m_bUltimateHit[15] = { false };
 	_bool		m_bOriginBuff = false;
-
+	_bool			m_bTraillEffectStartCheck = false;
+	_bool			m_bTrailEndCheck = false;
 
 	/*Imgui*/
 	_float3			m_vTestPos;

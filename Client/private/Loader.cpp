@@ -49,6 +49,8 @@
 #include "Inventory_Button.h"
 #include "Broken_Image.h"
 #include "Mesh_Effect.h"
+#include "Trail_Effect.h"
+
 
 /* For.CombatScene*/
 
@@ -268,6 +270,14 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Diffuse"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/TextureMap_1/MAP_Terrain_%d.dds"), CTexture::TYPE_DIFFUSE, 35))))
 		return E_FAIL;
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Normal"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/TerrainNormal/MAP_Terrain_0_NRM1234.png"), CTexture::TYPE_DIFFUSE))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Tree_Normal"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Terraindds/TerrainNormal/MAP_trees_A_01_NRM.png"), CTexture::TYPE_DIFFUSE))))
+		return E_FAIL;
+
 	/* For.Prototype_Component_Texture_Filter */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_FilterCanvas"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Filter_2.dds"), CTexture::TYPE_FILTER, 1))))
@@ -498,6 +508,12 @@ HRESULT CLoader::ForGamePlay_Shader(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_Shader_VtxTexIncCount"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTexIncCount.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxTrail"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxTrail.hlsl"), VTXPOINTINSTANCING_DECLARATION::Elements, VTXPOINTINSTANCING_DECLARATION::iNumElements))))
+		return E_FAIL;
+
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_VtxModel_Instance"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxModelInstance.hlsl"), VTXMODEL_INSTAICING_DECLARATION::Elements, VTXMODEL_INSTAICING_DECLARATION::iNumElements))))
 		return E_FAIL;
@@ -766,6 +782,10 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Mesh_Effect"),
 		CMesh_Effect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Trail_Effect"),
+		CTrail_Effect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	return S_OK;
@@ -1085,6 +1105,12 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Cam/Sprites/Sprites_%d.png"),
 			CTexture::TYPE_END, 4))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Trail"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Trail/Trail_%d.png"),
+			CTexture::TYPE_END, 11))))
 		return E_FAIL;
 
 
