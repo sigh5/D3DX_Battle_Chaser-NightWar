@@ -158,38 +158,52 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		if (nullptr != m_pFullscreenEffect)
 			m_pFullscreenEffect->Tick(TimeDelta);
 
-		//static float ffPos[3] = {};
-		//static float ffScale[3] = {};
-		//static char  szName[MAX_PATH] = "";
-		//ImGui::InputFloat3("SkillPos", ffPos);
-		//ImGui::InputFloat3("SkillScale", ffScale);
+		if (nullptr != m_pTrailUVMoveEffect)
+			m_pTrailUVMoveEffect->Tick(TimeDelta);
 
-		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		//ImGui::InputText("TextureName", szName, MAX_PATH);
+		static float ffPos[3] = {};
+		static float ffScale[3] = {};
+		static char  szName[MAX_PATH] = "";
+		ImGui::InputFloat3("SkillPos", ffPos);
+		ImGui::InputFloat3("SkillScale", ffScale);
 
-		//if (ImGui::Button("Create_Skill"))
-		//{
-		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		ImGui::InputText("TextureName", szName, MAX_PATH);
 
-		//	m_TextureTag =   Texture_NameTag;
-		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
-
-		//	Create_Test_Effect();		// Test¿ë
-
-		//}
-		//RELEASE_INSTANCE(CGameInstance);
-
-		if (ImGui::Button("TestTraill"))
+		if (ImGui::Button("Create_Skill"))
 		{
-			m_bTraillEffectStartCheck = false;
-		
+			_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+			MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+
+			m_TextureTag =   Texture_NameTag;
+			m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+			m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+
+			Create_Test_Effect();		// Test¿ë
+
 		}
+		RELEASE_INSTANCE(CGameInstance);
+
+		
+		static float vScale[3];
+		ImGui::InputFloat3("VScale", vScale);
+		static float vPos[3];
+		ImGui::InputFloat3("vPos", vPos);
+
+		if (ImGui::Button("Pos_Scale Set"))
+		{
+			m_PlayerParts[0]->Get_Transform()->Set_Scaled(_float3(vScale[0], vScale[1], vScale[2]));
+			//m_PlayerParts[0]->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(vPos[0], vPos[1], vPos[2], 1.f));
+		}
+
+
 
 
 		Create_Sword_Trail();
 	
+
+
+
 
 
 	}
@@ -275,6 +289,16 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			}
 		}
 
+		if (nullptr != m_pTrailUVMoveEffect)
+		{
+			m_pTrailUVMoveEffect->Late_Tick(TimeDelta);
+			if (static_cast<CBuff_Effect*>(m_pTrailUVMoveEffect)->Get_IsFinish())
+			{
+				Safe_Release(m_pTrailUVMoveEffect);
+				m_pTrailUVMoveEffect = nullptr;
+			}
+		}
+			
 
 	}
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
@@ -1369,7 +1393,7 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
 	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, -2.f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.5f, 2.f, 0.5f, 0.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.5f, 3.6f, 1.5f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BLUE;
 
@@ -1460,7 +1484,7 @@ void CHero_Garrison::Free()
 	for (_uint i = 0; i < MAPTYPE_END; ++i)
 		Safe_Release(m_pStatusCom[i]);
 
-
+	Safe_Release(m_pTrailEffect);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pAnimFsm);
 	Safe_Release(m_pColliderCom);
@@ -1548,88 +1572,261 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 		CCombatController::GetInstance()->Camera_Zoom_In();
 		m_bIsUseUltimate = true;
 	}
-	else if (!m_bUltimateHit[0] && m_pModelCom->Control_KeyFrame_Create(30, 105))
+
+	else if (!m_bUltimateHit[0] && m_pModelCom->Control_KeyFrame_Create(30, 105)) //1
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[0] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+
 	}
-	else if (!m_bUltimateHit[1] && m_pModelCom->Control_KeyFrame_Create(30, 130))
+	else if (!m_bUltimateHit[1] && m_pModelCom->Control_KeyFrame_Create(30, 130)) //2
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[1] = true;
-	}
-	else if (!m_bUltimateHit[2] && m_pModelCom->Control_KeyFrame_Create(30, 140))
-	{
-	Create_Ultimate_Effect();
 
-	m_bUltimateHit[2] = true;
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+	
 	}
-	else if (!m_bUltimateHit[3] && m_pModelCom->Control_KeyFrame_Create(30, 150))
+	else if (!m_bUltimateHit[2] && m_pModelCom->Control_KeyFrame_Create(30, 140)) //3
+	{
+		Create_Ultimate_Effect();
+		m_bUltimateHit[2] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 8;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 16);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+	}
+
+	else if (!m_bUltimateHit[3] && m_pModelCom->Control_KeyFrame_Create(30, 150)) //4
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[3] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 8;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 16);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+
 	}
-	else if (!m_bUltimateHit[4] && m_pModelCom->Control_KeyFrame_Create(30, 160))
+	else if (!m_bUltimateHit[4] && m_pModelCom->Control_KeyFrame_Create(30, 160)) //5
 	{
 		Create_Ultimate_Effect();
 		m_bUltimateHit[4] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 8;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 16);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+
+
 	}
-	else if (!m_bUltimateHit[5] && m_pModelCom->Control_KeyFrame_Create(30, 170))
+	else if (!m_bUltimateHit[5] && m_pModelCom->Control_KeyFrame_Create(30, 170)) //6
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[5] = true;
 
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 10;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 19);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[6] && m_pModelCom->Control_KeyFrame_Create(30, 183))
+	else if (!m_bUltimateHit[6] && m_pModelCom->Control_KeyFrame_Create(30, 183))//7
 	{
 		Create_Ultimate_Effect();
 		m_bUltimateHit[6] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 8;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 16);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
 
-	else if (!m_bUltimateHit[7] && m_pModelCom->Control_KeyFrame_Create(30, 190))
+	else if (!m_bUltimateHit[7] && m_pModelCom->Control_KeyFrame_Create(30, 190)) //8
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[7] = true;
+		
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 8;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 16);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+
 	}
-	else if (!m_bUltimateHit[8] && m_pModelCom->Control_KeyFrame_Create(30, 201))
+	else if (!m_bUltimateHit[8] && m_pModelCom->Control_KeyFrame_Create(30, 201)) //9
 	{
 		Create_Ultimate_Effect();
-
 		m_bUltimateHit[8] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[9] && m_pModelCom->Control_KeyFrame_Create(30, 215))
+	else if (!m_bUltimateHit[9] && m_pModelCom->Control_KeyFrame_Create(30, 215)) //10
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[9] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 10;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 13);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[10] && m_pModelCom->Control_KeyFrame_Create(30, 223))
+	else if (!m_bUltimateHit[10] && m_pModelCom->Control_KeyFrame_Create(30, 223)) //11
 	{
 		Create_Ultimate_Effect();
-
 		m_bUltimateHit[10] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[11] && m_pModelCom->Control_KeyFrame_Create(30, 235))
+	else if (!m_bUltimateHit[11] && m_pModelCom->Control_KeyFrame_Create(30, 235)) //12
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[11] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 2;
+		TrailDesc.iMaxCenterCount = 10;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 13);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[12] && m_pModelCom->Control_KeyFrame_Create(30, 243))
+	else if (!m_bUltimateHit[12] && m_pModelCom->Control_KeyFrame_Create(30, 243)) //13
 	{
 		Create_Ultimate_Effect();
 		m_bUltimateHit[12] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
 	}
-	else if (!m_bUltimateHit[13] && m_pModelCom->Control_KeyFrame_Create(30, 255))
+	else if (!m_bUltimateHit[13] && m_pModelCom->Control_KeyFrame_Create(30, 255)) //14
 	{
 		Create_Ultimate_Effect();
 		CCombatController::GetInstance()->UI_Shaking(true);
 		m_bUltimateHit[13] = true;
+
+		CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+		ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+		TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
+		TrailDesc.pGameObject = m_PlayerParts[0];
+		TrailDesc.iDevideFixNum = 3;
+		TrailDesc.iMaxCenterCount = 7;
+		TrailDesc.fSize = 1.f;
+		TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+		static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
+		m_bTraillEffectStartCheck = true;
+		m_bTrailEndCheck = false;
+
 	}
 	else if (!m_bUltimateHit[14] && m_pModelCom->Control_KeyFrame_Create(30, 270))
 	{
@@ -1665,82 +1862,77 @@ void CHero_Garrison::Create_Sword_Trail()
 			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
 			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
 			TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
-			TrailDesc.pModel = m_pModelCom;
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc,9);
-			m_bTraillEffectStartCheck = true;
-			m_bTrailEndCheck = false;
-		
-
-		}
-		else if(!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(3, 12))
-		{
-			//static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
-			m_bTrailEndCheck = true;
-			m_bTraillEffectStartCheck = false;
-		}
-
-
-		/*else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 7))
-		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->New_StartPos();
+			TrailDesc.pGameObject = m_PlayerParts[0];
+			TrailDesc.iDevideFixNum = 3;
+			TrailDesc.iMaxCenterCount = 7;
+			TrailDesc.fSize = 1.f;
+			TrailDesc.eType = CTrail_Effect::GARRISON_NORMAL;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 6, 18);
 			m_bTraillEffectStartCheck = true;
 			m_bTrailEndCheck = false;
 
+
 		}
-		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 13))
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(3, 12))
 		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim();
 			m_bTrailEndCheck = true;
 			m_bTraillEffectStartCheck = false;
-			m_bTrailStop = false;
 		}
-
-		else if (!m_bTrailStop&& m_pModelCom->Control_KeyFrame_Create(19, 16))
+		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(10, 23))
 		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
-			m_bTrailStop = true;
-		}
-
-
-		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 17))
-		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->New_StartPos();
-			m_bTraillEffectStartCheck = true;
-			m_bTrailEndCheck = false;
-		}
-		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 23))
-		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim();
-			m_bTrailEndCheck = true;
-			m_bTraillEffectStartCheck = false;
-			m_bTrailStop = false;
-		}
-
-		else if (!m_bTrailStop&& m_pModelCom->Control_KeyFrame_Create(19, 27))
-		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_RenderStop();
-			m_bTrailStop = true;
-		}
-*/
-
-		/*else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 4))
-		{
-			CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
-
 			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
 			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
 			TrailDesc.pColider = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider();
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->NoUVMoveSet(TrailDesc, 10);
+			TrailDesc.pGameObject = m_PlayerParts[0];
+			TrailDesc.iDevideFixNum = 2;
+			TrailDesc.iMaxCenterCount = 12;
+			TrailDesc.fSize = 4.f;
+			TrailDesc.eType = CTrail_Effect::GARRISON_SKILL1;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 9, 22);
 			m_bTraillEffectStartCheck = true;
-			RELEASE_INSTANCE(CGameInstance);
-
+			m_bTrailEndCheck = false;
 		}
-		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 10))
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(10, 33))
 		{
-			static_cast<CTrail_Effect*>(m_pTrailEffect)->End_Anim_NoUVMove();
 			m_bTrailEndCheck = true;
 			m_bTraillEffectStartCheck = false;
-		}*/
+		}
+		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 3))
+		{
+
+			CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+			_uint			iEffectNum = 1;
+			CBuff_Effect::BuffEffcet_Client BuffDesc;
+			ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+			CBone* pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
+
+			m_pTrailUVMoveEffect = pInstance->Load_Effect(TEXT("Texture_garrison_burst_0_Effect"), LEVEL_COMBAT, false);
+			BuffDesc.ParentTransform = m_pTransformCom;
+			BuffDesc.vPosition = _float4(-0.5f,0.1f,2.0f,1.f);
+			BuffDesc.vScale = _float3(8.f,8.f,8.f);
+			BuffDesc.vAngle = 90.f;
+			BuffDesc.fCoolTime = 4.f;
+			BuffDesc.bIsMainTain = false;
+			BuffDesc.iFrameCnt = 5;
+			BuffDesc.bIsUp = false;
+			
+			static_cast<CBuff_Effect*>(m_pTrailUVMoveEffect)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
+			static_cast<CBuff_Effect*>(m_pTrailUVMoveEffect)->Set_ShaderPass(5);
+			RELEASE_INSTANCE(CGameInstance);
+
+			m_bTraillEffectStartCheck = true;
+			m_bTrailEndCheck = false;
+		}
+
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 16))
+		{
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+		
+		else
+			return;
+		
 
 	}
 
@@ -2057,6 +2249,8 @@ void CHero_Garrison::Create_Test_Effect()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	CBone* pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
+
 	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
@@ -2064,10 +2258,11 @@ void CHero_Garrison::Create_Test_Effect()
 	BuffDesc.vScale = m_vTestScale;
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 4.f;
-	BuffDesc.bIsMainTain = false;
+	BuffDesc.bIsMainTain = true;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
 	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(0);
 	RELEASE_INSTANCE(CGameInstance);
 }

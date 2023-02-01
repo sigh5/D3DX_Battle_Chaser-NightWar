@@ -444,6 +444,7 @@
     <ClInclude Include="..\Public\Trail_Effect.h">
       <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Traile_Effect_Child.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -656,6 +657,7 @@
     <ClCompile Include="..\Private\Trail_Effect.cpp">
       <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Traile_Effect_Child.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

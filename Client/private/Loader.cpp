@@ -50,7 +50,7 @@
 #include "Broken_Image.h"
 #include "Mesh_Effect.h"
 #include "Trail_Effect.h"
-
+#include "Traile_Effect_Child.h"
 
 /* For.CombatScene*/
 
@@ -787,6 +787,11 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Trail_Effect"),
 		CTrail_Effect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Trail_Effect_Child"),
+		CTraile_Effect_Child::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+	
 
 	return S_OK;
 }

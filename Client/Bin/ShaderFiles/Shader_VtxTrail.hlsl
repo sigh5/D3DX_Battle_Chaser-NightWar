@@ -6,17 +6,13 @@ matrix				g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 vector				g_vCamPosition;		// 빌보드 형식으로 나오게하기위해서
 
 texture2D			g_Texture;
-
+texture2D			g_ColorTexture;
+texture2D			g_ColorTexture2;
 
 vector				g_WorldTrailPos[4];
-float				g_Life;
-float				g_CurLife;
-vector				g_FirstPos;
 
-float				g_iUV_Max_Width_Num;
-float				g_iUV_Max_Height_Num;
-float				g_iUV_Cur_Width_Num;
-float				g_iUV_Cur_Height_Num;
+float				g_fUV_X_Ratio;
+float				g_fFixRatio;
 
 
 struct VS_IN
@@ -58,6 +54,7 @@ struct GS_OUT
 {
 	float4		vPosition : SV_POSITION;		// 실제 지오메트리 쉐이더 연산결과 레스터라이즈를 끝낸데이터를 픽셀 쉐이더에 전달
 	float2		vTexUV : TEXCOORD0;
+	
 };
 
 [maxvertexcount(6)]		// 정점은 숫자가 관계없으나 20개 이하가 지오메트리의 성능을 발휘하기에 좋다,
@@ -75,22 +72,21 @@ void	GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 
 	vPosition = g_WorldTrailPos[0];//+ vRight + vUp;
 	Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[0].vTexUV = float2(0.f, 0.f);
+	Out[0].vTexUV = float2(g_fUV_X_Ratio , 0.f) ;
 
 	vPosition = g_WorldTrailPos[3];//+ vRight - vUp;
 	Out[3].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[3].vTexUV = float2(0.f, 1.f) ;
+	Out[3].vTexUV = float2(g_fUV_X_Ratio , 1.f) ;
 
 
 	vPosition = g_WorldTrailPos[1];//- vRight + vUp;
 	Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[1].vTexUV = float2(1.f, 0.f) ;
+	Out[1].vTexUV = float2(g_fUV_X_Ratio  + g_fFixRatio, 0.f) ;
 
 	vPosition = g_WorldTrailPos[2];//+ vRight - vUp;
 	Out[2].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[2].vTexUV = float2(1.f, 1.f);
+	Out[2].vTexUV = float2(g_fUV_X_Ratio  + g_fFixRatio, 1.f);
 
-	
 
 	Vertices.Append(Out[0]);
 	Vertices.Append(Out[1]);
@@ -104,52 +100,6 @@ void	GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 	Vertices.RestartStrip();
 	
 }
-
-[maxvertexcount(6)]		// 정점은 숫자가 관계없으나 20개 이하가 지오메트리의 성능을 발휘하기에 좋다,
-void	GS_MAIN_NONE(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
-{
-	GS_OUT		Out[4];	// 사각형을 만들거니까 인덱스는 4개필요
-
-	matrix		matVP = mul(g_ViewMatrix, g_ProjMatrix);
-	float3		vPosition;
-
-	vPosition = g_WorldTrailPos[0];
-	Out[0].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[0].vTexUV = float2(1.f / g_iUV_Max_Width_Num *(g_iUV_Cur_Width_Num + 1.f),
-		(1.f) / g_iUV_Max_Height_Num* (g_iUV_Cur_Height_Num));
-
-	vPosition = g_WorldTrailPos[3];
-	Out[3].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[3].vTexUV = float2(1.f / g_iUV_Max_Width_Num* (g_iUV_Cur_Width_Num + 1.f),
-		(1.f) / g_iUV_Max_Height_Num * (g_iUV_Cur_Height_Num + 1.f));
-
-
-	vPosition = g_WorldTrailPos[1];
-	Out[1].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[1].vTexUV = float2(1.f / g_iUV_Max_Width_Num * (g_iUV_Cur_Width_Num),
-		(1.f) / g_iUV_Max_Height_Num * (g_iUV_Cur_Height_Num));
-
-	vPosition = g_WorldTrailPos[2];
-	Out[2].vPosition = mul(vector(vPosition, 1.f), matVP);
-	Out[2].vTexUV = float2(1.f / g_iUV_Max_Width_Num * g_iUV_Cur_Width_Num,
-		(1.f) / g_iUV_Max_Height_Num* (g_iUV_Cur_Height_Num + 1.f));
-
-
-
-	Vertices.Append(Out[0]);
-	Vertices.Append(Out[1]);
-	Vertices.Append(Out[2]);
-	Vertices.RestartStrip();		// 이걸 안써주면 라인 스트립처럼그려서 
-									//트라이앵글리스트를 쓸려면 한번 끊어줘야한다.
-
-	Vertices.Append(Out[0]);
-	Vertices.Append(Out[2]);
-	Vertices.Append(Out[3]);
-	Vertices.RestartStrip();
-
-}
-
-
 
 struct PS_IN
 {
@@ -167,11 +117,23 @@ PS_OUT PS_MAIN(PS_IN In)
 {
 	PS_OUT			Out = (PS_OUT)0;
 
-	Out.vColor = g_Texture.Sample(PointSampler, In.vTexUV);
-	
-	if (Out.vColor.a < 0.2f)
-		discard;
 
+	float4	TextureColor0, TextureColor1, TexturColor ,TempVec;
+	TexturColor = g_Texture.Sample(LinearSampler, In.vTexUV);
+	TextureColor0 = g_ColorTexture.Sample(LinearSampler, In.vTexUV);
+	TextureColor1 = g_ColorTexture2.Sample(LinearSampler, In.vTexUV);
+
+	if (TextureColor0.r < TextureColor1.r)
+		TempVec = TextureColor1;
+	else
+		TempVec = TextureColor0;
+
+	Out.vColor = saturate(TexturColor * TempVec);
+
+
+	if (Out.vColor.a <= 0.5f)
+		discard;
+	
 	return Out;
 }
 
@@ -181,7 +143,7 @@ technique11 DefaultTechnique
 	{
 		SetRasterizerState(RS_NONE);
 		SetDepthStencilState(DS_Default, 0);
-		SetBlendState(BS_AlphaBlend, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+		SetBlendState(BS_One, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
 
 		VertexShader = compile vs_5_0 VS_MAIN();
 		GeometryShader = compile gs_5_0 GS_MAIN();
@@ -190,16 +152,5 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Rect2
-	{
-		SetRasterizerState(RS_NONE);
-		SetDepthStencilState(DS_Default, 0);
-		SetBlendState(BS_One, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
 
-		VertexShader = compile vs_5_0 VS_MAIN();
-		GeometryShader = compile gs_5_0 GS_MAIN_NONE();
-		HullShader = NULL;
-		DomainShader = NULL;
-		PixelShader = compile ps_5_0 PS_MAIN();
-	}
 }

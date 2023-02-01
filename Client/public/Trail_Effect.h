@@ -9,17 +9,27 @@ class CShader;
 class CBone;
 class CTexture;
 class CCollider;
-class CModel;
 END
 
 BEGIN(Client)
+class CTraile_Effect_Child;
+
 class CTrail_Effect final : public CHitBoxObject
 {
 public:
+	enum TRAIL_OPTION {
+		GARRISON_NORMAL, GARRISON_SKILL1, GARRISON_ULTIMATE, TRAIL_OPTION_END
+	};
+
+
 	typedef struct  tag_Trail_Effect
 	{
 		CCollider* pColider;
-		CModel*	   pModel;
+		CGameObject* pGameObject;
+		TRAIL_OPTION	eType;
+		_int			iDevideFixNum;
+		_int			iMaxCenterCount;
+		_float			fSize;
 	}tag_Trail_Effect_DESC;
 
 
@@ -29,10 +39,7 @@ public:
 	virtual ~CTrail_Effect() = default;
 public:
 	const	_bool	Get_IsFinish()const { return m_bIsFinsishBuffer; }
-	void			Set_Desc(tag_Trail_Effect_DESC& Desc,_int iTextureNum);
-	void			End_Anim();
-
-
+	void			Set_Desc(tag_Trail_Effect_DESC& Desc,_int iTextureNum, _int iCurPointNum);
 	void			Set_RenderStop() { m_bIsTrailStartCheck = false; }
 	void			First_Edition();
 public:
@@ -43,11 +50,14 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Last_Initialize()override;
 
+
+public:
+	void	Garrison_Normal_TrailTick();
+	void	Garrison_Skill1_TrailTick();
+	
 private:
-	CShader*							m_pShaderCom = nullptr;
-	CRenderer*							m_pRendererCom = nullptr;
-	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
-	CTexture*							m_pTextureCom = nullptr;
+	vector<class CTraile_Effect_Child*>	m_TrailEffectChild;
+
 
 private:
 	_bool								m_bIsFinsishBuffer = false;
@@ -63,15 +73,30 @@ private:
 	_int								m_iTextureNum = 0;
 
 	_vector								m_Trail_Pos[4];
-	_vector								m_Collider_pos[12];
+	_vector								m_Collider_pos[100];
 	
+	_vector								m_Colider_Trail_Pos[100];
+	_int								m_iTraillPos_Index = 0;
+	_int								m_iDevide_Lerp_Num = 0;
+	_int								m_CurPointNum = 30;
+
+
 	_int								m_iCUrCOunt = 0;
-
-
 	_uint								m_iShaderPass = 0;
 	_float								m_fTrailTimer = 0.f;
 	_vector								m_vFirstPos;
 	_bool								m_bTrail_Maintain = false;
+	_bool								m_bTraill_RealRender = false;
+	_float								m_fRadius = 0.f;
+	_bool								m_bIsTestBool = false;
+
+
+	_bool								m_bIsImguiToolcheck = false;
+	_vector								 vLook;
+	_bool								m_bDeleteCheck = false;
+	
+
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

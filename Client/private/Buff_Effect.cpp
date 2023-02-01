@@ -192,6 +192,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 
 
 
+
 #ifdef NOMODLES
 	m_HitBoxDesc.Poing_Desc = m_pVIBufferCom->Get_Point_TextureDesc();
 #else

@@ -231,6 +231,7 @@
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
+    <ClInclude Include="..\Public\Traile_Effect_Child.h" />
     <ClInclude Include="..\Public\Trail_Effect.h" />
     <ClInclude Include="..\Public\TrunLoseCanvas.h" />
     <ClInclude Include="..\Public\TrunWinCanvas.h" />
@@ -305,6 +306,7 @@
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />
+    <ClCompile Include="..\Private\Traile_Effect_Child.cpp" />
     <ClCompile Include="..\Private\Trail_Effect.cpp" />
     <ClCompile Include="..\Private\TrunLoseCanvas.cpp" />
     <ClCompile Include="..\Private\TrunWinCanvas.cpp" />
