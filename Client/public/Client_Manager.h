@@ -66,6 +66,7 @@ public: /* For_Player */
 	static			vector<CGameObject*>::iterator	Delete_BuffImage(vector<CGameObject*>& vecBuffImage, CStatus* pStauts, _bool bIsPlayer);
 	static void		Sort_BuffImage(vector<CGameObject*>& vecBuffImage, _bool bIsPlayer);
 
+
 public:/*For.Imgui_AnimTool*/
 #ifdef _DEBUG
 	static void		Make_Anim_Queue(queue<pair<_uint, _double>>& AnimQueue, AnimType eType);

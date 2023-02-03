@@ -10,6 +10,9 @@ class CSound_Manager : public CBase
 {
 	DECLARE_SINGLETON(CSound_Manager)
 	
+public:
+	map<const _tchar*, CSound*>& Get_Sound() {return  m_Sounds; }
+
 private:	
 	typedef map<const _tchar*, CSound*> SOUNDS;
 	SOUNDS m_Sounds;
@@ -24,7 +27,7 @@ private:
 	CSound_Manager();
 	virtual ~CSound_Manager() = default;
 
-	HRESULT Load_SoundFile(const char *pFilePath);
+	
 	void Stop_SoundAuto();
 	void Stop_All();
 
@@ -59,5 +62,8 @@ public:
 	설정할 사운드 키 값, 첫번째 인자로 전달한 사운드는 두번째 인자로 전달된 SoundDesc에 정보로 거리를 계산하여 볼륨을 조절한다
 	CSound::SOUND_DESC 주석 참고 */
 	void Set_SoundDesc(const _tchar *pSoundKey, CSound::SOUND_DESC& SoundDesc);
+
+	HRESULT Load_SoundFile(const char *pFilePath, const _tchar* pTag=nullptr);
+
 };
 END

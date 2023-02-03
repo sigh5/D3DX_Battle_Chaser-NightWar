@@ -320,6 +320,11 @@ void CTurnUICanvas::Move_ReCoverChild()
 		fBackLimitYPos += 50.f;
 	}
 
+	/*list< CUI*>::iterator  SwapIter;
+	list< CUI*>::iterator  SelcetIter;
+
+	m_ChildrenVec.splice(SwapIter,)*/
+
 
 	for (auto iter : OldCharImage)
 	{

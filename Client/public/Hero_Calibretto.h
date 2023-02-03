@@ -59,7 +59,7 @@ public:  /*For.Combat*/
 	void			  Intro_Exit();
 	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 	virtual		void  Calculator_HitDamage()override;	/*충돌시 함수*/
-
+	virtual void				Initialize_CombatSound()override;
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
 	void				Create_Test_Rect_Effect();		// Test
@@ -106,6 +106,7 @@ private:
 	CGameObject*			m_pFog = nullptr;
 	CGameObject*			m_pFullscreenEffect = nullptr;
 	CGameObject*			m_pUltimateEffect = nullptr;
+	CGameObject*			m_pLazorEffect = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
 	_int					bResult = ANIM_EMD;
@@ -168,7 +169,7 @@ private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
 
-	CGameObject*			m_pLazorEffect = nullptr;
+
 
 	WeaponType		m_eWeaponType= WEAPON_END;
 

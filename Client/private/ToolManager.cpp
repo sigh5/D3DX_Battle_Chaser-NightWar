@@ -51,6 +51,11 @@ void CToolManager::Imgui_SelectParentViewer()
 
 
 	Imgui_Create_NaviGator();
+	
+	
+
+	Imgui_Sound_Tool();
+
 
 	ImGui::End();
 	
@@ -526,6 +531,37 @@ void CToolManager::Imgui_Create_NaviGator()
 	static_cast<CTerrain*>(m_pSelectTerrain)->Get_PickingPos();
 
 }
+
+void CToolManager::Imgui_Sound_Tool()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	ImGui::Begin("Sound_tool");
+
+	if (ImGui::TreeNode("Selcte_Sound"))
+	{
+		if (ImGui::BeginListBox("##"))
+		{
+			for (auto Pair : pGameInstance->Get_Sound())
+			{
+				char szobjectTag[128];
+				wc2c((Pair.first), szobjectTag);
+
+				if (ImGui::Selectable(szobjectTag))
+				{
+					pGameInstance->Play_Sound(Pair.first, 1.f, false, 4);
+				}
+			}
+			ImGui::EndListBox();
+		}
+		ImGui::TreePop();
+	}
+
+	ImGui::End();
+	RELEASE_INSTANCE(CGameInstance);
+}
+	
+
 
 HRESULT CToolManager::Imgui_Save_NaviGator()
 {

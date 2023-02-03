@@ -42,7 +42,7 @@ public:
 	
 
 	virtual void			Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption);
-
+	virtual void				Initialize_CombatSound();
 
 public:
 	virtual HRESULT Initialize_Prototype()override;

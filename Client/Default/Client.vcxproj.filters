@@ -214,6 +214,12 @@
     <Filter Include="02.GameObjects\Effect\Trail_Effect">
       <UniqueIdentifier>{304f5892-b1ef-4558-bd51-2615b4633908}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound_Models">
+      <UniqueIdentifier>{58484e13-8d09-41c4-9d56-0e82f978c914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Mouse">
+      <UniqueIdentifier>{edd953e9-d06f-45db-bef3-16e5dab16a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -444,7 +450,15 @@
     <ClInclude Include="..\Public\Trail_Effect.h">
       <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Traile_Effect_Child.h" />
+    <ClInclude Include="..\Public\Traile_Effect_Child.h">
+      <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SoundPlayer.h">
+      <Filter>Sound_Models</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Mouse.h">
+      <Filter>02.GameObjects\Mouse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -657,7 +671,15 @@
     <ClCompile Include="..\Private\Trail_Effect.cpp">
       <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Traile_Effect_Child.cpp" />
+    <ClCompile Include="..\Private\Traile_Effect_Child.cpp">
+      <Filter>02.GameObjects\Effect\Trail_Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SoundPlayer.cpp">
+      <Filter>Sound_Models</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Mouse.cpp">
+      <Filter>02.GameObjects\Mouse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -48,7 +48,7 @@ HRESULT CUIButton::Initialize(void * pArg)
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
-	
+
 	m_fSizeX = (_float)g_iWinSizeX / 16;
 	m_fSizeY = (_float)g_iWinSizeY / 16;
 	m_fX = m_fSizeX * 0.5f;
@@ -75,15 +75,15 @@ HRESULT CUIButton::Last_Initialize()
 	}
 
 	Button_RenderSetActive(m_bRenderActive);
-	
+
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 
 	if (pGameInstance->GetCurLevelIdx() == LEVEL_GAMEPLAY)
 	{
 		m_bRenderActive = true;
 	}
-	
-	
+
+
 	RELEASE_INSTANCE(CGameInstance);
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -95,6 +95,7 @@ void CUIButton::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 
 	Click_This_Button();
+	Mouse_Image_change();
 }
 
 void CUIButton::Late_Tick(_double TimeDelta)
@@ -107,7 +108,7 @@ void CUIButton::Late_Tick(_double TimeDelta)
 	if (nullptr != m_pButtonImage)
 	{
 		m_pButtonImage->Set_RenderActive(m_bRenderActive);
-		
+
 
 		//if(!lstrcmp(m_pButtonImage->Get_ObjectName(),TEXT("Icon_FsmButton2_Image")))
 		//{ 
@@ -170,8 +171,8 @@ void CUIButton::Set_HighRightUIDesc(HIGHLIGHT_UIDESC & HighLightDesc)
 
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.y = HighLightDesc.yPos;
-	
-	m_pTransformCom->Set_Scaled(_float3(HighLightDesc.iNumSizeX, HighLightDesc.iNumSizeY,0.f));
+
+	m_pTransformCom->Set_Scaled(_float3(HighLightDesc.iNumSizeX, HighLightDesc.iNumSizeY, 0.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 	m_pTextureCom->Set_SelectTextureIndex(HighLightDesc.iTextureIndex);
 }
@@ -194,7 +195,7 @@ void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 
 	if (ChildFsmButtonSize == 0)
 		return;*/
-	//m_eActiceType = eType;
+		//m_eActiceType = eType;
 
 	for (auto pChildButton : m_ChildFsmButton)
 	{
@@ -206,7 +207,7 @@ void	CUIButton::State_Image_Change(BUTTON_STATE eType)
 		}
 		else if (eType == BUTTON_STATE_ABLILTY)
 		{
-			
+
 			pChildButton->Change_ICON_Ablity();
 		}
 		else if (eType == BUTTON_STATE_ITEM)
@@ -350,8 +351,8 @@ void CUIButton::Change_ICON_Ablity()
 	{
 		pTexture->Set_SelectTextureIndex(4);
 		m_eFsmState = BUTTON_FSM_ULTIMATE;
-	
-		
+
+
 		m_strPos = _float2(700.f, 675.f);
 		m_vFontColor = _float4(1.f, 0.f, 0.f, 1.f);
 		m_vSFontize = _float2(0.3f, 0.3f);
@@ -413,10 +414,10 @@ void CUIButton::Change_ICON_Item()
 	if (!lstrcmp(m_ObjectName, TEXT("UI_State_Action_Button0")))
 	{
 		pTexture->Set_SelectTextureIndex(7);
-		
-		_int	iHpNum =	static_cast<CPlayer*>(CCombatController::GetInstance()->
+
+		_int	iHpNum = static_cast<CPlayer*>(CCombatController::GetInstance()->
 			Get_CurActor())->Get_RestHpPotion();
-		
+
 		if (iHpNum <= 0)
 		{
 			m_strSkillName = TEXT("None");
@@ -427,10 +428,10 @@ void CUIButton::Change_ICON_Item()
 			static_cast<CMyImage*>(m_pButtonImage)->Set_ShaderPass(1);
 			m_strSkillName = TEXT("HP");
 		}
-		
-		
+
+
 		m_eFsmState = BUTTON_FSM_USE_HP_ITEM;		// 체력
-	
+
 		m_strPos = _float2(700.f, 575.f);
 		m_vFontColor = _float4(1.f, 0.f, 0.f, 0.f);
 		m_vSFontize = _float2(0.4f, 0.4f);
@@ -452,7 +453,7 @@ void CUIButton::Change_ICON_Item()
 		}
 		pTexture->Set_SelectTextureIndex(8);
 		m_eFsmState = BUTTON_FSM_USE_MP_ITEM;		// 마나
-	
+
 		m_strPos = _float2(700.f, 625.f);
 		m_vFontColor = _float4(0.f, 0.f, 1.f, 1.f);
 		m_vSFontize = _float2(0.4f, 0.4f);
@@ -481,7 +482,7 @@ _bool CUIButton::Click_This_Button()
 		return false;
 
 	_bool bResult = false;
-	
+
 	POINT ptMouse{};
 
 	GetCursorPos(&ptMouse);
@@ -513,7 +514,7 @@ _bool CUIButton::Click_This_Button()
 
 void CUIButton::Shaking()
 {
-	
+
 }
 
 void CUIButton::Button_RenderSetActive(_bool bRenderActive)
@@ -554,13 +555,13 @@ HRESULT CUIButton::SetUp_ShaderResources()
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	if (FAILED(m_pTransformCom->Bind_ShaderResource(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
-	
+
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ViewMatrix", &m_ViewMatrix)))
 		return E_FAIL;
-	
+
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_ORTH))))
 		return E_FAIL;
-	
+
 	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_Texture", m_pTextureCom->Get_SelectTextureIndex())))
 		return E_FAIL;
 
@@ -601,7 +602,7 @@ void CUIButton::Set_RenderActive(_bool bActive)
 {
 	m_bRenderActive = bActive;
 
-	
+
 }
 
 void CUIButton::Change_ButtonIcon(const wstring & TextureTag)
@@ -627,7 +628,39 @@ void CUIButton::Change_ButtonIcon(const wstring & TextureTag)
 		return;
 
 
-	
+
+
+}
+
+void CUIButton::Mouse_Image_change()
+{
+	if (CGameInstance::GetInstance()->GetCurLevelIdx() == LEVEL_COMBAT)
+	{
+		POINT ptMouse{};
+
+		GetCursorPos(&ptMouse);
+		ScreenToClient(g_hWnd, &ptMouse);
+
+		_long lLeft, lTop, lRight, lBottom;
+		_float4	vPos;
+
+		memcpy(&vPos, &m_pTransformCom->Get_WorldMatrix().r[3], sizeof(_float4));
+
+		_float3 vScale;
+		XMStoreFloat3(&vScale, XMLoadFloat3(&m_pTransformCom->Get_Scaled()));
+
+		lLeft = (_long)(vPos.x + g_iWinSizeX*0.5f - vScale.x*0.5f);
+		lRight = (_long)(vPos.x + g_iWinSizeX*0.5f + vScale.x*0.5f);
+		lTop = (_long)(g_iWinSizeY * 0.5f - vPos.y - vScale.y*0.5f);
+		lBottom = (_long)(g_iWinSizeY * 0.5f - vPos.y + vScale.y*0.5f);
+
+		RECT rcButton = { lLeft, lTop, lRight, lBottom };
+
+		if (PtInRect(&rcButton, ptMouse))
+		{
+			CCombatController::GetInstance()->Set_MouseTextureOption(4);
+		}
+	}
 
 }
 
@@ -641,5 +674,5 @@ void CUIButton::Free()
 	Safe_Release(m_pRendererCom);
 	m_pButtonImage = nullptr;
 	m_ChildFsmButton.clear();
-	
+
 }

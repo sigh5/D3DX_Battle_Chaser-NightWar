@@ -56,7 +56,9 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
+	
 	m_pVIBufferCom->UV_Move_Tick(TimeDelta);
+	
 #ifdef NOMODLES
 	m_HitBoxDesc.Poing_Desc = m_pVIBufferCom->Get_Point_TextureDesc();
 #else
@@ -94,7 +96,7 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 	if (m_bUseGlow)
 	{
 		if (m_fGlowStrength >= 1.f)
-			m_bIsChange = true;
+			return;//m_bIsChange = true;
 		else if (m_fGlowStrength <= 0)
 			m_bIsChange = false;
 
@@ -102,9 +104,10 @@ void CSkill_TextureObj::Tick(_double TimeDelta)
 			m_fGlowStrength += (_float)TimeDelta * -1.f;
 		else
 			m_fGlowStrength += (_float)TimeDelta;
+
 	}
 
-
+	
 
 }
 
@@ -243,7 +246,6 @@ HRESULT CSkill_TextureObj::SetUp_ShaderResources()
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength, sizeof(_float))))
 			return E_FAIL;
-
 
 		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", m_iGlowTextureNum)))
 			return E_FAIL;

@@ -414,7 +414,7 @@ _bool CVIBuffer_Point_Instancing::UV_Move_Tick(_double TimeDelta)
 HRESULT CVIBuffer_Point_Instancing::Set_UV_RawValue(CShader * pShader )
 {
 	/*if (nullptr == pShader)
-		assert(! && "CVIBuffer_Point_Instancing::Set_UV_RawValue");*/
+		assert(!  "CVIBuffer_Point_Instancing::Set_UV_RawValue");*/
 
 	if (FAILED(pShader->Set_RawValue("g_iUV_Cur_Width_Num", &m_iWidthTextureCnt, sizeof(_float))))
 		return E_FAIL;

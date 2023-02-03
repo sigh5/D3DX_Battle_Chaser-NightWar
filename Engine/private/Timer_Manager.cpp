@@ -26,6 +26,15 @@ void CTimer_Manager::Set_Timedelta(const _tchar * pTimerTag, _double Time)
 
 }
 
+_double CTimer_Manager::Get_FixTimeDelta(const _tchar * pTimerTag)
+{
+	CTimer*	pTimer = Find_Timer(pTimerTag);
+	if (nullptr == pTimer)
+		return 0.0;
+
+	return pTimer->Get_FixTimeDelta();
+}
+
 HRESULT CTimer_Manager::Ready_Timer(const _tchar * pTimerTag)
 {
 	CTimer*	pTimer = Find_Timer(pTimerTag);

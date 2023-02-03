@@ -379,7 +379,7 @@ _bool CModel::Control_KeyFrame(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
 
 	if (iFrameIndex >= KeyBegin  && KeyEnd >= iFrameIndex)
 	{
-		m_Animations[iAnimIndex]->Set_TickPerSecond(0.5f);
+		m_Animations[iAnimIndex]->Set_TickPerSecond(1.f);
 		return true;
 	}
 	return false;

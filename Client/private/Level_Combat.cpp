@@ -9,7 +9,7 @@
 #include "TrunWinCanvas.h"
 #include "TrunLoseCanvas.h"
 #include "Spider_Mana.h"
-
+#include "SoundPlayer.h"
 
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -49,6 +49,12 @@ HRESULT CLevel_Combat::Initialize()
 	
 	m_pCombatController->Initialize(LEVEL_COMBAT);
 	
+
+	
+	CGameInstance::GetInstance()->Play_Sound(TEXT("02_Nights_Curse.wav"), 0.2f, true, SOUND_BGM);
+
+
+
 	return S_OK;
 }
 
@@ -60,7 +66,7 @@ void CLevel_Combat::Tick(_double TimeDelta)
 	Combat_Intro();
 	__super::Tick(TimeDelta);
 	Combat_Control_Tick(TimeDelta);
-
+	CSoundPlayer::GetInstance()->Tick(TimeDelta);
 	
 
 
@@ -131,7 +137,10 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY), true)))
 			return;
-
+		
+		pGameInstance->Stop_Sound(SOUND_BGM);
+		CSoundPlayer::GetInstance()->Clear_allSound();
+		
 		CClient_Manager::m_bCombatWin = false;
 		Safe_Release(pGameInstance);
 		m_bSceneChange = false;
@@ -376,7 +385,4 @@ CLevel_Combat * CLevel_Combat::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 void CLevel_Combat::Free()
 {
 	__super::Free();
-
-	
-
 }

@@ -38,8 +38,7 @@ private:
 	CRenderer*				m_pRenderer = nullptr;
 	class CToolManager*			m_pToolManager = nullptr;
 	class CPlayerController*	m_pPlayerController = nullptr;
-
-
+	
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

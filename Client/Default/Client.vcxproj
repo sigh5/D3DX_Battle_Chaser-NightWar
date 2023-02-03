@@ -113,7 +113,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;fmodL_vc.lib;fmod_vc.lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>
@@ -157,7 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <LargeAddressAware>true</LargeAddressAware>
       <AdditionalLibraryDirectories>../../Reference/Librarys/</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Engine.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Engine.lib;fmodL_vc.lib;fmod_vc.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderType>Effect</ShaderType>
@@ -220,6 +220,7 @@
     <ClInclude Include="..\Public\Map_3D_UI.h" />
     <ClInclude Include="..\Public\Mesh_Effect.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
+    <ClInclude Include="..\Public\Mouse.h" />
     <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
     <ClInclude Include="..\public\PlayerController.h" />
@@ -228,6 +229,7 @@
     <ClInclude Include="..\Public\Skill_TextureObj.h" />
     <ClInclude Include="..\Public\SkyBox.h" />
     <ClInclude Include="..\Public\SlimeKing.h" />
+    <ClInclude Include="..\public\SoundPlayer.h" />
     <ClInclude Include="..\Public\Spider_Mana.h" />
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\public\ToolManager.h" />
@@ -295,6 +297,7 @@
     <ClCompile Include="..\Private\Map_3D_UI.cpp" />
     <ClCompile Include="..\Private\Mesh_Effect.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
+    <ClCompile Include="..\Private\Mouse.cpp" />
     <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
@@ -303,6 +306,7 @@
     <ClCompile Include="..\Private\Skill_TextureObj.cpp" />
     <ClCompile Include="..\Private\SkyBox.cpp" />
     <ClCompile Include="..\Private\SlimeKing.cpp" />
+    <ClCompile Include="..\private\SoundPlayer.cpp" />
     <ClCompile Include="..\Private\Spider_Mana.cpp" />
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\ToolManager.cpp" />

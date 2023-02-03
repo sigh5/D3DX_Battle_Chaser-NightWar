@@ -32,19 +32,9 @@ void CTrail_Effect::Set_Desc(tag_Trail_Effect_DESC & Desc, _int iTextureNum ,_in
 	m_iDevide_Lerp_Num = 0;
 
 	_matrix  vMatirkx = m_Desc.pGameObject->Get_Transform()->Get_WorldMatrix();
-	
-//	if(m_Desc.eType==CTrail_Effect::GARRISON_NORMAL)
-		memcpy(&vLook, &vMatirkx.r[2], sizeof(_vector));
-		/*else if  (m_Desc.eType == CTrail_Effect::GARRISON_SKILL1)
-			memcpy(&vLook, &vMatirkx.r[0], sizeof(_vector));*/
-
-
-
+	memcpy(&vLook, &vMatirkx.r[2], sizeof(_vector));
 	vLook = XMVector3Normalize(vLook);
-
-
 }
-
 
 void CTrail_Effect::First_Edition()
 {
@@ -111,8 +101,6 @@ void CTrail_Effect::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 
-	
-	//m_CurPointNum = 20;
 
 	_int		iIndex = 0;
 	for (auto& pChild : m_TrailEffectChild)

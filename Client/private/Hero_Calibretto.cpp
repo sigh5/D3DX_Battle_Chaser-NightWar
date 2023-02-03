@@ -13,6 +13,7 @@
 #include "Damage_Font_Manager.h"
 #include "Attack_Effect_Rect.h"
 #include "Explain_FontMgr.h"
+#include "SoundPlayer.h"
 
 CHero_Calibretto::CHero_Calibretto(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
@@ -354,8 +355,7 @@ void CHero_Calibretto::Change_Level_Data(_uint iLevleIdx)
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-		
-		
+	
 		if (m_bCombat_LastInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -420,9 +420,24 @@ void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 {
 	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
 		m_iAnimIndex = 0;
+	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (false == m_bIsWalk && m_bRun == true)
+	{
+		m_fWalkSoundTimer += (_float)TimeDelta;
+		if (m_fWalkSoundTimer >= 0.3f)
+		{
+			pGameInstance->Stop_Sound(SOUND_CALIBRETTO_EFFECT);
+			pGameInstance->Play_Sound(TEXT("Calibretto_0020.wav"), 0.6f, false, SOUND_CALIBRETTO_EFFECT);
+			m_fWalkSoundTimer = 0.f;
+		}
+	}
+	else
+		pGameInstance->Stop_Sound(SOUND_CALIBRETTO_EFFECT);
+	
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CHero_Calibretto::Anim_Frame_Create_Control()
@@ -490,7 +505,9 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 	else if (!m_bLazorStop && m_pModelCom->Control_KeyFrame_Create(28, 58))
 	{
 		m_bLazorStop = true;
-		CCombatController::GetInstance()->Wide_Attack(false, 86);
+
+		if(nullptr != m_pHitTarget)
+			CCombatController::GetInstance()->Wide_Attack(false, 86);
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(40, 50))
 	{
@@ -537,12 +554,6 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		CGameInstance::GetInstance()->Set_Timedelta(TEXT("Timer_60"), 1.0f);
 		Create_FullScreenEffect();
 	}
-	//else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(46, 250))
-	//{
-	//	Create_FullScreenEffect();
-	//	m_bUltimateCam = true;
-	//}
-
 	else if (m_bUltimateStop && m_pModelCom->Control_KeyFrame_Create(46, 260))	
 	{
 		Create_Ultimate_End_Effect();
@@ -583,8 +594,9 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 	_float3 vScale = _float3(3.f, 3.f, 3.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 10);
 
-
+	
 	m_bDefence = false;
 	m_isWideBuff = true;
 
@@ -733,7 +745,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 10;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 250;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;
@@ -896,6 +908,7 @@ void CHero_Calibretto::Anim_WideAreaBuff()
 
 void CHero_Calibretto::Anim_Use_Item()
 {
+	m_CurAnimqeue.push({ 19,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -917,7 +930,7 @@ void CHero_Calibretto::Anim_Light_Hit()
 	}
 	else 
 	{
-		m_CurAnimqeue.push({ 4 , 1.f });		// 4 or 5
+		m_CurAnimqeue.push({ 5 , 1.f });		// 4 or 5
 		m_CurAnimqeue.push({ 1,  1.f });
 	}
 
@@ -1061,14 +1074,17 @@ void CHero_Calibretto::Free()
 		Safe_Release(m_pStatusCom[i]);
 
 
-	Safe_Release(m_pLazorEffect);
-
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+	Safe_Release(m_pFog);
+	Safe_Release(m_pUltimateEffect);
+	Safe_Release(m_pLazorEffect);
+	Safe_Release(m_pFullscreenEffect);
 }
 
 
@@ -1317,7 +1333,8 @@ void CHero_Calibretto::Create_Skill2_Beam()
 
 	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
 	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Glow(true, L"Prototype_Component_Texture_bretto_laser_Bullet",0);
-	
+	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Dissove(true, L"Prototype_Component_Texture_bretto_laser_Bullet", 3);
+	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_ShaderPass(8);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -1815,7 +1832,6 @@ void CHero_Calibretto::Use_HpPotion()
 {
 	_int iRandNum = rand() % 20 + 20;
 	
-	
 	m_pStatusCom[COMBAT_PLAYER]->Incrase_Hp(iRandNum);
 
 	_float4 vPos;
@@ -1829,8 +1845,6 @@ void CHero_Calibretto::Use_HpPotion()
 
 	CDamage_Font_Manager::GetInstance()->Set_HPMPFont_0(vPos, _float3(2.f, 2.f, 2.f), iRandNum);
 	
-
-
 	m_pStatusCom[DUNGEON_PLAYER]->Use_Item(CStatus::ITEM_HP_POTION);
 
 
@@ -1843,7 +1857,7 @@ void CHero_Calibretto::Use_HpPotion()
 
 	BuffDesc.ParentTransform = m_pTransformCom;
 	BuffDesc.vPosition = _float4(0.f, 4.f, 0.f, 1.f);
-	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+	BuffDesc.vScale = _float3(15.f, 15.f, 15.f);
 	BuffDesc.vAngle = -90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
@@ -1978,6 +1992,174 @@ void CHero_Calibretto::Calculator_HitDamage()
 	else
 		CCombatController::GetInstance()->UI_Shaking(true);
 
+}
+
+void CHero_Calibretto::Initialize_CombatSound()
+{
+	CSoundPlayer::Anim_Model_SoundDesc SoundDesc;
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 1;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0046.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 3;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Return.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 4;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0048.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 5;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0048.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 6;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0016.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 7;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Buff2.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 7;
+	SoundDesc.iFrame = 30;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Buff_Second.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 8;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0009.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Return.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 11;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0021.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 12;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0016.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 13;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0020.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 16;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0030.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 17;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0019.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 19;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Potion.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 19;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0057.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 25;
+	SoundDesc.iFrame = 12;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0030.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 25;
+	SoundDesc.iFrame = 6;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Gun_Hit_Gun.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 28;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0009.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 30;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0053.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 40;
+	SoundDesc.iFrame = 23;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0022.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 40;
+	SoundDesc.iFrame = 90;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Wide_Buff_end.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 46;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Ultimate.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 }
 
 

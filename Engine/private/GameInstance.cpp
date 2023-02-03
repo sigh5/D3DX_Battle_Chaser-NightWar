@@ -90,7 +90,10 @@ HRESULT CGameInstance::Initialize_Engine(HINSTANCE hInst, _uint iNumLevels, cons
 	if (FAILED(m_pFrustum->Initialize()))
 		return E_FAIL;
 	
-	
+	if (FAILED(m_pSound_Manager->Reserve_Manager(GraphicDesc.pSoundFilePath, 10)))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -108,7 +111,8 @@ void CGameInstance::Tick_Engine(_double TimeDelta)
 
 	m_pObject_Manager->Tick(TimeDelta);
 	m_pLevel_Manager->Tick(TimeDelta);
-
+	m_pSound_Manager->Tick(TimeDelta);
+	
 	m_pPipeLine->Tick();
 
 	m_pFrustum->Transform_ToWorldSpace();		// Æ½ÀÌ¶û ·¹ÀÌÆ®¶û Áß°£¿¡ ³õ¾Ò´Ù.
@@ -676,6 +680,18 @@ void CGameInstance::Set_SoundDesc(const _tchar * pSoundKey, CSound::SOUND_DESC &
 {
 	assert(nullptr != m_pSound_Manager && " CGameInstance::Set_SoundDesc");
 	return m_pSound_Manager->Set_SoundDesc(pSoundKey,SoundDesc);
+}
+
+HRESULT CGameInstance::Load_SoundFile(const char * pFilePath, const _tchar* pTag)
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Set_SoundDesc");
+	return m_pSound_Manager->Load_SoundFile(pFilePath, pTag);
+}
+
+map<const _tchar*, CSound*>& CGameInstance::Get_Sound()
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Get_Sound");
+	return m_pSound_Manager->Get_Sound();
 }
 
 void CGameInstance::Release_Engine()

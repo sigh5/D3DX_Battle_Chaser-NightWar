@@ -73,6 +73,18 @@ void CBuff_Effect::Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNum
 
 }
 
+void CBuff_Effect::Set_Dissove(_bool bUseGlow, wstring GlowTag, _int iGlowTextureNumber)
+{
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, GlowTag.c_str(), TEXT("Com_DeTexture"),
+		(CComponent**)&m_pDeTextureCom)))
+		assert(!" CBuff_Effect::Set_Glow");
+
+	m_iDeSolveNum = iGlowTextureNumber;
+
+}
+
 void CBuff_Effect::Set_ShaderPass(_uint iShaderPass)
 {
 	m_HitBoxDesc.HitBoxOrigin_Desc.m_iShaderPass = iShaderPass;
@@ -174,12 +186,23 @@ void CBuff_Effect::Tick(_double TimeDelta)
 		m_pVIBufferCom->Tick_UpDown(TimeDelta);
 	}
 	
+	
 
 
 	if (m_bUseGlow)
 	{
+		// = m_fTick;
+		m_fIncraseX +=  2.f*(_float)TimeDelta ;
+
+		if (m_fIncraseX >= 1.f)
+			m_fIncraseX = 1.f;
+
+
 		if (m_fGlowStrength >= 1.f)
-			m_bIsChange = true;
+		{
+			//m_bIsChange = true;
+			return;
+		}
 		else if (m_fGlowStrength <= 0)
 			m_bIsChange = false;
 
@@ -187,7 +210,10 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			m_fGlowStrength += (_float)TimeDelta * -1.f;
 		else
 			m_fGlowStrength += (_float)TimeDelta;
+
+
 	}
+
 
 
 
@@ -261,6 +287,8 @@ HRESULT CBuff_Effect::SetUp_Components()
 		(CComponent**)&m_pTextureCom)))
 		return E_FAIL;
 
+
+
 	return S_OK;
 }
 
@@ -293,13 +321,21 @@ HRESULT CBuff_Effect::SetUp_ShaderResources()
 	{
 		if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength ,sizeof(_float))))
 			return E_FAIL;
-
-
 		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", m_iGlowTextureNum)))
 			return E_FAIL;
+
+		if (nullptr != m_pDeTextureCom)
+		{
+			if (FAILED(m_pDeTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DissolveTexture", m_iDeSolveNum)))
+				return E_FAIL;
+		}
+	
 	}
 
+	if (FAILED(m_pShaderCom->Set_RawValue("g_iUVX_InCrease", &m_fIncraseX, sizeof(_float))))
+		return E_FAIL;
 
+	
 	return S_OK;
 }
 
@@ -379,6 +415,7 @@ void CBuff_Effect::Free()
 		Safe_Release(m_pGlowTextureCom);
 	}
 
+	Safe_Release(m_pDeTextureCom);
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);

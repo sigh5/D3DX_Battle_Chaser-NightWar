@@ -52,7 +52,7 @@ public:
 	virtual void	Set_ParentLoad(CUI * pUI)override;
 	virtual  void	Set_RenderActive(_bool bActive)override;
 	void			Change_ButtonIcon(const wstring& TextureTag);
-
+	void			Mouse_Image_change();
 private:
 	void			FirstDungeonUIInit();
 

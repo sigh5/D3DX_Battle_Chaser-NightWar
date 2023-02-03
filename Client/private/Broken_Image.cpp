@@ -71,6 +71,8 @@ HRESULT CBroken_Image::Last_Initialize()
 	if (m_bLast_Initlize)
 		return S_OK;
 
+	CGameInstance::GetInstance()->Play_Sound(TEXT("Common_Broken_Image.wav"), 1.0f, false, SOUND_TYPE_HIT);
+
 	m_bLast_Initlize = true;
 
 	return S_OK;
@@ -257,4 +259,5 @@ void CBroken_Image::Free()
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
 }

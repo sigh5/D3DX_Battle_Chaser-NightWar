@@ -79,15 +79,20 @@ protected:
 	CGameObject*					m_pCaptinPlayer = nullptr;	//Dungeon
 	_bool							m_bIsHeavyHit = false;
 	_bool							m_bBuffEffectStop = false;
+	_float							m_fWalkSoundTimer = 0.f;
+
+	_bool							m_bIsWalk = false;
+	_bool					m_bRun = false;
 private:
 	_double					m_fWalkTime = 0.f;
 	_float					m_fMoveSpeedRatio = 0.f;
 	_bool					m_bKeyInput = false;
 	_bool					m_bIsSwap = false;
 	_bool					m_isStop = false;
-	_bool					m_bIsWalk = false;
 
 
+
+	
 	
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;

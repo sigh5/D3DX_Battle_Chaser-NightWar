@@ -34,6 +34,7 @@ namespace Engine
 		unsigned int	iViewportSizeX;
 		unsigned int	iViewportSizeY;
 		HWND			hWnd;		
+		const char*			pSoundFilePath;
 	}GRAPHIC_DESC;
 
 	typedef struct tagVertexPosition

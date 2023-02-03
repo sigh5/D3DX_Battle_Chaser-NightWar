@@ -53,7 +53,7 @@ private:
 	void	Imgui_Camera_Type();
 	void	Imgui_Create_NaviGator();
 
-
+	void	Imgui_Sound_Tool();
 
 	HRESULT	Imgui_Save_NaviGator();
 

@@ -14,7 +14,7 @@
 #include "Client_Manager.h"
 #include "Attack_Effect_Rect.h"
 #include "Mesh_Effect.h"
-
+#include "SoundPlayer.h"
 
 CSlimeKing::CSlimeKing(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice,pContext)
@@ -289,8 +289,8 @@ void CSlimeKing::Late_Tick(_double TimeDelta)
 		}
 		else
 			++iter;
-
 	}
+
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -313,6 +313,95 @@ HRESULT CSlimeKing::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 	return S_OK;
+}
+
+void CSlimeKing::Initialize_CombatSound()
+{
+	CSoundPlayer::Anim_Model_SoundDesc SoundDesc;
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Light_hit
+	SoundDesc.iAnimIndex = 1;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Hit.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Die
+	SoundDesc.iAnimIndex = 2;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0192.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Buff
+	SoundDesc.iAnimIndex = 3;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Buff.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Move
+	SoundDesc.iAnimIndex = 4;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0039.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// HeavyHit
+	SoundDesc.iAnimIndex = 6;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0199.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Light_hit
+	SoundDesc.iAnimIndex = 7;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0176.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Move
+	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Move.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// 머리박치기
+	SoundDesc.iAnimIndex = 10;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0017.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// 머리박치기
+	SoundDesc.iAnimIndex = 13;
+	SoundDesc.iFrame = 25;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Skill1.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Ultimate_Start
+	SoundDesc.iAnimIndex = 15;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0012.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Ultimate_Start
+	SoundDesc.iAnimIndex = 15;
+	SoundDesc.iFrame = 123;
+	SoundDesc.iSoundChannel = SOUND_MONSTER3;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Ultimate.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
 }
 
 void CSlimeKing::Combat_Tick(_double TimeDelta)
@@ -867,13 +956,15 @@ void CSlimeKing::Anim_Frame_Create_Control()
 		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		CCombatController::GetInstance()->Camera_Zoom_In();
-		
+
 		m_bIsUseUltimate = true;
 	}
 	else if (false == m_bUltiAttackStart&& m_pModelCom->Control_KeyFrame_Create(15, 130))
 	{
 		m_bUltiAttackStart = true;
 		m_bUltimate_AttackEffect = true;
+		m_bUltimateSoundCheck = true;
+
 	}
 
 	else if (!m_bUltiAttackStop && m_pModelCom->Control_KeyFrame_Create(15, 240))
@@ -884,6 +975,8 @@ void CSlimeKing::Anim_Frame_Create_Control()
 
 	else if (!m_bUltiWideAttack && m_pModelCom->Control_KeyFrame_Create(15, 283))
 	{
+		if (nullptr != m_pHitTarget)
+			return;
 		CCombatController::GetInstance()->Wide_Attack(true, 83);
 		m_bUltiWideAttack = true;
 	}
@@ -1097,6 +1190,7 @@ void CSlimeKing::Anim_Skill1_Attack()
 
 void CSlimeKing::Anim_Uitimate()
 {
+	m_bUltimateSoundCheck = false;
 	m_bUltimateCam = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_pStatusCom->Use_SkillMp(50);

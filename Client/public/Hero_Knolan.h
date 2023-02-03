@@ -55,6 +55,9 @@ public:  /*For.Combat*/
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_DeadTick(_double TimeDelta)override;
 
+	virtual void	Initialize_CombatSound()override;
+
+
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
 	void			  Create_Test_Effect();		//Test_Effect
 

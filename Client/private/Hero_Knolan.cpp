@@ -16,7 +16,7 @@
 #include "ToolManager.h"
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
-
+#include "SoundPlayer.h"
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -55,11 +55,7 @@ _bool CHero_Knolan::Calculator_HitColl(CGameObject * pWeapon)
 
 		if (m_bUseDefence == true)
 		{
-			_float4 vPos;
-			XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-			vPos.y += 4.f;
-			m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5f));
-			CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), _int(m_iGetDamageNum*0.5));
+			
 
 			Create_Hit_Effect();
 			return true;
@@ -330,7 +326,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-
+		//Initialize_CombatSound();
 		if (m_bCombat_LastInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -421,10 +417,28 @@ void CHero_Knolan::NormalLightCharUI()
 
 void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 {
+	
 	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
 		m_iAnimIndex = 0;
+	
+	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (false == m_bIsWalk && m_bRun==true)
+	{
+		m_fWalkSoundTimer += (_float)TimeDelta;
+		if (m_fWalkSoundTimer >= 0.3f)
+		{
+			pGameInstance->Stop_Sound(SOUND_TYPE_KNOLAN_EFFECT);
+			pGameInstance->Play_Sound(TEXT("Knolan_Walk.wav"), 0.6f, false, SOUND_TYPE_KNOLAN_EFFECT);
+			m_fWalkSoundTimer = 0.f;
+		}
+	}
+	else
+		pGameInstance->Stop_Sound(SOUND_TYPE_KNOLAN_EFFECT);
+
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CHero_Knolan::Combat_Initialize()
@@ -443,12 +457,12 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_bDefence = true;
 	m_isWideBuff = true;
+	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 10);
 
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
 	_float3 vScale = _float3(3.f, 3.f, 3.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
-
 
 	m_bCombat_LastInit = true;
 	return S_OK;
@@ -460,7 +474,6 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
 	Anim_Frame_Create_Control();
-
 
 	for (auto &pEffect : m_pEffectParts)
 	{
@@ -492,13 +505,203 @@ void CHero_Knolan::Combat_Tick(_double TimeDelta)
 		m_fDefenceFsmTimer = 0.f;
 		Fsm_Exit();
 	}
-
 	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CHero_Knolan::Combat_DeadTick(_double TimeDelta)
 {
 	CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+}
+
+void CHero_Knolan::Initialize_CombatSound()
+{
+	CSoundPlayer::Anim_Model_SoundDesc SoundDesc;
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 1;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Active_Start.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 3;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Light_hit0.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 4;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Light_hit1.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 5;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Dead.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 6;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0045.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 6;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0018.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 7;
+	SoundDesc.iFrame = 4;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Normal_Attack.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 7;
+	SoundDesc.iFrame = 10;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0038.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 8;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Heavy_Hit2.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Heavy_Hit1.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 10;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Heavy_hit0.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 12;
+	SoundDesc.iFrame = 28;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Intro.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 14;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Potion.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 14;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0082.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 21;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0005.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 21;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0009.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 24;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0044.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 24;
+	SoundDesc.iFrame = 65;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0082.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 26;
+	SoundDesc.iFrame = 2;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Real_Buff.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 26;
+	SoundDesc.iFrame = 20;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0087.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 27;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Normal_Attacking.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 27;
+	SoundDesc.iFrame = 80;
+	SoundDesc.iSoundChannel = SOUND_VOCIE;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0087.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 28;
+	SoundDesc.iFrame = 1;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0095.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 28;
+	SoundDesc.iFrame = 15;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0107.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 37;
+	SoundDesc.iFrame = 3;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Victory.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 }
 
 void CHero_Knolan::Create_Skill_Texture()
@@ -587,6 +790,12 @@ void CHero_Knolan::Create_Hit_Effect()
 
 	if (m_bUseDefence)
 	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 4.f;
+		m_pStatusCom[COMBAT_PLAYER]->Take_Damage(_int(m_iGetDamageNum*0.5f));
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), _int(0));
+
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_8", LEVEL_COMBAT, false);
 		BuffDesc.vPosition = _float4(0.f, 1.f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(6.f, 6.f, 6.f);
@@ -816,9 +1025,6 @@ void CHero_Knolan::Use_MpPotion()
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
-
-
-
 }
 
 void CHero_Knolan::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
@@ -1277,6 +1483,9 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		CCombatController::GetInstance()->Load_CamBG2();
+
+	
+
 		m_bFogStart = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
@@ -1369,7 +1578,7 @@ HRESULT CHero_Knolan::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(StatusDesc));
-	StatusDesc.iHp = 150;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 250;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusDungeon"),
 		(CComponent**)&m_pStatusCom[DUNGEON_PLAYER], &StatusDesc)))
@@ -1409,7 +1618,7 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 20;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 250;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;
@@ -1417,6 +1626,8 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
+
+	
 
 
 	return S_OK;
@@ -1444,10 +1655,10 @@ void CHero_Knolan::Calculator_HitDamage()
 		m_bIsHeavyHit = true;
 		CExplain_FontMgr::GetInstance()->Set_Explain_Target0_Font1(vPos, _float3(1.f, 1.f, 1.f), TEXT("critical"));
 	}
+	
 	CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 
-	m_pStatusCom[COMBAT_PLAYER]->Take_Damage(m_iGetDamageNum);
 
 	if (m_pStatusCom[COMBAT_PLAYER]->Get_CurStatusHpRatio() <= 0.f)
 	{
@@ -1664,7 +1875,7 @@ void CHero_Knolan::Anim_Light_Hit()
 	}
 	else
 	{
-		m_CurAnimqeue.push({ 3,  1.f });	// 3 or 4
+		m_CurAnimqeue.push({ 4,  1.f });	// 3 or 4
 		m_CurAnimqeue.push({ 1,  1.f });
 	}
 
@@ -1807,14 +2018,17 @@ void CHero_Knolan::Free()
 	}
 	m_pEffectParts.clear();
 
-	Safe_Release(m_pFog);
+	
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
 	Safe_Release(m_pModelCom);
-
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
+
+	Safe_Release(m_pFog);
+	Safe_Release(m_pFullscreenEffect);
+
 }
 
 _bool CHero_Knolan::Is_Dead()

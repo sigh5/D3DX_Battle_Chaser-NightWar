@@ -81,7 +81,7 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 			if (FAILED(pGameInstance->Open_Level(m_eNextLevelID, pLevel)))
 				return;
 
-		
+			
 		}
 	}
 

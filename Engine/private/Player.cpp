@@ -3,6 +3,8 @@
 #include "Input_Device.h"
 #include "Model.h"
 #include "Navigation.h"
+
+
 CPlayer::CPlayer(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CCombatActors(pDevice, pContext)
 {
@@ -120,7 +122,7 @@ void CPlayer::LookAtTarget(_double TimeDelta, CNavigation* pNavigation)
 	{
 		CNavigation* pCaptinNavi = static_cast<CNavigation*>(m_pCaptinPlayer->Get_Component(TEXT("Com_Navigation")));
 		pNavigation->Set_OldPos(pCaptinNavi->Get_Navi_OldPos());
-		pNavigation->Set_NaviCurrentIndex(pCaptinNavi->GetCurrent_NaviIndex());
+		pNavigation->Set_NaviCurrentIndex(pCaptinNavi->GetCurrent_NaviIndex());	
 	}
 
 
@@ -247,12 +249,13 @@ _bool CPlayer::KeyInput(_double TimeDelta, CNavigation* pNavigation)
 			m_bIsWalk = true;
 		}									// nullptr, pNavigation
 		m_pTransformCom->Go_Straight(TimeDelta, m_fMoveSpeedRatio, pNavigation);
-
+		m_bRun = true;
 		return true;
 	}
 	else
 	{
 		m_fWalkTime = 0.0;
+		m_bRun = false;
 		return false;
 	}
 }

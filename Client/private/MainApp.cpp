@@ -11,14 +11,15 @@
 #include "CombatController.h"
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
-
+#include "SoundPlayer.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
 	, m_pToolManager(CToolManager::GetInstance())
 
+
 {
-	
+	CSoundPlayer::GetInstance();
 	Safe_AddRef(m_pGameInstance);
 }
 
@@ -35,6 +36,7 @@ HRESULT CMainApp::Initialize()
 	GraphicDesc.iViewportSizeX = g_iWinSizeX;
 	GraphicDesc.iViewportSizeY = g_iWinSizeY;
 	GraphicDesc.eWindowMode = GRAPHIC_DESC::WINMODE_WIN;
+	GraphicDesc.pSoundFilePath = "../Bin/Resources/Sound/Soundtrack/";
 
 	if (FAILED(m_pGameInstance->Initialize_Engine(g_hInst, LEVEL_END, GraphicDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
@@ -58,7 +60,7 @@ HRESULT CMainApp::Initialize()
 
 	srand((unsigned int)time(NULL));
 
-	
+
 
 
 	return S_OK;
@@ -86,8 +88,10 @@ void CMainApp::Tick(_double TimeDelta)
 
 	LastInitalize();
 
-	
 	m_pGameInstance->Tick_Engine(TimeDelta);
+	
+
+
 	m_pToolManager->Imgui_SelectParentViewer();
 
 	CClient_Manager::TimeDelta = TimeDelta;
@@ -313,11 +317,16 @@ void CMainApp::Free()
 	CToolManager::DestroyInstance();
 	CDamage_Font_Manager::DestroyInstance();
 	CExplain_FontMgr::DestroyInstance();
+	CSoundPlayer::DestroyInstance();
+
+
 
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pContext);
 	Safe_Release(m_pDevice);
+	
+
 
 	CGameInstance::Release_Engine();
 

@@ -44,7 +44,7 @@ public:
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
 	void			Anim_Frame_Create_Control();
-
+	virtual void	Initialize_CombatSound()override;
 public:		/*Create_EFfect*/
 	virtual void	Create_Hit_Effect()override;
 	virtual void	Create_Heavy_Hit_Effect()override;

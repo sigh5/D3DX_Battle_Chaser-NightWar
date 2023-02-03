@@ -193,6 +193,10 @@ void CCombatActors::Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)
 {
 }
 
+void CCombatActors::Initialize_CombatSound()
+{
+}
+
 
 
 

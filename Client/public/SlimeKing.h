@@ -38,7 +38,7 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
+	virtual void				Initialize_CombatSound()override;
 public:
 	virtual	void	Fsm_Exit()override;
 	void			UltiHeavyHitExit();
@@ -135,6 +135,11 @@ private:
 
 	WeaponType				m_eWeaponType = WEAPON_HEAD;
 	UI_REPRESENT			m_Represnt = REPRESENT_SLIMEKING;
+
+
+	_bool					m_bUltimateSoundCheck = false;
+	_float					m_fUltimateSoundTimer = 0.f;
+
 
 private: /*For.Imgui*/
 	wstring			m_TextureTag = TEXT("");

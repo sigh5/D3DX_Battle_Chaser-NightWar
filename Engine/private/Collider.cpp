@@ -154,8 +154,6 @@ _bool CCollider::Collision(CCollider * pTargetCollider)
 _bool CCollider::Collision_Mouse(HWND hWnd)
 {
 	m_isColl = false;
-
-
 	CGameInstance* pGameIntance = GET_INSTANCE(CGameInstance);
 
 	POINT		ptMouse{};

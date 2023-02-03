@@ -22,7 +22,7 @@
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
 #include "CombatMap.h"
-
+#include "Mouse.h"
 
 
 #include "MyImage.h"
@@ -60,6 +60,14 @@ void CCombatController::Setting_Win_Canvas(CCanvas * pCanvas)
 	}
 
 
+}
+
+void CCombatController::Set_MouseTextureOption(_int iMouseTextureNum)
+{
+	if (m_pMouse != nullptr)
+	{
+		m_pMouse->Set_MouseTextureNUm(iMouseTextureNum);
+	}
 }
 
 CGameObject* CCombatController::Get_Player(wstring pName)
@@ -131,6 +139,8 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 				ObjTag = obj->Get_ObjectName();
 				m_CurActorMap.emplace(ObjTag, obj);
 				Safe_AddRef(obj);
+
+				static_cast<CCombatActors*>(obj)->Initialize_CombatSound();
 			}
 		}
 	}
@@ -158,6 +168,8 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 
 	}
 
+	
+
 
 	m_pCombatCamera = static_cast<CCamera_Combat*>(
 		m_pGameInstace->Get_GameObject(LEVEL_COMBAT,
@@ -165,6 +177,9 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 
 	m_pFontManager->Initialize();
 	m_pExplainFontManager->Initialize();
+
+	m_pMouse = static_cast<CMouse*>(CGameInstance::GetInstance()->Get_GameObject(LEVEL_COMBAT,LAYER_PLAYER, TEXT("MouseCuSor")));
+
 
 	return S_OK;
 }
@@ -221,6 +236,9 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	// 몬스터 Fsm 완성전까지 주석 /*필요한 코드 삭제x*/
 	if (nullptr != dynamic_cast<CMonster*>(m_pCurentActor))
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+
+
+	MouseChangeOn_Target();
 
 	if (m_pGameInstace->Mouse_Up(CInput_Device::DIM_LB))
 	{
@@ -360,19 +378,26 @@ void CCombatController::Cal_HitPlayerTarget()
 			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
 			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
 		{
-			if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+			/*if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
 				To_Uitimate();
-			else
+			else*/
 				To_Buff();
 		}
 		else
 		{
-			if (true== bMonsterSkill1_Normal)
+			if (0== bMonsterSkill1_Normal)
 				To_Skill1_Attack();
-			else
+			else if(1 == bMonsterSkill1_Normal)
 				To_Normal_Attack();
-
-			bMonsterSkill1_Normal = !bMonsterSkill1_Normal;
+			else if (2 == bMonsterSkill1_Normal)
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+				{
+					To_Skill2_Attack();
+				}
+				bMonsterSkill1_Normal = 0;
+			}
+			
 		}
 
 		//else if(fCurActorMpRatio >= 0.8f) // 스킬 // 스킬 공격? 
@@ -544,6 +569,11 @@ void CCombatController::Ultimate_Timedelta_Tick(_double TimeDelta)
 	if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Calibretto")))
 	{
 		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 1.0f);
+		return;
+	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Hero_Alumon")))
+	{
+		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 1.f);
 		return;
 	}
 	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Monster_SlimeKing")))
@@ -750,7 +780,6 @@ void CCombatController::Wide_Attack(_bool IsPlayer, _int iDamage)
 			pPlayer.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
 			static_cast<CCombatActors*>(pPlayer.second)->Set_WideAttackDamage(iDamage);
 		}
-
 		Camera_Shaking();
 	}
 	else
@@ -759,16 +788,11 @@ void CCombatController::Wide_Attack(_bool IsPlayer, _int iDamage)
 		{
 			if(dynamic_cast<CMonster*>(pMonster.second) == nullptr)
 				continue;
-
 			pMonster.second->Set_FsmState(true, CGameObject::m_Heavy_Hit);
 			static_cast<CCombatActors*>(pMonster.second)->Set_WideAttackDamage(iDamage);
 		}
-
 		Camera_Shaking();
-		//Camera_Zoom_In();
 	}
-
-
 }
 
 void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
@@ -789,8 +813,26 @@ void CCombatController::PickingTarget()		// 피킹은 플레이어만 가능하다.
 			static_cast<CMonster*>(m_pHitActor)->Set_Me_HitPlayer(m_pCurentActor);
 			break;
 		}
-		
 	}
+}
+
+void CCombatController::MouseChangeOn_Target()
+{
+	_bool bIsMouse_OnTarget = false;
+	for (auto& pMonster : m_CurActorMap)
+	{
+		if (nullptr == dynamic_cast<CMonster*>(pMonster.second))
+			continue;
+
+		if (static_cast<CMonster*>(pMonster.second)->IsCollMouse())
+		{
+			m_pMouse->Set_MouseTextureNUm(1);
+			bIsMouse_OnTarget = true;
+		}
+	}
+
+	if (bIsMouse_OnTarget == false)
+		m_pMouse->Set_MouseTextureNUm(4);
 }
 
 void CCombatController::MonsterSetTarget(_double TimeDelta)
@@ -1240,7 +1282,7 @@ void CCombatController::To_Flee()
 			else
 				pCurActor.second->Set_FsmState(true, CGameObject::m_Viroty);
 		}
-
+		CGameInstance::GetInstance()->Play_Sound(TEXT(""), 1.f, false, SOUND_VOCIE);
 		//m_pTurnCanvas->Move_Children();
 
 		CClient_Manager::m_bCombatlose = true;

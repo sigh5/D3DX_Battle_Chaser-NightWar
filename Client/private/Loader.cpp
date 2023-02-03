@@ -51,7 +51,7 @@
 #include "Mesh_Effect.h"
 #include "Trail_Effect.h"
 #include "Traile_Effect_Child.h"
-
+#include "Mouse.h"
 /* For.CombatScene*/
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -116,6 +116,12 @@ HRESULT CLoader::Loading_ForLogo()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Logo/BattleChasersLogo.dds")))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_MouseCusor"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Mouse_Cusor/CombatCusor_%d.png"), CTexture::TYPE_DIFFUSE, 5))))
+		return E_FAIL;
+
+
+
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
 
@@ -134,6 +140,10 @@ HRESULT CLoader::Loading_ForLogo()
 
 	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_BackGroundLogo"),
 		CMainLogo::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Mouse"),
+		CMouse::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));

@@ -46,7 +46,7 @@ public:
 
 
 	 void				Setting_Win_Canvas(CCanvas* pCanvas);
-
+	 void				Set_MouseTextureOption(_int iMouseTextureNum);
 /*for_Tool*/
 	 CGameObject*				Get_Player(wstring pName);
 
@@ -75,7 +75,8 @@ public:  /*Combat Logic*/
 
 
 private:
-	void	PickingTarget();		//플레이어의 턴일때
+	void	PickingTarget();		//플레이어의 
+	void	MouseChangeOn_Target();		//플레이어의 턴일때
 	void	MonsterSetTarget(_double TimeDelta);
 
 public:	/*Reset*/
@@ -96,7 +97,7 @@ public:	/*Reset*/
 	void	Wide_Attack(_bool IsPlayer, _int iDamage);
 	void	Collison_Event();
 	void	Cal_HitPlayerTarget();
-
+	
 
 
 public:		/*플레이어턴 + 얼티메이트 */
@@ -110,7 +111,7 @@ private:
 public:
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
-
+	
 
 
 
@@ -136,6 +137,7 @@ private:
 	CGameInstance*			m_pGameInstace = nullptr;
 	class   CDamage_Font_Manager*	m_pFontManager = nullptr;
 	class   CExplain_FontMgr*		m_pExplainFontManager = nullptr;
+	class	CMouse*					m_pMouse = nullptr;
 private:
 	vector<CCanvas*>		m_CanvasVec;	// CombatScene전체의 캔버스
 	//vector<CCanvas*>		m_CombatMapVec;
@@ -182,7 +184,7 @@ private:
 	_bool					m_bCurActorUltimateEnd = false;
 	_bool					m_bBannerClose = false;
 
-	_bool					bMonsterSkill1_Normal = false;
+	_int					bMonsterSkill1_Normal = 0;
 	_bool					m_bMonsterUseUltimate = false;
 	
 private:

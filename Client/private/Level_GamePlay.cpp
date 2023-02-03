@@ -13,13 +13,10 @@
 #include "UI.h"
 #include "Broken_Image.h"
 #include "Attack_Effect_Rect.h"
-
+#include "SoundPlayer.h"
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
 	, m_pPlayerController(CPlayerController::GetInstance())
-	
-	
-
 {
 }
 
@@ -55,7 +52,16 @@ HRESULT CLevel_GamePlay::Initialize()
 	
 	m_pPlayerController->Reset_LateInit();
 
-	//CExplain_FontMgr::GetInstance()->Initialize();
+#ifdef NOMODLES
+
+#else
+	
+	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Level_GamePlay.wav"), 0.5f, true, SOUND_BGM);
+	
+#endif // NOMODLES
+
+	
+
 	
 	return S_OK;
 
@@ -68,9 +74,8 @@ void CLevel_GamePlay::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 	
 	m_pPlayerController->Player_Controll_Tick(TimeDelta);
-
+	CSoundPlayer::GetInstance()->Tick(TimeDelta);
 	m_TimeAcc += TimeDelta;
-
 #ifdef FONT_TEST
 	//CExplain_FontMgr::GetInstance()->Tick(TimeDelta);
 #else
@@ -150,7 +155,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
 			return;
-
+		pGameInstance->Play_Sound(TEXT("Common_0037.wav"), 1.f, false, SOUND_CALIBRETTO_EFFECT);
 		Safe_Release(pGameInstance);
 	}
 
@@ -207,6 +212,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
 		return E_FAIL;
 
+	
 	Safe_Release(pGameInstance);
 
 	return S_OK;
@@ -235,8 +241,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
-		return E_FAIL;
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
+		return E_FAIL;*/
 
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
@@ -251,6 +257,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
 #ifdef NOMODLES
+	
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
+		return E_FAIL;
 
 
 #else
@@ -268,6 +277,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 		m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
 		pGameInstance->m_bOnceCreatePlayer = true;
 		
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
+			return E_FAIL;
 	}
 #endif
 
@@ -303,7 +314,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-	pGameInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_GAMEPLAY,true);
+	//pGameInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_GAMEPLAY,true);
 
 	//pGameInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect"), LEVEL_GAMEPLAY, true);
 #else
@@ -419,6 +430,4 @@ void CLevel_GamePlay::Free()
 {
 	__super::Free();
 	
-	
-
 }

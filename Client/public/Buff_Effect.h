@@ -49,6 +49,7 @@ public:
 	const   _bool  Get_MainTain()const { return m_Client_BuffEffect_Desc.bIsMainTain; }
 	
 	void	Set_Glow(_bool bUseGlow, wstring GlowTag,_int iGlowTextureNumber);
+	void	Set_Dissove(_bool bUseGlow, wstring GlowTag, _int iGlowTextureNumber);
 	void	Set_ShaderPass(_uint iShaderPass);
 
 
@@ -71,6 +72,7 @@ private:
 	CVIBuffer_Point_Instancing*			m_pVIBufferCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
 	CTexture*							m_pGlowTextureCom = nullptr;
+	CTexture*							m_pDeTextureCom = nullptr;
 
 private:
 	BuffEffcet_Client					m_Client_BuffEffect_Desc;
@@ -87,6 +89,11 @@ private:
 	_bool								m_bIsChange = false;
 
 	_bool								m_bIsUpdown = false;
+	_int								m_iDeSolveNum = 0;
+
+	_float								m_fTick = 0.f;
+	_float								m_fIncraseX = 0.f;
+	_float								m_fIncraseY = 1.f;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
