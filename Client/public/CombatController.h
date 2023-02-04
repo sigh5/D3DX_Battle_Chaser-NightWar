@@ -97,8 +97,6 @@ public:	/*Reset*/
 	void	Wide_Attack(_bool IsPlayer, _int iDamage);
 	void	Collison_Event();
 	void	Cal_HitPlayerTarget();
-	
-
 
 public:		/*플레이어턴 + 얼티메이트 */
 	void	Ultimate_LateTick(_double TimeDelta);
@@ -107,6 +105,8 @@ private:
 	void	Ultimate_Start_LateTick(_double TimeDelta);
 	void	Ultimate_Timedelta_Tick(_double TimeDelta);
 	void	Ultimate_End_LateTick(_double TimeDelta);
+
+
 
 public:
 	void	Ultimate_Camera_On();
@@ -184,9 +184,12 @@ private:
 	_bool					m_bCurActorUltimateEnd = false;
 	_bool					m_bBannerClose = false;
 
-	_int					bMonsterSkill1_Normal = 0;
+	
 	_bool					m_bMonsterUseUltimate = false;
 	
+	_uint					m_iFsmOption = 0;
+
+
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();

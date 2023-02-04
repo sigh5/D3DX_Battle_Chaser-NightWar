@@ -36,8 +36,6 @@ HRESULT CLoadingImage::Initialize(void * pArg)
 	if (FAILED(CUI::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(CUI::SetUp_UI()))
-		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
@@ -86,12 +84,8 @@ HRESULT CLoadingImage::Render()
 	if (FAILED(SetUp_ShaderResources()))
 		return E_FAIL;
 
-	CUI::Begin_UI();
-
 	m_pShaderCom->Begin(0);
 	m_pVIBufferCom->Render();
-
-	CUI::End_UI();
 
 	return S_OK;
 }

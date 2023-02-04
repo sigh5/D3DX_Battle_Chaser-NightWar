@@ -32,13 +32,11 @@ public:
 
 public:
 	void	Add_SoundEffect_Model(class CModel* pModel, tag_SoundDesc& Desc);
-	void	Add_SoundHit_Model(class CModel* pModel, tag_SoundDesc& Desc);
+	
 	void	Clear_allSound();
 private:
 	vector<pair<class CModel*, tag_SoundDesc >> Model_EffectSoundVec;
-	vector<pair<class CModel*, tag_SoundDesc >> Model_HitSoundVec;
-
-
+	
 	
 
 #ifdef _DEBUG

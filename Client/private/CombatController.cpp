@@ -128,8 +128,10 @@ void CCombatController::Reset_Timer()
 
 HRESULT CCombatController::Initialize(_uint iLevel)
 {
-	wstring ObjTag = TEXT("");
+#ifdef LEVEL_BOSSONLY
 
+#else
+	wstring ObjTag = TEXT("");
 	for (auto& Pair : m_pGameInstace->Get_Layer()[iLevel])
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
@@ -144,7 +146,7 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 			}
 		}
 	}
-
+	
 	for (auto& Pair : m_pGameInstace->Get_Layer()[iLevel])
 	{
 		for (auto& obj : Pair.second->GetGameObjects())
@@ -168,9 +170,6 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 
 	}
 
-	
-
-
 	m_pCombatCamera = static_cast<CCamera_Combat*>(
 		m_pGameInstace->Get_GameObject(LEVEL_COMBAT,
 			TEXT("Layer_Camera"), TEXT("CombatLevel_Camera")));
@@ -179,7 +178,7 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 	m_pExplainFontManager->Initialize();
 
 	m_pMouse = static_cast<CMouse*>(CGameInstance::GetInstance()->Get_GameObject(LEVEL_COMBAT,LAYER_PLAYER, TEXT("MouseCuSor")));
-
+#endif // LEVEL_BOSSONLY
 
 	return S_OK;
 }
@@ -188,6 +187,9 @@ HRESULT CCombatController::Late_Init()
 {
 	if (m_bLateInit)
 		return S_OK;
+#ifdef LEVEL_BOSSONLY
+
+#else
 	Set_CurrentActor();
 
 	if (FAILED(Set_ActorsStatus()))
@@ -202,15 +204,19 @@ HRESULT CCombatController::Late_Init()
 	}
 
 	m_bLateInit = true;
+#endif // LEVEL_BOSSONLY
 	return S_OK;
 }
 
 void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 {
 
+#ifdef LEVEL_BOSSONLY
+
+#else
 	m_pFontManager->Tick(TimeDelta);
 	m_pExplainFontManager->Tick(TimeDelta);
-	
+
 	if (m_bVirtory)
 	{
 		Render_StopCanvas();
@@ -248,6 +254,8 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 	MonsterSetTarget(TimeDelta);
 	Active_Fsm();
 	Collison_Event();
+#endif
+
 }
 
 void CCombatController::Status_CanvasInit()
@@ -294,12 +302,14 @@ void CCombatController::PlayerWin()
 
 void CCombatController::Late_Tick(_double TimeDelta)
 {
+#ifdef LEVEL_BOSSONLY
+
+#else
 	m_pFontManager->Late_Tick(TimeDelta);
 	m_pExplainFontManager->Late_Tick(TimeDelta);
 	Ultimate_LateTick(TimeDelta);
+#endif
 }
-
-
 
 void CCombatController::Cal_HitPlayerTarget()
 {
@@ -319,6 +329,7 @@ void CCombatController::Cal_HitPlayerTarget()
 	//m_iMonster_Player_Option = 2;
 
 	CGameObject* pMeHit_Player = static_cast<CMonster*>(m_pCurentActor)->Get_Me_hitPlayer();
+	_int iMonsterActiveNum = static_cast<CMonster*>(m_pCurentActor)->Get_MonsterActiveNum();
 	if (pMeHit_Player != nullptr)
 	{
 		m_pHitActor = pMeHit_Player;
@@ -367,6 +378,13 @@ void CCombatController::Cal_HitPlayerTarget()
 	_float fCurActorHpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusHpRatio();
 	_float fCurActorMpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusMpRatio();
 
+
+	//if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate()) //OnlyDebug
+	//{
+	//	To_Uitimate();
+	//	m_bMonsterSelect_Target = true;
+	//	return;
+	//}
 	if (fCurActorHpRatio <= 0.f)
 	{
 		To_Normal_Attack();
@@ -378,36 +396,34 @@ void CCombatController::Cal_HitPlayerTarget()
 			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
 			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
 		{
-			/*if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
-				To_Uitimate();
-			else*/
-				To_Buff();
+			
+			To_Buff();
 		}
 		else
 		{
-			if (0== bMonsterSkill1_Normal)
+			if (0 == iMonsterActiveNum)
+			{
+				 To_Normal_Attack();
+				 ++iMonsterActiveNum;
+			}
+			else if(1 == iMonsterActiveNum)
+			{
 				To_Skill1_Attack();
-			else if(1 == bMonsterSkill1_Normal)
-				To_Normal_Attack();
-			else if (2 == bMonsterSkill1_Normal)
+				++iMonsterActiveNum;
+			}
+			else if (2 == iMonsterActiveNum)
 			{
 				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
 				{
 					To_Skill2_Attack();
 				}
-				bMonsterSkill1_Normal = 0;
+				else
+					To_Skill1_Attack();
+				
+				iMonsterActiveNum = 0;
 			}
-			
+		
 		}
-
-		//else if(fCurActorMpRatio >= 0.8f) // 스킬 // 스킬 공격? 
-		//{
-		//	To_Skill1_Attack();
-		//}
-		//else		
-		//{
-		//	To_Normal_Attack();
-		//}
 		
 	}
 	else   // 본인 피가 절반 이하다.
@@ -420,13 +436,18 @@ void CCombatController::Cal_HitPlayerTarget()
 				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate() && !m_bMonsterUseUltimate)
 				{
 					m_bMonsterUseUltimate = true;
+					iMonsterActiveNum = 0;
 					To_Uitimate();
 				}
-				else if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+				else if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
+				{
 					To_Skill2_Attack();
+					iMonsterActiveNum = 0;
+				}
 				else
 				{
 					To_Skill1_Attack();
+					++iMonsterActiveNum;
 					if(static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
 					{
 						m_bMonsterUseUltimate = false;
@@ -435,31 +456,45 @@ void CCombatController::Cal_HitPlayerTarget()
 			}
 			else //마나가 50퍼 공격 스킬사용
 			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
+				{
 					To_Skill2_Attack();
+					iMonsterActiveNum = 0;
+				}
 				else
+				{
 					To_Skill1_Attack();
+					++iMonsterActiveNum;
+				}
 			}
 		}
 		else
 		{	
-			if (fCurActorMpRatio >= 0.5f)	//공격스킬사용
+			if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && fCurActorMpRatio >= 0.25f && iMonsterActiveNum == 2)
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+						To_Skill2_Attack();
+				else if(false == static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2()
+					&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+						To_Uitimate();
+				else
+					To_Skill1_Attack();
+			
+				++iMonsterActiveNum;
+			}
+			else if (fCurActorMpRatio >= 0.1f &&  iMonsterActiveNum==1)	//공격스킬사용
 			{
 				To_Skill1_Attack();
-			}
-			else if(fCurActorMpRatio <= 0.3f && fCurActorMpRatio >=0.1f)		// 방어스킬 사용
-			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveDefence())
-					To_Defence();
-				else
-					To_Normal_Attack();
+				++iMonsterActiveNum;
 			}
 			else						//기본공격 사용
 			{
 				To_Normal_Attack();
+				iMonsterActiveNum = 0;
 			}
 		}
 	}
+	static_cast<CMonster*>(m_pCurentActor)->Set_MonsterActiveNum(iMonsterActiveNum);
 	Mana_Refresh(); 
 	m_bMonsterSelect_Target = true;
 
@@ -597,6 +632,8 @@ void CCombatController::Ultimate_End_LateTick(_double TimeDelta)
 	m_pCombatBG = nullptr;
 	m_pCombatBG2 = nullptr;
 }
+
+
 
 void CCombatController::Refresh_CurActor()
 {
@@ -1282,7 +1319,7 @@ void CCombatController::To_Flee()
 			else
 				pCurActor.second->Set_FsmState(true, CGameObject::m_Viroty);
 		}
-		CGameInstance::GetInstance()->Play_Sound(TEXT(""), 1.f, false, SOUND_VOCIE);
+		//CGameInstance::GetInstance()->Play_Sound(TEXT(""), 1.f, false, SOUND_VOCIE);
 		//m_pTurnCanvas->Move_Children();
 
 		CClient_Manager::m_bCombatlose = true;

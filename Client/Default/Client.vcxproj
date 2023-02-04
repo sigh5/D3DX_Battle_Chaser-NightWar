@@ -174,6 +174,7 @@
     <ClInclude Include="..\public\AnimFsm.h" />
     <ClInclude Include="..\Public\Attack_Effect_Rect.h" />
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Boss_Alumon.h" />
     <ClInclude Include="..\Public\Broken_Image.h" />
     <ClInclude Include="..\Public\Buff_Effect.h" />
     <ClInclude Include="..\Public\Buff_Image.h" />
@@ -211,6 +212,7 @@
     <ClInclude Include="..\public\Level_Loading.h" />
     <ClInclude Include="..\public\Level_Logo.h" />
     <ClInclude Include="..\public\Loader.h" />
+    <ClInclude Include="..\Public\LoadingCircle.h" />
     <ClInclude Include="..\Public\LoadingImage.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
@@ -218,6 +220,7 @@
     <ClInclude Include="..\Public\MapOneTree.h" />
     <ClInclude Include="..\Public\MapTile.h" />
     <ClInclude Include="..\Public\Map_3D_UI.h" />
+    <ClInclude Include="..\Public\MeshGround.h" />
     <ClInclude Include="..\Public\Mesh_Effect.h" />
     <ClInclude Include="..\Public\MonsterFsm.h" />
     <ClInclude Include="..\Public\Mouse.h" />
@@ -253,6 +256,7 @@
     <ClCompile Include="..\private\AnimFsm.cpp" />
     <ClCompile Include="..\Private\Attack_Effect_Rect.cpp" />
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Boss_Alumon.cpp" />
     <ClCompile Include="..\private\Broken_Image.cpp" />
     <ClCompile Include="..\Private\Buff_Effect.cpp" />
     <ClCompile Include="..\Private\Buff_Image.cpp" />
@@ -288,6 +292,7 @@
     <ClCompile Include="..\private\Level_Loading.cpp" />
     <ClCompile Include="..\private\Level_Logo.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
+    <ClCompile Include="..\Private\LoadingCircle.cpp" />
     <ClCompile Include="..\Private\LoadingImage.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
@@ -295,6 +300,7 @@
     <ClCompile Include="..\Private\MapOneTree.cpp" />
     <ClCompile Include="..\Private\MapTile.cpp" />
     <ClCompile Include="..\Private\Map_3D_UI.cpp" />
+    <ClCompile Include="..\Private\MeshGround.cpp" />
     <ClCompile Include="..\Private\Mesh_Effect.cpp" />
     <ClCompile Include="..\Private\MonsterFsm.cpp" />
     <ClCompile Include="..\Private\Mouse.cpp" />

@@ -57,15 +57,6 @@ HRESULT CMapOne2D::Last_Initialize()
 void CMapOne2D::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
-
-	if (GetKeyState('Z') & 0x8000)
-	{
-		m_bRenderActive = false;
-	}
-	if (GetKeyState('X') & 0x8000)
-	{
-		m_bRenderActive = true;
-	}
 }
 
 void CMapOne2D::Late_Tick(_double TimeDelta)
@@ -81,8 +72,6 @@ void CMapOne2D::Late_Tick(_double TimeDelta)
 
 HRESULT CMapOne2D::Render()
 {
-	if (m_bRenderActive)
-		return S_OK;
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 

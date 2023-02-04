@@ -55,7 +55,6 @@ HRESULT CLevel_GamePlay::Initialize()
 #ifdef NOMODLES
 
 #else
-	
 	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Level_GamePlay.wav"), 0.5f, true, SOUND_BGM);
 	
 #endif // NOMODLES
@@ -131,6 +130,20 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 	//}
 #ifdef NOMODLES
 
+	if (GetKeyState(VK_SPACE) & 0x8000)
+	{
+		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+		Safe_AddRef(pGameInstance);
+		//pGameInstance->Stop_Sound(SOUND_BGM);
+
+		pGameInstance->SceneChange_NameVectorClear();
+		pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), false)))
+			return;
+		pGameInstance->Setting_MonsterScene(4);
+		Safe_Release(pGameInstance);
+	}
+
 
 #else
 	if (m_bSceneChange)
@@ -159,6 +172,21 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 		Safe_Release(pGameInstance);
 	}
 
+
+	if (GetKeyState(VK_SPACE) & 0x8000)
+	{
+		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+		Safe_AddRef(pGameInstance);
+		//pGameInstance->Stop_Sound(SOUND_BGM);
+		
+		pGameInstance->SceneChange_NameVectorClear();
+		pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
+			return;
+		pGameInstance->Setting_MonsterScene(4);
+		Safe_Release(pGameInstance);
+
+	}
 	
 
 #endif
@@ -244,6 +272,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
 		return E_FAIL;*/
 
+	
+
+
+
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
 #endif
@@ -258,9 +290,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 
 #ifdef NOMODLES
 	
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
-		return E_FAIL;
-
+	
 
 #else
 	if (pGameInstance->m_bOnceCreatePlayer == false)
@@ -274,11 +304,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Hero_Calibretto"))))
 			return E_FAIL;
 
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
+			return E_FAIL;
+
 		m_pPlayerController->Initialize(LEVEL_GAMEPLAY);
 		pGameInstance->m_bOnceCreatePlayer = true;
 		
-		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
-			return E_FAIL;
+	
 	}
 #endif
 
@@ -341,7 +373,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 0.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext,TEXT("Level_Game_Directional") ,LightDesc)))
 		return E_FAIL;

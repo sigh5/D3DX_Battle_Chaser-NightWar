@@ -53,10 +53,12 @@ void CChestBox::Tick(_double TimeDelta)
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CCollider* pCaptinColl = static_cast<CCollider*>(pPlayerController->Get_Captin()->Get_Component(L"Com_OBB"));
 	
-	if (m_pColliderCom->Collision(pCaptinColl) && pGameInstance->Key_Down(DIK_F))
+	if (!m_bOnceGet && m_pColliderCom->Collision(pCaptinColl) && pGameInstance->Key_Down(DIK_F))
 	{
 		m_pModelCom->Set_AnimIndex(2);
 		Get_Captin_Player_Item();
+		pGameInstance->Play_Sound(TEXT("Common_0037.wav"), 1.f, false, SOUND_ULTIBGM);
+		m_bOnceGet = true;
 	}
 
 	RELEASE_INSTANCE(CPlayerController);

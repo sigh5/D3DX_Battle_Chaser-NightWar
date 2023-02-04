@@ -414,9 +414,9 @@ PS_OUT PS_MAIN_Glow_Lazor(PS_IN In)
 
 	TexturColor = g_Texture.Sample(LinearSampler, In.vTexUV );
 	GlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUV );
-	float dissolve = g_DissolveTexture.Sample(LinearSampler, In.vTexUV).r;
+	//float dissolve = g_DissolveTexture.Sample(LinearSampler, In.vTexUV).r;
 
-	//if (dissolve > g_iUVX_InCrease)		// µðÁ¹ºê
+	//if (dissolve >= G_Power)		// µðÁ¹ºê
 	//	discard;
 
 	Out.vColor = saturate(TexturColor + (GlowColor* G_Power));
@@ -426,7 +426,7 @@ PS_OUT PS_MAIN_Glow_Lazor(PS_IN In)
 	if (In.vTexUV.x >= (1 / g_iUV_Max_Width_Num)* (g_iUV_Cur_Width_Num + g_iUVX_InCrease))//* * g_iUVX_InCrease)
 		discard;
 
-	//
+	////
 
 
 	//1/g_iUV_Max_Width_Num *(g_iUV_Cur_Width_Num + 1.f)

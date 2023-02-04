@@ -46,9 +46,6 @@ HRESULT CMainLogo::Initialize(void * pArg)
 	m_pTransformCom->Set_Scaled(_float3(450.f, 240.f, 1.f));
 	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(400.f, 220.f, 0.1f, 1.f));
 
-
-
-
 	return S_OK;
 }
 

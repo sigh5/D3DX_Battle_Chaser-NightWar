@@ -25,12 +25,14 @@ private:
 	virtual ~CTurnCharcterUI() = default;
 
 public:
-	void Set_Top_BottomYPos(_float& fTopY, _float& fBottomY) {m_fTopY = fTopY; m_fBottomY = fBottomY;}
+	void Set_Top_BottomYPos(_float fTopY,  _float fBottomY) {m_fTopY = fTopY; m_fBottomY = fBottomY;}
 	const UI_REPRESENT Get_Represent_Char()const { return m_iRepresent_Char; }
 
 	void	Set_LimitYPos_Float(_float fLimitPos);
 	void	Set_LimitYPos(_int iLimitPosRatio);
 	const _float	Get_LimitYPos()const { return m_vLimitPos.y; }
+
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -80,7 +82,7 @@ private:
 	int						m_iSwitching = 1;
 
 	_float					m_fTopY=0.f, m_fBottomY=0.f;
-
+	
 private:
 	UI_REPRESENT			m_iRepresent_Char = REPRESENT_END;		// 현재 어떤 캐릭터 담당인지
 

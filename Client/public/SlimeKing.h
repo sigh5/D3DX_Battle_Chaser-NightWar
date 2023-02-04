@@ -97,6 +97,7 @@ private:
 	vector<CGameObject*>	m_MonsterParts;
 	list<CGameObject*>		m_UltimateBullet;
 	CGameObject*			m_pCamEffectObj = nullptr;
+
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;

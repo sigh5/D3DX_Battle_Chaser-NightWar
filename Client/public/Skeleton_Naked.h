@@ -83,11 +83,8 @@ public:
 	void					Anim_Die();
 	void					Anim_Viroty();
 
-
 private:
 	vector<CGameObject*>			m_MonsterParts;
-	
-
 	
 private:
 	_int					m_iMovingDir = ANIM_EMD;

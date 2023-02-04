@@ -92,7 +92,7 @@ void CPlayerController::Player_Controll_Tick(_double TimeDelta)
 		if (false == m_bInventoryRender)
 		{
 			m_pInventory->Clear_InventoryImage();
-			pGameInstace->Play_Sound(TEXT("Common_0035.wav"), 0.8f, false, SOUND_MONSTER1);
+			pGameInstace->Play_Sound(TEXT("Common_0045.wav"), 0.8f, false, SOUND_MONSTER1);
 		}
 
 		if (m_bInventoryRender == true)

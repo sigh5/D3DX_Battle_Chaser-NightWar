@@ -12,11 +12,12 @@
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
 #include "SoundPlayer.h"
-
+#include "LoadingCircle.h"
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
+#ifdef _DEBUG
 	, m_pToolManager(CToolManager::GetInstance())
-
+#endif
 
 {
 	CSoundPlayer::GetInstance();
@@ -90,9 +91,11 @@ void CMainApp::Tick(_double TimeDelta)
 
 	m_pGameInstance->Tick_Engine(TimeDelta);
 	
-
-
+#ifdef _DEBUG
 	m_pToolManager->Imgui_SelectParentViewer();
+#endif // DEBUG
+
+
 
 	CClient_Manager::TimeDelta = TimeDelta;
 }
@@ -209,9 +212,10 @@ HRESULT CMainApp::Ready_Prototype_Component()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/LoadingImage/LoadScreen%d.png"),CTexture::TYPE_END,6))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(CGameInstance::Get_StaticLevelIndex(), TEXT("Prototype_Component_Texture_LoadingCircle"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Logo/UI_LoadingRing_%d.png"), CTexture::TYPE_END, 2))))
+		return E_FAIL;
 	
-
-
 
 	Safe_AddRef(m_pRenderer);
 
@@ -231,6 +235,11 @@ HRESULT CMainApp::Ready_Prototype_GameObject()
 	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingImage"),
 		CLoadingImage::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LoadingCircle"),
+		CLoadingCircle::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 
 	return S_OK;
@@ -314,7 +323,9 @@ void CMainApp::Free()
 {
 	CCombatController::DestroyInstance();
 	CPlayerController::DestroyInstance();
+#ifdef _DEBUG
 	CToolManager::DestroyInstance();
+#endif
 	CDamage_Font_Manager::DestroyInstance();
 	CExplain_FontMgr::DestroyInstance();
 	CSoundPlayer::DestroyInstance();

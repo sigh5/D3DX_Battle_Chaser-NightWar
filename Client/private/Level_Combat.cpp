@@ -50,8 +50,8 @@ HRESULT CLevel_Combat::Initialize()
 	m_pCombatController->Initialize(LEVEL_COMBAT);
 	
 
-	
-	CGameInstance::GetInstance()->Play_Sound(TEXT("02_Nights_Curse.wav"), 0.2f, true, SOUND_BGM);
+
+	//CGameInstance::GetInstance()->Play_Sound(TEXT("02_Nights_Curse.wav"), 0.2f, true, SOUND_BGM);
 
 
 
@@ -68,8 +68,6 @@ void CLevel_Combat::Tick(_double TimeDelta)
 	Combat_Control_Tick(TimeDelta);
 	CSoundPlayer::GetInstance()->Tick(TimeDelta);
 	
-
-
 	m_TimeAcc += TimeDelta;
 
 }
@@ -124,8 +122,6 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 	}
 
 
-
-
 	if (m_bSceneChange &&  GetKeyState(VK_RETURN) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
@@ -137,7 +133,7 @@ void CLevel_Combat::Late_Tick(_double TimeDelta)
 
 		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY), true)))
 			return;
-		
+
 		pGameInstance->Stop_Sound(SOUND_BGM);
 		CSoundPlayer::GetInstance()->Clear_allSound();
 		
@@ -220,9 +216,11 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
+#ifdef LEVEL_BOSSONLY
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
+		return E_FAIL;
 
-	
-
+#endif
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -230,10 +228,19 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 HRESULT CLevel_Combat::Ready_Layer_Camera(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-	
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_CombatCamera"))))
-		return E_FAIL;
 
+	int iMonsterSettingNum = pGameInstance->Get_Setting_MonsterScene();
+
+	if (iMonsterSettingNum == 4)
+	{
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Camera_Dynamic"))))
+			return E_FAIL;
+	}
+	else
+	{
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_CombatCamera"))))
+			return E_FAIL;
+	}
 	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Camera_Dynamic"))))
 	//	return E_FAIL;
 
@@ -265,17 +272,13 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 	case 1:
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
-
-		
-
 		pGameInstance->
 			Get_GameObject(LEVEL_COMBAT,
 				pLayerTag, TEXT("Spider_Mana"))->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
 
 		static_cast<CSpider_Mana*>(pGameInstance->
 			Get_GameObject(LEVEL_COMBAT,
-				pLayerTag, TEXT("Spider_Mana")))->Set_buff_Image_Height();
-
+				pLayerTag, TEXT("Spider_Mana")))->Set_buff_Image_Height(-245.f);
 
 		break;
 
@@ -285,8 +288,11 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
+		
+		static_cast<CSpider_Mana*>(pGameInstance->
+			Get_GameObject(LEVEL_COMBAT,
+				pLayerTag, TEXT("Spider_Mana")))->Set_buff_Image_Height(-285.f);
 		break;
-
 	case 3:
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_SlimeKing"))))
 			return E_FAIL;
@@ -296,6 +302,12 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
 		
+		break;
+
+	case 4:
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Boss_Alumon"))))
+			return E_FAIL;
+
 		break;
 
 	default:
@@ -311,7 +323,7 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
+	
 	
 	
 	int iMonsterSettingNum = pGameInstance->Get_Setting_MonsterScene();
@@ -334,14 +346,22 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 		pGameInstance->Load_Object(TEXT("UI_TrunThree"), LEVEL_COMBAT);
 		pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas3"), LEVEL_COMBAT);
 		break;
-	
+	case 4:
+
+		break;
+
 	default:
 		break;
 	}
 
-	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
-	
-
+	if (iMonsterSettingNum != 4)
+	{
+		pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
+		pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
+	}
+	else
+		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_MeshGround"))))
+			return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
@@ -360,7 +380,7 @@ HRESULT CLevel_Combat::Ready_Lights()
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vSpecular = _float4(0.3f, 0.3f, 0.3f, 0.3f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Combat_Directional"), LightDesc)))
 		return E_FAIL;

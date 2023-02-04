@@ -190,6 +190,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 
 	
 	}
+
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -238,7 +239,7 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 			}
 		}
 			
-		if (m_bIsCombatScene == true)
+		if (m_bIsCombatScene == true )
 		{
 			if (!m_bIsDead && false == m_bUltimateBuffRenderStop && CClient_Manager::m_bCombatWin == false)
 			{
@@ -476,6 +477,8 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		_int iRandom = rand() % 5;
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target2_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum, 1.5f, 1.2f);
 		m_bOnceCreate = true;
+
+		m_iMultiHitNum = 0;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(15, 1) )
 	{
@@ -558,6 +561,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_End_Effect();
 		CCombatController::GetInstance()->Wide_Attack(false,50);
+		
 		m_bUltimateStop = false;
 	}
 	else if (!m_bRecoverHeight && m_pModelCom->Control_KeyFrame_Create(46, 400))	// 대신 쓴 변수
@@ -745,7 +749,7 @@ HRESULT CHero_Calibretto::Ready_Parts_Combat()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 1000;
+	StatusDesc.iHp = 10000;
 	StatusDesc.iMp = 250;
 	StatusDesc.iExp = 0;
 	StatusDesc.iLevel = 1;
@@ -927,6 +931,8 @@ void CHero_Calibretto::Anim_Light_Hit()
 		m_CurAnimqeue.push({ 1,  1.f });
 		m_bOnceCreate = false;
 		m_bIs_Multi_Hit = false;
+
+		m_iMultiHitNum = 2;
 	}
 	else 
 	{
@@ -1333,7 +1339,7 @@ void CHero_Calibretto::Create_Skill2_Beam()
 
 	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
 	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Glow(true, L"Prototype_Component_Texture_bretto_laser_Bullet",0);
-	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Dissove(true, L"Prototype_Component_Texture_bretto_laser_Bullet", 3);
+	//static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_Dissove(true, L"Prototype_Component_Texture_Dissoive", 3);
 	static_cast<CBuff_Effect*>(m_pLazorEffect)->Set_ShaderPass(8);
 	RELEASE_INSTANCE(CGameInstance);
 }
@@ -1750,6 +1756,16 @@ void CHero_Calibretto::Create_Hit_Effect()
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		
+		if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
+		{
+			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+		}
+		if (m_iMultiHitNum == 3)
+		{
+			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+		}
+		m_iMultiHitNum++;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
@@ -1759,6 +1775,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.f, 1.f, 0.5f, 1.f);		// 이미지 교체필요
 		BuffDesc.vScale = _float3(13.f, 13.f, 13.f);
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
@@ -2004,12 +2021,7 @@ void CHero_Calibretto::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0046.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
-	SoundDesc.iAnimIndex = 3;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Return.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 4;
@@ -2082,6 +2094,13 @@ void CHero_Calibretto::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0020.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		//Move 
+	SoundDesc.iAnimIndex = 15;
+	SoundDesc.iFrame = 2;
+	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Return.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 16;
 	SoundDesc.iFrame = 20;
@@ -2133,6 +2152,13 @@ void CHero_Calibretto::Initialize_CombatSound()
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 28;
+	SoundDesc.iFrame = 58;
+	SoundDesc.iSoundChannel = SOUND_TYPE_HIT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Explosion_Lazor.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 30;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
@@ -2160,6 +2186,15 @@ void CHero_Calibretto::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Ultimate.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 46;
+	SoundDesc.iFrame = 257;
+	SoundDesc.iSoundChannel = SOUND_ULTIBGM;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Explosion_Ultimate_End.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
 }
 
 

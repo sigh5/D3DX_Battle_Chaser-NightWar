@@ -52,7 +52,9 @@
 #include "Trail_Effect.h"
 #include "Traile_Effect_Child.h"
 #include "Mouse.h"
-/* For.CombatScene*/
+
+#include "Boss_Alumon.h"
+#include "MeshGround.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -79,6 +81,7 @@ _uint APIENTRY LoadingThread(void* pArg)
 	case LEVEL_COMBAT:
 		pLoader->Loading_Combat();
 		break;
+
 	}
 
 	LeaveCriticalSection(&pLoader->Get_CriticalSection());
@@ -116,10 +119,12 @@ HRESULT CLoader::Loading_ForLogo()
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Logo/BattleChasersLogo.dds")))))
 		return E_FAIL;
 
+	
+
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_MouseCusor"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Mouse_Cusor/CombatCusor_%d.png"), CTexture::TYPE_DIFFUSE, 5))))
 		return E_FAIL;
-
+	
 
 
 	lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
@@ -146,6 +151,7 @@ HRESULT CLoader::Loading_ForLogo()
 		CMouse::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
 	m_isFinished = true;
@@ -171,12 +177,17 @@ HRESULT CLoader::Loading_ForGamePlay()
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 		/* Model */
 #ifdef NOMODLES
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);	
+	/*	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);	
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
-
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);*/
+		
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_GAMEPLAY); 
+		if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"),
+			CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Map2/Map2_%d.png"), CTexture::TYPE_DIFFUSE,9))))
+			return E_FAIL;
+		
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
 		/*CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
@@ -202,6 +213,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 		if (FAILED(ForGamePlay_GameObjects(pGameInstance)))
 			return E_FAIL;
 
+#ifdef _DEBUG
+		
+#endif // _DEBUG
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MeshGround"),
+			CMeshGround::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+
+
 		lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 		pGameInstance->Set_ProtoTypeCreate(LEVEL_GAMEPLAY);
 	}
@@ -226,6 +245,10 @@ HRESULT CLoader::Loading_Combat()
 		lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
+
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Alumon_Model"), LEVEL_COMBAT);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_COMBAT); 
+
 
 		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
@@ -255,6 +278,10 @@ HRESULT CLoader::Loading_Combat()
 		/* For.Prototype_GameObject_Skill_Obj */
 		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Skill_Obj"),
 			CSkill_Object::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Boss_Alumon"),
+			CBoss_Alumon::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
 
 		lstrcpy(m_szLoadingText, TEXT("로딩끝."));
@@ -472,6 +499,13 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			TEXT("../Bin/Resources/Textures2D/MapBlocker/MapBlocker_%d.png"),		//exp bar 가지고있음
 			CTexture::TYPE_END, 4))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Dissoive"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/dissolve/dissolve_%d.png"),		//exp bar 가지고있음
+			CTexture::TYPE_END, 5))))
+		return E_FAIL;
+
 
 
 

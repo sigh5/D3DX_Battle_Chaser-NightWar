@@ -199,6 +199,7 @@ void CHero_Garrison::Tick(_double TimeDelta)
 		//	//m_PlayerParts[0]->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(vPos[0], vPos[1], vPos[2], 1.f));
 		//}
 	}
+	
 
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
@@ -245,7 +246,7 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 				++iter;
 		}
 
-		if (m_bIsCombatScene == true)
+		if (m_bIsCombatScene == true )
 		{
 			if (!m_bIsDead && false == m_bUltimateBuffRenderStop && CClient_Manager::m_bCombatWin == false)
 			{
@@ -610,6 +611,17 @@ void CHero_Garrison::Create_Hit_Effect()
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale =	 _float3(5.f, 5.f, 5.f);
+			
+			if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
+			{
+				pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			if (m_iMultiHitNum == 3)
+			{
+				pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			m_iMultiHitNum++;
+			
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
 			pGameObject = pInstance->Load_Effect(L"Texture_Bleeding_Effect_3", LEVEL_COMBAT, false);
@@ -617,6 +629,7 @@ void CHero_Garrison::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.5f, 1.f);
 			BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 			static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+			pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
 			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
@@ -1108,6 +1121,8 @@ void CHero_Garrison::Anim_Frame_Create_Control()
 
 		Create_Hit_Effect();
 		m_bOnceCreate = true;
+
+		m_iMultiHitNum = 0;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(17, 14))
 	{
@@ -1458,10 +1473,9 @@ void CHero_Garrison::Initialize_CombatSound()
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 30;
 	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_GARRISON_EFFECT;
+	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Garrison_0056.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 30;
@@ -1477,6 +1491,13 @@ void CHero_Garrison::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Garrison_Buff.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 30;
+	SoundDesc.iFrame = 295;
+	SoundDesc.iSoundChannel = SOUND_GARRISON_EFFECT;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Garrison_Explosion_Ultimate.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 32;
@@ -1484,8 +1505,9 @@ void CHero_Garrison::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_GARRISON_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Garrison_0036.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
 }
+
+
 
 HRESULT CHero_Garrison::SetUp_Components()
 {
@@ -2337,6 +2359,8 @@ void CHero_Garrison::Anim_Light_Hit()
 		m_CurAnimqeue.push({ 1,  1.f });
 		m_bOnceCreate = false;
 		m_bIs_Multi_Hit = false;
+		
+		m_iMultiHitNum = 2;
 	}
 	else
 	{

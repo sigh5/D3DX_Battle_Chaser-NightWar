@@ -33,7 +33,7 @@ public:
 	virtual void Tick(_double TimeDelta)override;
 	virtual void Late_Tick(_double TimeDelta)override;
 	virtual HRESULT Render()override;
-	virtual void	Delete_Delegate()override;
+	
 public:
 	void	ChildrenMoveCheck(UI_REPRESENT iRepesentNum, _uint iOpiton); // iOption == 0,1,2,3,4,5 RepesetOption
 	
@@ -42,10 +42,12 @@ public:
 
 	void	Move_ReCoverChild();
 
-	virtual void	Set_RenderActive(_bool bActive)override;
-	
-
+	virtual void		Set_RenderActive(_bool bActive)override;
 	virtual void			Shaking_Child_UI()override;
+
+	void	Sort_floatYPosChild();
+	
+	void	Imgui_ViewYPos();
 
 private:
 	CShader*				m_pShaderCom = nullptr;
@@ -61,14 +63,14 @@ private:
 private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
+	_float					m_fChildBottom = 0.f;
 
 	class CUI*				m_pTopUI = nullptr;
 	class CUI*				m_pBottomUI = nullptr;
 	_bool					m_bMoveFinish = false;
 	vector<CUI*>			OldCharImage;
 
-	_float					m_fAfter_Delete_Move_Timer = 0.f;
-
+	
 public:
 	static CTurnUICanvas* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) ;

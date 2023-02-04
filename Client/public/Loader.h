@@ -41,7 +41,7 @@ public:
 	HRESULT Loading_ForLogo();
 	HRESULT Loading_ForGamePlay();
 	HRESULT Loading_Combat();
-	
+
 
 	HRESULT ForGamePlay_Texture(class CGameInstance* pGameInstance);
 	HRESULT ForGamePlay_Shader(class CGameInstance* pGameInstance);

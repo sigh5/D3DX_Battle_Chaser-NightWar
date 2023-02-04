@@ -46,6 +46,8 @@ public: /*For.PlayerController*/
 	void				Get_CaptinPlayer_Item(class CStatus* pStatus);
 
 
+
+
 public: /*For.Combat*/
 	virtual void				Use_HpPotion();
 	virtual void				Use_MpPotion();

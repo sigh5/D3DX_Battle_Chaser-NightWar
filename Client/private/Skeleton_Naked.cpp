@@ -196,7 +196,7 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	if (m_bModelRender)
+	if (m_bModelRender && false == m_bMonster_Victroys)
 	{
 		if( false==m_bIsDead)
 		{ 
@@ -347,6 +347,7 @@ void CSkeleton_Naked::MovingAnimControl(_double TimeDelta)
 
 void CSkeleton_Naked::Create_Hit_Effect()
 {
+	/* 다중 공격 시*/
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 	CGameObject* pGameObject = nullptr;
 	
@@ -375,7 +376,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 3);
-
+		pInstance->Play_Sound(TEXT("Common_Knolan_Skill2_Effect.wav"), 1.f, false, SOUND_TYPE_HIT);
 
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
@@ -393,7 +394,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 2);
 
-
+		pInstance->Play_Sound(TEXT("Common_0012.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
@@ -401,12 +402,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
-		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
-		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		pInstance->Play_Sound(TEXT("Common_0234.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
@@ -414,8 +410,10 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN:
+		
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
@@ -427,8 +425,16 @@ void CSkeleton_Naked::Create_Hit_Effect()
 			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
+		
+		if (m_iMultiHitNum == 0)
+			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+		else if (m_iMultiHitNum == 1)
+			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+		++m_iMultiHitNum;
+
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		iEffectNum = 0;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1:
@@ -439,6 +445,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
+		pInstance->Play_Sound(TEXT("Common_0102.wav"), 1.f, false, SOUND_TYPE_HIT);
 		IsDebuffing = true;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
@@ -450,7 +457,7 @@ void CSkeleton_Naked::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 1);
-		
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
 		m_DebuffName = TEXT("armor break");
@@ -573,6 +580,7 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
+		m_iMultiHitNum = 0;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 1) )
 	{
@@ -669,7 +677,7 @@ void CSkeleton_Naked::Initialize_CombatSound()
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Move
-	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iAnimIndex = 8;
 	SoundDesc.iFrame = 2;
 	SoundDesc.iSoundChannel = SOUND_MONSTER1;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047_1.wav"));
@@ -1109,17 +1117,7 @@ void CSkeleton_Naked::Anim_Viroty()
 	m_CurAnimqeue.push({ 14, 1.f });
 	m_CurAnimqeue.push({ 0, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
-
-	for (auto& pParts : m_MonsterParts)
-		Safe_Release(pParts);
-	m_MonsterParts.clear();
-
-
+	m_bMonster_Victroys = true;
 }
 
 CSkeleton_Naked * CSkeleton_Naked::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
@@ -1151,13 +1149,10 @@ void CSkeleton_Naked::Free()
 	__super::Free();
 
 
-	for (auto iter = m_MonsterParts.begin(); iter != m_MonsterParts.end();)
-	{
-		Safe_Release(*iter);
-		*iter = nullptr;
-		iter = m_MonsterParts.erase(iter);
-	}
-	m_MonsterParts.clear();
+	for (auto& pPart : m_MonsterParts)
+		Safe_Release(pPart);
+	m_MonsterParts.clear();		// 흠 버프이미지는 부모에서 지워줌
+
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

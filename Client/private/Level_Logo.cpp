@@ -25,7 +25,7 @@ HRESULT CLevel_Logo::Initialize()
 	CGameInstance::GetInstance()->Clear_ImguiObjects();
 	CGameInstance::GetInstance()->Add_ImguiTabObject(CImgui_PropertyEditor::Create());
 
-	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Battle_Chasers_Theme.wav"), 1.f, true, SOUND_BGM);
+	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Battle_Chasers_Theme.wav"), 0.5f, true, SOUND_BGM);
 	
 	CGameInstance::GetInstance()->Load_SoundFile("../Bin/Resources/Sound/Monsters_Sound/", TEXT("Monster_"));
 
@@ -99,6 +99,7 @@ HRESULT CLevel_Logo::Ready_Layer_Logo(const wstring & pLayerTag)
 
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
 		return E_FAIL;
+
 
 	Safe_Release(pGameInstance);
 

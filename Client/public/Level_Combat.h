@@ -34,8 +34,6 @@ private:
 	void	Combat_Intro();
 
 
-
-
 private:
 	class	CCombatController*	 	m_pCombatController = nullptr;
 

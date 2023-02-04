@@ -23,7 +23,10 @@ public:
 	const _bool		Get_UseBuff()const { return m_useBuff; }
 	void			Set_Me_HitPlayer(CGameObject* pHiter) { m_pMeHit_Player = pHiter; }
 	CGameObject*	Get_Me_hitPlayer() { return m_pMeHit_Player; }
-
+	_int	Get_MonsterActiveNum() {
+		return m_iMonsterAttackNum;
+	}
+	void			Set_MonsterActiveNum(_int iMonsterAttackNum) { m_iMonsterAttackNum = iMonsterAttackNum; }
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -47,7 +50,8 @@ protected:
 	_bool			m_bHaveUltimate = false;
 	_bool			m_bHaveSkill2 = false;
 	_bool			m_bHaveBuff = false;
-
+	_int			m_iMonsterAttackNum = 0;
+	_bool			m_bMonster_Victroys = false;
 };
 
 END

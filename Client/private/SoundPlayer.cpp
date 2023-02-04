@@ -9,17 +9,16 @@ IMPLEMENT_SINGLETON(CSoundPlayer);
 CSoundPlayer::CSoundPlayer()
 {
 	Model_EffectSoundVec.reserve(100);
-	Model_HitSoundVec.reserve(100);
 }
 
 void CSoundPlayer::Tick(_double TimeDelta)
 {
 	CGameInstance* pGameInstace = GET_INSTANCE(CGameInstance);
-	if (pGameInstace->GetCurLevelIdx() != LEVEL_COMBAT)
+	/*if (pGameInstace->GetCurLevelIdx() != LEVEL_COMBAT)
 	{
 		RELEASE_INSTANCE(CGameInstance);
 		return;
-	}
+	}*/
 	for (auto& pPair : Model_EffectSoundVec)
 	{
 		if (pPair.first != nullptr)
@@ -34,19 +33,7 @@ void CSoundPlayer::Tick(_double TimeDelta)
 		}
 	}
 
-	for (auto& pPair : Model_HitSoundVec)
-	{
-		if (pPair.first != nullptr)
-		{
-			Anim_Model_SoundDesc SoundDesc = pPair.second;
-
-			if (pPair.first->Control_KeyFrame_Create(SoundDesc.iAnimIndex, SoundDesc.iFrame))
-			{
-				pGameInstace->Stop_Sound(SoundDesc.iSoundChannel);
-				pGameInstace->Play_Sound(SoundDesc.pSoundTag, 0.8f, false, SoundDesc.iSoundChannel);
-			}
-		}
-	}
+	
 	RELEASE_INSTANCE(CGameInstance);
 
 	/*For_Imgui*/
@@ -103,23 +90,15 @@ void CSoundPlayer::Tick(_double TimeDelta)
 
 void CSoundPlayer::Add_SoundEffect_Model(CModel * pModel, tag_SoundDesc & Desc)
 {
-	assert(nullptr != pModel && "CSoundPlayer::Add_SoundEffect_Model");
+	/*assert(nullptr != pModel && "CSoundPlayer::Add_SoundEffect_Model");
 
-	Model_EffectSoundVec.push_back({ pModel, Desc });
+	Model_EffectSoundVec.push_back({ pModel, Desc });*/
 	//Safe_AddRef(pModel);
 }
 
-void CSoundPlayer::Add_SoundHit_Model(CModel * pModel, tag_SoundDesc & Desc)
-{
-	assert(nullptr != pModel && "CSoundPlayer::Add_SoundEffect_Model");
-
-	Model_HitSoundVec.push_back({ pModel, Desc });
-	//Safe_AddRef(pModel);
-}
 
 void CSoundPlayer::Clear_allSound()
 {
-	Model_HitSoundVec.clear();
 	Model_EffectSoundVec.clear();
 }
 
@@ -131,7 +110,6 @@ void CSoundPlayer::Free()
 
 	/*for (auto& pSoundModel : Model_HitSoundVec)
 		Safe_Release(pSoundModel.first);*/
-	Model_HitSoundVec.clear();
 
 	
 }

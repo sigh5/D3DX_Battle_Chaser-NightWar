@@ -191,12 +191,10 @@ void CBuff_Effect::Tick(_double TimeDelta)
 
 	if (m_bUseGlow)
 	{
-		// = m_fTick;
 		m_fIncraseX +=  2.f*(_float)TimeDelta ;
 
 		if (m_fIncraseX >= 1.f)
 			m_fIncraseX = 1.f;
-
 
 		if (m_fGlowStrength >= 1.f)
 		{
@@ -207,7 +205,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			m_bIsChange = false;
 
 		if (m_bIsChange == true)
-			m_fGlowStrength += (_float)TimeDelta * -1.f;
+			m_fGlowStrength += (_float)TimeDelta * -1.f ;
 		else
 			m_fGlowStrength += (_float)TimeDelta;
 

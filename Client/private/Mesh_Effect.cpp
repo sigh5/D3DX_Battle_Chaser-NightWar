@@ -148,7 +148,7 @@ void CMesh_Effect::Tick(_double TimeDelta)
 		{
 			static_cast<CPlayer*>(pGameObject)->Boss_Ultimate_Anim();
 			m_bIsFinsishBuffer = true;
-			
+			CGameInstance::GetInstance()->Play_Sound(TEXT("Monster_Slime_Bullet.wav"), 1.f, false, SOUND_MONSTER3);
 		}
 	}
 
@@ -164,28 +164,6 @@ void CMesh_Effect::Tick(_double TimeDelta)
 		else
 			m_fGlowStrength += (_float)TimeDelta;
 	}
-
-	;
-	/*for (auto &pPlayer : *CCombatController::GetInstance()->Get_CurActorMap())
-	{
-		if (dynamic_cast<CPlayer*>(pPlayer.second) != nullptr)
-		{
-			CCollider* pColider =dynamic_cast<CCollider*>(pPlayer.second->Get_Component(TEXT("Com_OBB")));
-
-			assert(nullptr != pColider &&"CMesh_Effect_Tick Issue");
-
-			if (m_pColliderCom->Collision(pColider) && !m_bHit)
-			{
-				static_cast<CPlayer*>(pPlayer.second)->Boss_Ultimate_Anim();
-				m_bIsFinsishBuffer = true;
-				m_bHit = true;
-			}
-		}
-	}
-
-	*/
-
-
 }
 
 void CMesh_Effect::Late_Tick(_double TimeDelta)

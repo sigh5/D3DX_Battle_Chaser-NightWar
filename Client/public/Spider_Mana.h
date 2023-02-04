@@ -25,7 +25,9 @@ public:
 	virtual		_bool	Calculator_HitColl(CGameObject* pWeapon);
 	virtual		_bool	IsCollMouse()override;
 
-	void		Set_buff_Image_Height() { m_fBuffImage_Height = -245.f; }
+	void		Set_buff_Image_Height(_float fHeight) {
+		m_fBuffImage_Height = fHeight;
+	}//-245.f; }
 	virtual	  _bool	  Is_Dead()override;
 public:
 	virtual HRESULT Initialize_Prototype();

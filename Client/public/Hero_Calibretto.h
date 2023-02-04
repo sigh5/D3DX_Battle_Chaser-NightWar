@@ -59,7 +59,8 @@ public:  /*For.Combat*/
 	void			  Intro_Exit();
 	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 	virtual		void  Calculator_HitDamage()override;	/*충돌시 함수*/
-	virtual void				Initialize_CombatSound()override;
+	virtual void	  Initialize_CombatSound()override;
+
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
 	void				Create_Test_Rect_Effect();		// Test

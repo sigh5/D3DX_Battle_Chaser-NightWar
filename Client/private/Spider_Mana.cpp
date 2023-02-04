@@ -200,7 +200,7 @@ void CSpider_Mana::Late_Tick(_double TimeDelta)
 
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
-	if (m_bModelRender)
+	if (m_bModelRender &&false == m_bMonster_Victroys)
 	{
 		if(false==m_bIsDead)
 		{ 
@@ -374,7 +374,7 @@ void CSpider_Mana::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 3);
-
+		pInstance->Play_Sound(TEXT("Common_Knolan_Skill2_Effect.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
 		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
@@ -390,7 +390,7 @@ void CSpider_Mana::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 2);
-
+		pInstance->Play_Sound(TEXT("Common_0012.wav"), 1.f, false, SOUND_TYPE_HIT);
 
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
@@ -399,19 +399,16 @@ void CSpider_Mana::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		pInstance->Play_Sound(TEXT("Common_0234.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
-		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
-		break;
+
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
@@ -425,8 +422,17 @@ void CSpider_Mana::Create_Hit_Effect()
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
+		
+		if (m_iMultiHitNum == 0)
+			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+		else if (m_iMultiHitNum == 1)
+			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+
+		++m_iMultiHitNum;
+		
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		iEffectNum = 0;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1:
@@ -437,6 +443,7 @@ void CSpider_Mana::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
+		pInstance->Play_Sound(TEXT("Common_0102.wav"), 1.f, false, SOUND_TYPE_HIT);
 		IsDebuffing = true;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
@@ -448,7 +455,7 @@ void CSpider_Mana::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 1);
-
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
 		m_DebuffName = TEXT("armor break");
@@ -585,6 +592,7 @@ void CSpider_Mana::Anim_Frame_Create_Control()
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
+		m_iMultiHitNum = 0;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(8, 2))
 	{
@@ -657,7 +665,7 @@ void CSpider_Mana::Initialize_CombatSound()
 	SoundDesc.iAnimIndex = 3;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_MONSTER2;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0020.wav"));
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0040.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// return
@@ -682,7 +690,7 @@ void CSpider_Mana::Initialize_CombatSound()
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// move
-	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iAnimIndex = 8;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_MONSTER2;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0020.wav"));
@@ -1132,6 +1140,7 @@ void CSpider_Mana::Anim_NormalAttack()
 
 void CSpider_Mana::Anim_Skill1_Attack()
 {
+	// 사운드 없어도됌
 	m_iHitCount = 1;
 	m_eWeaponType = WEAPON_HEAD;
 	
@@ -1145,8 +1154,8 @@ void CSpider_Mana::Anim_Skill1_Attack()
 	m_bOnceCreate = false;
 	m_LimitDistance = 5.f;
 
-	m_CurAnimqeue.push({ 13, m_setTickForSecond });	//깨물기
-	m_CurAnimqeue.push({ 14, 1.f });
+	m_CurAnimqeue.push({ 13, m_setTickForSecond });
+	m_CurAnimqeue.push({ 14, 1.f });	//깨물기
 	m_CurAnimqeue.push({ 12, m_setTickForSecond });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1240,14 +1249,9 @@ void CSpider_Mana::Anim_Viroty()
 	m_CurAnimqeue.push({ 18,1.f });
 	m_CurAnimqeue.push({ 0,1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
-
-	for (auto& pParts : m_MonsterParts)
-		Safe_Release(pParts);
-	m_MonsterParts.clear();
+	m_bMonster_Victroys = true;
+	
+	CGameInstance::GetInstance()->Play_Sound(TEXT("Monster_0040.wav"), 1.f, false, SOUND_MONSTER2);
 
 }
 
@@ -1281,7 +1285,7 @@ void CSpider_Mana::Free()
 
 	for (auto& pPart : m_MonsterParts)
 		Safe_Release(pPart);
-	m_MonsterParts.clear();
+	m_MonsterParts.clear();		// 흠 버프이미지는 부모에서 지워줌
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

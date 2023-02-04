@@ -220,6 +220,15 @@
     <Filter Include="02.GameObjects\Mouse">
       <UniqueIdentifier>{edd953e9-d06f-45db-bef3-16e5dab16a16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\LogoBackGround\Logo\LoadingCircle">
+      <UniqueIdentifier>{a7143ca2-3498-4e30-a621-b5556ded911c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\Monster\Boss_Alumon">
+      <UniqueIdentifier>{8a5e58d7-457d-4a95-9e48-51d695d7e703}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObjects\CombatMaps\BossCombatMap">
+      <UniqueIdentifier>{3f236e12-3055-4b45-b025-0b7bad08d197}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -459,6 +468,13 @@
     <ClInclude Include="..\Public\Mouse.h">
       <Filter>02.GameObjects\Mouse</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LoadingCircle.h">
+      <Filter>02.GameObjects\LogoBackGround\Logo\LoadingCircle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Boss_Alumon.h">
+      <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshGround.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -680,6 +696,13 @@
     <ClCompile Include="..\Private\Mouse.cpp">
       <Filter>02.GameObjects\Mouse</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LoadingCircle.cpp">
+      <Filter>02.GameObjects\LogoBackGround\Logo\LoadingCircle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Boss_Alumon.cpp">
+      <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshGround.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

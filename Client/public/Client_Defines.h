@@ -11,13 +11,13 @@
 #define EPSILON 0.0001
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
-//#define NOMODLES
+#define NOMODLES
 //#define FONT_TEST
-
+#define LEVEL_BOSSONLY
 
 namespace Client
 {																			
-	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY,LEVEL_COMBAT ,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1
+	enum LEVEL {LEVEL_LOADING, LEVEL_LOGO, LEVEL_GAMEPLAY,LEVEL_COMBAT,LEVEL_END };// 로딩오브젝트는 맨뒤에서 -1
 
 	enum TEXTURE { TYPE_DIFFUSE, TYPE_BRUSH, TYPE_FILTER, TYPE_END };
 
@@ -77,7 +77,7 @@ extern const unsigned int	g_iFullWinSizeX;
 extern const unsigned int	g_iFullWinSizeY;
 
 
-
+static float		g_fMasterBGMVolue = 0.8f;
 static  int			m_iLoadingIndex;
 
 using namespace Client;

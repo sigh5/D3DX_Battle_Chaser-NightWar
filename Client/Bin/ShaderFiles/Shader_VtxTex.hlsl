@@ -8,6 +8,9 @@ texture2D		g_DepthTexture;
 float			g_Ratio = 1.f;
 float				G_Power;
 
+float			g_DissolvePower = 1.f;
+texture2D		g_DissolveTexture;
+
 BlendState			AlphaBlend
 {
 	BlendEnable[0] = true;
@@ -150,11 +153,24 @@ PS_OUT PS_MAIN_EFFECT(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_DISSOIVE(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	float4 dissolve = g_Texture.Sample(LinearSampler, In.vTexUV);
+
+	if (dissolve.a > g_DissolvePower)		// µðÁ¹ºê
+		discard;
+
+
+	Out.vColor = dissolve;
+	return Out;
+}
 
 
 technique11 DefaultTechnique
 {
-	pass Rect
+	pass Rect_0
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
@@ -168,7 +184,7 @@ technique11 DefaultTechnique
 	}
 
 
-	pass AlPhaBlend
+	pass AlPhaBlend_1
 	{
 
 		SetRasterizerState(RS_Default);
@@ -195,7 +211,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Rect_Banner
+	pass Rect_Banner_3
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -210,7 +226,7 @@ technique11 DefaultTechnique
 
 
 
-	pass Rect_Glow
+	pass Rect_Glow_4
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
@@ -223,7 +239,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
 
-	pass Rect_No_Ultimate
+	pass Rect_No_Ultimate_5
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_ZEnable_ZWriteEnable_FALSE, 0);
@@ -237,7 +253,7 @@ technique11 DefaultTechnique
 	}
 
 
-	pass NONALPHABLEND
+	pass NONALPHABLEND_6
 	{
 
 		SetRasterizerState(RS_Default);
@@ -251,7 +267,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_NONALPHABLEND();
 	}
 	
-	pass Effect
+	pass Effect_7
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -264,4 +280,16 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_EFFECT();
 	}
 
+	pass DISSOIVE_8
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_AlphaBlend, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_DISSOIVE();
+	}
 }

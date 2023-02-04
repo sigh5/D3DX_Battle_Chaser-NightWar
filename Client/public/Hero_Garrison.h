@@ -60,6 +60,7 @@ public:  /*For.Combat*/
 	void				MovingAnimControl(_double TimeDelta);
 	virtual void		Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 	virtual void				Initialize_CombatSound()override;
+
 public:	 /*Create_Effect*/
 	virtual void		Create_Hit_Effect()override;
 	virtual void		Create_Defence_Effect_And_Action()override;

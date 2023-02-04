@@ -174,7 +174,6 @@ void CHero_Knolan::Tick(_double TimeDelta)
 	}
 
 
-
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -225,7 +224,7 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 				++iter;
 		}
 
-		if (m_bIsCombatScene == true)
+		if (m_bIsCombatScene == true )
 		{
 			if (!m_bIsDead && false ==m_bUltimateBuffRenderStop && CClient_Manager::m_bCombatWin == false)
 			{
@@ -326,7 +325,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-		//Initialize_CombatSound();
+		Initialize_CombatSound();
 		if (m_bCombat_LastInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -335,7 +334,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 			m_pTransformCom->Set_Scaled(vScale);
 		}
-
+		
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_KnolanCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert(!"Change_Level_Data : LEVEL_COMBAT");
@@ -457,7 +456,10 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_bDefence = true;
 	m_isWideBuff = true;
+	
+#ifdef _DEBUG
 	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 10);
+#endif
 
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
@@ -695,6 +697,13 @@ void CHero_Knolan::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0107.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
+	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
+	SoundDesc.iAnimIndex = 28;
+	SoundDesc.iFrame = 32;
+	SoundDesc.iSoundChannel = SOUND_ULTIBGM;
+	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_UltimateExplosion.wav"));
+	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 37;
@@ -703,6 +712,7 @@ void CHero_Knolan::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Victory.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 }
+
 
 void CHero_Knolan::Create_Skill_Texture()
 {
@@ -839,6 +849,17 @@ void CHero_Knolan::Create_Hit_Effect()
 			iEffectNum = 1;
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			
+			if (m_iMultiHitNum == 2  || m_iMultiHitNum==0)
+			{
+				pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			if (m_iMultiHitNum == 3)
+			{
+				pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			m_iMultiHitNum++;
+			
 			break;
 
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
@@ -847,6 +868,7 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);		// 이미지 교체필요
 			BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
 			static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+			pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 			break;
 		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
 			pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
@@ -1442,6 +1464,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 
 		m_bOnceCreate = true;
 		m_bOnceStop = false;
+		m_iMultiHitNum = 0;
 	}
 	else if (!m_bOnceStop &&m_pModelCom->Control_KeyFrame_Create(24, 10))
 	{
@@ -1626,9 +1649,6 @@ HRESULT CHero_Knolan::Ready_Parts_Combat()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
-
-	
-
 
 	return S_OK;
 }
@@ -1872,6 +1892,7 @@ void CHero_Knolan::Anim_Light_Hit()
 		m_CurAnimqeue.push({ 1,  1.f });
 		m_bOnceCreate = false;
 		m_bIs_Multi_Hit = false;
+		m_iMultiHitNum = 2;
 	}
 	else
 	{

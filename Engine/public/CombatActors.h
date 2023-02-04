@@ -94,7 +94,7 @@ protected:
 	_bool							m_bUseDefence = false;//디펜스를 사용할때
 	_bool							m_bIsDefenceTimer = false;
 	CStatus::DEBUFFTYPE				m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_NONE;
-
+	
 
 protected:
 	_uint							m_bFinishOption = 0;
@@ -128,7 +128,7 @@ protected:
 	
 	_int							m_iWideAttackDamgae = 0;
 	wstring							m_DebuffName = TEXT("");
-
+	_uint							m_iMultiHitNum = 0;
 public:
 	virtual CGameObject* Clone(void* pArg = nullptr) = 0;
 	virtual void Free() override;

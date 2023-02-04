@@ -25,20 +25,19 @@ public:
 	HRESULT LastInitalize();
 	void Tick(_double TimeDelta);
 	HRESULT Render();	
-	
 	const _bool	 ChangeTimeDelta()const { return m_bTimeStop; }
-private:
-	HRESULT Ready_Gara();
+
 
 public:
 	HRESULT	Resize_BackBuffer();
 
 private:
-	CGameInstance*			m_pGameInstance = nullptr;
-	CRenderer*				m_pRenderer = nullptr;
-	class CToolManager*			m_pToolManager = nullptr;
+	CGameInstance*				m_pGameInstance = nullptr;
+	CRenderer*					m_pRenderer = nullptr;
 	class CPlayerController*	m_pPlayerController = nullptr;
-	
+#ifdef _DEBUG
+	class CToolManager*			m_pToolManager = nullptr;
+#endif	
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

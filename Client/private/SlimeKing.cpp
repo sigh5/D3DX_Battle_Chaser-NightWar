@@ -171,14 +171,15 @@ void CSlimeKing::Tick(_double TimeDelta)
 			m_fCreateScale -= 0.05f;
 			m_fCreateScale = fmax(m_fCreateScale, 0.2f);
 
-			Create_Skill_Ultimate_Effect0();
+			Create_Skill_Ultimate_Effect0(); 
 			Create_Skill_Ultimate_Effect1();
 			Create_Skill_Ultimate_Effect2();
 			m_fUltimateTimer = 0.f;
+
+			CGameInstance::GetInstance()->Play_Sound(TEXT("Monster_Slime_BulletShoot.wav"), 1.f, false, SOUND_MONSTER1);
 		}
 	}
 
-		
 
 	for (auto& pBullet : m_UltimateBullet)
 	{
@@ -339,7 +340,6 @@ void CSlimeKing::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Buff.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Move
 	SoundDesc.iAnimIndex = 4;
 	SoundDesc.iFrame = 1;
@@ -347,14 +347,12 @@ void CSlimeKing::Initialize_CombatSound()
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0039.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// HeavyHit
 	SoundDesc.iAnimIndex = 6;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_MONSTER3;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0199.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Light_hit
 	SoundDesc.iAnimIndex = 7;
@@ -365,7 +363,7 @@ void CSlimeKing::Initialize_CombatSound()
 
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Move
-	SoundDesc.iAnimIndex = 9;
+	SoundDesc.iAnimIndex = 8;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_MONSTER3;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_Slime_Move.wav"));
@@ -450,7 +448,7 @@ void CSlimeKing::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 3);
-
+		pInstance->Play_Sound(TEXT("Common_Knolan_Skill2_Effect.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
 		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
@@ -465,6 +463,7 @@ void CSlimeKing::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 2);
+		pInstance->Play_Sound(TEXT("Common_0012.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_NORMAL:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
@@ -472,12 +471,7 @@ void CSlimeKing::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
-		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
-		break;
-	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		pInstance->Play_Sound(TEXT("Common_0234.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_HIT:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
@@ -485,6 +479,7 @@ void CSlimeKing::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(1.5f, 1.f, -3.f, 1.f);
 		BuffDesc.vScale = _float3(22.f, 22.f, 22.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_NONE);
+		pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PUNCH_GUN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_Impact_Mirror_0", LEVEL_COMBAT, false);
@@ -498,8 +493,16 @@ void CSlimeKing::Create_Hit_Effect()
 			_float4(500.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
+	
+		if (m_iMultiHitNum == 0)
+			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+		else if (m_iMultiHitNum == 1)
+			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+
+		++m_iMultiHitNum;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_NORMAL:
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		iEffectNum = 0;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1:
@@ -511,6 +514,7 @@ void CSlimeKing::Create_Hit_Effect()
 			_float4(500.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 4);
 		IsDebuffing = true;
+		pInstance->Play_Sound(TEXT("Common_0102.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2:
 		iEffectNum = 0;
@@ -521,6 +525,7 @@ void CSlimeKing::Create_Hit_Effect()
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, -285.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 1);
+		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate:
 		m_DebuffName = TEXT("armor break");
@@ -938,6 +943,7 @@ void CSlimeKing::Anim_Frame_Create_Control()
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target2_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
 		m_pStatusCom->Take_Damage(m_iGetDamageNum);
 		m_bOnceCreate = true;
+		m_iMultiHitNum = 0;
 	}
 	else  if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(15, 1))
 	{
@@ -975,9 +981,9 @@ void CSlimeKing::Anim_Frame_Create_Control()
 
 	else if (!m_bUltiWideAttack && m_pModelCom->Control_KeyFrame_Create(15, 283))
 	{
-		if (nullptr != m_pHitTarget)
-			return;
 		CCombatController::GetInstance()->Wide_Attack(true, 83);
+		CGameInstance::GetInstance()->Play_Sound(TEXT("Monster_Slime_UltiEnd"), 1.f, false, SOUND_ULTIBGM);
+
 		m_bUltiWideAttack = true;
 	}
 	else
@@ -1323,7 +1329,7 @@ void CSlimeKing::Free()
 		Safe_Release(pBullet);
 	m_UltimateBullet.clear();
 
-
+	Safe_Release(m_pCamEffectObj);
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);

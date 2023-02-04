@@ -147,7 +147,7 @@ inline T * CClient_Manager::Get_SecondMaxValue_Pointer(vector<T*>& pVec , _float
 
 
 template<typename T>
-inline T * CClient_Manager::Get_SmallValue_Pointer(vector<T*>& pVec, _float & fSmallY, COMPARE_UI_POS eType)
+inline T * CClient_Manager::Get_SmallValue_Pointer(vector<T*>& pVec,OUT _float & fSmallY, COMPARE_UI_POS eType)
 {
 	_float4 vPos;
 	T* pMaxObject = nullptr;

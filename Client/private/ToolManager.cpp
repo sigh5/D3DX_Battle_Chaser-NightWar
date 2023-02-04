@@ -549,7 +549,7 @@ void CToolManager::Imgui_Sound_Tool()
 
 				if (ImGui::Selectable(szobjectTag))
 				{
-					pGameInstance->Play_Sound(Pair.first, 1.f, false, 4);
+					pGameInstance->Play_Sound(Pair.first, 1.f, false, 0);
 				}
 			}
 			ImGui::EndListBox();

@@ -183,6 +183,18 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 				assert(!"Coll_CaptinPlayer");
 			CClient_Manager::bIsCollPlayerTo3DUI[3] = true;
 		}
+		/*	else if (!lstrcmp(m_ObjectName, TEXT("Map_3D_UI4")) && !m_bOnce && !CClient_Manager::bIsCollPlayerTo3DUI[3])
+			{
+				pGameInstance->Load_Object(TEXT("ThirdMonsterStart"), LEVEL_GAMEPLAY);
+				m_bOnce = true;
+
+				CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
+				pCanvas->Set_RenderActive(false);
+				pGameInstance->Setting_MonsterScene(3);
+				if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, LAYER_UI, TEXT("Prototype_GameObject_Broken_Image"))))
+					assert(!"Coll_CaptinPlayer");
+				CClient_Manager::bIsCollPlayerTo3DUI[4] = true;
+			}*/
 
 		pGameInstance->Stop_Sound(SOUND_BGM);
 	}

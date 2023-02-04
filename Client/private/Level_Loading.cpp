@@ -41,18 +41,24 @@ void CLevel_Loading::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
+	if (m_iLoadingIndex != 0)
+		static_cast<CUI*>(pLoadingCircle)->Set_RenderActive(true);
+
+	pLoadingCircle->Tick(TimeDelta);
 }
 
 void CLevel_Loading::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
-
+	pLoadingCircle->Late_Tick(TimeDelta);
 
 	CGameInstance*	pGameInstance = CGameInstance::GetInstance();
 	Safe_AddRef(pGameInstance);
 
 	if (true == m_pLoader->isFinished())
 	{
+		static_cast<CUI*>(pLoadingCircle)->Change_Texture(1,TEXT(""));
+
 		if (GetKeyState(VK_RETURN) & 0x8000)
 		{
 			
@@ -61,18 +67,14 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 			switch (m_eNextLevelID)
 			{
 			case LEVEL_LOGO:
-				
 				pLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
 				break;
-
 			case LEVEL_GAMEPLAY:
 				pLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 				break;
-
 			case LEVEL_COMBAT:
 				pLevel = CLevel_Combat::Create(m_pDevice, m_pContext);
 				break;
-
 			}
 
 			if (nullptr == pLevel)
@@ -84,6 +86,9 @@ void CLevel_Loading::Late_Tick(_double TimeDelta)
 			
 		}
 	}
+	else
+		static_cast<CUI*>(pLoadingCircle)->Change_Texture(0, TEXT(""));
+
 
 	Safe_Release(pGameInstance);
 }
@@ -108,6 +113,9 @@ HRESULT CLevel_Loading::Ready_Layer_BackGround(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOADING, pLayerTag, TEXT("Prototype_GameObject_LoadingImage"))))
 		return E_FAIL;
 
+	pLoadingCircle = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_LoadingCircle"));
+
+	
 	Safe_Release(pGameInstance);
 
 	return S_OK;
@@ -130,6 +138,6 @@ void CLevel_Loading::Free()
 	__super::Free();
 
 	Safe_Release(m_pLoader);
-	
+	Safe_Release(pLoadingCircle);
 
 }
