@@ -37,7 +37,7 @@ CCombatController::CCombatController()
 	, m_pFontManager(CDamage_Font_Manager::GetInstance())
 	, m_pExplainFontManager(CExplain_FontMgr::GetInstance())
 {
-	//Safe_AddRef(m_pGameInstace);
+	
 }
 
 CStatus * CCombatController::Get_CurActorStatus() 

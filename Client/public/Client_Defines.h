@@ -11,9 +11,9 @@
 #define EPSILON 0.0001
 #define FLOAT_EQ(x,v) (((v - EPSILON) < x) && (x <( v + EPSILON)))
 
-#define NOMODLES
+//#define NOMODLES
 //#define FONT_TEST
-#define LEVEL_BOSSONLY
+//#define LEVEL_BOSSONLY
 
 namespace Client
 {																			

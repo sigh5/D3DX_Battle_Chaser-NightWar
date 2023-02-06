@@ -475,6 +475,7 @@
       <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MeshGround.h" />
+    <ClInclude Include="..\Public\Light_Pos.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -703,6 +704,7 @@
       <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MeshGround.cpp" />
+    <ClCompile Include="..\Private\Light_Pos.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

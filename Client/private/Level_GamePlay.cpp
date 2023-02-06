@@ -173,20 +173,20 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 	}
 
 
-	if (GetKeyState(VK_SPACE) & 0x8000)
-	{
-		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
-		Safe_AddRef(pGameInstance);
-		//pGameInstance->Stop_Sound(SOUND_BGM);
-		
-		pGameInstance->SceneChange_NameVectorClear();
-		pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
-		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
-			return;
-		pGameInstance->Setting_MonsterScene(4);
-		Safe_Release(pGameInstance);
+	//if (GetKeyState(VK_SPACE) & 0x8000)
+	//{
+	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+	//	Safe_AddRef(pGameInstance);
+	//	//pGameInstance->Stop_Sound(SOUND_BGM);
+	//	
+	//	pGameInstance->SceneChange_NameVectorClear();
+	//	pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
+	//	if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
+	//		return;
+	//	pGameInstance->Setting_MonsterScene(4);
+	//	Safe_Release(pGameInstance);
 
-	}
+	//}
 	
 
 #endif
@@ -278,6 +278,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
+
+	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Light_Pos"))))
+		return E_FAIL;*/
+
 #endif
 
 	RELEASE_INSTANCE(CGameInstance);

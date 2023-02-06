@@ -23,6 +23,9 @@ public:
 	HRESULT Begin_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
 	HRESULT End_MRT(ID3D11DeviceContext* pContext, const _tchar* pMRTTag);
 
+	HRESULT Begin_ShadowDepthRenderTarget(ID3D11DeviceContext* pContext, const _tchar * pTargetTag);
+	
+	
 #ifdef _DEBUG
 public:
 	HRESULT Ready_Debug(const _tchar* pTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -38,19 +41,25 @@ private:
 	map<const _tchar*, list<class CRenderTarget*>>			m_MRTs;
 	typedef map<const _tchar*, list<class CRenderTarget*>>	MRTS;
 
-
-
+	
+	_uint								m_iShadowMapCX = 1280;
+	_uint								m_iShadowMapCY = 720;
+	
 private:
 	ID3D11RenderTargetView*				m_pBackBufferView = nullptr;
 	ID3D11DepthStencilView*				m_pDepthStencilView = nullptr;
 
-
+	D3D11_VIEWPORT						m_ViewPortOrigin;
+	
+	
 #ifdef _DEBUG
 private:
 	class CVIBuffer_Rect*				m_pVIBuffer = nullptr;
 	class CShader*						m_pShader = nullptr;
 	_float4x4							m_ViewMatrix, m_ProjMatrix;
 #endif
+
+
 
 
 private:

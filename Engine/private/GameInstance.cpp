@@ -588,6 +588,38 @@ void CGameInstance::Clear_Light()
 	return m_pLight_Manager->Clear();
 }
 
+void CGameInstance::Set_LightView_Matrirx(wstring nameTag, _float4x4 fMatrix)
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Set_LightView_Matrirx()");
+
+	return m_pLight_Manager->Set_LightView_Matrirx(nameTag,fMatrix);
+}
+
+void CGameInstance::Set_LightProj_Matrirx(wstring nameTag, _float4x4 fMatrix)
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Set_LightView_Matrirx()");
+
+	return m_pLight_Manager->Set_LightProj_Matrirx(nameTag, fMatrix);
+}
+
+_float4x4 CGameInstance::Get_Light_Matrix(wstring nameTag)
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Get_Light_Matrix()");
+
+	return m_pLight_Manager->Get_Light_Matrix(nameTag);
+}
+
+_float4x4 CGameInstance::Get_Light_ProjMatrix(wstring nameTag)
+{
+	if (nullptr == m_pLight_Manager)
+		assert(!"CGameInstance::Get_Light_ProjMatrix()");
+
+	return m_pLight_Manager->Get_Light_Matrix(nameTag);
+}
+
 HRESULT CGameInstance::Add_Font(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const _tchar * pFontTag, const _tchar * pFontFilePath)
 {
 	if (nullptr == m_pFont_Manager)

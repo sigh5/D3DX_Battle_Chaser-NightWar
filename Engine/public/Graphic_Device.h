@@ -38,6 +38,8 @@ public:
 	HRESULT Update_SwapChain(HWND hWnd, _uint iWinCX, _uint iWinCY, _bool bIsFullScreen, _bool bNeedUpdate);
 	mutex& GetContextMtx() { return m_ContextMtx; }
 
+	ID3D11DepthStencilView*		Get_OriginDepthStencileView() { return m_pDepthStencilView; }
+
 private:
 
 	/* 메모리 할당. (정점버퍼, 인덱스버퍼, 텍스쳐로드) */
@@ -52,6 +54,9 @@ private:
 	ID3D11RenderTargetView*		m_pBackBufferRTV = nullptr;
 	ID3D11DepthStencilView*		m_pDepthStencilView = nullptr;
 	mutex m_ContextMtx;
+
+
+
 private:
 	HRESULT Ready_SwapChain(HWND hWnd, GRAPHIC_DESC::WINMODE WinMode, _uint iWinCX, _uint iWinCY);
 	HRESULT Ready_BackBufferRenderTargetView();

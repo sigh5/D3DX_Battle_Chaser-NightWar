@@ -33,6 +33,8 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
+	virtual HRESULT	Render_ShadowDepth()override;
+	virtual void	Initialize_CombatSound()override;
 
 public:
 	virtual	void	Fsm_Exit()override;
@@ -44,7 +46,7 @@ public:
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
 	void			Anim_Frame_Create_Control();
-	virtual void	Initialize_CombatSound()override;
+	
 public:		/*Create_EFfect*/
 	virtual void	Create_Hit_Effect()override;
 	virtual void	Create_Heavy_Hit_Effect()override;

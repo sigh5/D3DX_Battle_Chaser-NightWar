@@ -1,5 +1,7 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix			g_ProjMatrixInv, g_ViewMatrixInv;
+matrix			g_LightViewMatrix, g_LightProjMatrix;
+matrix			g_matLightViewInv;
 
 vector			g_vLightDir;
 vector			g_vLightPos;
@@ -18,10 +20,14 @@ vector			g_vMtrlSpecular = (vector)1.f;
 texture2D		g_Texture; /* 디버그용텍스쳐*/
 texture2D		g_NormalTexture;
 texture2D		g_DepthTexture;
+texture2D		g_ShadowDepthTexture;
 
 texture2D		g_DiffuseTexture;
 texture2D		g_ShadeTexture;
 texture2D		g_SpecularTexture;
+
+
+float			g_DistanceShadow = 2.5f;
 
 sampler LinearSampler = sampler_state
 {
@@ -194,9 +200,44 @@ PS_OUT PS_MAIN_BLEND(PS_IN In)
 
 	Out.vColor = vDiffuse * vShade + vSpecular;
 
+	vector		vDepthInfo = g_DepthTexture.Sample(LinearSampler, In.vTexUV);
+	float		fViewZ = vDepthInfo.y * 300.f;
+
+	vector		vPosition;
+
+	/*vPosition.x = (In.vTexUV.x * 2.f - 1.f) * fViewZ;
+	vPosition.y = (In.vTexUV.y * -2.f + 1.f) * fViewZ;
+	vPosition.z = vDepthInfo.y * fViewZ;
+	vPosition.w = fViewZ;*/
+
+	vPosition.x = In.vTexUV.x * 2.f - 1.f;
+	vPosition.y = In.vTexUV.y * -2.f + 1.f;
+	vPosition.z = vDepthInfo.x; /* 0 ~ 1 */
+	vPosition.w = 1.0f;
+
+	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+	vPosition *= fViewZ;
+	// 뷰 상
+	vPosition = mul(vPosition, g_ProjMatrixInv);
+	// 월드 상
+	vPosition = mul(vPosition, g_ViewMatrixInv);		
+
+	vPosition = mul(vPosition, g_LightViewMatrix);// 여기에 새로운 조명 넣어야됌
+
+	vector		vUVPos = mul(vPosition, g_LightProjMatrix);	// 새로운 조명의 프로젝션을 넣고
+	float2		vNewUV;
+
+	vNewUV.x = (vUVPos.x / vUVPos.w) * 0.5f + 0.5f;
+	vNewUV.y = (vUVPos.y / vUVPos.w) * -0.5f + 0.5f;
+
+	vector		vShadowDepthInfo = g_ShadowDepthTexture.Sample(LinearSampler, vNewUV);
+
+	if (vPosition.z - g_DistanceShadow > vShadowDepthInfo.r * 300.f)
+		Out.vColor = vector(0.f, 0.f, 0.f, 1.f);
+
 	if (0.0f == Out.vColor.a)
 		discard;
-
+	
 	return Out;
 }
 

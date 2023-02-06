@@ -3,6 +3,7 @@
 
 #include "Shader.h"
 #include "VIBuffer_Rect.h"
+#include "GameInstance.h"
 
 IMPLEMENT_SINGLETON(CTarget_Manager)
 
@@ -22,17 +23,15 @@ ID3D11ShaderResourceView * CTarget_Manager::Get_SRV(const _tchar * pTargetTag)
 
 HRESULT CTarget_Manager::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-#ifdef _DEBUG
 
-	D3D11_VIEWPORT			ViewportDesc;
-	ZeroMemory(&ViewportDesc, sizeof ViewportDesc);
-
+	ZeroMemory(&m_ViewPortOrigin, sizeof m_ViewPortOrigin);
 	_uint			iNumViewports = 1;
+	pContext->RSGetViewports(&iNumViewports, &m_ViewPortOrigin);
 
-	pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
-
+#ifdef _DEBUG
+	
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
-	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(m_ViewPortOrigin.Width, m_ViewPortOrigin.Height, 0.f, 1.f));
 
 	m_pShader = CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_Deferred.hlsl"), VTXTEX_DECLARATION::Elements, VTXTEX_DECLARATION::iNumElements);
 	if (nullptr == m_pShader)
@@ -43,6 +42,7 @@ HRESULT CTarget_Manager::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* 
 		return E_FAIL;
 
 #endif // _DEBUG
+
 
 	return S_OK;
 }
@@ -119,8 +119,41 @@ HRESULT CTarget_Manager::End_MRT(ID3D11DeviceContext * pContext, const _tchar * 
 	Safe_Release(m_pBackBufferView);
 	Safe_Release(m_pDepthStencilView);
 
+	// 원래 뷰포트로 갈아끼기
+
+	pContext->RSSetViewports(1, &m_ViewPortOrigin);
 	return S_OK;
 }
+
+HRESULT CTarget_Manager::Begin_ShadowDepthRenderTarget(ID3D11DeviceContext* pContext, const _tchar * pTargetTag)
+{
+	CRenderTarget*      pRenderTarget = Find_RenderTarget(pTargetTag);
+
+	ID3D11ShaderResourceView*      pSRVs[128] = { nullptr };
+
+	pContext->PSSetShaderResources(0, 128, pSRVs);
+
+	ID3D11RenderTargetView*      pRTV = nullptr;
+
+	_float4 vClearColor = _float4(1.f, 1.f, 1.f, 1.f);
+	pContext->ClearRenderTargetView(pRenderTarget->Get_RTV(), (_float*)&vClearColor);
+	pRTV = pRenderTarget->Get_RTV();
+
+	pContext->OMGetRenderTargets(1, &m_pBackBufferView, &m_pDepthStencilView);
+
+	_uint   iNumViewPort = 1;
+	pContext->RSGetViewports(&iNumViewPort, &m_ViewPortOrigin);			// 제가 만 만 짜리 뷰포트 가져오기
+
+	pContext->OMSetRenderTargets(1, &pRTV, pRenderTarget->Get_SDSV());
+
+	pContext->ClearDepthStencilView(pRenderTarget->Get_SDSV(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+	pContext->RSSetViewports(1, &pRenderTarget->Get_ViewPortDesc());
+
+	return S_OK;
+}
+
+
 #ifdef _DEBUG
 
 HRESULT CTarget_Manager::Ready_Debug(const _tchar * pTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
@@ -150,6 +183,7 @@ void CTarget_Manager::Render_Debug(const _tchar* pMRTTag)
 		pRenderTarget->Render(m_pShader, m_pVIBuffer);
 	}
 }
+
 #endif // _DEBUG
 
 CRenderTarget * CTarget_Manager::Find_RenderTarget(const _tchar * pTargetTag)
@@ -187,6 +221,7 @@ void CTarget_Manager::Free()
 		Safe_Release(Pair.second);
 	m_RenderTargets.clear();
 
+	
 
 #ifdef _DEBUG
 	Safe_Release(m_pShader);

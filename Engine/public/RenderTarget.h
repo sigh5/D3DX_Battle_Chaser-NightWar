@@ -22,10 +22,16 @@ public:
 		return m_pSRV;
 	}
 
+	ID3D11DepthStencilView* Get_SDSV() const {
+		return m_pShadowDepthView;
+	}
+
+	D3D11_VIEWPORT	Get_ViewPortDesc()const { return m_ViewPort; }
+
 public:
 	HRESULT Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixelFormat, const _float4* pClearColor);
 	HRESULT Clear();
-
+	HRESULT		Reday_ShadowDepthStencilView( _uint iWidth, _uint iHeight);
 
 #ifdef _DEBUG
 
@@ -43,10 +49,10 @@ private:
 	ID3D11Texture2D*					m_pTexture2D = nullptr;
 	ID3D11RenderTargetView*				m_pRTV = nullptr;
 	ID3D11ShaderResourceView*			m_pSRV = nullptr;
-
+	ID3D11DepthStencilView *			m_pShadowDepthView = nullptr;
 private:
 	_float4								m_vClearColor;
-
+	D3D11_VIEWPORT						m_ViewPort;
 #ifdef _DEBUG
 private:
 	_float4x4							m_WorldMatrix;

@@ -13,6 +13,14 @@ private:
 public:
 	LIGHTDESC*	Get_LightDesc(wstring NameTag);
 
+	void				Set_LightView_Matrirx(wstring nameTag,_float4x4 fMatrix);
+	void				Set_LightProj_Matrirx(wstring nameTag, _float4x4 fMatrix);
+
+	_float4x4			Get_Light_Matrix( wstring nameTag);
+	_float4x4			Get_Light_ProjMatrix(wstring nameTag);
+
+	_float4x4			Test1();
+	_float4x4			Test2();
 public:
 	//HRESULT		Add_Light(ID3D11Device* pDevice, ID3D11DeviceContext *pContext, const LIGHTDESC& LightDesc);
 	void		Render_Light(class CVIBuffer_Rect* pVIBuffer, class CShader* pShader);
@@ -23,6 +31,8 @@ public:
 private:
 	class	CLight*		Find_Light(wstring nameTag);
 
+	_float4x4  m_LightViewMatrix;
+	_float4x4  m_LightProjMatrix;
 
 private:
 	/*vector<class CLight*>	m_Lights;

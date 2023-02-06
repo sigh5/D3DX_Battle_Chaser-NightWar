@@ -28,7 +28,6 @@ HRESULT CLevel_Logo::Initialize()
 	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Battle_Chasers_Theme.wav"), 0.5f, true, SOUND_BGM);
 	
 	CGameInstance::GetInstance()->Load_SoundFile("../Bin/Resources/Sound/Monsters_Sound/", TEXT("Monster_"));
-
 	CGameInstance::GetInstance()->Load_SoundFile("../Bin/Resources/Sound/Kalibretto_Sound/", TEXT("Calibretto_"));
 	CGameInstance::GetInstance()->Load_SoundFile("../Bin/Resources/Sound/GarrisonSound/", TEXT("Garrison_"));
 	CGameInstance::GetInstance()->Load_SoundFile("../Bin/Resources/Sound/Knolan_Sound/", TEXT("Knolan_"));

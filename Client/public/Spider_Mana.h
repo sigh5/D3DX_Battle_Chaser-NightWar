@@ -29,6 +29,8 @@ public:
 		m_fBuffImage_Height = fHeight;
 	}//-245.f; }
 	virtual	  _bool	  Is_Dead()override;
+
+	
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -36,7 +38,7 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT	Render_ShadowDepth()override;
 public:
 	virtual		void	Fsm_Exit()override;
 	void				UltiHeavyHitExit();
@@ -113,8 +115,7 @@ private:
 	_bool					m_bSkill2_AttackEffect = false;
 	_bool					m_bClearScene = false;
 	_float					m_fBuffImage_Height = -330.f;
-
-
+	
 	WeaponType		m_eWeaponType = WEAPON_END;
 	UI_REPRESENT	m_Represnt = REPRESENT_SPIDER_MANA;
 

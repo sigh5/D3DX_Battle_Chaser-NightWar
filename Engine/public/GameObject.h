@@ -42,8 +42,7 @@ public:
 
 public:
 	virtual void					Change_Level_Data(_uint iLevleIdx) {}
-
-
+	
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -51,6 +50,8 @@ public:
 	virtual void Tick(_double TimeDelta);
 	virtual void Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
+	virtual HRESULT	Render_ShadowDepth() { return NOERROR; }
+
 public:
 	virtual		void	Final_Update() sealed;
 

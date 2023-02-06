@@ -40,6 +40,21 @@ HRESULT CRenderTarget::Initialize(_uint iWidth, _uint iHeight, DXGI_FORMAT ePixe
 	if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexture2D, nullptr, &m_pSRV)))
 		return E_FAIL;
 
+
+
+
+	// 여기서 뎁스스텐실 뷰만 만든다 여기서 만든다.
+	if (iWidth >= 10000)
+	{
+		if (Reday_ShadowDepthStencilView(iWidth, iHeight))
+			return E_FAIL;
+	}
+
+
+
+
+
+
 	m_vClearColor = *pClearColor;
 
 	return S_OK;
@@ -51,6 +66,51 @@ HRESULT CRenderTarget::Clear()
 
 	return S_OK;
 }
+
+HRESULT CRenderTarget::Reday_ShadowDepthStencilView(_uint iWidth, _uint iHeight)
+{
+	if (nullptr == m_pDevice)
+		return E_FAIL;
+
+	ZeroMemory(&m_ViewPort, sizeof(D3D11_VIEWPORT));
+	m_ViewPort.TopLeftX = 0.f;
+	m_ViewPort.TopLeftY = 0.f;
+	m_ViewPort.Width = (_float)iWidth;
+	m_ViewPort.Height = (_float)iHeight;
+	m_ViewPort.MinDepth = 0.f;
+	m_ViewPort.MaxDepth = 1.f;
+
+	ID3D11Texture2D*		pDepthStencilTexture = nullptr;
+
+	D3D11_TEXTURE2D_DESC	TextureDesc;
+	ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+	TextureDesc.Width = (_uint)m_ViewPort.Width;
+	TextureDesc.Height = (_uint)m_ViewPort.Height;
+	TextureDesc.MipLevels = 1;
+	TextureDesc.ArraySize = 1;
+	TextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.SampleDesc.Count = 1;
+
+	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	TextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	TextureDesc.CPUAccessFlags = 0;
+	TextureDesc.MiscFlags = 0;
+
+	if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pDepthStencilTexture)))
+		return E_FAIL;
+
+	if (FAILED(m_pDevice->CreateDepthStencilView(pDepthStencilTexture, nullptr, &m_pShadowDepthView)))
+		return E_FAIL;
+
+	Safe_Release(pDepthStencilTexture);
+
+	return S_OK;
+}
+
+
 
 #ifdef _DEBUG
 
@@ -98,7 +158,7 @@ CRenderTarget * CRenderTarget::Create(ID3D11Device * pDevice, ID3D11DeviceContex
 
 void CRenderTarget::Free()
 {
-
+	Safe_Release(m_pShadowDepthView);
 	/*if(m_vClearColor.y == 0.f)
 	SaveDDSTextureToFile(m_pContext, m_pTexture2D, TEXT("../Bin/Test.dds"));
 	*/

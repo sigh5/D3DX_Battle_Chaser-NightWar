@@ -265,6 +265,7 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 #ifdef  _DEBUG
 		CClient_Manager::Collider_Render(this, m_pColliderCom, m_pRendererCom);
 		CClient_Manager::Navigation_Render(this, m_pNavigationCom, m_pRendererCom);
@@ -289,13 +290,29 @@ HRESULT CHero_Knolan::Render()
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
-	//#ifdef _DEBUG
-	//	CClient_Manager::Collider_Render(this, m_pColliderCom);
-	//	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
-	//	if (m_bIsCombatScene)
-	//		m_pColliderCom->Render();
-	//
-	//#endif
+
+	return S_OK;
+}
+
+HRESULT CHero_Knolan::Render_ShadowDepth()
+{
+	if (m_bIsCombatScene == false)
+		return S_OK;
+
+	if (FAILED(__super::Render()))
+		return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Set_Matrix("g_matLightView", &CGameInstance::GetInstance()->Get_Light_Matrix(TEXT("Level_Combat_Directional")));
+	m_pShaderCom->Set_Matrix("g_matLightProj", &CGameInstance::GetInstance()->Get_Light_ProjMatrix(TEXT("Level_Combat_Directional")));
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		m_pModelCom->Render(m_pShaderCom, i, 1, "g_BoneMatrices", "DN_FR_FishingRod");
+	}
 	return S_OK;
 }
 
@@ -447,9 +464,9 @@ HRESULT CHero_Knolan::Combat_Initialize()
 
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR1);
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
 
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(1.f, 0.f, 27.f, 1.f));
 
 	if (FAILED(Ready_Parts_Combat()))
 		return E_FAIL;
@@ -462,8 +479,8 @@ HRESULT CHero_Knolan::Combat_Initialize()
 #endif
 
 	_float4 vPos;
-	XMStoreFloat4(&vPos, XMVectorSet(-1.7f, 0.f, 23.f, 1.f));
-	_float3 vScale = _float3(3.f, 3.f, 3.f);
+	XMStoreFloat4(&vPos, XMVectorSet(1.f, 0.f, 27.f, 1.f));
+	_float3 vScale = _float3(4.f, 4.f, 4.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
 	m_bCombat_LastInit = true;

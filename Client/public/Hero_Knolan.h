@@ -36,7 +36,7 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_ShadowDepth()override;
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 	virtual		void	Fsm_Exit()override;

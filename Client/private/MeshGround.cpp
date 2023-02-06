@@ -24,6 +24,11 @@ HRESULT CMeshGround::Initialize(void * pArg)
 {
 	 m_ObjectName = L"Test_Ground";
 
+	 ZeroMemory(&m_GroundModelDesc, sizeof(m_GroundModelDesc));
+
+	 if (pArg != nullptr)
+		 memcpy(&m_GroundModelDesc, pArg, sizeof(m_GroundModelDesc));
+
 
 	 if (FAILED(__super::Initialize(pArg)))
 		 return E_FAIL;
@@ -31,14 +36,14 @@ HRESULT CMeshGround::Initialize(void * pArg)
 	 if (FAILED(SetUp_Components()))
 		 return E_FAIL;
 
-	 m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(52.f, -1.5f, 55.f, 1.f));
+	 m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(52.f, -1.6f, 55.f, 1.f));
 
-	 m_pTransformCom->Set_Scaled(_float3(5.f, 1.f, 5.f));
+	 m_pTransformCom->Set_Scaled(_float3(6.5f, 1.f, 5.f));
 
 
 	 _matrix		m_matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
 
-	 matScale = XMMatrixScaling(5.f, 1.f, 5.f);
+	 matScale = XMMatrixScaling(6.5f, 1.f, 5.f);
 
 	 matRotX = XMMatrixRotationX(XMConvertToRadians(0.f));
 	 matRotY = XMMatrixRotationY(XMConvertToRadians(45.f));
@@ -67,7 +72,7 @@ void CMeshGround::Late_Tick(_double TimeDelta)
 
 	if (nullptr != m_pRendererCom)
 	{
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	}
 
 }
@@ -86,7 +91,7 @@ HRESULT CMeshGround::Render()
 		if (i == 0)
 			continue;
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+		m_pModelCom->Render(m_pShaderCom, i, 0);
 	}
 	return S_OK;
 }
@@ -114,18 +119,16 @@ HRESULT CMeshGround::SetUp_Components()
 
 #ifdef NOMODLES
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Ground"), TEXT("Com_Model"),
+	if (FAILED(__super::Add_Component(LEVEL_COMBAT, m_GroundModelDesc.Name, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
-	/* For.Com_Texture */
-	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"), TEXT("Com_Texture"),
-		(CComponent**)&m_pTextureCom)))
-		return E_FAIL;
+
 #else
 	/* For.Com_Model */
-	if (FAILED(__super::Add_Component(LEVEL_COMBAT, TEXT("Prototype_Component_Ground"), TEXT("Com_Model"),
+	if (FAILED(__super::Add_Component(LEVEL_COMBAT, m_GroundModelDesc.Name, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
+
 #endif
 	
 
@@ -147,8 +150,6 @@ HRESULT CMeshGround::SetUp_ShaderResources()
 		return E_FAIL;
 	RELEASE_INSTANCE(CGameInstance);
 
-	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", 7)))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -182,7 +183,6 @@ void CMeshGround::Free()
 	__super::Free();
 
 	Safe_Release(m_pModelCom);
-	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);
 }

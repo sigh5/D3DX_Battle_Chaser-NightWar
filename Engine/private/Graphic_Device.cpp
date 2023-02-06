@@ -63,9 +63,6 @@ HRESULT CGraphic_Device::Clear_BackBuffer_View(_float4 vClearColor)
 	/* 백버퍼를 초기화하낟.  */
 	m_pDeviceContext->ClearRenderTargetView(m_pBackBufferRTV, (_float*)&vClearColor);
 
-
-
-
 	return S_OK;
 }
 
@@ -208,6 +205,8 @@ HRESULT CGraphic_Device::Ready_BackBufferRenderTargetView()
 		return E_FAIL;
 
 	Safe_Release(pBackBufferTexture);
+
+
 
 	return S_OK;
 }

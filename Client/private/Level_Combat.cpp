@@ -10,6 +10,7 @@
 #include "TrunLoseCanvas.h"
 #include "Spider_Mana.h"
 #include "SoundPlayer.h"
+#include "MeshGround.h"
 
 CLevel_Combat::CLevel_Combat(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -63,11 +64,15 @@ void CLevel_Combat::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 	m_dCombatIntroTimer += TimeDelta *1.0;
 
-	Combat_Intro();
+	Combat_Intro(TimeDelta);
 	__super::Tick(TimeDelta);
 	Combat_Control_Tick(TimeDelta);
 	CSoundPlayer::GetInstance()->Tick(TimeDelta);
 	
+
+	
+
+
 	m_TimeAcc += TimeDelta;
 
 }
@@ -186,11 +191,12 @@ void CLevel_Combat::Combat_Control_Tick(_double TimeDelta)
 
 }
 
-void CLevel_Combat::Combat_Intro()
+void CLevel_Combat::Combat_Intro(_double Timedelta)
 {
 	if (m_bIntroFinish)
+	{
 		return;
-
+	}
 	if (m_dCombatIntroTimer >= 0.15f)
 	{
 		m_pCombatController->Set_CombatIntro(true);
@@ -217,10 +223,14 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef LEVEL_BOSSONLY
-	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_SkyBox"))))
 		return E_FAIL;
 
 #endif
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Light_Pos"))))
+		return E_FAIL;
+
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -302,6 +312,11 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Monster_Spider_Mana"))))
 			return E_FAIL;
 		
+
+		//static_cast<CSpider_Mana*>(pGameInstance->
+		//	Get_GameObject(LEVEL_COMBAT,
+		//		pLayerTag, TEXT("Spider_Mana")))->Set_StopIntroSound();
+
 		break;
 
 	case 4:
@@ -323,7 +338,8 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
-	
+	CMeshGround::Ground_ModelDesc ModelNameDesc;
+	ZeroMemory(&ModelNameDesc, sizeof(ModelNameDesc));
 	
 	
 	int iMonsterSettingNum = pGameInstance->Get_Setting_MonsterScene();
@@ -356,13 +372,19 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 
 	if (iMonsterSettingNum != 4)
 	{
+		lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_CombatBaseGround"));
 		pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
 		pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
 	}
 	else
-		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_MeshGround"))))
-			return E_FAIL;
+	{
+		pGameInstance->Load_Object(TEXT("CombatScene2"), LEVEL_COMBAT);
+		lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_Ground"));
+	}
 
+	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_MeshGround"), &ModelNameDesc)))
+		return E_FAIL;
+		
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -384,6 +406,26 @@ HRESULT CLevel_Combat::Ready_Lights()
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Combat_Directional"), LightDesc)))
 		return E_FAIL;
+	
+	/*_vector		vLightEye = XMVectorSet(-10.f, 30.f, -10.f, 1.f);
+	_vector		vLightAt = XMVectorSet(100.f, 0.f, 100.f, 0.f);
+	_vector		vLightUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	_matrix		LightViewMatrix;
+	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	_float4x4  m_LightViewMatrix;
+	XMStoreFloat4x4(&m_LightViewMatrix, LightViewMatrix);
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), _float(g_iWinSizeX) / _float(g_iWinSizeY), 0.2f, 300.f);
+
+	_float4x4  m_LightProjMatrix;
+	XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);
+
+	pGameInstance->Set_LightView_Matrirx(TEXT("Level_Combat_Directional"), m_LightViewMatrix);
+	pGameInstance->Set_LightProj_Matrirx(TEXT("Level_Combat_Directional"), m_LightProjMatrix);
+*/
+
 
 	RELEASE_INSTANCE(CGameInstance);
 

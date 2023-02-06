@@ -36,7 +36,7 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-
+	virtual HRESULT Render_ShadowDepth()override;
 public: /*For.SceneChange*/
 	virtual void		Change_Level_Data(_uint iLevleIdx)override;
 
@@ -121,6 +121,7 @@ private:
 	_bool					m_bUltimateBuffRenderStop = false;
 	_bool					m_bFogStart = false;
 	_bool					m_bFullScreenEffect = false;
+
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();

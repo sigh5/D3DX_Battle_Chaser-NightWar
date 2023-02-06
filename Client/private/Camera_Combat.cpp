@@ -56,9 +56,9 @@ HRESULT CCamera_Combat::Initialize(void * pArg)
 	matScale	=	XMMatrixScaling(1.f, 1.f, 1.f);
 	
 	matRotX = XMMatrixRotationX(XMConvertToRadians(17.f));
-	matRotY = XMMatrixRotationY(XMConvertToRadians(47.f));
+	matRotY = XMMatrixRotationY(XMConvertToRadians(45.f));
 	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
-	matTrans = XMMatrixTranslation(-6.5f, 21.7f, -13.f);
+	matTrans = XMMatrixTranslation(-6.5f, 21.7f, -11.f);
 
 	m_matWorld = matScale * matRotX * matRotY * matRotZ * matTrans;
 

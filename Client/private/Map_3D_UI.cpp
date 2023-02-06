@@ -199,12 +199,6 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 		pGameInstance->Stop_Sound(SOUND_BGM);
 	}
 
-	/*if (ImGui::IsMouseClicked(1))
-	{
-		CUI*pCanvas = static_cast<CUI*>(pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), LAYER_UI, TEXT("DungeonCanvas")));
-		pCanvas->Set_RenderActive(true);
-	}*/
-
 
 	RELEASE_INSTANCE(CPlayerController);
 	RELEASE_INSTANCE(CGameInstance);

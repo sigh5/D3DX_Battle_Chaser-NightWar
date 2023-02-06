@@ -14,6 +14,13 @@ END
 BEGIN(Client)
 class CMeshGround  final : public CGameObject
 {
+public:
+	typedef struct tag_GroundModel
+	{
+		_tchar	Name[MAX_PATH] = TEXT("");
+	}Ground_ModelDesc;
+
+
 private:
 	CMeshGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CMeshGround(const CMeshGround& rhs);
@@ -31,7 +38,9 @@ private:
 	CShader*							m_pShaderCom = nullptr;
 	CRenderer*							m_pRendererCom = nullptr;
 	CModel*								m_pModelCom = nullptr;
-	CTexture*							m_pTextureCom = nullptr;
+
+private:
+	Ground_ModelDesc					m_GroundModelDesc;
 
 private:
 	HRESULT SetUp_Components();

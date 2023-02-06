@@ -77,8 +77,8 @@ HRESULT CBoss_Alumon::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
-	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(33.f, 0.f, -11.3f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f,4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(30.f, 0.f, -8.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
 
@@ -130,6 +130,26 @@ void CBoss_Alumon::Tick(_double TimeDelta)
 
 	//RELEASE_INSTANCE(CGameInstance);
 	
+	_float4 vTargetPos;
+	XMStoreFloat4(&vTargetPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	if (pGameInstance->Key_Pressing(DIK_DOWN))
+	{
+		m_pTransformCom->Go_Straight(TimeDelta *-5.f, 1.f);
+		
+
+	}
+	else if (pGameInstance->Key_Pressing(DIK_UP))
+	{
+		m_pTransformCom->Go_Straight(TimeDelta *+5.f, 1.f);
+	}
+	
+	RELEASE_INSTANCE(CGameInstance);
+
+		
+
+
 	m_pModelCom->Play_Animation(TimeDelta, false);
 }
 
@@ -140,6 +160,7 @@ void CBoss_Alumon::Late_Tick(_double TimeDelta)
 	if (nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 		//m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
 	}
 }
@@ -156,6 +177,22 @@ HRESULT CBoss_Alumon::Render()
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+	}
+	return S_OK;
+}
+
+HRESULT CBoss_Alumon::Render_ShadowDepth()
+{
+	if (FAILED(__super::Render()))
+		return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		m_pModelCom->Render(m_pShaderCom, i, 1, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 	return S_OK;
 }
@@ -257,6 +294,11 @@ HRESULT CBoss_Alumon::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
+	m_pShaderCom->Set_Matrix("g_matLightView", &pGameInstance->Get_Light_Matrix(TEXT("Level_Combat_Directional")));
+	m_pShaderCom->Set_Matrix("g_matLightProj", &pGameInstance->Get_Light_ProjMatrix(TEXT("Level_Combat_Directional")));
+
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }

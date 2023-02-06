@@ -81,8 +81,8 @@ PS_OUT PS_MAIN_ALPHABLEND(PS_IN In)
 
 	Out.vColor = g_Texture.Sample(LinearSampler, In.vTexUV);
 
-	/*if (Out.vColor.a < 0.25f)
-		discard;*/
+	if (Out.vColor.a < 0.25f)
+		discard;
 	return Out;
 }
 
@@ -97,7 +97,7 @@ PS_OUT PS_MAIN_Glow(PS_IN In)
 
 	Out.vColor = saturate(TexturColor + (GlowColor* G_Power));
 
-	if (Out.vColor.a < 0.1f)
+	if (Out.vColor.a < 0.25f)
 		discard;
 
 	return Out;

@@ -211,6 +211,7 @@
     <ClInclude Include="..\public\Level_GamePlayPreHeader.h" />
     <ClInclude Include="..\public\Level_Loading.h" />
     <ClInclude Include="..\public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Light_Pos.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\Public\LoadingCircle.h" />
     <ClInclude Include="..\Public\LoadingImage.h" />
@@ -291,6 +292,7 @@
     <ClCompile Include="..\private\Level_GamePlay.cpp" />
     <ClCompile Include="..\private\Level_Loading.cpp" />
     <ClCompile Include="..\private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Light_Pos.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\Private\LoadingCircle.cpp" />
     <ClCompile Include="..\Private\LoadingImage.cpp" />

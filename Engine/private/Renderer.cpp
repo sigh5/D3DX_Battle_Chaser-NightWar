@@ -44,6 +44,9 @@ HRESULT CRenderer::Draw_RenderGroup()
 {
 	if (FAILED(Render_Priority()))
 		return E_FAIL;
+	if (FAILED(Render_ShadowDepth()))
+		return E_FAIL;
+
 	if (FAILED(Render_NonAlphaBlend()))
 		return E_FAIL;
 
@@ -81,6 +84,7 @@ HRESULT CRenderer::Draw_RenderGroup()
 	{
 		m_pTarget_Manager->Render_Debug(TEXT("MRT_Deferred"));
 		m_pTarget_Manager->Render_Debug(TEXT("MRT_LightAcc"));
+		m_pTarget_Manager->Render_Debug(TEXT("MRT_LightDepth"));
 	}
 #endif
 
@@ -101,6 +105,9 @@ HRESULT CRenderer::Initialize_Prototype()
 
 	/* 렌터타겟들을 생성하낟. */
 
+	m_iShadowMapCX = 12800;
+	m_iShadowMapCY = 7200;
+
 	/* For.Target_Diffuse */
 	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Diffuse"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_B8G8R8A8_UNORM, &_float4(0.f, 0.0f, 0.0f, 0.f))))
 		return E_FAIL;
@@ -116,9 +123,8 @@ HRESULT CRenderer::Initialize_Prototype()
 	/* For.Target_Specular */
 	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_Specular"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.0f, 0.0f, 0.f))))
 		return E_FAIL;
-
-	/* For.Target_UI */
-	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, TEXT("Target_UI"), (_uint)ViewportDesc.Width, (_uint)ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, &_float4(0.0f, 0.0f, 0.0f, 0.f))))
+	// For.Target_ShadowDepth
+	if (FAILED(m_pTarget_Manager->Add_RenderTarget(m_pDevice, m_pContext, L"Target_ShadowDepth", (_uint)m_iShadowMapCX, (_uint)m_iShadowMapCY, DXGI_FORMAT_R32G32B32A32_FLOAT, &_float4(1.0f, 1.0f, 1.0f, 1.f))))
 		return E_FAIL;
 
 
@@ -135,7 +141,10 @@ HRESULT CRenderer::Initialize_Prototype()
 		return E_FAIL;
 	if (FAILED(m_pTarget_Manager->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
 		return E_FAIL;
-
+	
+	// For.MRT_ShadowDepth(Shadow)
+	if (FAILED(m_pTarget_Manager->Add_MRT(L"MRT_LightDepth", L"Target_ShadowDepth")))
+		return E_FAIL;
 
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pContext);
@@ -165,7 +174,8 @@ HRESULT CRenderer::Initialize_Prototype()
 	if (FAILED(m_pTarget_Manager->Ready_Debug(TEXT("Target_Specular"), -300.0f, 300.f, 200.f, 200.f)))
 		return E_FAIL;
 
-
+	if (FAILED(m_pTarget_Manager->Ready_Debug(TEXT("Target_ShadowDepth"), 500.0f, 100.f, 200.f, 200.f)))
+		return E_FAIL;
 
 #endif
 
@@ -192,6 +202,28 @@ HRESULT CRenderer::Render_Priority()
 	}
 
 	m_RenderObjects[RENDER_PRIORITY].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_ShadowDepth()
+{
+	if (nullptr == m_pTarget_Manager)
+		return E_FAIL;
+
+	if (FAILED(m_pTarget_Manager->Begin_ShadowDepthRenderTarget(m_pContext, TEXT("Target_ShadowDepth"))))
+		return E_FAIL;
+	
+	for (auto& pGameObject : m_RenderObjects[RENDER_SHADOWDEPTH])
+	{
+		if (nullptr != pGameObject)
+			pGameObject->Render_ShadowDepth();
+		Safe_Release(pGameObject);
+	}
+	m_RenderObjects[RENDER_SHADOWDEPTH].clear();
+
+	if (FAILED(m_pTarget_Manager->End_MRT(m_pContext, TEXT("MRT_LightDepth"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -284,12 +316,40 @@ HRESULT CRenderer::Render_Blend()
 	if (FAILED(m_pShader->Set_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	CPipeLine*		pPipeLine = GET_INSTANCE(CPipeLine);
+
+	if (FAILED(m_pShader->Set_Matrix("g_ProjMatrixInv", &pPipeLine->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_PROJ))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Set_Matrix("g_ViewMatrixInv", &pPipeLine->Get_TransformFloat4x4_Inverse(CPipeLine::D3DTS_VIEW))))
+		return E_FAIL;
+	RELEASE_INSTANCE(CPipeLine);
+
 	if (FAILED(m_pShader->Set_ShaderResourceView("g_DiffuseTexture", m_pTarget_Manager->Get_SRV(TEXT("Target_Diffuse")))))
 		return E_FAIL;
 	if (FAILED(m_pShader->Set_ShaderResourceView("g_ShadeTexture", m_pTarget_Manager->Get_SRV(TEXT("Target_Shade")))))
 		return E_FAIL;
 	if (FAILED(m_pShader->Set_ShaderResourceView("g_SpecularTexture", m_pTarget_Manager->Get_SRV(TEXT("Target_Specular")))))
 		return E_FAIL;
+	if (FAILED(m_pShader->Set_ShaderResourceView("g_DepthTexture", m_pTarget_Manager->Get_SRV(TEXT("Target_Depth")))))
+		return E_FAIL;
+	if (FAILED(m_pShader->Set_ShaderResourceView("g_ShadowDepthTexture", m_pTarget_Manager->Get_SRV(TEXT("Target_ShadowDepth")))))
+		return E_FAIL;
+
+	// 쉐도우 카메라에 다 던지면되잖아요
+	// 뷰랑 프로젝션 둘다
+
+
+	/* 기존 데력셔널의 월드매트릭스를 가져오는것이다 */
+	
+	m_pShader->Set_Matrix("g_LightViewMatrix", &m_pLight_Manager->Test1());
+	m_pShader->Set_Matrix("g_LightProjMatrix", &m_pLight_Manager->Test2());
+
+
+
+	
+	//m_pShader->Set_RawValue("g_DistanceShadow", &fDistance, sizeof(fDistance));
+
+
 
 	m_pShader->Begin(3);
 	m_pVIBuffer->Render();
@@ -334,8 +394,6 @@ HRESULT CRenderer::Render_AlphaBlend()
 
 HRESULT CRenderer::Render_UI()
 {
-	//if (FAILED(m_pTarget_Manager->Begin_MRT(m_pContext, TEXT("MRT_UI"))))
-	//	return E_FAIL;
 
 	for (auto& pGameObject : m_RenderObjects[RENDER_UI])
 	{
@@ -347,10 +405,7 @@ HRESULT CRenderer::Render_UI()
 
 	m_RenderObjects[RENDER_UI].clear();
 
-	/*if (FAILED(m_pTarget_Manager->End_MRT(m_pContext, TEXT("MRT_UI"))))
-		return E_FAIL;
-*/
-
+	
 	return S_OK;
 }
 
@@ -368,6 +423,8 @@ HRESULT CRenderer::RENDER_Inventory()
 
 	return S_OK;
 }
+
+
 
 #ifdef _DEBUG
 HRESULT CRenderer::Render_DebugObject()

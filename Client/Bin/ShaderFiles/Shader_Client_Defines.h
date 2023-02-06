@@ -14,9 +14,6 @@ sampler PointSampler = sampler_state
 };
 
 
-
-
-
 RasterizerState RS_Default
 {
 	FillMode = Solid;

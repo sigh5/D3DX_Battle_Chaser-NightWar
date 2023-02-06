@@ -32,7 +32,8 @@ public:
 	virtual void	Tick(_double TimeDelta);
 	virtual void	Late_Tick(_double TimeDelta);
 	virtual HRESULT Render();
-	virtual void				Initialize_CombatSound()override;
+	virtual HRESULT Render_ShadowDepth()override;
+	virtual void	Initialize_CombatSound()override;
 
 public:
 	virtual	void	Fsm_Exit()override;

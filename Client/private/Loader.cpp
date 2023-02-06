@@ -55,6 +55,7 @@
 
 #include "Boss_Alumon.h"
 #include "MeshGround.h"
+#include "Light_Pos.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -183,11 +184,12 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);*/
 		
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_GAMEPLAY); 
-		if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"),
-			CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Map2/Map2_%d.png"), CTexture::TYPE_DIFFUSE,9))))
-			return E_FAIL;
+		/*	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_GAMEPLAY);
+
+		*/
 		
+	
+
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
 		/*CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
@@ -202,8 +204,14 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);
 		/* ~Model */
-#endif
 
+		
+
+
+#endif
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Light_Pos"),
+			CLight_Pos::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
 		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 		if (FAILED(ForGamePlay_Shader(pGameInstance)))
 			return E_FAIL;
@@ -216,9 +224,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 #ifdef _DEBUG
 		
 #endif // _DEBUG
-		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MeshGround"),
-			CMeshGround::Create(m_pDevice, m_pContext))))
-			return E_FAIL;
+		
 
 
 		lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
@@ -242,14 +248,20 @@ HRESULT CLoader::Loading_Combat()
 	{
 		lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다. "));
 
+		if (FAILED(pGameInstance->Add_Prototype(LEVEL_COMBAT, TEXT("Prototype_Component_Texture_CombatMapTwo"),
+			CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Map2/Map2_%d.png"), CTexture::TYPE_DIFFUSE, 9))))
+			return E_FAIL;
+
 		lstrcpy(m_szLoadingText, TEXT("버퍼를 로딩중입니다. "));
 
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Alumon_Model"), LEVEL_COMBAT);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_COMBAT); 
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("CombatMapBase"), LEVEL_COMBAT);
 
 
+		
 		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 
 		lstrcpy(m_szLoadingText, TEXT("객체원형을 생성중입니다. "));
@@ -506,7 +518,9 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 			CTexture::TYPE_END, 5))))
 		return E_FAIL;
 
-
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Map2/Map2_%d.png"), CTexture::TYPE_DIFFUSE, 9))))
+		return E_FAIL;
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -836,6 +850,10 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		CTraile_Effect_Child::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 	
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_MeshGround"),
+		CMeshGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 	return S_OK;
 }

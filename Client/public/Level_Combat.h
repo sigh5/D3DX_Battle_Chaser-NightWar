@@ -31,7 +31,7 @@ private:
 
 private:
 	void	Combat_Control_Tick(_double TimeDelta);
-	void	Combat_Intro();
+	void	Combat_Intro(_double Timedelta);
 
 
 private:

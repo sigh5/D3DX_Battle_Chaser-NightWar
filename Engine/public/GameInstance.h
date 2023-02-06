@@ -122,7 +122,13 @@ public:/* For.Light_Manager */
 	HRESULT				Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, wstring NameTag, const LIGHTDESC & LightDesc);
 	HRESULT				Delete_Light(wstring NameTag);
 	void				Clear_Light();
-	
+	void				Set_LightView_Matrirx(wstring nameTag, _float4x4 fMatrix);
+	void				Set_LightProj_Matrirx(wstring nameTag, _float4x4 fMatrix);
+	_float4x4			Get_Light_Matrix(wstring nameTag);
+	_float4x4			Get_Light_ProjMatrix(wstring nameTag);
+
+
+
 
 public: /* For.Font_Manager */
 	HRESULT Add_Font(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontTag, const _tchar* pFontFilePath);

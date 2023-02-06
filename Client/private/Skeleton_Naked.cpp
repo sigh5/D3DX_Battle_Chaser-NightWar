@@ -108,8 +108,8 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 		return E_FAIL;
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
-	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(28.f, 0.f, 1.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
 
@@ -246,6 +246,7 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 		m_pRendererCom->Add_DebugRenderGroup(m_pColliderCom);
 	}
 }
@@ -264,6 +265,25 @@ HRESULT CSkeleton_Naked::Render()
 		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 
+	return S_OK;
+}
+
+HRESULT CSkeleton_Naked::Render_ShadowDepth()
+{
+	if (FAILED(__super::Render()))
+		return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Set_Matrix("g_matLightView", &CGameInstance::GetInstance()->Get_Light_Matrix(TEXT("Level_Combat_Directional")));
+	m_pShaderCom->Set_Matrix("g_matLightProj", &CGameInstance::GetInstance()->Get_Light_ProjMatrix(TEXT("Level_Combat_Directional")));
+
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+	for (_uint i = 0; i < iNumMeshes; ++i)
+	{
+		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		m_pModelCom->Render(m_pShaderCom, i, 1, "g_BoneMatrices", "DN_FR_FishingRod");
+	}
 	return S_OK;
 }
 
@@ -624,120 +644,120 @@ void CSkeleton_Naked::Anim_Frame_Create_Control()
 
 void CSkeleton_Naked::Initialize_CombatSound()
 {
-	CSoundPlayer::Anim_Model_SoundDesc SoundDesc;
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Light_hit
-	SoundDesc.iAnimIndex = 1;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0040.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-	
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		//Die
-	SoundDesc.iAnimIndex = 2;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0142.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//CSoundPlayer::Anim_Model_SoundDesc SoundDesc;
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Light_hit
+	//SoundDesc.iAnimIndex = 1;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0040.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));		//Die
+	//SoundDesc.iAnimIndex = 2;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0142.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Buff
-	SoundDesc.iAnimIndex = 3;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Buff
+	//SoundDesc.iAnimIndex = 3;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move
-	SoundDesc.iAnimIndex = 4;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move
+	//SoundDesc.iAnimIndex = 4;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
-	SoundDesc.iAnimIndex = 4;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_VOCIE;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0120.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
+	//SoundDesc.iAnimIndex = 4;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_VOCIE;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0120.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Heavy_Hit
-	SoundDesc.iAnimIndex = 6;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0099.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Heavy_Hit
+	//SoundDesc.iAnimIndex = 6;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0099.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		 // Light_hit
-	SoundDesc.iAnimIndex = 7;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0134.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));		 // Light_hit
+	//SoundDesc.iAnimIndex = 7;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0134.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Move
-	SoundDesc.iAnimIndex = 8;
-	SoundDesc.iFrame = 2;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047_1.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Move
+	//SoundDesc.iAnimIndex = 8;
+	//SoundDesc.iFrame = 2;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047_1.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
-	SoundDesc.iAnimIndex = 8;
-	SoundDesc.iFrame = 2;
-	SoundDesc.iSoundChannel = SOUND_VOCIE;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0183.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
+	//SoundDesc.iAnimIndex = 8;
+	//SoundDesc.iFrame = 2;
+	//SoundDesc.iSoundChannel = SOUND_VOCIE;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0183.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Normal_Attack
-	SoundDesc.iAnimIndex = 10;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0037.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));	// Normal_Attack
+	//SoundDesc.iAnimIndex = 10;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0037.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
-	SoundDesc.iAnimIndex = 10;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_VOCIE;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0183.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc)); // Move_Voice
+	//SoundDesc.iAnimIndex = 10;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_VOCIE;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0183.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Intro
-	SoundDesc.iAnimIndex = 11;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103_1.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));		// Intro
+	//SoundDesc.iAnimIndex = 11;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103_1.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Victory
-	SoundDesc.iAnimIndex = 14;
-	SoundDesc.iFrame = 2;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103_2.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Victory
+	//SoundDesc.iAnimIndex = 14;
+	//SoundDesc.iFrame = 2;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0103_2.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Move
-	SoundDesc.iAnimIndex = 15;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047_2.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Move
+	//SoundDesc.iAnimIndex = 15;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0047_2.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Skill1
-	SoundDesc.iAnimIndex = 16;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0015.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));			// Skill1
+	//SoundDesc.iAnimIndex = 16;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0015.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
-	ZeroMemory(&SoundDesc, sizeof(SoundDesc));		//HeavyHit
-	SoundDesc.iAnimIndex = 17;
-	SoundDesc.iFrame = 1;
-	SoundDesc.iSoundChannel = SOUND_MONSTER1;
-	lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0099.wav"));
-	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+	//ZeroMemory(&SoundDesc, sizeof(SoundDesc));		//HeavyHit
+	//SoundDesc.iAnimIndex = 17;
+	//SoundDesc.iFrame = 1;
+	//SoundDesc.iSoundChannel = SOUND_MONSTER1;
+	//lstrcpy(SoundDesc.pSoundTag, TEXT("Monster_0099.wav"));
+	//CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 
 
 }

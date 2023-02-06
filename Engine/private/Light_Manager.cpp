@@ -5,6 +5,18 @@ IMPLEMENT_SINGLETON(CLight_Manager)
 
 CLight_Manager::CLight_Manager()
 {
+	_vector		vLightEye = XMVectorSet(-10.f, 30.f, -10.f, 1.f);
+	_vector		vLightAt = XMVectorSet(100.f, 0.f, 100.f, 0.f);
+	_vector		vLightUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	_matrix		LightViewMatrix;
+	LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	XMStoreFloat4x4(&m_LightViewMatrix, LightViewMatrix);
+
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), _float(1280) / _float(720), 0.2f, 300.f);
+
+	XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);
 }
 
 
@@ -17,6 +29,76 @@ LIGHTDESC * CLight_Manager::Get_LightDesc(wstring NameTag)
 		assert(! "CLight_Manager::Get_LightDesc");
 
 	return pLight->Get_LightDesc();
+}
+
+void CLight_Manager::Set_LightView_Matrirx(wstring nameTag,_float4x4 fMatrix)
+{
+	/*CLight* pLight = Find_Light(nameTag);
+	assert(nullptr != pLight && "CLight_Manager::Set_LightView_Matrirx");
+
+	pLight->Set_LightView_Matrirx(fMatrix);*/
+
+	m_LightViewMatrix = fMatrix;
+
+}
+
+void CLight_Manager::Set_LightProj_Matrirx(wstring nameTag, _float4x4 fMatrix)
+{
+	/*CLight* pLight = Find_Light(nameTag);
+	assert(nullptr != pLight && "CLight_Manager::Set_LightProj_Matrirx");
+
+	pLight->Set_LightProj_Matrirx(fMatrix);*/
+
+	m_LightProjMatrix = fMatrix;
+}
+
+_float4x4 CLight_Manager::Get_Light_Matrix(const wstring nameTag) 
+{
+	/*CLight* pLight = Find_Light(nameTag);
+	assert(nullptr != pLight && "CLight_Manager::Get_Light_Matrix");
+	return pLight->Get_Light_Matrix();*/
+
+	//_vector		vLightEye = XMVectorSet(-1.f, 10.f, -1.f, 1.f);
+	//_vector		vLightAt = XMVectorSet(100.f, 0.f, 100.f, 0.f);
+	//_vector		vLightUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+
+	//_matrix		LightViewMatrix;
+	//LightViewMatrix = XMMatrixLookAtLH(vLightEye, vLightAt, vLightUp);
+
+	//;
+	//XMStoreFloat4x4(&m_LightViewMatrix, LightViewMatrix);
+
+	return m_LightViewMatrix;
+}
+
+_float4x4 CLight_Manager::Get_Light_ProjMatrix(wstring nameTag)
+{
+	/*CLight* pLight = Find_Light(nameTag);
+	assert(nullptr != pLight && "CLight_Manager::Get_Light_ProjMatrix");
+	return pLight->Get_Light_ProjMatrix();*/
+	//_matrix		LightProjMatrix;
+	//LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.f), _float(1280) / _float(720), 0.2f, 1000.f);
+
+	//
+	//XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);
+
+	return m_LightProjMatrix;
+	
+}
+
+_float4x4 CLight_Manager::Test1()
+{
+	return m_LightViewMatrix;
+}
+
+_float4x4 CLight_Manager::Test2()
+{
+	/*_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(120.f), _float(1280) / _float(720), 0.2f, 300.f);
+
+	XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);*/
+
+	return m_LightProjMatrix;
 }
 
 //HRESULT CLight_Manager::Add_Light(ID3D11Device * pDevice, ID3D11DeviceContext * pContext, const LIGHTDESC & LightDesc)

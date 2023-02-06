@@ -30,12 +30,14 @@ private:
 public:
 	void	Tick(_double TimeDelta);
 
+	
+
 public:
 	void	Add_SoundEffect_Model(class CModel* pModel, tag_SoundDesc& Desc);
 	
 	void	Clear_allSound();
 private:
-	vector<pair<class CModel*, tag_SoundDesc >> Model_EffectSoundVec;
+	list<pair<class CModel*, tag_SoundDesc >> Model_EffectSoundVec;
 	
 	
 

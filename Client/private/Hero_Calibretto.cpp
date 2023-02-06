@@ -201,6 +201,8 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 	CurAnimQueue_Play_LateTick(m_pModelCom);
 
 
+
+
 	if(m_bModelRender)
 	{ 
 		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
@@ -285,6 +287,7 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_SHADOWDEPTH, this);
 #ifdef _DEBUG
 		CClient_Manager::Collider_Render(this, m_pColliderCom, m_pRendererCom);
 		CClient_Manager::Navigation_Render(this, m_pNavigationCom, m_pRendererCom);
@@ -303,24 +306,58 @@ HRESULT CHero_Calibretto::Render()
 		return E_FAIL;
 
 	if (m_bIsCombatScene)
+	{
 		m_pModelCom->Set_NoRenderMeshIndex(10);	//  베이스무기  그리지말기
-
+		_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+		for (_uint i = m_iNonRenderMeshIndex; i < iNumMeshes; ++i)
+		{
+			if (i == 11)
+				continue;
+			if (i == 12)
+				continue;
+			m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+			m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+		}
+	}
 	else
+	{
 		m_pModelCom->Set_NoRenderMeshIndex(2);
+
+		_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+		for (_uint i = m_iNonRenderMeshIndex; i < iNumMeshes; ++i)
+		{
+			m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+			m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CHero_Calibretto::Render_ShadowDepth()
+{
+	if (m_bIsCombatScene == false)
+		return S_OK;
+
+	if (FAILED(__super::Render()))
+		return E_FAIL;
+	if (FAILED(SetUp_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Set_Matrix("g_matLightView", &CGameInstance::GetInstance()->Get_Light_Matrix(TEXT("Level_Combat_Directional")));
+	m_pShaderCom->Set_Matrix("g_matLightProj", &CGameInstance::GetInstance()->Get_Light_ProjMatrix(TEXT("Level_Combat_Directional")));
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 	for (_uint i = m_iNonRenderMeshIndex; i < iNumMeshes; ++i)
 	{
-		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
-	}
+		if (i == 11)
+			continue;
+		if (i == 12)
+			continue;
 
-//#ifdef _DEBUG
-//	CClient_Manager::Collider_Render(this, m_pColliderCom);
-//	CClient_Manager::Navigation_Render(this, m_pNavigationCom);
-//	if (m_bIsCombatScene)
-//		m_pColliderCom->Render();
-//#endif
+		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		m_pModelCom->Render(m_pShaderCom, i, 1, "g_BoneMatrices", "DN_FR_FishingRod");
+	}
 	return S_OK;
 }
 
@@ -584,8 +621,8 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 	m_pFsmCom = CAnimFsm::Create(this, ANIM_CHAR3);
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
-	m_pTransformCom->Set_Scaled(_float3(3.f, 3.f, 3.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(3.13f, 0.f, 29.5f, 1.f));
+	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(7.f, 0.f, 38.f, 1.f));
 	m_vOriginPos = m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION);
 	m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 
@@ -594,8 +631,8 @@ HRESULT CHero_Calibretto::Combat_Initialize()
 		return E_FAIL;
 	
 	_float4 vPos;
-	XMStoreFloat4(&vPos, XMVectorSet(3.13f, 0.f, 29.5f, 1.f));
-	_float3 vScale = _float3(3.f, 3.f, 3.f);
+	XMStoreFloat4(&vPos, XMVectorSet(7.f, 0.f, 38.f, 1.f));
+	_float3 vScale = _float3(4.f, 4.f, 4.f);
 	m_pStatusCom[COMBAT_PLAYER]->Set_Combat_PosScale(vPos, vScale);
 
 	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 10);
