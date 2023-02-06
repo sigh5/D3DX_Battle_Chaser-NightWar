@@ -342,7 +342,7 @@ void CHero_Knolan::Change_Level_Data(_uint iLevleIdx)
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-		Initialize_CombatSound();
+
 		if (m_bCombat_LastInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -548,14 +548,14 @@ void CHero_Knolan::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Light_hit0.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
+	
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 4;
 	SoundDesc.iFrame = 1;
 	SoundDesc.iSoundChannel = SOUND_TYPE_KNOLAN_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_Light_hit1.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
+	
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 5;
 	SoundDesc.iFrame = 1;
@@ -697,8 +697,6 @@ void CHero_Knolan::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_VOCIE;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Knolan_0087.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
-
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 28;
@@ -1274,6 +1272,7 @@ void CHero_Knolan::Create_Test_Effect()
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+
 	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
@@ -1298,7 +1297,7 @@ void CHero_Knolan::Create_Skill_Ultimate_Effect0()
 		iRandomScale = rand() % 10 + 7;
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_11", LEVEL_COMBAT, false);
 		BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
-		BuffDesc.vPosition = _float4(_float(rand() % 3 * iSign), _float(rand() % 2), _float(rand() % 3 * iSign), 1.f);
+		BuffDesc.vPosition = _float4(_float(rand() % 3 * iSign), _float(rand() % 2) +1.f, _float(rand() % 3 * iSign), 1.f);
 		BuffDesc.vScale = _float3(_float(iRandomScale), _float(iRandomScale), _float(iRandomScale));
 		BuffDesc.vAngle = -90.f;
 		BuffDesc.fCoolTime = 5.f;
@@ -1379,14 +1378,13 @@ void CHero_Knolan::Create_Ultimate_StartFog_CamEffect()
 	m_pFog = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Cloud"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(3.15f, 4.64f, 23.84f, 1.f);
+	BuffDesc.vPosition = _float4(7.3f, 3.1f, 28.f, 1.f);
 	BuffDesc.vScale = _float3(40.f, 30.f, 40.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = true;
-	BuffDesc.iFrameCnt = 5;
+	BuffDesc.iFrameCnt = 8;
 	BuffDesc.bIsUp = false;
-
 
 	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
 	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
@@ -1523,9 +1521,6 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		CCombatController::GetInstance()->Load_CamBG2();
-
-	
-
 		m_bFogStart = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
@@ -1552,8 +1547,6 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		CCombatController::GetInstance()->Wide_Attack(false, 83);
 		m_bIsUseUltimate = true;
 	}
-
-
 	else if (m_bUseDefence == true && !m_bOnceCreate 
 		&& m_pModelCom->Control_KeyFrame_Create(26, 20))
 	{

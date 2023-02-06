@@ -102,6 +102,7 @@ public:		/*플레이어턴 + 얼티메이트 */
 	void	Ultimate_LateTick(_double TimeDelta);
 
 private:
+	
 	void	Ultimate_Start_LateTick(_double TimeDelta);
 	void	Ultimate_Timedelta_Tick(_double TimeDelta);
 	void	Ultimate_End_LateTick(_double TimeDelta);
@@ -109,6 +110,7 @@ private:
 
 
 public:
+	void	Ready_Ultimate();
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
 	

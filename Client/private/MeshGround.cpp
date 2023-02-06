@@ -22,7 +22,7 @@ HRESULT CMeshGround::Initialize_Prototype()
 
 HRESULT CMeshGround::Initialize(void * pArg)
 {
-	 m_ObjectName = L"Test_Ground";
+	 m_ObjectName = L"Commbat_MeshGround";
 
 	 ZeroMemory(&m_GroundModelDesc, sizeof(m_GroundModelDesc));
 
@@ -70,7 +70,7 @@ void CMeshGround::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
 
-	if (nullptr != m_pRendererCom)
+	if (nullptr != m_pRendererCom && m_bRenderActive)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
 	}

@@ -27,6 +27,9 @@ private:
 	virtual ~CMeshGround() = default;
 
 public:
+	void	Set_MeshGroundRender_Active(_bool bRenderActive) { m_bRenderActive = bRenderActive; }
+
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void Tick(_double TimeDelta) override;
@@ -41,7 +44,7 @@ private:
 
 private:
 	Ground_ModelDesc					m_GroundModelDesc;
-
+	_bool								m_bRenderActive = true;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

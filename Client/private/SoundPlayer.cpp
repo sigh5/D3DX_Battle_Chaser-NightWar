@@ -23,7 +23,7 @@ void CSoundPlayer::Tick(_double TimeDelta)
 			Anim_Model_SoundDesc SoundDesc = pPair.second;
 			if (pPair.first->Control_KeyFrame_Create(SoundDesc.iAnimIndex, SoundDesc.iFrame))
 			{
-				//pGameInstace->Stop_Sound(SoundDesc.iSoundChannel);
+				pGameInstace->Stop_Sound(SoundDesc.iSoundChannel);
 				pGameInstace->Play_Sound(SoundDesc.pSoundTag, 0.8f, false, SoundDesc.iSoundChannel);
 			}
 		}

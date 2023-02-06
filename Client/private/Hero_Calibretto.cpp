@@ -153,27 +153,27 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			m_pFullscreenEffect->Tick(TimeDelta);
 
 	
-		//static float ffPos[3] = {};
-		//static float ffScale[3] = {};
-		//static char  szName[MAX_PATH] = "";
-		//ImGui::InputFloat3("SkillPos", ffPos);
-		//ImGui::InputFloat3("SkillScale", ffScale);
+		static float ffPos[3] = {};
+		static float ffScale[3] = {};
+		static char  szName[MAX_PATH] = "";
+		ImGui::InputFloat3("SkillPos", ffPos);
+		ImGui::InputFloat3("SkillScale", ffScale);
 
-		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		//ImGui::InputText("TextureName", szName, MAX_PATH);
+		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+		ImGui::InputText("TextureName", szName, MAX_PATH);
 
-		////if (ImGui::Button("Create_Skill"))
-		////{
-		////	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		////	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+		//if (ImGui::Button("Create_Skill"))
+		//{
+		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
 
-		////	m_TextureTag = Texture_NameTag;
-		////	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-		////	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		//	m_TextureTag = Texture_NameTag;
+		//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
 
-		////	Create_Test_TextureObj();		// Test
+		//	Create_Test_TextureObj();		// Test
 
-		////}
+		//}
 		//if (ImGui::Button("Create_Effect"))
 		//{
 		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
@@ -186,7 +186,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		//	Create_Test_Effect();		// Test
 		//}
 
-		//RELEASE_INSTANCE(CGameInstance);
+		RELEASE_INSTANCE(CGameInstance);
 
 	
 	}
@@ -559,7 +559,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		Create_Wide_BuffEffect_Second();
 		m_bRun = true;
 	}
-	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(46, 3))
+	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(46, 6))
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		Create_Ultimate_StartCam_Effect();
@@ -1236,10 +1236,28 @@ void CHero_Calibretto::Create_Test_Effect()
 	BuffDesc.bIsMainTain = false;
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
-	
+
 	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
+
+	/*CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
+	ZeroMemory(&EffectDesc, sizeof(EffectDesc));
+
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_bretto_Glow_Ultimate_Rect"), LEVEL_COMBAT, true);
+
+	EffectDesc.fCoolTime = 5.f;
+	EffectDesc.bIsMainTain = true;
+	EffectDesc.iFrameCnt = 1;
+
+
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc);
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"), 0);*/
+
 
 }
 
@@ -1366,7 +1384,7 @@ void CHero_Calibretto::Create_Skill2_Beam()
 	m_pLazorEffect = pInstance->Load_Effect(L"Texture_bretto_laser_Bullet_Effect_2", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(2.5f, -0.3f, 12.5f, 1.f);		//m_vSkill_Pos;
+	BuffDesc.vPosition = _float4(2.5f, 0.1f, 11.f, 1.f);		//m_vSkill_Pos;
 	BuffDesc.vScale	   = _float3(80.f, 30.f, 80.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 10.f;
@@ -1702,8 +1720,8 @@ void CHero_Calibretto::Create_Ultimate_StartCam_Effect()
 	m_pUltimateEffect = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(36.5f, -3.18f, 25.f, 1.f);
-	BuffDesc.vScale = _float3(50.f, 50.f, 50.f);
+	BuffDesc.vPosition = _float4(45.f, 1.f, 70.f, 1.f);
+	BuffDesc.vScale = _float3(130.f, 100.f, 100.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 7.f;
 	BuffDesc.bIsMainTain = true;
@@ -1711,7 +1729,7 @@ void CHero_Calibretto::Create_Ultimate_StartCam_Effect()
 	BuffDesc.bIsUp = false;
 
 	static_cast<CBuff_Effect*>(m_pUltimateEffect)->Set_CamEffect(BuffDesc);
-	//static_cast<CBuff_Effect*>(m_pUltimateEffect)->Set_ShaderPass(7);
+	static_cast<CBuff_Effect*>(m_pUltimateEffect)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 
 
@@ -2057,8 +2075,6 @@ void CHero_Calibretto::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_CALIBRETTO_EFFECT;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_0046.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
-
-	
 
 	ZeroMemory(&SoundDesc, sizeof(SoundDesc));
 	SoundDesc.iAnimIndex = 4;

@@ -26,7 +26,7 @@
 
 
 #include "MyImage.h"
-
+#include "MeshGround.h"
 
 
 
@@ -570,6 +570,17 @@ void CCombatController::Ultimate_LateTick(_double TimeDelta)
 }
 	
 
+void CCombatController::Ready_Ultimate()
+{
+	//CCombatController::GetInstance()->Get_CurActor()->
+	Get_CurActor()->Set_FsmState(true, CGameObject::m_Uitimate);
+
+	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
+	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
+	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(false);
+
+}
+
 void CCombatController::Ultimate_Start_LateTick(_double TimeDelta)
 {
 	if (false == m_bCurActorUltimateUse)
@@ -624,10 +635,15 @@ void CCombatController::Ultimate_End_LateTick(_double TimeDelta)
 {
 	if (false == m_bCurActorUltimateEnd)
 		return;
+	
 	m_bBannerClose = false;
 	m_bCurActorUltimateEnd = false;
 	m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCombatBG->Get_ObjectName());
 	m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCombatBG2->Get_ObjectName());
+
+	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
+	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
+	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(true);
 	Ultimate_Camera_Off();
 	m_pCombatBG = nullptr;
 	m_pCombatBG2 = nullptr;
@@ -668,8 +684,6 @@ void CCombatController::Active_Fsm()
 		pStatus->Set_Exp(120);
 	}
 
-
-	
 	To_Idle();
 	To_Intro();
 	To_Normal_Attack();

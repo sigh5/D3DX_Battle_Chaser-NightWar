@@ -375,6 +375,9 @@ void CModel::InitChannel()
 
 _bool CModel::Control_KeyFrame(_uint iAnimIndex, _uint KeyBegin, _uint KeyEnd)
 {
+	if (iAnimIndex >= m_iNumAnimations)
+		_bool b = false;
+
 	_uint	iFrameIndex = m_Animations[iAnimIndex]->Get_Key_Frame();
 
 	if (iFrameIndex >= KeyBegin  && KeyEnd >= iFrameIndex)
@@ -398,6 +401,9 @@ _bool CModel::Control_KeyFrame_Collision(_uint iAnimIndex, _uint KeyBegin, _uint
 
 _bool CModel::Control_KeyFrame_Create(_uint iAnimIndex, _uint KeyFrame)
 {
+	if (iAnimIndex >= m_iNumAnimations)
+		_bool b = false;
+
 	_uint	iFrameIndex = m_Animations[iAnimIndex]->Get_Key_Frame();
 
 	if (iFrameIndex == KeyFrame)

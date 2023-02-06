@@ -90,6 +90,11 @@ private:
 	_float4					m_vUltimatePos;
 
 
+	_bool					m_bUlticamImguiCheck = false;
+	_bool					m_bUlticamImguiResetCheck = false;
+
+
+
 	_bool					m_bUltimateCamWorkTick[UlTIMATE_TARGET_END] = {false};
 	_bool					m_bXShaking = false;
 	// shake

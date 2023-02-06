@@ -89,8 +89,8 @@ void CMyImage::Tick(_double TimeDelta)
 		{
 			m_bRenderActive = false;
 			m_bBanerTimerFinish = true;
-			CCombatController::GetInstance()->Get_CurActor()->
-				Set_FsmState(true, CGameObject::m_Uitimate);
+
+			CCombatController::GetInstance()->Ready_Ultimate();
 		}
 	}
 

@@ -214,7 +214,7 @@ void CAttack_Effect_Rect::Reset_CurMartirx()
 	matRotX = XMMatrixRotationX(XMConvertToRadians(-18.f));
 	matRotY = XMMatrixRotationY(XMConvertToRadians(47.f));	//스트레이트는 90 , 골프 -180
 	matRotZ = XMMatrixRotationZ(XMConvertToRadians(-24.f));
-	matTrans = XMMatrixTranslation(53.6f,-2.77f,-2.72f);
+	matTrans = XMMatrixTranslation(65.f,-3.f,10.f);
 	m_OriginMatrix = matScale * matRotX * matRotY * matRotZ * matTrans;
 
 	XMStoreFloat4x4(&m_SocketMatrix, m_OriginMatrix);

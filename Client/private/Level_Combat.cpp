@@ -68,13 +68,8 @@ void CLevel_Combat::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 	Combat_Control_Tick(TimeDelta);
 	CSoundPlayer::GetInstance()->Tick(TimeDelta);
-	
-
-	
-
 
 	m_TimeAcc += TimeDelta;
-
 }
 
 void CLevel_Combat::Late_Tick(_double TimeDelta)
@@ -381,7 +376,7 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 		pGameInstance->Load_Object(TEXT("CombatScene2"), LEVEL_COMBAT);
 		lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_Ground"));
 	}
-
+	lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_Ground"));
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_MeshGround"), &ModelNameDesc)))
 		return E_FAIL;
 		

@@ -164,12 +164,12 @@ void CHero_Garrison::Tick(_double TimeDelta)
 
 		Create_Sword_Trail();
 
-		/*static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
-*/
+		//static float ffPos[3] = {};
+		//static float ffScale[3] = {};
+		//static char  szName[MAX_PATH] = "";
+		//ImGui::InputFloat3("SkillPos", ffPos);
+		//ImGui::InputFloat3("SkillScale", ffScale);
+
 		//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 		//ImGui::InputText("TextureName", szName, MAX_PATH);
 
@@ -186,18 +186,6 @@ void CHero_Garrison::Tick(_double TimeDelta)
 
 		//}
 		//RELEASE_INSTANCE(CGameInstance);
-
-		
-		//static float vScale[3];
-		//ImGui::InputFloat3("VScale", vScale);
-		//static float vPos[3];
-		//ImGui::InputFloat3("vPos", vPos);
-
-		//if (ImGui::Button("Pos_Scale Set"))
-		//{
-		//	m_PlayerParts[0]->Get_Transform()->Set_Scaled(_float3(vScale[0], vScale[1], vScale[2]));
-		//	//m_PlayerParts[0]->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(vPos[0], vPos[1], vPos[2], 1.f));
-		//}
 	}
 	
 
@@ -264,12 +252,14 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 
 		if (nullptr != m_pFog)
 		{
-			m_pFog->Late_Tick(TimeDelta);
 			if (static_cast<CBuff_Effect*>(m_pFog)->Get_IsFinish())
 			{
 				Safe_Release(m_pFog);
 				m_pFog = nullptr;
 			}
+			else
+				m_pFog->Late_Tick(TimeDelta);
+			
 		}
 
 		if (nullptr != m_pFullscreenEffect)
@@ -376,7 +366,6 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
 
-		//Initialize_CombatSound();
 		if (m_bCombatInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -847,7 +836,7 @@ void CHero_Garrison::Create_Ultimate_Effect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Garrison_Ultimate_Effect_0", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(0.f, 0.f, +1.0f, 1.f);
+	BuffDesc.vPosition = _float4(0.f, 1.f, +1.0f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -994,15 +983,16 @@ void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(10.f, 1.f, 16.f, 1.f);
-	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
+	BuffDesc.vPosition = _float4(6.5f, 6.f, 14.6f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
-	BuffDesc.iFrameCnt = 3;
+	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	m_pEffectParts.push_back(pGameObject);
 	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 }
 
@@ -1838,8 +1828,8 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 
 	else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(30, 70))		//45
 	{
-		Safe_Release(m_pFog);
-		m_pFog = nullptr;
+		/*	Safe_Release(m_pFog);
+			m_pFog = nullptr;*/
 		//
 		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
@@ -2510,9 +2500,10 @@ void CHero_Garrison::Create_Test_Effect()
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	
-	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
-	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(0);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
+
 }
 
 _bool CHero_Garrison::Is_Dead()
