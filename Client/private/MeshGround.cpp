@@ -90,8 +90,8 @@ HRESULT CMeshGround::Render()
 	{
 		if (i == 0)
 			continue;
-		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0);
+		//m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
+		m_pModelCom->Render(m_pShaderCom, i, m_GroundModelDesc.iShaderPass);
 	}
 	return S_OK;
 }
@@ -101,6 +101,9 @@ HRESULT CMeshGround::Last_Initialize()
 {
 	if (m_bLast_Initlize)
 		return S_OK;
+
+	
+
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -123,12 +126,22 @@ HRESULT CMeshGround::SetUp_Components()
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"), TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
+		return E_FAIL;
+
 #else
 	/* For.Com_Model */
 	if (FAILED(__super::Add_Component(LEVEL_COMBAT, m_GroundModelDesc.Name, TEXT("Com_Model"),
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+	/* For.Com_Texture */
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, m_GroundModelDesc.TextureName, TEXT("Com_Texture"),
+		(CComponent**)&m_pTextureCom)))
+		return E_FAIL;
 #endif
 	
 
@@ -148,6 +161,10 @@ HRESULT CMeshGround::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	
+	if (FAILED(m_pTextureCom->Bind_ShaderResource(m_pShaderCom, "g_DiffuseTexture", m_GroundModelDesc.iTextureIndex)))
+		return E_FAIL;
+	
 	RELEASE_INSTANCE(CGameInstance);
 
 
@@ -181,7 +198,7 @@ CGameObject * CMeshGround::Clone(void * pArg)
 void CMeshGround::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pRendererCom);

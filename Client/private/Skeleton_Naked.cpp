@@ -93,9 +93,7 @@ HRESULT CSkeleton_Naked::Initialize_Prototype()
 HRESULT CSkeleton_Naked::Initialize(void * pArg)
 {
 	m_ObjectName = TEXT("Skeleton_Naked");
-
 	m_vecBuffImage.reserve(5);
-
 
 	CGameObject::GAMEOBJECTDESC			GameObjectDesc;
 	ZeroMemory(&GameObjectDesc, sizeof GameObjectDesc);
@@ -231,18 +229,12 @@ void CSkeleton_Naked::Late_Tick(_double TimeDelta)
 
 	if(m_bIsDead && !m_bClearScene)
 	{
-		//for (auto& pBuffImage : m_MonsterParts)	// 이펙트 생성때문에 돌려야됌
-		//	Safe_Release(pBuffImage);
-		//m_MonsterParts.clear();
-
 		for (auto& pBuffImage : m_vecBuffImage)
 			Safe_Release(pBuffImage);
 		m_vecBuffImage.clear();
-
 		m_bClearScene = true;
 	}
 
-	
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -922,7 +914,7 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 1000;
+	StatusDesc.iHp = 500;
 	StatusDesc.iMp = 250;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -1053,7 +1045,7 @@ void CSkeleton_Naked::Anim_Skill1_Attack()
 	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;
 	m_pStatusCom->Use_SkillMp(30);
 	m_iStage_Buff_DamgaeUP = 0;
-	m_LimitDistance = 6.f;
+	m_LimitDistance = 5.f;
 	m_pMeHit_Player = nullptr;
 	m_bRun = false;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
@@ -1118,8 +1110,8 @@ void CSkeleton_Naked::Anim_Heavy_Hit()
 	++m_iHitNum;
 	m_bIsHeavyHit = false;
 	m_CurAnimqeue.push({ 17, 1.f });
-	Set_CombatAnim_Index(m_pModelCom);
 	
+	Set_CombatAnim_Index(m_pModelCom);
 	Create_Heavy_Hit_Effect();
 }
 

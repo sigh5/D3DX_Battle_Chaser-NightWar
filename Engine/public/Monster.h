@@ -15,6 +15,7 @@ public:
 	_bool		IsHaveUlitmate()const { return m_bHaveUltimate; }
 	_bool		IsHaveSkill2() const{ return m_bHaveSkill2; }
 	_bool		IsHaveBuff()const { return m_bHaveBuff; }
+	_bool		IsHaveUseItem()const { return m_bMonsterHaveUseItem; }
 public:
 	virtual		_bool	IsCollMouse() = 0;
 
@@ -50,6 +51,7 @@ protected:
 	_bool			m_bHaveUltimate = false;
 	_bool			m_bHaveSkill2 = false;
 	_bool			m_bHaveBuff = false;
+	_bool			m_bMonsterHaveUseItem = false;
 	_int			m_iMonsterAttackNum = 0;
 	_bool			m_bMonster_Victroys = false;
 };

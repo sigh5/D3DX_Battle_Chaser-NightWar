@@ -18,6 +18,9 @@ public:
 	typedef struct tag_GroundModel
 	{
 		_tchar	Name[MAX_PATH] = TEXT("");
+		_tchar  TextureName[MAX_PATH] = TEXT("");
+		_int	iTextureIndex;
+		_uint	iShaderPass;
 	}Ground_ModelDesc;
 
 
@@ -41,7 +44,7 @@ private:
 	CShader*							m_pShaderCom = nullptr;
 	CRenderer*							m_pRendererCom = nullptr;
 	CModel*								m_pModelCom = nullptr;
-
+	CTexture*							m_pTextureCom = nullptr;
 private:
 	Ground_ModelDesc					m_GroundModelDesc;
 	_bool								m_bRenderActive = true;

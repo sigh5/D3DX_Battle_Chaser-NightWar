@@ -108,12 +108,12 @@ private:
 	void	Ultimate_End_LateTick(_double TimeDelta);
 
 
-
 public:
 	void	Ready_Ultimate();
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
-	
+	void	CombatMap_RenderStop();
+	void	CombatMap_RenderStart();
 
 
 
@@ -127,6 +127,7 @@ public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 	void		To_Uitimate();
 	void		To_Buff();
 	void		To_WideAreaBuff();
+	void		To_Use_NormalAttack2();
 	void		To_Use_Item();
 	void		To_Defence();
 	void		To_Light_Hit();
@@ -191,11 +192,24 @@ private:
 	
 	_uint					m_iFsmOption = 0;
 
+	_float					fCurActorHpRatio = 0.f;
+	_float					fCurActorMpRatio = 0.f;
+	_int					iMonsterActiveNum = 0;
+	_int					m_iBossActiveOption = 0;
+	_bool					m_bBossUltimateTwo = false;
+	_bool					m_bManaHalfAndHpHalf = false;
 
 private:
 	HRESULT					Set_CurrentActor();
 	HRESULT					Set_ActorsStatus();
 	
+
+
+	void					Cal_MapOneMonsterFsm();
+	void					Cal_MapTwoMonsterFsm();
+
+
+
 	CGameObject*			Find_CurActor(const wstring& pNameTag);
 	CStatus*				Find_CurStatus(const wstring& pNameTag);
 

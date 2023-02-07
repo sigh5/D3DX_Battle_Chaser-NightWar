@@ -74,15 +74,15 @@ PS_OUT PS_MAIN(PS_IN In)
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV );
 
-	if (0.4f > vDiffuse.a)
-		discard;
-
 	Out.vDiffuse = vDiffuse;
 
 	/* -1 ~ 1 => 0 ~ 1 */
 	vector vNormal = vector(-1.f, 1.f, -1.f, 0.f);
 	Out.vNormal = normalize(vNormal);//vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
+
+	if (0.4f > vDiffuse.a)
+		discard;
 
 	return Out;
 }
@@ -107,6 +107,28 @@ PS_OUT PS_MAIN_Glow(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_MeshUvCut(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+
+	Out.vDiffuse = vDiffuse;
+
+	/* -1 ~ 1 => 0 ~ 1 */
+	vector vNormal = vector(-1.f, 1.f, -1.f, 0.f);
+	Out.vNormal = normalize(vNormal);//vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
+
+	if (0.4f > vDiffuse.a)
+		discard;
+
+	if (0.65f >= In.vTexUV.y)
+		discard;
+
+
+	return Out;
+}
 
 
 technique11 DefaultTechnique
@@ -137,4 +159,16 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
 
+	pass MeshGround
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_MeshUvCut();
+	}
 }

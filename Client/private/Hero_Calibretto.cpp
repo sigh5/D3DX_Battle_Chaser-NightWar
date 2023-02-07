@@ -153,15 +153,15 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 			m_pFullscreenEffect->Tick(TimeDelta);
 
 	
-		static float ffPos[3] = {};
-		static float ffScale[3] = {};
-		static char  szName[MAX_PATH] = "";
-		ImGui::InputFloat3("SkillPos", ffPos);
-		ImGui::InputFloat3("SkillScale", ffScale);
+		/*	static float ffPos[3] = {};
+			static float ffScale[3] = {};
+			static char  szName[MAX_PATH] = "";
+			ImGui::InputFloat3("SkillPos", ffPos);
+			ImGui::InputFloat3("SkillScale", ffScale);
 
-		CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-		ImGui::InputText("TextureName", szName, MAX_PATH);
-
+			CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+			ImGui::InputText("TextureName", szName, MAX_PATH);
+	*/
 		//if (ImGui::Button("Create_Skill"))
 		//{
 		//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
@@ -186,7 +186,7 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 		//	Create_Test_Effect();		// Test
 		//}
 
-		RELEASE_INSTANCE(CGameInstance);
+		//RELEASE_INSTANCE(CGameInstance);
 
 	
 	}
@@ -336,7 +336,7 @@ HRESULT CHero_Calibretto::Render()
 
 HRESULT CHero_Calibretto::Render_ShadowDepth()
 {
-	if (m_bIsCombatScene == false)
+	if (m_bIsCombatScene == false || m_bUltimateNoRenderShader==true)
 		return S_OK;
 
 	if (FAILED(__super::Render()))
@@ -510,7 +510,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 		vPos.x -= 1.f;
-		vPos.y += 9.f;
+		vPos.y += 11.f;
 		_int iRandom = rand() % 5;
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target2_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum, 1.5f, 1.2f);
 		m_bOnceCreate = true;
@@ -559,11 +559,12 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		Create_Wide_BuffEffect_Second();
 		m_bRun = true;
 	}
-	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(46, 6))
+	else if (!m_bFogStart && m_pModelCom->Control_KeyFrame_Create(46, 8))
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		Create_Ultimate_StartCam_Effect();
 		CCombatController::GetInstance()->Load_CamBG2();
+		m_bUltimateNoRenderShader = true;
 		m_bFogStart = true;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(46, 200))	
@@ -598,7 +599,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_End_Effect();
 		CCombatController::GetInstance()->Wide_Attack(false,50);
-		
+		m_bUltimateNoRenderShader = false;
 		m_bUltimateStop = false;
 	}
 	else if (!m_bRecoverHeight && m_pModelCom->Control_KeyFrame_Create(46, 400))	// 대신 쓴 변수
@@ -830,7 +831,7 @@ void CHero_Calibretto::AnimNormalAttack()
 	m_SpeedRatio = 8.f;
 	m_LimitDistance = 8.f;
 	m_ReturnDistance = 0.4f;
-	m_setTickForSecond = 0.9f;
+
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
 
@@ -1556,7 +1557,7 @@ void CHero_Calibretto::Create_Wide_BuffEffect_Second()
 		{
 			pGameObject = pInstance->Load_Effect(L"Texture_bretto_heal_spread_0_Effect", LEVEL_COMBAT, false);
 			BuffDesc.ParentTransform = pActor.second->Get_Transform();
-			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vPosition = _float4(0.f, 2.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(20.f, 20.f, 20.f);
 			BuffDesc.vAngle = 90.f;
 			BuffDesc.fCoolTime = 5.f;
@@ -1696,7 +1697,7 @@ void CHero_Calibretto::Create_Heavy_Hit_Effect()
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 1.f;
-	vPos.y += 9.f;
+	vPos.y += 11.f;
 	CDamage_Font_Manager::GetInstance()->Set_Damage_Target2_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom);
 
 
@@ -1851,7 +1852,46 @@ void CHero_Calibretto::Create_Hit_Effect()
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_SHILED:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 
+		if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
+		{
+			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+		}
+		if (m_iMultiHitNum == 3)
+		{
+			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+		}
+		m_iMultiHitNum++;
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		break;
+	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_TWO:
+		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		iEffectNum = 1;
+		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		break;
 
 
 	default:
@@ -1910,7 +1950,7 @@ void CHero_Calibretto::Use_HpPotion()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
 	vPos.x -= 1.f;
-	vPos.y += 9.f;
+	vPos.y += 11.f;
 	CExplain_FontMgr::GetInstance()->Set_Explain_Target2_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("hp up"));
 
@@ -1954,7 +1994,7 @@ void CHero_Calibretto::Use_MpPotion()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 
 	vPos.x -= 1.f;
-	vPos.y += 9.f;
+	vPos.y += 11.f;
 	CExplain_FontMgr::GetInstance()->Set_Explain_Target2_Font0(vPos,
 		_float3(1.f, 1.f, 1.f), TEXT("mp up"));
 
@@ -2034,13 +2074,13 @@ void CHero_Calibretto::Calculator_HitDamage()
 	_float4 vPos;
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 1.f;
-	vPos.y += 9.f;
+	vPos.y += 11.f;
 	
 	if (Is_DebuffBlend(m_pStatusCom[COMBAT_PLAYER], m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
 	{
 		_float4 vPos2;
 		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos2.y += 8.f;
+		vPos2.y += 11.f;
 		CExplain_FontMgr::GetInstance()->
 			Set_Debuff_Target2_Font(vPos2, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
 

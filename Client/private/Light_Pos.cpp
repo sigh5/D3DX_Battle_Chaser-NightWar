@@ -69,16 +69,16 @@ void CLight_Pos::Tick(_double TimeDelta)
 	//m_pTransformCom->LookAt(XMVectorSet(0.f, -1.f, 0.f, 0.f));
 
 	/*For Tool*/
-	//_float4x4 WorldMatrix, m_LightProjMatrix;
-	//XMStoreFloat4x4(&WorldMatrix, m_pTransformCom->Get_WorldMatrix_Inverse());
+	_float4x4 WorldMatrix, m_LightProjMatrix;
+	XMStoreFloat4x4(&WorldMatrix, m_pTransformCom->Get_WorldMatrix_Inverse());
 
-	//_matrix		LightProjMatrix;
-	//LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.f), _float(1280) / _float(720), 0.2f, 300.f);
-	//XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);
+	_matrix		LightProjMatrix;
+	LightProjMatrix = XMMatrixPerspectiveFovLH(XMConvertToRadians(60.f), _float(1280) / _float(720), 0.2f, 300.f);
+	XMStoreFloat4x4(&m_LightProjMatrix, LightProjMatrix);
 
 
-	//CGameInstance::GetInstance()->Set_LightView_Matrirx(TEXT("Test"), WorldMatrix);
-	//CGameInstance::GetInstance()->Set_LightProj_Matrirx(TEXT("Test"), m_LightProjMatrix);
+	CGameInstance::GetInstance()->Set_LightView_Matrirx(TEXT("Test"), WorldMatrix);
+	CGameInstance::GetInstance()->Set_LightProj_Matrirx(TEXT("Test"), m_LightProjMatrix);
 
 	/*~ For Tool*/
 

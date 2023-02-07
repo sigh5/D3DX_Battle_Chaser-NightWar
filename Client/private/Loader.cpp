@@ -178,23 +178,10 @@ HRESULT CLoader::Loading_ForGamePlay()
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 		/* Model */
 #ifdef NOMODLES
-	/*	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);	
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);*/
-		
-		/*	CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_GAMEPLAY);
-
-		*/
-		
 	
-
+	
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
-		/*CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_start"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Anim_battle_Start"), LEVEL_GAMEPLAY);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_NonAnim"), LEVEL_GAMEPLAY);*/
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("PlayerModels"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Skills"), LEVEL_GAMEPLAY);
@@ -371,7 +358,7 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 
 	/* For.Prototype_Component_Texture_UITrunCharUI */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_UITrunCharUI"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/ComBatCharUI/ComBatCharUI_%d.png"), CTexture::TYPE_END, 6))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Combat/ComBatCharUI/ComBatCharUI_%d.png"), CTexture::TYPE_END, 7))))
 		return E_FAIL;
 
 	/* For.Prototype_Component_Texture_UITrunCharUI */
@@ -381,7 +368,7 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 
 	/* For.Prototype_Component_Texture_UITrunCharUI */
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_COmbatScene_Forest"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/CombatScene//BG_Forest_%d.png"), CTexture::TYPE_END, 6))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/CombatScene//BG_Forest_%d.png"), CTexture::TYPE_END, 7))))
 		return E_FAIL;
 
 

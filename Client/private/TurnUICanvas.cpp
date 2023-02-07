@@ -10,7 +10,7 @@
 #include "Spider_Mana.h"
 #include "SlimeKing.h"
 #include "Skeleton_Naked.h"
-
+#include "Boss_Alumon.h"
 
 #include "TurnCharcterUI.h"
 
@@ -85,12 +85,12 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Player"), TEXT("Hero_Alumon"));
 	dynamic_cast<CHero_Garrison*>(pGameObject)->m_Hero_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 
-	if (pInstance->Get_Setting_MonsterScene() != 1)
+	if (pInstance->Get_Setting_MonsterScene() != 1 && pInstance->Get_Setting_MonsterScene() != 4)
 	{
 		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Skeleton_Naked"));
 		dynamic_cast<CSkeleton_Naked*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 	}
-	if (pInstance->Get_Setting_MonsterScene() != 0)
+	if (pInstance->Get_Setting_MonsterScene() != 0 && pInstance->Get_Setting_MonsterScene() != 4)
 	{
 		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Spider_Mana"));
 		dynamic_cast<CSpider_Mana*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
@@ -101,6 +101,12 @@ HRESULT CTurnUICanvas::Last_Initialize()
 	{
 		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Monster_SlimeKing"));
 		dynamic_cast<CSlimeKing*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
+	}
+	
+	if (pInstance->Get_Setting_MonsterScene() == 4)
+	{
+		pGameObject = pInstance->Get_GameObject(pInstance->GetCurLevelIdx(), TEXT("Layer_Monster"), TEXT("Boss_Alumon"));
+		dynamic_cast<CBoss_Alumon*>(pGameObject)->m_Monster_CombatTurnDelegeter.bind(this, &CTurnUICanvas::ChildrenMoveCheck);
 	}
 
 	SetUp_ChildrenPosition();

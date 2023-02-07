@@ -172,21 +172,7 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 		Safe_Release(pGameInstance);
 	}
 
-
-	//if (GetKeyState(VK_SPACE) & 0x8000)
-	//{
-	//	CGameInstance*		pGameInstance = CGameInstance::GetInstance();
-	//	Safe_AddRef(pGameInstance);
-	//	//pGameInstance->Stop_Sound(SOUND_BGM);
-	//	
-	//	pGameInstance->SceneChange_NameVectorClear();
-	//	pGameInstance->Set_CopyIndexs(LEVEL_GAMEPLAY, LEVEL_COMBAT);
-	//	if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_COMBAT), true)))
-	//		return;
-	//	pGameInstance->Setting_MonsterScene(4);
-	//	Safe_Release(pGameInstance);
-
-	//}
+	
 	
 
 #endif
@@ -272,15 +258,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
 		return E_FAIL;*/
 
-	
-
-
-
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
 
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Light_Pos"))))
-		return E_FAIL;*/
+
 
 #endif
 
@@ -334,8 +315,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 	pGameInstance->Load_Object(TEXT("Inventory"), LEVEL_GAMEPLAY);
 	
-	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Broken_Image"))))
-		return E_FAIL;*/
 
 #endif
 
@@ -350,9 +329,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const wstring & pLayerTag)
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 	
 #ifdef NOMODLES
-	//pGameInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Lighting"), LEVEL_GAMEPLAY,true);
-
-	//pGameInstance->Load_Effect(TEXT("Slime_Ultimate_Mesh_Effect"), LEVEL_GAMEPLAY, true);
+	
 #else
 
 #endif
@@ -380,64 +357,6 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LightDesc.vSpecular = _float4(0.f, 0.f, 0.f, 0.f);
 
 	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext,TEXT("Level_Game_Directional") ,LightDesc)))
-		return E_FAIL;
-
-	ZeroMemory(&LightDesc, sizeof LightDesc);
-
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.isEnable = true;
-	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	LightDesc.vPosition = _float4(11.f, 3.f, 2.7f, 1.f);
-	LightDesc.fRange = 5.f;
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_One"), LightDesc)))
-		return E_FAIL;
-
-
-	ZeroMemory(&LightDesc, sizeof LightDesc);
-
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.isEnable = true;
-	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	LightDesc.vPosition = _float4(11.f, 3.f, 9.3f, 1.f);
-	LightDesc.fRange = 5.f;
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Two"), LightDesc)))
-		return E_FAIL;
-
-
-	ZeroMemory(&LightDesc, sizeof LightDesc);
-
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.isEnable = true;
-	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	LightDesc.vPosition = _float4(19.f, 3.f, 13.f, 1.f);
-	LightDesc.fRange = 5.f;
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Three"), LightDesc)))
-		return E_FAIL;
-
-	ZeroMemory(&LightDesc, sizeof LightDesc);
-
-	LightDesc.eType = LIGHTDESC::TYPE_POINT;
-	LightDesc.isEnable = true;
-	/*LightDesc.vDirection = _float4(1.f, -1.f, 1.0f, 0.f);*/
-	LightDesc.vPosition = _float4(11.f, 3.f, 15.f, 1.f);
-	LightDesc.fRange = 5.f;
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.2f, 0.2f, 0.2f);
-	LightDesc.vSpecular = LightDesc.vDiffuse;
-
-	if (FAILED(pGameInstance->Add_Light(m_pDevice, m_pContext, TEXT("Level_Game_PointLight_Four"), LightDesc)))
 		return E_FAIL;
 
 	RELEASE_INSTANCE(CGameInstance);

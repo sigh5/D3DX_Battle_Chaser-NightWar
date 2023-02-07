@@ -236,12 +236,12 @@ HRESULT CLevel_Combat::Ready_Layer_Camera(const wstring & pLayerTag)
 
 	int iMonsterSettingNum = pGameInstance->Get_Setting_MonsterScene();
 
-	if (iMonsterSettingNum == 4)
+	/*if (iMonsterSettingNum == 4)
 	{
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_Camera_Dynamic"))))
 			return E_FAIL;
 	}
-	else
+	else*/
 	{
 		if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_CombatCamera"))))
 			return E_FAIL;
@@ -358,9 +358,9 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 		pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas3"), LEVEL_COMBAT);
 		break;
 	case 4:
-
+		pGameInstance->Load_Object(TEXT("UI_TrunBoss"), LEVEL_COMBAT);
+		pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvasBoss"), LEVEL_COMBAT);
 		break;
-
 	default:
 		break;
 	}
@@ -368,15 +368,21 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 	if (iMonsterSettingNum != 4)
 	{
 		lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_CombatBaseGround"));
+		lstrcpy(ModelNameDesc.TextureName, TEXT("Prototype_Component_Texture_COmbatScene_Forest"));
+		ModelNameDesc.iTextureIndex = 4;
 		pGameInstance->Load_Object(TEXT("CombatSceneForest1"), LEVEL_COMBAT);
-		pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
+		ModelNameDesc.iShaderPass = 2;
 	}
 	else
 	{
 		pGameInstance->Load_Object(TEXT("CombatScene2"), LEVEL_COMBAT);
 		lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_Ground"));
+		lstrcpy(ModelNameDesc.TextureName, TEXT("Prototype_Component_Texture_CombatMapTwo"));
+		ModelNameDesc.iTextureIndex = 3;
+		ModelNameDesc.iShaderPass = 2;
 	}
-	lstrcpy(ModelNameDesc.Name, TEXT("Prototype_Component_Ground"));
+
+	pGameInstance->Load_Object(TEXT("UI_Combat_State"), LEVEL_COMBAT);
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_COMBAT, pLayerTag, TEXT("Prototype_GameObject_MeshGround"), &ModelNameDesc)))
 		return E_FAIL;
 		

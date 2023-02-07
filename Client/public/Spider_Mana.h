@@ -102,8 +102,8 @@ private:
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
-	_float					m_LimitDistance = 6.f;
-	_float					m_ReturnDistance = 0.1f;
+	_float					m_LimitDistance = 4.f;
+	_float					m_ReturnDistance = 0.4f;
 	_float					m_setTickForSecond = 1.f;
 	_uint					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	_bool					m_bChange_hit_Effect = false;

@@ -93,6 +93,8 @@ protected:
 	_bool							m_bCombatChaseTarget = false;
 	_bool							m_bUseDefence = false;//디펜스를 사용할때
 	_bool							m_bIsDefenceTimer = false;
+
+	_bool							m_bUltimateNoRenderShader = false;
 	CStatus::DEBUFFTYPE				m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_NONE;
 	
 

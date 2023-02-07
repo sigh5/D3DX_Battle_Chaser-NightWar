@@ -166,6 +166,7 @@ void CCombatMap::Change_Texture(_uint iLevel, const wstring & NewComPonentTag)
 void CCombatMap::Set_RenderActive(_bool bActive)
 {
 	__super::Set_RenderActive(bActive);
+	m_bRenderActive = bActive;
 }
 
 

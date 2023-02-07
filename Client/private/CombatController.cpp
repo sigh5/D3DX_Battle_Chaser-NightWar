@@ -329,7 +329,7 @@ void CCombatController::Cal_HitPlayerTarget()
 	//m_iMonster_Player_Option = 2;
 
 	CGameObject* pMeHit_Player = static_cast<CMonster*>(m_pCurentActor)->Get_Me_hitPlayer();
-	_int iMonsterActiveNum = static_cast<CMonster*>(m_pCurentActor)->Get_MonsterActiveNum();
+	iMonsterActiveNum = static_cast<CMonster*>(m_pCurentActor)->Get_MonsterActiveNum();
 	if (pMeHit_Player != nullptr)
 	{
 		m_pHitActor = pMeHit_Player;
@@ -375,127 +375,19 @@ void CCombatController::Cal_HitPlayerTarget()
 		4) 같은 스킬은 연속해서 쓰지 않는다.
 	*/
 
-	_float fCurActorHpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusHpRatio();
-	_float fCurActorMpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusMpRatio();
+	fCurActorHpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusHpRatio();
+	fCurActorMpRatio = Find_CurStatus(m_pCurentActor->Get_ObjectName())->Get_CurStatusMpRatio();
+
+	int iMonsterSettingNum = m_pGameInstace->Get_Setting_MonsterScene();
+
+	if (iMonsterSettingNum != 4)
+		Cal_MapOneMonsterFsm();
+
+	else
+		Cal_MapTwoMonsterFsm();
 
 
-	//if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate()) //OnlyDebug
-	//{
-	//	To_Uitimate();
-	//	m_bMonsterSelect_Target = true;
-	//	return;
-	//}
-	if (fCurActorHpRatio <= 0.f)
-	{
-		To_Normal_Attack();
-	}
-	else if (fCurActorHpRatio >= 0.5f) // 1) 본인 피가 절반인가? 
-	{	
-		// 맞은 적이없고 버프를 쓴적이없다.
-		if (static_cast<CMonster*>(m_pCurentActor)->Get_HitNum() == 0
-			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
-			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
-		{
-			
-			To_Buff();
-		}
-		else
-		{
-			if (0 == iMonsterActiveNum)
-			{
-				 To_Normal_Attack();
-				 ++iMonsterActiveNum;
-			}
-			else if(1 == iMonsterActiveNum)
-			{
-				To_Skill1_Attack();
-				++iMonsterActiveNum;
-			}
-			else if (2 == iMonsterActiveNum)
-			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
-				{
-					To_Skill2_Attack();
-				}
-				else
-					To_Skill1_Attack();
-				
-				iMonsterActiveNum = 0;
-			}
-		
-		}
-		
-	}
-	else   // 본인 피가 절반 이하다.
-	{
-		//본인 피가 절반 20%이하고 마나가 50퍼 이상 높을때 궁극기 사용
-		if (fCurActorHpRatio <= 0.45f)		// 나중에 0.3f 로 바꾸기
-		{	
-			if (fCurActorMpRatio >= 0.5f)
-			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate() && !m_bMonsterUseUltimate)
-				{
-					m_bMonsterUseUltimate = true;
-					iMonsterActiveNum = 0;
-					To_Uitimate();
-				}
-				else if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
-				{
-					To_Skill2_Attack();
-					iMonsterActiveNum = 0;
-				}
-				else
-				{
-					To_Skill1_Attack();
-					++iMonsterActiveNum;
-					if(static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
-					{
-						m_bMonsterUseUltimate = false;
-					}
-				}
-			}
-			else //마나가 50퍼 공격 스킬사용
-			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
-				{
-					To_Skill2_Attack();
-					iMonsterActiveNum = 0;
-				}
-				else
-				{
-					To_Skill1_Attack();
-					++iMonsterActiveNum;
-				}
-			}
-		}
-		else
-		{	
-			if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && fCurActorMpRatio >= 0.25f && iMonsterActiveNum == 2)
-			{
-				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
-						To_Skill2_Attack();
-				else if(false == static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2()
-					&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
-						To_Uitimate();
-				else
-					To_Skill1_Attack();
-			
-				++iMonsterActiveNum;
-			}
-			else if (fCurActorMpRatio >= 0.1f &&  iMonsterActiveNum==1)	//공격스킬사용
-			{
-				To_Skill1_Attack();
-				++iMonsterActiveNum;
-			}
-			else						//기본공격 사용
-			{
-				To_Normal_Attack();
-				iMonsterActiveNum = 0;
-			}
-		}
-	}
-	static_cast<CMonster*>(m_pCurentActor)->Set_MonsterActiveNum(iMonsterActiveNum);
-	Mana_Refresh(); 
+	Mana_Refresh();
 	m_bMonsterSelect_Target = true;
 
 }
@@ -540,6 +432,10 @@ void CCombatController::Ultimate_Camera_On()
 	{
 		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_SlimeKing"), LEVEL_COMBAT));
 	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Boss_Alumon")))
+	{
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_SlimeKing"), LEVEL_COMBAT));
+	}
 	else
 		return;
 
@@ -572,12 +468,13 @@ void CCombatController::Ultimate_LateTick(_double TimeDelta)
 
 void CCombatController::Ready_Ultimate()
 {
-	//CCombatController::GetInstance()->Get_CurActor()->
 	Get_CurActor()->Set_FsmState(true, CGameObject::m_Uitimate);
 
 	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
 	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
 	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(false);
+
+
 
 }
 
@@ -588,6 +485,7 @@ void CCombatController::Ultimate_Start_LateTick(_double TimeDelta)
 
 	if (true == m_pCurBannerImage->Get_BannerTimerFinsish())
 	{
+		CombatMap_RenderStop();
 		m_pCombatCamera->UltimateStart_CameraWork(m_pCurentActor);
 		m_pGameInstace->DeleteGameObject(LEVEL_COMBAT, m_pCurBannerImage->Get_ObjectName());
 		m_bCurActorUltimateUse = false;
@@ -626,6 +524,10 @@ void CCombatController::Ultimate_Timedelta_Tick(_double TimeDelta)
 	{
 		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.4f);
 	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Boss_Alumon")))
+	{
+		m_fTimeSlowRatio = fmax(m_fTimeSlowRatio, 0.4f);
+	}
 	
 	m_pGameInstace->Set_Timedelta(TEXT("Timer_60"), m_fTimeSlowRatio);	
 	
@@ -644,12 +546,29 @@ void CCombatController::Ultimate_End_LateTick(_double TimeDelta)
 	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
 	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
 	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(true);
+	CombatMap_RenderStart();
 	Ultimate_Camera_Off();
 	m_pCombatBG = nullptr;
 	m_pCombatBG2 = nullptr;
 }
 
+void CCombatController::CombatMap_RenderStop()
+{
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
+			pCanvas->Set_RenderActive(false);
+	}
+}
 
+void CCombatController::CombatMap_RenderStart()
+{
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
+			pCanvas->Set_RenderActive(true);
+	}
+}
 
 void CCombatController::Refresh_CurActor()
 {
@@ -720,6 +639,10 @@ void CCombatController::Load_CamBG2()
 		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
 	}
 	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Monster_SlimeKing")))
+	{
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
+	}
+	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Boss_Alumon")))
 	{
 		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
 	}
@@ -976,6 +899,13 @@ HRESULT CCombatController::Set_CurrentActor()
 		m_iMonster_Player_Option = 1;
 		m_bIsPlayer = false;
 		break;
+	case Client::REPRESENT_REAL_BOSS:
+		m_pCurentActor = Find_CurActor(TEXT("Boss_Alumon"));
+		m_iMonster_Player_Option = 1;
+		m_bIsPlayer = false;
+		break;
+		
+
 	case Client::REPRESENT_END:
 		break;
 	}
@@ -1000,6 +930,270 @@ HRESULT CCombatController::Set_ActorsStatus()
 	}
 
 	return S_OK;
+}
+
+void CCombatController::Cal_MapOneMonsterFsm()
+{
+	if (fCurActorMpRatio <= 0.f)
+	{
+		To_Normal_Attack();
+	}
+	else if (fCurActorHpRatio >= 0.5f) // 1) 본인 피가 절반인가? 
+	{
+		// 맞은 적이없고 버프를 쓴적이없다.
+		if (static_cast<CMonster*>(m_pCurentActor)->Get_HitNum() == 0
+			&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveBuff()
+			&& false == static_cast<CMonster*>(m_pCurentActor)->Get_UseBuff())
+		{
+
+			To_Buff();
+		}
+		else
+		{
+			if (0 == iMonsterActiveNum)
+			{
+				To_Normal_Attack();
+				++iMonsterActiveNum;
+			}
+			else if (1 == iMonsterActiveNum)
+			{
+				To_Skill1_Attack();
+				++iMonsterActiveNum;
+			}
+			else if (2 == iMonsterActiveNum)
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+				{
+					To_Skill2_Attack();
+				}
+				else
+					To_Skill1_Attack();
+
+				iMonsterActiveNum = 0;
+			}
+
+		}
+
+	}
+	else   // 본인 피가 절반 이하다.
+	{
+		//본인 피가 절반 20%이하고 마나가 50퍼 이상 높을때 궁극기 사용
+		if (fCurActorHpRatio <= 0.45f)		// 나중에 0.3f 로 바꾸기
+		{
+			if (fCurActorMpRatio >= 0.5f)
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate() && !m_bMonsterUseUltimate)
+				{
+					m_bMonsterUseUltimate = true;
+					iMonsterActiveNum = 0;
+					To_Uitimate();
+				}
+				else if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
+				{
+					To_Skill2_Attack();
+					iMonsterActiveNum = 0;
+				}
+				else
+				{
+					To_Skill1_Attack();
+					++iMonsterActiveNum;
+					if (static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+					{
+						m_bMonsterUseUltimate = false;
+					}
+				}
+			}
+			else //마나가 50퍼 공격 스킬사용
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && iMonsterActiveNum >= 1)
+				{
+					To_Skill2_Attack();
+					iMonsterActiveNum = 0;
+				}
+				else
+				{
+					To_Skill1_Attack();
+					++iMonsterActiveNum;
+				}
+			}
+		}
+		else
+		{
+			if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2() && fCurActorMpRatio >= 0.25f && iMonsterActiveNum == 2)
+			{
+				if (static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2())
+					To_Skill2_Attack();
+				else if (false == static_cast<CMonster*>(m_pCurentActor)->IsHaveSkill2()
+					&& true == static_cast<CMonster*>(m_pCurentActor)->IsHaveUlitmate())
+					To_Uitimate();
+				else
+					To_Skill1_Attack();
+
+				++iMonsterActiveNum;
+			}
+			else if (fCurActorMpRatio >= 0.1f &&  iMonsterActiveNum == 1)	//공격스킬사용
+			{
+				To_Skill1_Attack();
+				++iMonsterActiveNum;
+			}
+			else						//기본공격 사용
+			{
+				To_Normal_Attack();
+				iMonsterActiveNum = 0;
+			}
+		}
+	}
+
+	static_cast<CMonster*>(m_pCurentActor)->Set_MonsterActiveNum(iMonsterActiveNum);
+}
+
+void CCombatController::Cal_MapTwoMonsterFsm()
+{
+	To_Use_NormalAttack2();		// 보스는 노멀어택 2임
+	++m_iBossActiveOption;
+	return;
+
+	if (fCurActorMpRatio <= 0.f)
+	{
+		if (m_iBossActiveOption == 0)
+		{
+			To_Normal_Attack();
+			++m_iBossActiveOption;
+		}
+		if (m_iBossActiveOption == 1)
+		{
+			To_Use_Item();
+			m_iBossActiveOption = 0;
+		}
+	}
+	else if (fCurActorHpRatio >= 0.5f) // 1) 본인 피가 절반인가? 
+	{
+		// 맞은 적이없고 버프를 쓴적이없다.
+		if (static_cast<CMonster*>(m_pCurentActor)->Get_HitNum() == 0)
+		{
+			To_Buff();
+			m_iBossActiveOption = 0;
+		}
+		else
+		{
+			if (0 == m_iBossActiveOption)
+			{
+				To_Normal_Attack();
+				++m_iBossActiveOption;
+			}
+			else if (1 == m_iBossActiveOption)
+			{
+				To_Skill1_Attack();
+				++m_iBossActiveOption;
+			}
+			else if (2 == m_iBossActiveOption)
+			{
+				To_Use_Item();		// 보스는 노멀어택 2임
+				++m_iBossActiveOption;
+			}
+			else if (3 == m_iBossActiveOption)
+			{
+				To_Skill2_Attack();
+				m_iBossActiveOption = 0;
+			}
+		}
+	}
+	else   // 본인 피가 절반 이하다.
+	{
+		//본인 피가 절반 20%이하고 마나가 50퍼 이상 높을때 궁극기 사용
+		if (fCurActorHpRatio <= 0.45f)		// 나중에 0.3f 로 바꾸기
+		{
+			if (fCurActorMpRatio >= 0.5f)
+			{
+				if (!m_bMonsterUseUltimate )
+				{
+					m_bMonsterUseUltimate = true;
+					m_iBossActiveOption = 1;	
+					To_Uitimate();
+				}
+				else if (m_iBossActiveOption==1)
+				{
+					To_Skill2_Attack();
+					++m_iBossActiveOption;
+				}
+				else if (m_iBossActiveOption == 2)
+				{
+					To_Skill1_Attack();
+					m_bMonsterUseUltimate = false;
+					m_iBossActiveOption = 0;
+				}
+			}
+			else //마나가 50퍼이하 공격 스킬사용
+			{
+				if (false == m_bManaHalfAndHpHalf)
+				{
+					To_Skill2_Attack();
+					m_iBossActiveOption = 0;
+					m_bManaHalfAndHpHalf = true;
+				}
+				else if (m_iBossActiveOption ==0)
+				{
+					To_Use_Item();
+					iMonsterActiveNum = 0;
+				
+				}
+				else if (m_iBossActiveOption == 1)
+				{
+					To_Buff();
+					++iMonsterActiveNum;
+				}
+				else if (m_iBossActiveOption == 2)
+				{
+					To_Normal_Attack();
+					++iMonsterActiveNum;
+				}
+				else if (m_iBossActiveOption == 3)
+				{
+					To_Skill1_Attack();
+					m_bManaHalfAndHpHalf = false;
+				}
+			}
+		}
+		else
+		{
+			if (false==m_bBossUltimateTwo)
+			{
+				To_WideAreaBuff();		// 보스는 이게 궁극기 2임
+				
+				if (m_iBossActiveOption >= 1)
+					m_iBossActiveOption = 0;
+				else
+					++m_iBossActiveOption;
+
+				m_bBossUltimateTwo = true;
+			}
+			else if (m_iBossActiveOption == 1)
+			{
+				To_Skill1_Attack();
+				++m_iBossActiveOption;
+			}
+			else if (m_iBossActiveOption == 2)
+			{
+				To_Buff();
+				++iMonsterActiveNum;
+			}
+			else if (m_iBossActiveOption == 3)
+			{
+				To_Uitimate();
+				++iMonsterActiveNum;
+			}
+			else if (m_iBossActiveOption == 4)
+			{
+				To_Skill2_Attack();
+				++iMonsterActiveNum;
+			}
+			else if (m_iBossActiveOption == 5)
+			{
+				To_Normal_Attack();
+				m_bBossUltimateTwo = false;
+			}
+		}
+	}
 }
 
 
@@ -1179,15 +1373,22 @@ void CCombatController::To_WideAreaBuff()
 		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
 	}
-	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
+	else
+		return;
+
+}
+
+void CCombatController::To_Use_NormalAttack2()
+{
+	if (dynamic_cast<CMonster*>(m_pCurentActor) == nullptr)
+		return;
+	if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
 	{
-		m_pCurentActor->Set_FsmState(true, CGameObject::m_WideAreaBuff);
-		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_Use_Item);
 		m_bMonsterTurnEnd = true;
 	}
 	else
 		return;
-
 }
 	
 void CCombatController::To_Use_Item()

@@ -186,7 +186,7 @@ HRESULT CMonsterFsm::Init_SlimeKing(CGameObject * pTarget)
 	}, 0))
 		.OnExit([this]()
 	{
-		static_cast<CSkeleton_Naked*>(m_pTarget)->UltiHeavyHitExit();
+		static_cast<CSlimeKing*>(m_pTarget)->UltiHeavyHitExit();
 	})
 
 

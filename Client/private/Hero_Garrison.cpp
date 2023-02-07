@@ -316,7 +316,7 @@ HRESULT CHero_Garrison::Render()
 
 HRESULT CHero_Garrison::Render_ShadowDepth()
 {
-	if (m_bIsCombatScene == false)
+	if (m_bIsCombatScene == false || m_bUltimateNoRenderShader==true)
 		return S_OK;
 
 	if (FAILED(__super::Render()))
@@ -349,6 +349,9 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		m_pTransformCom->Set_Scaled(vScale);
 		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
+
+		Safe_Release(m_pTrailEffect);
+		m_pTrailEffect = nullptr;
 
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
@@ -661,7 +664,46 @@ void CHero_Garrison::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_SHILED:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 
+			if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
+			{
+				pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			if (m_iMultiHitNum == 3)
+			{
+				pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			m_iMultiHitNum++;
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_TWO:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
 
 		default:
 			break;
@@ -983,7 +1025,7 @@ void CHero_Garrison::Create_Ultimate_StartCam_Effect()
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
 	pGameObject = pInstance->Load_Effect(TEXT("Knolan_Ultimage_CamEffect"), LEVEL_COMBAT, false);
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(6.5f, 6.f, 14.6f, 1.f);
+	BuffDesc.vPosition = _float4(6.5f, 6.6f, 13.5f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -1810,6 +1852,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 		CCombatController::GetInstance()->Load_CamBG2();
 		Create_Ultimate_StartCam_Effect();
 		m_bFogStart = true;
+		m_bUltimateNoRenderShader = true;
 	}
 	//else if (!m_bUltimateCam && m_pModelCom->Control_KeyFrame_Create(30, 45))		//45
 	//{
@@ -1836,6 +1879,7 @@ void CHero_Garrison::Ultimate_Anim_Frame_Control()
 		CCombatController::GetInstance()->Camera_Zoom_In();
 		m_bUltimateCam = true;
 		m_bIsUseUltimate = true;
+		m_bUltimateNoRenderShader = false;
 	}
 	//else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(30, 70))		//70
 	//{
@@ -2215,14 +2259,14 @@ void CHero_Garrison::AnimNormalAttack()
 
 	m_SpeedRatio = 7.f;
 	m_LimitDistance = 10.f;
-	m_ReturnDistance = 0.1f;
-	m_setTickForSecond = 0.9f;
+	m_ReturnDistance = 0.15f;
+	m_setTickForSecond = 1.f;
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
 
-	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
+	m_CurAnimqeue.push({ 4,  1.f });
 	m_CurAnimqeue.push({ 3,  1.f });		// 3에서		// 3 22에 이펙트 생성
-	m_CurAnimqeue.push({ 11, m_setTickForSecond });
+	m_CurAnimqeue.push({ 11, 1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -2239,17 +2283,17 @@ void CHero_Garrison::Anim_Skill1_Attack()
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
 	m_SpeedRatio = 8.f;
 	m_LimitDistance = 10.f;
-	m_ReturnDistance = 0.1f;
+	m_ReturnDistance = 0.15f;
 	m_setTickForSecond = 0.9f;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL1;
 	m_iStage_Buff_DamgaeUP = 0;
 	m_bBuffEffectStop = true;
 
 
-	m_CurAnimqeue.push({ 4,  m_setTickForSecond });
+	m_CurAnimqeue.push({ 4,  1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
-	m_CurAnimqeue.push({ 11, m_setTickForSecond });
+	m_CurAnimqeue.push({ 11, 1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -2266,7 +2310,7 @@ void CHero_Garrison::Anim_Skill2_Attack()
 	m_iHitCount = 1;
 	m_LimitDistance = 12.f;
 	m_SpeedRatio = 6.f;
-	m_ReturnDistance = 0.5f;
+	m_ReturnDistance = 0.15f;
 	m_setTickForSecond = 0.9f;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_SKILL2;
 	m_bBuffEffectStop = true;
@@ -2277,7 +2321,7 @@ void CHero_Garrison::Anim_Skill2_Attack()
 	m_CurAnimqeue.push({ 17, 1.0f });
 	m_CurAnimqeue.push({ 18, 0.5f });
 	m_CurAnimqeue.push({ 19, 1.f });
-	m_CurAnimqeue.push({ 11, m_setTickForSecond });
+	m_CurAnimqeue.push({ 11, 1.f });
 	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -2303,14 +2347,16 @@ void CHero_Garrison::Anim_Uitimate()
 
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(40);
 
+	//m_LimitDistance = 10.f;
 	m_LimitDistance = 10.f;
-	m_SpeedRatio = 6.f;
-	m_ReturnDistance = 0.5f;
+	m_SpeedRatio = 9.f;
+	//m_SpeedRatio = 6.f;
+	m_ReturnDistance = 0.15f;
 	m_setTickForSecond = 0.9f;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GARRISON_Ultimate;
 
 	m_CurAnimqeue.push({ 30,  1.f });	// Key프레임 (뛰는 것)하나 찾기 83~94 는 움직여야함  //Texture_Garrison_Ultimate_Effect
-	m_CurAnimqeue.push({ 11,  m_setTickForSecond });
+	m_CurAnimqeue.push({ 11,  1.f });
 	m_CurAnimqeue.push({ 12,  1.f });
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);

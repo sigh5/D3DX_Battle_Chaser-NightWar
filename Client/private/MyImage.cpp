@@ -91,6 +91,7 @@ void CMyImage::Tick(_double TimeDelta)
 			m_bBanerTimerFinish = true;
 
 			CCombatController::GetInstance()->Ready_Ultimate();
+
 		}
 	}
 

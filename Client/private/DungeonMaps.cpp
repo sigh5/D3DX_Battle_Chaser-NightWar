@@ -49,14 +49,14 @@ void CDungeonMaps::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
 
-	if (GetKeyState('Z') & 0x8000)
+	/*if (GetKeyState('Z') & 0x8000)
 	{
 		m_iShaderPass = 0;
 	}
 	if (GetKeyState('X') & 0x8000)
 	{
 		m_iShaderPass = 1;
-	}
+	}*/
 
 	//Create_NaviMesh();
 

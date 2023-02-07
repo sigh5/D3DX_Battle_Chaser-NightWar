@@ -238,7 +238,7 @@ CMapOneTree * CMapOneTree::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX("Failed to Created : CMapOne2D");
+		MSG_BOX("Failed to Created : CMapOneTree");
 		Safe_Release(pInstance);
 	}
 	return pInstance;

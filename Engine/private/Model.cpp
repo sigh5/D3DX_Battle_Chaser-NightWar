@@ -523,7 +523,7 @@ void CModel::Imgui_RenderProperty()
 	}
 
 	
-	//Imgui_Gizmo_Bone();
+	Imgui_Gizmo_Bone();
 
 	ImGui::End();
 

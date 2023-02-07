@@ -327,6 +327,9 @@ HRESULT CSlimeKing::Render()
 
 HRESULT CSlimeKing::Render_ShadowDepth()
 {
+	if (m_bUltimateNoRenderShader)
+		return S_OK;
+
 	if (FAILED(__super::Render()))
 		return E_FAIL;
 	if (FAILED(SetUp_ShaderResources()))
@@ -339,9 +342,8 @@ HRESULT CSlimeKing::Render_ShadowDepth()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+		m_pModelCom->Render(m_pShaderCom, i, 1, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
-
 	return S_OK;
 }
 
@@ -670,8 +672,8 @@ void CSlimeKing::Create_Ultimate_StartCam_Effect()
 	m_pCamEffectObj = pInstance->Load_Effect(L"Slime_Ultimate_CamEffect_Base", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pTransformCom;
-	BuffDesc.vPosition = _float4(17.213f, 2.5f, 10.8f, 1.f);
-	BuffDesc.vScale = _float3(30.f, 20.f, 30.f);
+	BuffDesc.vPosition = _float4(8.f, 8.f, 3.f, 1.f);
+	BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
 	BuffDesc.bIsMainTain = false;
@@ -984,11 +986,13 @@ void CSlimeKing::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_StartCam_Effect();
 		CCombatController::GetInstance()->Load_CamBG2();
+		m_bUltimateNoRenderShader = true;
 		m_bUltimateCam = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(15, 75))
 	{
 		m_bUltimateBuffRenderStop = false;
+		m_bUltimateNoRenderShader = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
 		CCombatController::GetInstance()->Camera_Zoom_In();
 
@@ -1074,7 +1078,7 @@ HRESULT CSlimeKing::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 200;
+	StatusDesc.iHp = 1000;
 	StatusDesc.iMp = 300;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -1187,9 +1191,8 @@ void CSlimeKing::AnimNormalAttack()
 
 	m_LimitDistance = 5.f;
 	m_SpeedRatio = 6.f;
-	m_ReturnDistance = 0.1f;
-	m_setTickForSecond = 1.f;
-
+	m_ReturnDistance = 0.4f;
+	
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
 	m_CurAnimqeue.push({ 10,1.f });
@@ -1212,8 +1215,8 @@ void CSlimeKing::Anim_Skill1_Attack()
 
 	m_LimitDistance = 3.f;
 	m_SpeedRatio = 6.f;
-	m_ReturnDistance = 0.1f;
-	m_setTickForSecond = 1.f;
+
+
 
 	m_CurAnimqeue.push({ 8,1.f });
 	m_CurAnimqeue.push({ 9,1.f });
@@ -1233,8 +1236,8 @@ void CSlimeKing::Anim_Uitimate()
 	m_bUltimateRun = true;
 	m_bOnceCreate = false;
 	m_SpeedRatio = 6.f;
-	m_LimitDistance = 4.f;
-	m_ReturnDistance = 0.1f;
+	m_LimitDistance = 3.f;
+	
 	m_setTickForSecond = 1.f;
 	m_pMeHit_Player = nullptr;
 	m_bIsUseUltimate = false;

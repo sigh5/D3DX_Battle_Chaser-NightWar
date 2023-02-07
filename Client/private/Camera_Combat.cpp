@@ -422,8 +422,8 @@ void CCamera_Combat::Camera_UltiMate_ZoomTick(_double TimeDelta)
 	}
 	else if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS])
 	{
-		vPos.x -= 2.f;
-		vRange = 10.f;
+		vPos.x -= 3.f;
+		vRange = 15.f;
 	}
 	
 	m_pTransformCom->Chase(XMLoadFloat4(&vPos), TimeDelta* 20.f, vRange);

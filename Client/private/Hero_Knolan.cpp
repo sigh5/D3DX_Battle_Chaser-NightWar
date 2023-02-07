@@ -296,7 +296,7 @@ HRESULT CHero_Knolan::Render()
 
 HRESULT CHero_Knolan::Render_ShadowDepth()
 {
-	if (m_bIsCombatScene == false)
+	if (m_bIsCombatScene == false || m_bUltimateNoRenderShader==true)
 		return S_OK;
 
 	if (FAILED(__super::Render()))
@@ -903,7 +903,47 @@ void CHero_Knolan::Create_Hit_Effect()
 			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_SHILED:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
 
+			if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
+			{
+				pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			if (m_iMultiHitNum == 3)
+			{
+				pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+			}
+			m_iMultiHitNum++;
+			break;
+
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
+		case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_TWO:
+			pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+			iEffectNum = 1;
+			BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
+			BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+			break;
 
 		default:
 			break;
@@ -1521,6 +1561,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 	{
 		Create_Ultimate_StartFog_CamEffect();
 		CCombatController::GetInstance()->Load_CamBG2();
+		m_bUltimateNoRenderShader = true;
 		m_bFogStart = true;
 	}
 	else if (!m_bIsUseUltimate && m_pModelCom->Control_KeyFrame_Create(28, 40))
@@ -1529,6 +1570,7 @@ void CHero_Knolan::Anim_Frame_Create_Control()
 		m_pFog = nullptr;
 		m_bUltimateBuffRenderStop = false;
 		CCombatController::GetInstance()->Set_Ultimate_End(true);
+		m_bUltimateNoRenderShader = false;
 		m_bIsUseUltimate = true;
 	}
 	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(28, 60))

@@ -318,7 +318,8 @@ HRESULT CTurnCharcterUI::Set_Represent_Char()
 		m_iRepresent_Char = REPRESENT_SLIMEKING;
 	else if (m_pTextureCom->Get_SelectTextureIndex() == 5)
 		m_iRepresent_Char = REPRESENT_SPIDER_MANA;
-
+	else if (m_pTextureCom->Get_SelectTextureIndex() == 6)
+		m_iRepresent_Char = REPRESENT_REAL_BOSS;
 	return S_OK;
 }
 

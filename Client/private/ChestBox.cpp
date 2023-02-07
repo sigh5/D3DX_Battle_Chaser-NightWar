@@ -49,6 +49,9 @@ void CChestBox::Tick(_double TimeDelta)
 	__super::Tick(TimeDelta);
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
+#ifdef NOMODLES
+
+#else
 	CPlayerController* pPlayerController = GET_INSTANCE(CPlayerController);
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 	CCollider* pCaptinColl = static_cast<CCollider*>(pPlayerController->Get_Captin()->Get_Component(L"Com_OBB"));
@@ -63,6 +66,7 @@ void CChestBox::Tick(_double TimeDelta)
 
 	RELEASE_INSTANCE(CPlayerController);
 	RELEASE_INSTANCE(CGameInstance);
+#endif
 	m_pModelCom->Play_Animation_2(TimeDelta);
 }
 

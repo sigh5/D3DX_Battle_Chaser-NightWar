@@ -177,7 +177,7 @@ private:
 private:
 	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;
-	_float		m_ReturnDistance = 0.1f;
+	_float		m_ReturnDistance = 0.15f;
 	_float		m_setTickForSecond = 0.9f;
 	_uint		m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	wstring			m_TextureTag = TEXT("");

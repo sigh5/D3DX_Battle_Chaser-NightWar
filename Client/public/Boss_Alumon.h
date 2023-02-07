@@ -64,7 +64,7 @@ private:
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	CStatus*				m_pStatusCom = nullptr;
-	class CMonsterFsm*		m_pFsmCom = nullptr;
+	class CBossFsm*			m_pFsmCom = nullptr;
 
 private:
 	HRESULT					SetUp_Components();
@@ -76,18 +76,26 @@ private:
 
 public:
 	void					Anim_Idle();
-	void					Anim_Intro();
-	void					Anim_NormalAttack();
+	void					Anim_Intro();		//0
+	void					Anim_NormalAttack(); //0
 	void					Anim_Skill1_Attack();
-	void					Anim_Defence();
-	void					Anim_Buff();
-	void					Anim_Light_Hit();
-	void					Anim_Heavy_Hit();
-	void					Anim_Die();
+	void					Anim_Skill2_Attack();
+	void					Anim_Uitimate();//0
+	void					Anim_Defence();//0
+	void					Anim_Buff();  //0
+	void					Anim_Uitimate2(); //Brust_One(Anim_Uitimate2)
+
+	void					Anim_NormalAttack2();  //NormalAttack2 (UseItem)
+
+	void					Anim_Light_Hit(); //0
+	void					Anim_Heavy_Hit(); //0
+	void					Anim_Die(); //0
 	void					Anim_Viroty();
 
 private:
-	vector<CGameObject*>			m_MonsterParts;
+	vector<CGameObject*>			m_BossParts;
+	vector<CGameObject*>			m_pEffectParts;
+
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
@@ -112,10 +120,7 @@ private:
 	_bool					m_bUltiWideAttack = false;
 	_bool					m_bUltiAttackStart = false;
 	_bool					m_bUltiAttackStop = false;
-	_float					m_fCreatePosX = 1.5f;
-	_float					m_fCreatePosY = 2.2f;
-	_float					m_fCreatePosZ = 2.0f;
-	_float					m_fCreateScale = 0.5f;
+	
 
 	_int					m_iFrameCnt = 0;
 	_int					m_iMaxCnt = 0;
@@ -125,7 +130,7 @@ private:
 
 
 	WeaponType				m_eWeaponType = WEAPON_HEAD;
-	UI_REPRESENT			m_Represnt = REPRESENT_SLIMEKING;
+	UI_REPRESENT			m_Represnt = REPRESENT_REAL_BOSS;
 
 
 	_bool					m_bUltimateSoundCheck = false;

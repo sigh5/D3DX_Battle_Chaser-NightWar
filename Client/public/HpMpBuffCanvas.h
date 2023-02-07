@@ -52,7 +52,7 @@ private:
 	_float					m_fX, m_fY, m_fSizeX, m_fSizeY;
 	_float4x4				m_ViewMatrix;
 	map<const wstring, CStatus*>	 m_StatusMap;
-
+	_int				m_iMonsterSettingNum = 0;
 	/*Imgui*/
 	char Name2[MAX_PATH] = "";
 

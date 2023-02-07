@@ -229,6 +229,9 @@
     <Filter Include="02.GameObjects\CombatMaps\BossCombatMap">
       <UniqueIdentifier>{3f236e12-3055-4b45-b025-0b7bad08d197}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObjects\Monster\Boss_Alumon\Fsm">
+      <UniqueIdentifier>{39b68691-b809-4fdf-a441-840de4957eed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -476,6 +479,7 @@
     </ClInclude>
     <ClInclude Include="..\Public\MeshGround.h" />
     <ClInclude Include="..\Public\Light_Pos.h" />
+    <ClInclude Include="..\Public\BossFsm.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -705,6 +709,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\MeshGround.cpp" />
     <ClCompile Include="..\Private\Light_Pos.cpp" />
+    <ClCompile Include="..\private\BossFsm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

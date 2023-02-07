@@ -122,6 +122,8 @@ private:
 	_bool					m_bFogStart = false;
 	_bool					m_bFullScreenEffect = false;
 
+
+
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
@@ -177,10 +179,10 @@ private:
 
 
 private:
-	_float		m_SpeedRatio = 8.f;
-	_float		m_LimitDistance = 12.f;
-	_float		m_ReturnDistance = 0.4f;
-	_float		m_setTickForSecond = 0.9f;
+	_float		m_SpeedRatio	    = 8.f;
+	_float		m_LimitDistance     = 12.f;
+	_float		m_ReturnDistance    = 0.4f;
+	_float		m_setTickForSecond  = 0.9f;
 	wstring		m_TextureTag = TEXT("");
 	_float3		m_vSkill_Scale;
 	_float4		m_vSkill_Pos;

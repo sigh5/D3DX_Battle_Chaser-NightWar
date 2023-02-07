@@ -979,7 +979,7 @@ HRESULT CSpider_Mana::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 500;
+	StatusDesc.iHp = 450;
 	StatusDesc.iMp = 300;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
@@ -1151,9 +1151,9 @@ void CSpider_Mana::Anim_NormalAttack()
 
 
 	m_CurAnimqeue.push({ 8, 1.f });
-	m_CurAnimqeue.push({ 9, m_setTickForSecond });
+	m_CurAnimqeue.push({ 9, 1.f });
 	m_CurAnimqeue.push({ 10, 1.f });
-	m_CurAnimqeue.push({ 4, m_setTickForSecond });
+	m_CurAnimqeue.push({ 4, 1.f });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
@@ -1172,11 +1172,14 @@ void CSpider_Mana::Anim_Skill1_Attack()
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
-	m_LimitDistance = 5.f;
+	
+	/*m_SpeedRatio = 6.f;
+	m_LimitDistance = 5.f;*/
+	
 
-	m_CurAnimqeue.push({ 13, m_setTickForSecond });
+	m_CurAnimqeue.push({ 13, 1.f });
 	m_CurAnimqeue.push({ 14, 1.f });	//±ú¹°±â
-	m_CurAnimqeue.push({ 12, m_setTickForSecond });
+	m_CurAnimqeue.push({ 12, 1.f });
 	m_CurAnimqeue.push({ 5, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
