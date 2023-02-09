@@ -319,6 +319,8 @@ vector<CGameObject*>::iterator CClient_Manager::Delete_BuffImage(vector<CGameObj
 		iIndexs.push_back(2);
 	if (Desc.isBuff_Damage == false)
 		iIndexs.push_back(0);
+	if (Desc.isDeBuff_TurnSkip == false)
+		iIndexs.push_back(5);
 
 	for (_uint i = 0; i < iIndexs.size(); ++i)
 	{
@@ -395,4 +397,54 @@ void CClient_Manager::Sort_BuffImage(vector<CGameObject*>& vecBuffImage,_bool bI
 
 
 
+
+/* »À Åø */
+
+
+//static float vScale[3];
+//ImGui::InputFloat3("VScale", vScale);
+//static float vPos[3];
+//ImGui::InputFloat3("vPos", vPos);
+//static char  szName[MAX_PATH] = "";
+//ImGui::InputText("TextureName", szName, MAX_PATH);
+
+//if (ImGui::Button("Pos_Scale Set"))
+//{
+//	for (auto &pParts : m_BossParts)
+//	{
+//		Safe_Release(pParts);
+//	}
+//	m_BossParts.clear();
+
+//	CGameObject*		pPartObject = nullptr;
+//	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+
+//	CWeapon::WEAPONDESC			WeaponDesc;
+//	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
+//	/*_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);*/
+
+//	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
+//	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr(szName);
+//	if (nullptr == WeaponDesc.pSocket)
+//	{
+//		RELEASE_INSTANCE(CGameInstance);
+//		return;
+//	}
+//	
+//	WeaponDesc.pTargetTransform = m_pTransformCom;
+//	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(vPos[0], vPos[1], vPos[2], 1.f));
+//	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(vScale[0], vScale[1], vScale[2], 0.f));
+//	WeaponDesc.eType = WEAPON_SWORD;
+//	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP;
+//	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
+//	if (nullptr == pPartObject)
+//		return;
+
+//	m_BossParts.push_back(pPartObject);
+//	Safe_AddRef(WeaponDesc.pSocket);
+//	Safe_AddRef(m_pTransformCom);
+//	RELEASE_INSTANCE(CGameInstance);
+
+//}
 

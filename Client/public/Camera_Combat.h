@@ -16,7 +16,7 @@ public:
 		CameraTarget_CurActor, CameraTarget_Hiter, CameraTarget_recover, CameraTarget_END
 	};
 	enum	UlTIMATE_TARGET{
-		UlTIMATE_TARGET_KNOLAN, UlTIMATE_TARGET_ALUMON, UlTIMATE_TARGET_CALLIBRETTO, UlTIMATE_TARGET_BOSS, UlTIMATE_TARGET_END
+		UlTIMATE_TARGET_KNOLAN, UlTIMATE_TARGET_ALUMON, UlTIMATE_TARGET_CALLIBRETTO, UlTIMATE_TARGET_BOSS, UlTIMATE_TARGET_BOSSREAL, UlTIMATE_TARGET_BOSSREAL2,UlTIMATE_TARGET_END
 	};
 
 private:
@@ -54,6 +54,10 @@ public:
 	void	UltimateStart_CameraWork(CGameObject* pCurActor);
 	void	Ultimate_EndCameraWork();
 	void	Camera_UltiMate_ZoomTick(_double TimeDelta);
+
+
+	void	UltimateStart_BossUltimateCameraWork(CGameObject* pCurActor);
+
 
 private:
 	HRESULT SetUp_Components();

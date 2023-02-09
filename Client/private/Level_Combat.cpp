@@ -226,6 +226,8 @@ HRESULT CLevel_Combat::Ready_Layer_BackGround(const wstring & pLayerTag)
 		return E_FAIL;
 
 
+
+
 	RELEASE_INSTANCE(CGameInstance);
 	return S_OK;
 }
@@ -358,7 +360,9 @@ HRESULT CLevel_Combat::Ready_Layer_UI(const wstring & pLayerTag)
 		pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvas3"), LEVEL_COMBAT);
 		break;
 	case 4:
-		pGameInstance->Load_Object(TEXT("UI_TrunBoss"), LEVEL_COMBAT);
+		//pGameInstance->Load_Object(TEXT("UI_TrunBoss"), LEVEL_COMBAT);
+		pGameInstance->Load_Object(TEXT("UI_TrunBossDebug"), LEVEL_COMBAT);
+		
 		pGameInstance->Load_Object(TEXT("HP_MP_BuffCanvasBoss"), LEVEL_COMBAT);
 		break;
 	default:

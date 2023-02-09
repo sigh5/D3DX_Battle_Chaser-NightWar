@@ -43,7 +43,7 @@ public:
 
 	virtual void			Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption);
 	virtual void				Initialize_CombatSound();
-
+	void					Set_AnimShaderPass(_int iShaderPass) { m_iAnimMondeShaderPass = iShaderPass; }
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -74,11 +74,17 @@ public:
 	virtual		void		Create_Heavy_Hit_Effect();
 	virtual		void		Create_Defence_Effect_And_Action();
 	void					WideBuff_Status(class CStatus* pStatus, _int iOption, _int iAmount);
+	virtual		void		Set_StunState();
+	virtual		void		Is_Stuning();
+
+	virtual		void		Set_Misstate();
+
 
 protected:
 	virtual		void		Calculator_HitDamage();
 	virtual		void		Is_Hit_DebuffSkill();
 
+	
 
 protected:
 	CGameObject*					m_pHitTarget = nullptr;		//Combat
@@ -97,7 +103,7 @@ protected:
 	_bool							m_bUltimateNoRenderShader = false;
 	CStatus::DEBUFFTYPE				m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_NONE;
 	
-
+	_float							m_bMultiHitTickSecond = 1.f;
 protected:
 	_uint							m_bFinishOption = 0;
 	_uint							m_iOldAnim = 0;
@@ -122,7 +128,7 @@ protected:
 	_bool							m_bOnceCreate = false;
 	_int							m_iGetDamageNum = 0;
 	_bool							m_bIsUseUltimate = false;
-
+	_int							m_iAnimMondeShaderPass = 0;
 protected:
 	_bool							m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool							m_isWideBuff = false;

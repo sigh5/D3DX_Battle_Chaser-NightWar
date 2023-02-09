@@ -39,11 +39,16 @@ public:
 	virtual	void	Fsm_Exit()override;
 	void			UltiHeavyHitExit();
 	void			Combat_Tick(_double TimeDelta);
+	void			Combat_UltimateTick(_double TimeDelta);
+	void			CombatAnim_Move_Ultimate(_double TimeDelta);
 	_int			Is_MovingAnim();
 	void			CombatAnim_Move(_double TImeDelta);
 	void			MovingAnimControl(_double TimeDelta);
 	void			Anim_Frame_Create_Control();
 	virtual	  void  Combat_DeadTick(_double TimeDelta)override;
+	void			Fsm_UltimateOne_Exit();
+
+
 
 public:		/*Create_EFfect*/
 	virtual void		Create_Hit_Effect()override;
@@ -51,9 +56,12 @@ public:		/*Create_EFfect*/
 	void				Create_Ultimate_StartCam_Effect();
 	void				Create_Move_Target_Effect();
 	void				Create_BuffEffect();
+	void				Create_Skill_UltimateTwo_FirstEffect();
+	void				Create_Skill_UltimateTwo_Effect();
 	void				Create_Skill_Ultimate_Effect();
 	void				Create_Test_MeshEffect();
-
+	void				Create_Ultimate_StartFog_CamEffect();
+	void			    Create_Whip_Trail();
 public: /*For.Imgui*/
 	void				Create_Test_Effect();		// Test
 
@@ -95,7 +103,10 @@ public:
 private:
 	vector<CGameObject*>			m_BossParts;
 	vector<CGameObject*>			m_pEffectParts;
+	CGameObject*					m_pFog = nullptr;
+	CGameObject*					m_pTrailEffect = nullptr;
 
+	//CGameObject*					m_pCrackObject = nullptr;
 private:
 	_int					m_iMovingDir = ANIM_EMD;
 	_float					m_SpeedRatio = 6.f;
@@ -113,6 +124,11 @@ private:
 	_bool					m_bClearScene = false;
 
 
+	_bool					m_bStunUltimate = false;
+	_float					m_bStun_UltimateTimer = 0.f;
+
+	_float					m_bUltimateOneMoveTimer = 0.f;
+
 	// Ultimate
 	_bool					m_bUltimateBuffRenderStop = false;
 	_bool					m_bUltimateCam = false;
@@ -120,14 +136,14 @@ private:
 	_bool					m_bUltiWideAttack = false;
 	_bool					m_bUltiAttackStart = false;
 	_bool					m_bUltiAttackStop = false;
-	
+	_bool					m_bUltimateFirstEffect = false;
 
 	_int					m_iFrameCnt = 0;
 	_int					m_iMaxCnt = 0;
 	_bool					m_bUltimate_AttackEffect = false;
 	_float					m_fUltimateTimer = 0.f;
-
-
+	_bool					m_bAttackColliderOn = false;
+	
 
 	WeaponType				m_eWeaponType = WEAPON_HEAD;
 	UI_REPRESENT			m_Represnt = REPRESENT_REAL_BOSS;
@@ -135,7 +151,11 @@ private:
 
 	_bool					m_bUltimateSoundCheck = false;
 	_float					m_fUltimateSoundTimer = 0.f;
+	_bool					m_bMaintainEffectErase = false;
 
+	/*Trail*/
+	_bool			m_bTraillEffectStartCheck = false;
+	_bool			m_bTrailEndCheck = false;
 
 private: /*For.Imgui*/
 	wstring			m_TextureTag = TEXT("");
@@ -143,7 +163,7 @@ private: /*For.Imgui*/
 	_float4			m_vSkill_Pos;
 	_float3			m_vTestPos;
 	_float3			m_vTestScale;
-
+	string			m_BoneTag = "";
 public:
 	BaseDelegater<UI_REPRESENT, _uint> m_Monster_CombatTurnDelegeter;	// ≈œ¡¶
 

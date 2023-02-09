@@ -96,7 +96,7 @@ public:
 	void			  CombatAnim_Move(_double TImeDelta);
 	void		      Ultimate_Anim_Frame_Control();
 
-	/*For.Imgui*/
+	
 	void			 Create_Sword_Trail();
 
 public:
@@ -117,7 +117,9 @@ public:
 	void				Anim_Flee();
 	void				Anim_Die();
 	void				Anim_Viroty();
-
+	virtual		void		Set_StunState()override;
+	virtual		void		Is_Stuning()override;
+	virtual		void		Set_Misstate()override;
 private:
 	void				Create_Test_Effect();
 	
@@ -142,6 +144,7 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
+	CTexture*				m_pTexturdissolveCom = nullptr;
 	class CAnimFsm*			m_pAnimFsm = nullptr;
 
 	CGameObject*			m_pFog = nullptr;
@@ -173,7 +176,8 @@ private:
 	WeaponType		m_eWeaponType = WEAPON_SWORD;
 	_bool			m_bUltimamteEffect = false;
 	_float			m_UltimateTimer = 0.f;
-	
+	_float								m_fGlowStrength = 0.f;
+	_bool								m_bIsChange = false;
 private:
 	_float		m_SpeedRatio = 7.f;
 	_float		m_LimitDistance = 8.f;

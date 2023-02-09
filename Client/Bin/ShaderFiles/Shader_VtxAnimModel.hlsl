@@ -10,7 +10,9 @@ matrix			g_BoneMatrices[256];
 
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
+texture2D		g_DissolveTexture;
 
+float			G_Power = 1.f;
 
 struct VS_IN
 {
@@ -86,6 +88,27 @@ PS_OUT PS_MAIN(PS_IN In)
 	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
 	if (0.1f > vDiffuse.a)
 		discard;
+
+	Out.vDiffuse = vDiffuse;
+	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+	Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w / 300.f, 0.f, 0.f);
+
+	return Out;
+}
+
+PS_OUT PS_MAIN_Dissolve(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	if (0.1f > vDiffuse.a)
+		discard;
+
+	float dissolve = g_DissolveTexture.Sample(LinearSampler, In.vTexUV).r;
+
+	if (dissolve >= G_Power)		// µðÁ¹ºê
+		vDiffuse = vector(1.f, 0.f, 0.f, 1.f);
+
 
 	Out.vDiffuse = vDiffuse;
 	Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
@@ -182,4 +205,18 @@ technique11 DefaultTechnique
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
 	}
+
+	pass Dissolve
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_Dissolve();
+	}
+
 }

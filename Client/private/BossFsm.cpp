@@ -123,7 +123,7 @@ HRESULT CBossFsm::Init_Boss(CGameObject * pTarget)
 	})
 		.Tick([this](_double TimeDelta)
 	{
-		static_cast<CBoss_Alumon*>(m_pTarget)->Combat_Tick(TimeDelta);
+		static_cast<CBoss_Alumon*>(m_pTarget)->Combat_UltimateTick(TimeDelta);
 	})
 		.OnExit([this]()
 	{
@@ -162,7 +162,7 @@ HRESULT CBossFsm::Init_Boss(CGameObject * pTarget)
 	})
 		.OnExit([this]()
 	{
-		static_cast<CBoss_Alumon*>(m_pTarget)->Fsm_Exit();
+		static_cast<CBoss_Alumon*>(m_pTarget)->Fsm_UltimateOne_Exit();
 	})
 		.Transition(TEXT("Idle"), FSM_TRANSITION(TEXT("WideBuff To Idle"), [this]()
 	{

@@ -270,6 +270,11 @@ void	GS_MAIN_Lazor(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
 	Out[3].vTexUV = float2(1.f / g_iUV_Max_Width_Num * g_iUV_Cur_Width_Num,
 		(1.f) / g_iUV_Max_Height_Num* (g_iUV_Cur_Height_Num + 1.f));
 
+	Out[0].vTexUVOrigin = float2(0.f, 0.f);
+	Out[1].vTexUVOrigin = float2(1.f, 0.f);
+	Out[2].vTexUVOrigin = float2(1.f, 1.f);
+	Out[3].vTexUVOrigin = float2(0.f, 1.f);
+
 
 	Vertices.Append(Out[0]);
 	Vertices.Append(Out[1]);
@@ -434,12 +439,31 @@ PS_OUT PS_MAIN_Glow_Lazor(PS_IN In)
 	return Out;
 }
 
+PS_OUT PS_MAIN_Glow_Boss(PS_IN In)
+{
+	PS_OUT			Out = (PS_OUT)0;
+
+	//Out.vColor = g_Texture.Sample(PointSampler, In.vTexUV);
+	//Out.vColor.rgb = float3(1.f, 0.f, 0.f);
+
+	float4	GlowColor, TexturColor;
+	TexturColor = g_Texture.Sample(LinearSampler, In.vTexUV);
+	GlowColor = g_GlowTexture.Sample(LinearSampler, In.vTexUVOrigin);
+
+
+	Out.vColor = saturate(TexturColor + (GlowColor* G_Power));
+
+	if (Out.vColor.a < 0.25f)
+		discard;
+
+	return Out;
+}
 
 
 
 technique11 DefaultTechnique
 {
-	pass Rect
+	pass Rect		//0
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -452,7 +476,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Glow
+	pass Glow//1
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -465,7 +489,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
 
-	pass Mirror
+	pass Mirror//2
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -479,7 +503,7 @@ technique11 DefaultTechnique
 	}
 	
 
-	pass Test
+	pass Test//3
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -493,7 +517,7 @@ technique11 DefaultTechnique
 	}
 
 
-	pass Rect_Alpha_None
+	pass Rect_Alpha_None //4
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -506,7 +530,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Default_Blend
+	pass Default_Blend//5
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -519,7 +543,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN();
 	}
 
-	pass Glow_Default_Blend
+	pass Glow_Default_Blend//6
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -532,7 +556,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_Glow();
 	}
 	
-	pass Test_AlpahBlending
+	pass Test_AlpahBlending//7
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -545,7 +569,7 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_Test();
 	}
 
-	pass Test_AlpahBlending_LAZOR
+	pass Test_AlpahBlending_LAZOR//8
 	{
 		SetRasterizerState(RS_Default);
 		SetDepthStencilState(DS_Default, 0);
@@ -556,6 +580,19 @@ technique11 DefaultTechnique
 		HullShader = NULL;
 		DomainShader = NULL;
 		PixelShader = compile ps_5_0 PS_MAIN_Glow_Lazor();
+	}
+
+	pass Test_AlpahBlending_Boss//9
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = compile gs_5_0 GS_MAIN();
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_Glow_Boss();
 	}
 
 }

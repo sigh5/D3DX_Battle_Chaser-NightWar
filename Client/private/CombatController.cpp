@@ -27,7 +27,7 @@
 
 #include "MyImage.h"
 #include "MeshGround.h"
-
+#include "CombatMapBroken.h"
 
 
 IMPLEMENT_SINGLETON(CCombatController);
@@ -167,7 +167,6 @@ HRESULT CCombatController::Initialize(_uint iLevel)
 		if (nullptr != dynamic_cast<CTurnStateCanvas*>(pCanvas))
 			m_pTurnStateButtonCanvas = static_cast<CTurnStateCanvas*>(pCanvas);
 
-
 	}
 
 	m_pCombatCamera = static_cast<CCamera_Combat*>(
@@ -216,6 +215,9 @@ void CCombatController::CurrentTurn_ActorControl(_double TimeDelta)
 #else
 	m_pFontManager->Tick(TimeDelta);
 	m_pExplainFontManager->Tick(TimeDelta);
+
+	if (nullptr != m_pBrokenImage)
+		m_pBrokenImage->Tick(TimeDelta);
 
 	if (m_bVirtory)
 	{
@@ -305,6 +307,14 @@ void CCombatController::Late_Tick(_double TimeDelta)
 #ifdef LEVEL_BOSSONLY
 
 #else
+	if (nullptr != m_pBrokenImage)
+	{
+		if (static_cast<CCombatMapBroken*>(m_pBrokenImage)->Is_Finish())
+			Safe_Release(m_pBrokenImage);
+		else
+			m_pBrokenImage->Late_Tick(TimeDelta);
+
+	}
 	m_pFontManager->Late_Tick(TimeDelta);
 	m_pExplainFontManager->Late_Tick(TimeDelta);
 	Ultimate_LateTick(TimeDelta);
@@ -434,7 +444,7 @@ void CCombatController::Ultimate_Camera_On()
 	}
 	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Boss_Alumon")))
 	{
-		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_SlimeKing"), LEVEL_COMBAT));
+		m_pCurBannerImage = static_cast<CMyImage*>(m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_Boss"), LEVEL_COMBAT));
 	}
 	else
 		return;
@@ -473,9 +483,47 @@ void CCombatController::Ready_Ultimate()
 	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
 	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
 	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(false);
+}
+
+void CCombatController::Ready_UltimateBoss()
+{
+	CGameObject* pMeshGround = m_pGameInstace->Get_GameObject(LEVEL_COMBAT, LAYER_UI, TEXT("Commbat_MeshGround"));
+	assert(nullptr != pMeshGround && "CCombatController::Ready_Ultimate()");
+	static_cast<CMeshGround*>(pMeshGround)->Set_MeshGroundRender_Active(false);
+}
+
+void CCombatController::Ultimate_Camera_OnBoss()
+{
+	m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_END);
+
+	for (auto& pCanvas : m_CanvasVec)
+	{
+		if (dynamic_cast<CCombatMap*>(pCanvas) != nullptr)
+		{
+			continue;
+		}
+		else
+			pCanvas->Set_RenderActive(false);
+	}
 
 
+	Ready_UltimateBoss();
+	CombatMap_RenderStop();
+		 
+	
+	m_pCombatCamera->UltimateStart_BossUltimateCameraWork(m_pCurentActor);
+	m_bCurActorUltimateUse = false;
+	m_bBannerClose = true;
+	m_pCombatBG = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG"), LEVEL_COMBAT);
+	m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_4"), LEVEL_COMBAT);
 
+	for (auto &pActor : m_CurActorMap)
+	{
+		static_cast<CCombatActors*>(pActor.second)->Set_ModelRender(false);
+	}
+	static_cast<CCombatActors*>(m_pCurentActor)->Set_ModelRender(true);
+
+	
 }
 
 void CCombatController::Ultimate_Start_LateTick(_double TimeDelta)
@@ -570,6 +618,66 @@ void CCombatController::CombatMap_RenderStart()
 	}
 }
 
+void CCombatController::CombatScene_Broken()
+{
+	m_pBrokenImage = 	m_pGameInstace->Clone_GameObject(
+		TEXT("Prototype_GameObject_CombatMapBroken"));
+}
+
+void CCombatController::Debuff_Stun()
+{
+	m_fStunTimer = 0.0;
+	//Hero_Calibretto Hero_Alumon
+	static _int iCharNum = 0;
+	CGameObject* pPlayer = nullptr;
+	if (iCharNum == 0)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Gully"));
+		++iCharNum;
+
+	}
+	else if (iCharNum == 1)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Calibretto"));
+		++iCharNum;
+	}
+	else if (iCharNum == 2)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Alumon"));
+		iCharNum = 0;;
+	}
+
+	assert(pPlayer != nullptr && "CCombatController::CombatScene_Broken");
+
+	static_cast<CCombatActors*>(pPlayer)->Set_StunState();
+
+
+}
+
+void CCombatController::Debuff_Miss()
+{
+	static _int iCharNumTwo = 0;
+	CGameObject* pPlayer = nullptr;
+	if (iCharNumTwo == 0)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Calibretto"));
+		++iCharNumTwo;
+	}
+	else if (iCharNumTwo == 1)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Gully"));
+		++iCharNumTwo;
+	}
+	else if (iCharNumTwo == 2)
+	{
+		pPlayer = Find_CurActor(TEXT("Hero_Alumon"));
+		iCharNumTwo = 0;;
+	}
+
+
+	static_cast<CCombatActors*>(pPlayer)->Set_Misstate();
+}
+
 void CCombatController::Refresh_CurActor()
 {
 	Set_CurrentActor();
@@ -603,6 +711,9 @@ void CCombatController::Active_Fsm()
 		pStatus->Set_Exp(120);
 	}
 
+
+
+	To_Stun();
 	To_Idle();
 	To_Intro();
 	To_Normal_Attack();
@@ -644,7 +755,7 @@ void CCombatController::Load_CamBG2()
 	}
 	else if (!lstrcmp(m_pCurentActor->Get_ObjectName(), TEXT("Boss_Alumon")))
 	{
-		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_2"), LEVEL_COMBAT);
+		m_pCombatBG2 = m_pGameInstace->Load_Object(TEXT("Texture_Ultimate_Banner_BG_4"), LEVEL_COMBAT);
 	}
 	else
 		return;
@@ -690,6 +801,22 @@ void CCombatController::HPMp_Update(CGameObject* pHiter)
 			
 		}
 	}
+}
+
+_bool CCombatController::Is_MissDebuff()
+{
+	CStatus* pStatus = Get_CurActorStatus();
+
+	if (pStatus->Get_DebuffType().isDeBuff_Miss == true)
+		return true;
+
+	return false;
+}
+
+void CCombatController::Use_MissDebuff()
+{
+	CStatus* pStatus = Get_CurActorStatus();
+	pStatus->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 }
 
 void CCombatController::ResetState()
@@ -904,14 +1031,12 @@ HRESULT CCombatController::Set_CurrentActor()
 		m_iMonster_Player_Option = 1;
 		m_bIsPlayer = false;
 		break;
-		
-
 	case Client::REPRESENT_END:
 		break;
 	}
 
 	
-
+	m_fStunTimer = 0.0;
 
 	return S_OK;
 }
@@ -1049,9 +1174,47 @@ void CCombatController::Cal_MapOneMonsterFsm()
 
 void CCombatController::Cal_MapTwoMonsterFsm()
 {
-	To_Use_NormalAttack2();		// 보스는 노멀어택 2임
-	++m_iBossActiveOption;
+#ifdef _DEBUG
+	if (m_iBossActiveOption == 0)
+	{
+		To_Buff();		//To_Uitimate();		// 보스는 노멀어택 2임
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 1)
+	{
+		To_Buff();  //To_Skill2_Attack();			//To_WideAreaBuff();
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 2)
+	{
+		To_Buff();//To_Normal_Attack();
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 3)
+	{
+		To_Buff();
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 4)
+	{
+		To_Buff();
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 5)
+	{
+		To_Buff();
+		++m_iBossActiveOption;
+	}
+	else if (m_iBossActiveOption == 6)
+	{
+		To_Buff();//To_Normal_Attack();
+		m_iBossActiveOption = 0;
+	}
+	
 	return;
+
+#endif // _DEBUG
+	
 
 	if (fCurActorMpRatio <= 0.f)
 	{
@@ -1062,7 +1225,7 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 		}
 		if (m_iBossActiveOption == 1)
 		{
-			To_Use_Item();
+			To_Use_NormalAttack2();
 			m_iBossActiveOption = 0;
 		}
 	}
@@ -1088,7 +1251,7 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 			}
 			else if (2 == m_iBossActiveOption)
 			{
-				To_Use_Item();		// 보스는 노멀어택 2임
+				To_Use_NormalAttack2();		// 보스는 노멀어택 2임
 				++m_iBossActiveOption;
 			}
 			else if (3 == m_iBossActiveOption)
@@ -1133,7 +1296,7 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 				}
 				else if (m_iBossActiveOption ==0)
 				{
-					To_Use_Item();
+					To_Use_NormalAttack2();
 					iMonsterActiveNum = 0;
 				
 				}
@@ -1190,8 +1353,14 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 			else if (m_iBossActiveOption == 5)
 			{
 				To_Normal_Attack();
+				++iMonsterActiveNum;
+			}
+			else if (m_iBossActiveOption == 6)
+			{
+				To_Use_NormalAttack2();
 				m_bBossUltimateTwo = false;
 			}
+			
 		}
 	}
 }
@@ -1372,6 +1541,11 @@ void CCombatController::To_WideAreaBuff()
 		m_pTurnStateButtonCanvas->Set_RenderActive(false);
 		m_pCombatCamera->Set_ZoomMoveOption(CCamera_Combat::CameraTarget_CurActor);
 		Mana_Refresh();
+	}
+	else if (m_iMonster_Player_Option == 1 && !m_bMonsterTurnEnd)
+	{
+		m_pCurentActor->Set_FsmState(true, CGameObject::m_WideAreaBuff);
+		m_bMonsterTurnEnd = true;
 	}
 	else
 		return;
@@ -1556,6 +1730,29 @@ void CCombatController::To_Viroty()
 		m_pCurentActor->Set_FsmState(true, CGameObject::m_Viroty);
 }
 
+void CCombatController::To_Stun()
+{
+	if (dynamic_cast<CPlayer*>(m_pCurentActor) == nullptr || m_pTurnStateButtonCanvas == nullptr || m_pTurnCanvas == nullptr)
+		return;
+	CStatus* pStatus = Find_CurStatus(m_pCurentActor->Get_ObjectName());
+
+	if (pStatus->Get_DebuffType().isDeBuff_TurnSkip == true)
+	{
+		m_fStunTimer += CClient_Manager::TimeDelta;
+		m_pTurnStateButtonCanvas->Set_RenderActive(false);
+		if (m_fStunTimer >= 0.5f)
+		{
+			static_cast<CCombatActors*>(m_pCurentActor)->Is_Stuning();
+			m_pTurnStateButtonCanvas->Set_RenderActive(false);
+			static_cast<CCombatActors*>(m_pCurentActor)->Fsm_Exit();
+			pStatus->Set_DebuffOption(CStatus::DEBUFF_TURNSKIP, false);
+			m_fStunTimer = 0.f;
+			m_bIsStuning = false;
+		}
+	}
+
+}
+
 CGameObject * CCombatController::Find_CurActor(const wstring& pNameTag)
 {
 	auto Pair = find_if(m_CurActorMap.begin(), m_CurActorMap.end(), [&](auto MyPair)->bool
@@ -1605,7 +1802,7 @@ void CCombatController::Free()
 	m_CanvasVec.clear();
 
 	Safe_Release(m_pCurBannerImage);
-
+	Safe_Release(m_pBrokenImage);
 	//Safe_Release(m_pGameInstace);
 
 }

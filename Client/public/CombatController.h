@@ -72,7 +72,8 @@ public:  /*Combat Logic*/
 
 	void	HPMp_Update(CGameObject* pHiter);
 
-
+	_bool	Is_MissDebuff();
+	void	Use_MissDebuff();
 
 private:
 	void	PickingTarget();		//플레이어의 
@@ -110,13 +111,18 @@ private:
 
 public:
 	void	Ready_Ultimate();
+	void	Ready_UltimateBoss();
+	void	Ultimate_Camera_OnBoss();
+
+
 	void	Ultimate_Camera_On();
 	void	Ultimate_Camera_Off();
 	void	CombatMap_RenderStop();
 	void	CombatMap_RenderStart();
 
-
-
+	void	CombatScene_Broken();
+	void	Debuff_Stun();
+	void	Debuff_Miss();
 
 public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 	_bool		To_Idle();				// 애는 좀 애매함
@@ -136,6 +142,8 @@ public:	/* 현재 액터의 상태를 제어하기위한 함수들 */
 	void		To_Die();
 	void		To_Viroty();
 
+	void		To_Stun();
+
 private:
 	CGameInstance*			m_pGameInstace = nullptr;
 	class   CDamage_Font_Manager*	m_pFontManager = nullptr;
@@ -147,7 +155,8 @@ private:
 	map<const wstring,  CGameObject*>     m_CurActorMap;
 	map<const wstring, CStatus*>		  m_ActorsStatusMap;
 
-
+	_double								m_fStunTimer = 0.0;
+	_bool								m_bIsStuning = false;
 
 
 private:
@@ -159,7 +168,7 @@ private:
 	class CMyImage*			m_pCurBannerImage = nullptr;
 	class CGameObject*		m_pCombatBG = nullptr;
 	class CGameObject*		m_pCombatBG2 = nullptr;
-
+	class CGameObject*		m_pBrokenImage = nullptr;
 private:
 	_bool					m_bCombatIntro = false;
 	_bool					m_bLateInit = false;

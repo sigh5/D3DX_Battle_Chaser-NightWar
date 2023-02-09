@@ -1,14 +1,22 @@
 matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix			g_ProjMatrixInv, g_ViewMatrixInv;
+matrix			g_LightViewMatrix, g_LightProjMatrix;
 
 matrix			g_BoneMatrices[256];
 
 texture2D		g_DiffuseTexture;
 texture2D		g_ShadeTexture;
 texture2D		g_SpecularTexture;
+texture2D		g_NormalTexture;
+texture2D		g_DepthTexture;
+texture2D		g_ShadowDepthTexture;
+
 
 texture2D		g_BGTexture;
 
+texture2D		g_BGTexture2;
+
+float			g_DistanceShadow = 2.5f;
 
 sampler LinearSampler = sampler_state
 {
@@ -119,6 +127,71 @@ PS_OUT PS_MAIN_BG(PS_IN In)
 }
 
 
+PS_OUT PS_MAIN_BLEND_UPDATE(PS_IN In)
+{
+	PS_OUT		Out = (PS_OUT)0;
+
+	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
+	vector		vBG1 = g_BGTexture.Sample(LinearSampler, In.vTexUV);
+	vector		vBG2 = g_BGTexture2.Sample(LinearSampler, In.vTexUV);
+	vector		vShade = g_ShadeTexture.Sample(LinearSampler, In.vTexUV);
+	vector		vSpecular = g_SpecularTexture.Sample(LinearSampler, In.vTexUV);
+	
+	Out.vColor = vDiffuse * vShade + vSpecular ;
+
+	if (Out.vColor.a == 0.f)
+	{
+		Out.vColor = vBG1;
+	}
+
+	if(vBG1.a == 0.f)
+	{
+		Out.vColor = vBG2;
+	}
+	
+
+	vector		vDepthInfo = g_DepthTexture.Sample(LinearSampler, In.vTexUV);
+	float		fViewZ = vDepthInfo.y * 300.f;
+
+	vector		vPosition;
+
+	/*vPosition.x = (In.vTexUV.x * 2.f - 1.f) * fViewZ;
+	vPosition.y = (In.vTexUV.y * -2.f + 1.f) * fViewZ;
+	vPosition.z = vDepthInfo.y * fViewZ;
+	vPosition.w = fViewZ;*/
+
+	vPosition.x = In.vTexUV.x * 2.f - 1.f;
+	vPosition.y = In.vTexUV.y * -2.f + 1.f;
+	vPosition.z = vDepthInfo.x; /* 0 ~ 1 */
+	vPosition.w = 1.0f;
+
+	/* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+	vPosition *= fViewZ;
+	// 뷰 상
+	vPosition = mul(vPosition, g_ProjMatrixInv);
+	// 월드 상
+	vPosition = mul(vPosition, g_ViewMatrixInv);
+
+	vPosition = mul(vPosition, g_LightViewMatrix);// 여기에 새로운 조명 넣어야됌
+
+	vector		vUVPos = mul(vPosition, g_LightProjMatrix);	// 새로운 조명의 프로젝션을 넣고
+	float2		vNewUV;
+
+	vNewUV.x = (vUVPos.x / vUVPos.w) * 0.5f + 0.5f;
+	vNewUV.y = (vUVPos.y / vUVPos.w) * -0.5f + 0.5f;
+
+	vector		vShadowDepthInfo = g_ShadowDepthTexture.Sample(LinearSampler, vNewUV);
+
+	if (vPosition.z - g_DistanceShadow > vShadowDepthInfo.r * 300.f)
+		Out.vColor = vector(0.f, 0.f, 0.f, 1.f);
+
+	if (0.0f == Out.vColor.a)
+		discard;
+
+	return Out;
+}
+
+
 
 RasterizerState RS_Default
 {
@@ -216,4 +289,16 @@ technique11 DefaultTechnique
 		PixelShader = compile ps_5_0 PS_MAIN_BG();
 	}
 
+	pass Blend_TWO
+	{
+		SetRasterizerState(RS_Default);
+		SetDepthStencilState(DS_Default, 0);
+		SetBlendState(BS_Default, float4(0.0f, 0.f, 0.f, 0.f), 0xffffffff);
+
+		VertexShader = compile vs_5_0 VS_MAIN();
+		GeometryShader = NULL;
+		HullShader = NULL;
+		DomainShader = NULL;
+		PixelShader = compile ps_5_0 PS_MAIN_BLEND_UPDATE();
+	}
 }

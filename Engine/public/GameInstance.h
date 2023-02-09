@@ -144,7 +144,7 @@ public: /* For.Target_Manager */
 	ID3D11ShaderResourceView* Get_DiffuseTargetSRV();
 	ID3D11ShaderResourceView* Get_ShadeTargetSRV();
 	ID3D11ShaderResourceView* Get_SpecularTargetSRV();
-
+	ID3D11ShaderResourceView* Get_ShadowTargetSRV();
 public: /* For.Sound_Manager */
 	void Play_Sound(const _tchar *pSoundKey, _float fVolume, _bool bIsBGM = false, _int iManualChannelIndex = -1);
 	void Stop_Sound(_uint iManualChannelIndex);

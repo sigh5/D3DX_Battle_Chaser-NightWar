@@ -54,7 +54,7 @@ void CDebuff_Font::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	if (m_bIsRendering  && nullptr != m_pRendererCom)	
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_INVENTORY, this);
 }
 
 HRESULT CDebuff_Font::Render()

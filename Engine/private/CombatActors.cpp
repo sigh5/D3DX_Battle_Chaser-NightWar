@@ -36,6 +36,18 @@ void CCombatActors::Is_Hit_DebuffSkill()
 {
 }
 
+void CCombatActors::Set_StunState()
+{
+}
+
+void CCombatActors::Is_Stuning()
+{
+}
+
+void CCombatActors::Set_Misstate()
+{
+}
+
 void CCombatActors::WideBuff_Status(CStatus * pStatus, _int iOption, _int iAmount)
 {
 	if (iOption == 0)
@@ -93,6 +105,13 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus, CHitBoxObject::WEAPON_OPTI
 			pStatus->Set_DebuffOption(eType, false);
 		}
 		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_SPIDER_HEAD)
+		{
+			(*iCurDamage) += 10;
+			pDebuffTag = TEXT("bleeding");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_BOSS_WHIP)
 		{
 			(*iCurDamage) += 10;
 			pDebuffTag = TEXT("bleeding");
@@ -173,6 +192,13 @@ _bool CCombatActors::Is_DebuffBlend(CStatus* pStatus, CHitBoxObject::WEAPON_OPTI
 			pStatus->Set_DebuffOption(eType, false);
 		}
 		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_PUNCH_GUN)
+		{
+			(*iCurDamage) += 15;
+			pDebuffTag = TEXT("armor critical");
+			eType = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+			pStatus->Set_DebuffOption(eType, false);
+		}
+		else if (eWeaponOption == Engine::CHitBoxObject::WEAPON_OPTIONAL_BOSS_SHILED)
 		{
 			(*iCurDamage) += 15;
 			pDebuffTag = TEXT("armor critical");

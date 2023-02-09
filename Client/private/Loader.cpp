@@ -56,6 +56,8 @@
 #include "Boss_Alumon.h"
 #include "MeshGround.h"
 #include "Light_Pos.h"
+#include "CombatMapBroken.h"
+
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -178,7 +180,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 		/* Model */
 #ifdef NOMODLES
-	
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
 	
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
@@ -282,6 +284,11 @@ HRESULT CLoader::Loading_Combat()
 		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Boss_Alumon"),
 			CBoss_Alumon::Create(m_pDevice, m_pContext))))
 			return E_FAIL;
+
+		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CombatMapBroken"),
+			CCombatMapBroken::Create(m_pDevice, m_pContext))))
+			return E_FAIL;
+
 
 		lstrcpy(m_szLoadingText, TEXT("로딩끝."));
 		pGameInstance->Set_ProtoTypeCreate(LEVEL_COMBAT);
@@ -470,14 +477,14 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Ultimate_Banner"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Ultimate_Banner/Ultimate_Banner_%d.png"),
-			CTexture::TYPE_END, 8))))
+			CTexture::TYPE_END, 10))))
 		return E_FAIL;
 
 	
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Combat_ICON"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Buff_ICon/Buff_ICon_%d.png"),
-			CTexture::TYPE_END, 5))))
+			CTexture::TYPE_END, 7))))
 		return E_FAIL;
 
 
@@ -854,7 +861,6 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			CTexture::TYPE_END, 6))))
 		return E_FAIL;
 
-
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_bretto_Heal_Active"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/bretto_Heal/bretto_Heal_Active_%d.png"),
@@ -931,7 +937,7 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_Crack"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/Skill_Effect/Garrison/Crack/Garrsion_Crack_%d.png"),
-			CTexture::TYPE_END, 4))))
+			CTexture::TYPE_END, 8))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Garrsion_Fire_bot_Height"),
@@ -1167,6 +1173,36 @@ HRESULT CLoader::ForGamePlay_Skill_and_Effect(CGameInstance * pGameInstance)
 			CTexture::TYPE_END, 11))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_AlumonTrail"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Alumon_trail/Alumon_trail_%d.png"),
+			CTexture::TYPE_END, 6))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_AlumonSkill"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Alumon/Alumon_%d.png"),
+			CTexture::TYPE_END, 9))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_AlumonParticle"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Alumon_Mesh/Alumon_5_%d.png"),
+			CTexture::TYPE_END, 16))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_AlumonCrack_Base"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Crack_Boss/Base/Garrsion_Crack_7_%d.png"),
+			CTexture::TYPE_END, 25))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_AlumonCrack_Glow"),
+		CTexture::Create(m_pDevice, m_pContext,
+			TEXT("../Bin/Resources/Textures2D/Crack_Boss/images/Garrsion_Crack_4_%d.png"),
+			CTexture::TYPE_END, 25))))
+		return E_FAIL;
 
 	return S_OK;
 }

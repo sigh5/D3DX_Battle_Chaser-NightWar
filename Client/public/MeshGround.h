@@ -45,6 +45,8 @@ private:
 	CRenderer*							m_pRendererCom = nullptr;
 	CModel*								m_pModelCom = nullptr;
 	CTexture*							m_pTextureCom = nullptr;
+
+
 private:
 	Ground_ModelDesc					m_GroundModelDesc;
 	_bool								m_bRenderActive = true;
@@ -53,6 +55,9 @@ private:
 	HRESULT SetUp_ShaderResources();
 
 
+private:
+	_int								m_iPlayOnFrameCnt = 0;
+	_int								m_iTextureNum = 0;
 public:
 	static CMeshGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;

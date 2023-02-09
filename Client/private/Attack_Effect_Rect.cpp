@@ -13,11 +13,18 @@ CAttack_Effect_Rect::CAttack_Effect_Rect(const CAttack_Effect_Rect & rhs)
 {
 }
 
-void CAttack_Effect_Rect::Set_Client_BuffDesc(Attack_Effec_Client & Desc)
+void CAttack_Effect_Rect::Set_Client_BuffDesc(Attack_Effec_Client & Desc, _bool bCalibretto )
 {
 	memcpy(&m_Client_AttackEffect_Desc, &Desc, sizeof(m_Client_AttackEffect_Desc));
-	Reset_CurMartirx();
-
+	if (bCalibretto)
+	{
+		Reset_CurMartirx();
+		m_bCalibretto = bCalibretto;
+	}
+	else
+	{
+		Reset_CurCrackMartirx();
+	}
 }
 
 void CAttack_Effect_Rect::Set_Glow(_bool bUseGlow, wstring GlowTag, _int iGlowTextureNumber)
@@ -59,7 +66,7 @@ HRESULT CAttack_Effect_Rect::Initialize(void * pArg)
 		return E_FAIL;
 	
 #ifdef  NOMODLES
-	Set_Glow(true, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"), 0);
+	Set_Glow(true, TEXT("Prototype_Component_Texture_Garrsion_Crack"), 0);
 #endif //  NOMODLES
 
 
@@ -91,14 +98,17 @@ void CAttack_Effect_Rect::Tick(_double TimeDelta)
 		m_iPlayOnFrameCnt = 0;
 		++m_iTextureNum;
 
-		if (m_iTextureNum >= 7)
+		if (m_iTextureNum >= m_Client_AttackEffect_Desc.iMaxTextureNum)
 		{
-			m_iTextureNum = 0;
+			if(m_bCalibretto)
+				m_iTextureNum = 0;
 
 			m_bIsFinsishBuffer = true;
 			m_bGlowEnd = true;
 		}
 	}
+
+	
 
 	if (m_bUseGlow)
 	{
@@ -120,7 +130,8 @@ void CAttack_Effect_Rect::Late_Tick(_double TimeDelta)
 	__super::Late_Tick(TimeDelta);
 
 	if (nullptr != m_pRendererCom)
-		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
+		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONLIGHT, this);
+		//m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_UI, this);
 }
 
 HRESULT CAttack_Effect_Rect::Render()
@@ -133,7 +144,7 @@ HRESULT CAttack_Effect_Rect::Render()
 		return E_FAIL;
 
 
-	m_pShaderCom->Begin(4);
+	m_pShaderCom->Begin(m_Client_AttackEffect_Desc.iShaderPass);
 	m_pVIBufferCom->Render();
 	return S_OK;
 }
@@ -221,6 +232,21 @@ void CAttack_Effect_Rect::Reset_CurMartirx()
 
 	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
 	
+}
+
+void CAttack_Effect_Rect::Reset_CurCrackMartirx()
+{
+	_matrix		m_matWorld, matScale, matRotX, matRotY, matRotZ, matTrans;
+	matScale = XMMatrixScaling(40.f, 40.f, 1.f);
+	matRotX = XMMatrixRotationX(XMConvertToRadians(90.f));
+	matRotY = XMMatrixRotationY(XMConvertToRadians(0.f));	//스트레이트는 90 , 골프 -180
+	matRotZ = XMMatrixRotationZ(XMConvertToRadians(0.f));
+	matTrans = XMMatrixTranslation(48.f, -10.f, 0.f);
+	m_OriginMatrix = matScale * matRotX * matRotY * matRotZ * matTrans;
+
+	XMStoreFloat4x4(&m_SocketMatrix, m_OriginMatrix);
+
+	m_pTransformCom->Set_WorldMatrix(m_SocketMatrix);
 }
 
 CAttack_Effect_Rect * CAttack_Effect_Rect::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)

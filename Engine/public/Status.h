@@ -10,7 +10,7 @@ BEGIN(Engine)
 class ENGINE_DLL CStatus final: public CComponent
 {
 public:
-	enum DEBUFFTYPE { DEBUFF_FIRE , DEBUFF_BLEED , DEBUFF_ARMOR, DEBUFF_MAGIC,BUFF_DAMAGE, DEBUFF_NONE };
+	enum DEBUFFTYPE { DEBUFF_FIRE , DEBUFF_BLEED , DEBUFF_ARMOR, DEBUFF_MAGIC,BUFF_DAMAGE, DEBUFF_TURNSKIP ,DEBUFF_MISS,DEBUFF_NONE };
 	enum ITEMID {ITEM_HP_POTION, ITEM_MP_POSION, ITEM_ULTIMATE_BOOK, ITEM_END};
 
 	
@@ -22,7 +22,8 @@ public:
 		_bool isDebuff_ARMOR = false;
 		_bool isDebuff_MAGIC = false;
 		_bool isBuff_Damage = false;
-
+		_bool isDeBuff_TurnSkip = false;
+		_bool isDeBuff_Miss = false;
 
 	}DEBUFF_TYPE_Desc;
 

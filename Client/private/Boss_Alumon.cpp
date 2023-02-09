@@ -15,7 +15,7 @@
 #include "Attack_Effect_Rect.h"
 #include "Mesh_Effect.h"
 #include "SoundPlayer.h"
-
+#include "Trail_Effect.h"
 
 CBoss_Alumon::CBoss_Alumon(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CMonster(pDevice, pContext)
@@ -181,41 +181,37 @@ void CBoss_Alumon::Tick(_double TimeDelta)
 				pBuffImage->Tick(TimeDelta);
 		}
 
+		if (nullptr != m_pFog)
+			m_pFog->Tick(TimeDelta);
+
+		Create_Whip_Trail();
 	}
-	//CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
-	//queue<pair<_uint, _double>> Temp;
-	//CClient_Manager::Make_Anim_Queue(Temp, ANIM_CHAR7);
-	//if (ImGui::Button("TestQueue"))
-	//{
-	//	m_CurAnimqeue = Temp;
-	//}
+	
+	static float ffPos[3] = {};
+	static float ffScale[3] = {};
+	static char  szName[MAX_PATH] = "";
+	static char  szBoneName[MAX_PATH] = "";
+	ImGui::InputFloat3("SkillPos", ffPos);
+	ImGui::InputFloat3("SkillScale", ffScale);
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+	ImGui::InputText("TextureName", szName, MAX_PATH);
+	ImGui::InputText("BoneName", szBoneName, MAX_PATH);
+	if (ImGui::Button("Create_Effect"))
+	{	
+		_tchar Texture_NameTag[MAX_PATH] = TEXT("");
+		MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
+
+		m_TextureTag = Texture_NameTag;
+		m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
+		m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
+		m_BoneTag = szBoneName;
+
+		Create_Test_Effect();		// Test
+		//Create_Test_MeshEffect();
+	}
 
 
-	//static float ffPos[3] = {};
-	//static float ffScale[3] = {};
-	//static char  szName[MAX_PATH] = "";
-	//ImGui::InputFloat3("SkillPos", ffPos);
-	//ImGui::InputFloat3("SkillScale", ffScale);
-	//CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
-	//ImGui::InputText("TextureName", szName, MAX_PATH);
-	//ImGui::InputInt("iFrameCnt", &m_iFrameCnt);
-	//ImGui::InputInt("iMaxCnt", &m_iMaxCnt);
-
-	//if (ImGui::Button("Create_Effect"))
-	//{	
-	//	_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-	//	MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);
-
-	//	m_TextureTag = Texture_NameTag;
-	//	m_vSkill_Pos = _float4(ffPos[0], ffPos[1], ffPos[2], 1.f);
-	//	m_vTestScale = _float3(ffScale[0], ffScale[1], ffScale[2]);
-
-	//	Create_Test_Effect();		// Test
-	//	//Create_Test_MeshEffect();
-	//}
-
-
-	//RELEASE_INSTANCE(CGameInstance);
+	RELEASE_INSTANCE(CGameInstance);
 
 	m_pModelCom->Play_Animation(TimeDelta, true);
 }
@@ -239,23 +235,31 @@ void CBoss_Alumon::Late_Tick(_double TimeDelta)
 				*iter = nullptr;
 				iter = m_pEffectParts.erase(iter);
 			}
+			else if (m_bMaintainEffectErase && true == static_cast<CBuff_Effect*>(*iter)->Get_MainTain())
+			{
+				Safe_Release(*iter);
+				*iter = nullptr;
+				iter = m_pEffectParts.erase(iter);
+			}
 			else
 				++iter;
+		}
+		else if (dynamic_cast<CAttack_Effect_Rect*>((*iter)) != nullptr
+			&& static_cast<CAttack_Effect_Rect*>(*iter)->Get_IsFinish())
+		{
+			Safe_Release(*iter);
+			*iter = nullptr;
+			iter = m_pEffectParts.erase(iter);
 		}
 		else
 			++iter;
 	}
 
+
 	if (m_bModelRender && false == m_bMonster_Victroys)
 	{
 		if (false == m_bIsDead)
 		{
-			/*for (auto &pParts : m_BossParts)
-			{
-				if (nullptr != pParts)
-					pParts->Late_Tick(TimeDelta);
-			}*/
-
 			CClient_Manager::Sort_BuffImage(m_vecBuffImage, false);
 			for (auto& pVecBuffImage : m_vecBuffImage)
 			{
@@ -274,53 +278,21 @@ void CBoss_Alumon::Late_Tick(_double TimeDelta)
 		m_bClearScene = true;
 	}
 
-	static float vScale[3];
-	ImGui::InputFloat3("VScale", vScale);
-	static float vPos[3];
-	ImGui::InputFloat3("vPos", vPos);
-	static char  szName[MAX_PATH] = "";
-	ImGui::InputText("TextureName", szName, MAX_PATH);
-
-	if (ImGui::Button("Pos_Scale Set"))
-	{
-		for (auto &pParts : m_BossParts)
-		{
-			Safe_Release(pParts);
-		}
-		m_BossParts.clear();
-
-		CGameObject*		pPartObject = nullptr;
-		CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
-
-		CWeapon::WEAPONDESC			WeaponDesc;
-		ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
-		/*_tchar Texture_NameTag[MAX_PATH] = TEXT("");
-		MultiByteToWideChar(CP_ACP, 0, szName, strlen(szName) + 1, Texture_NameTag, MAX_PATH);*/
-
-		WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
-		WeaponDesc.pSocket = m_pModelCom->Get_BonePtr(szName);
-		WeaponDesc.pTargetTransform = m_pTransformCom;
-		XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(vPos[0], vPos[1], vPos[2], 1.f));
-		XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(vScale[0], vScale[1], vScale[2], 0.f));
-		WeaponDesc.eType = WEAPON_SWORD;
-		WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_PULPLE;
-		pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
-		if (nullptr == pPartObject)
-			return;
-
-		m_BossParts.push_back(pPartObject);
-		Safe_AddRef(WeaponDesc.pSocket);
-		Safe_AddRef(m_pTransformCom);
-
-
-	}
 
 	for (auto &pParts : m_BossParts)
 	{
 		if (nullptr != pParts)
 			pParts->Late_Tick(TimeDelta);
 	}
-
+	if (nullptr != m_pFog)
+	{
+		m_pFog->Late_Tick(TimeDelta);
+		if (static_cast<CBuff_Effect*>(m_pFog)->Get_IsFinish())
+		{
+			Safe_Release(m_pFog);
+			m_pFog = nullptr;
+		}
+	}
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -373,6 +345,7 @@ void CBoss_Alumon::Fsm_Exit()
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 	CCombatController::GetInstance()->Camera_Zoom_Out();
+	m_iHitCount = 0;
 }
 
 void CBoss_Alumon::UltiHeavyHitExit()
@@ -393,6 +366,76 @@ void CBoss_Alumon::Combat_Tick(_double TimeDelta)
 	Anim_Frame_Create_Control();
 	Is_MovingAnim();
 	CombatAnim_Move(TimeDelta);
+}
+
+void CBoss_Alumon::Combat_UltimateTick(_double TimeDelta)
+{
+	if (m_iMovingDir == ANIM_DIR_STRAIGHT || m_iMovingDir == ANIM_DIR_BACK)
+	{
+		MovingAnimControl(TimeDelta);
+	}
+	else
+		CurAnimQueue_Play_Tick(TimeDelta, m_pModelCom);
+	
+	Anim_Frame_Create_Control();
+	Is_MovingAnim();
+	CombatAnim_Move_Ultimate(TimeDelta);
+}
+
+void CBoss_Alumon::CombatAnim_Move_Ultimate(_double TimeDelta)
+{
+	if (m_pHitTarget == nullptr)
+		return;
+
+	/*For Dubug*/
+	_float	fSpeedRatio = 0.f;
+	if (!lstrcmp(m_pHitTarget->Get_ObjectName(), TEXT("Hero_Alumon")))
+	{
+		fSpeedRatio = 0.13f;
+	}
+	else if (!lstrcmp(m_pHitTarget->Get_ObjectName(), TEXT("Hero_Calibretto")))
+	{
+		fSpeedRatio = 0.19f;
+	}
+	else if (!lstrcmp(m_pHitTarget->Get_ObjectName(), TEXT("Hero_Gully")))
+	{
+		fSpeedRatio = 0.18f;
+	}
+
+	_float4 Target;
+	XMStoreFloat4(&Target, m_pHitTarget->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION));
+	//if (!m_bOnceCreate)
+	//{
+	//	
+	//	//CCombatController::GetInstance()->Ready_UltimateBoss();
+
+	//	m_bOnceCreate = true;
+	//}
+
+	if (false == m_bRun	&& m_pModelCom->Get_AnimIndex() == 31)				// 특수사항
+	{
+		m_bUltimateOneMoveTimer += (_float)TimeDelta;
+		if (m_bUltimateOneMoveTimer <= 5.0f)
+		{
+			m_pTransformCom->CombatChaseTarget(XMLoadFloat4(&Target), TimeDelta, m_LimitDistance, m_SpeedRatio * fSpeedRatio);
+			CCombatController::GetInstance()->Camera_Zoom_In();
+		}
+		else
+		{
+			CCombatController::GetInstance()->Camera_Zoom_Out();
+			CCombatController::GetInstance()->Set_Ultimate_End(true);
+			m_bRun = true;
+	
+		}
+	}
+	else if (m_iMovingDir == ANIM_DIR_BACK)
+	{
+		//m_SpeedRatio = ;
+		m_bCombatChaseTarget = m_pTransformCom->CombatChaseTarget(m_vOriginPos, TimeDelta, m_ReturnDistance, 10.f);
+	}
+		
+	else
+		return;
 }
 
 _int CBoss_Alumon::Is_MovingAnim()
@@ -455,24 +498,112 @@ void CBoss_Alumon::MovingAnimControl(_double TimeDelta)
 
 void CBoss_Alumon::Anim_Frame_Create_Control()
 {
-	if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(12, 4))
+	if (!m_bAttackColliderOn && m_pModelCom->Control_KeyFrame_Create(3, 10))
 	{
-		Create_Hit_Effect();
-		CCombatController::GetInstance()->Camera_Shaking();
+		m_iHitCount = 1;		// 공격할때
+		m_bAttackColliderOn = true;
 
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(9, 1))
+	{
+		static_cast<CCombatActors*>(m_pHitTarget)->Set_AnimShaderPass(2);
+		m_bOnceCreate = true;
+
+	}
+	else if (!m_bAttackColliderOn && m_pModelCom->Control_KeyFrame_Create(9, 32))
+	{
+		m_iHitCount = 1;		// 공격할때
+		m_bAttackColliderOn = true;
+		static_cast<CCombatActors*>(m_pHitTarget)->Set_AnimShaderPass(0);
+		
 		_float4 vPos;
 		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
-		vPos.y += 4.f;
+		vPos.y += 6.f;
+		vPos.x -= 2.f;
+		CExplain_FontMgr::GetInstance()->
+			Set_Debuff_Target0_Font(vPos, _float3(1.f, 1.f, 1.f),TEXT("boss hp up"));
 
-		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), m_iGetDamageNum);
-		m_pStatusCom->Take_Damage(m_iGetDamageNum);
+		m_pStatusCom->Incrase_Hp(10);
+		CCombatController::GetInstance()->HPMp_Update(this);
+
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Get_AnimIndex() == 12)
+	{
+		CCombatController::GetInstance()->Camera_Shaking();
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.y += 6.f;
+		_int iRandom = rand() % 5;
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target1_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum);
+
+		Create_Hit_Effect();
 		m_bOnceCreate = true;
+
 		m_iMultiHitNum = 0;
 	}
+	else if (m_bStunUltimate && m_pModelCom->Get_AnimIndex() == 17)
+	{
+		if (!m_bOnceCreate)
+		{
+			CCombatController::GetInstance()->Ultimate_Camera_On();
+			CCombatController::GetInstance()->Load_CamBG2();
+			CCombatController::GetInstance()->Camera_Zoom_In();
+			m_bOnceCreate = true;
+		}
+		m_bStun_UltimateTimer += (_float)CClient_Manager::TimeDelta;
+		if (m_bStun_UltimateTimer >= 1.1f && !m_bUltimateFirstEffect)
+		{
+			Create_Skill_UltimateTwo_FirstEffect();
+			m_bUltimateFirstEffect = true;
+			m_bMaintainEffectErase = false;
+		}
+		if (m_bStun_UltimateTimer >= 2.f && !m_bUltiAttackStop)
+		{
+			m_bMaintainEffectErase = true;
+			CCombatController::GetInstance()->Camera_Zoom_Out();
+			CCombatController::GetInstance()->Set_Ultimate_End(true);
+			m_bUltiAttackStop = true;
+		}
+		else if (m_bStun_UltimateTimer >= 3.f)
+		{
+			CCombatController::GetInstance()->Camera_Shaking();
+			CCombatController::GetInstance()->CombatScene_Broken();
+			Create_Skill_UltimateTwo_Effect();
+			m_bStunUltimate = false;
+			m_bStun_UltimateTimer = 0.f;
+		}
+	}
+	else if (!m_bOnceCreate && m_pModelCom->Control_KeyFrame_Create(21, 62))
+	{
+		m_bOnceCreate = true;
+		Create_BuffEffect();
+		CCombatController::GetInstance()->Camera_Zoom_Out();
+		CCombatController::GetInstance()->Debuff_Miss();
+
+		//CCombatController::GetInstance()->Wide_Debuff(true,)
+	}
+	else if (!m_bAttackColliderOn && m_pModelCom->Control_KeyFrame_Create(35, 20))
+	{
+		m_iHitCount = 1;		// 공격할때
+		m_bAttackColliderOn = true;
+	}
+	else
+		return;
+
 }
 
 void CBoss_Alumon::Combat_DeadTick(_double TimeDelta)
 {
+}
+
+void CBoss_Alumon::Fsm_UltimateOne_Exit()
+{
+	_bool	bRenderTrue = true;
+	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
+	m_pHitTarget = nullptr;
+	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
+	CCombatController::GetInstance()->Debuff_Stun();
+	m_iHitCount = 0;
 }
 
 void CBoss_Alumon::Create_Hit_Effect()
@@ -511,7 +642,7 @@ void CBoss_Alumon::Create_Hit_Effect()
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_RED_KNOLAN_SKILL1:
 		pGameObject = pInstance->Load_Effect(L"Texture_DeBuff_Mana_Effect", LEVEL_COMBAT, false);
-		BuffDesc.vPosition = _float4(0.f, 1.5f, 0.f, 1.f);
+		BuffDesc.vPosition = _float4(0.f, 2.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(6.f, 10.f, 6.f);
 		m_pStatusCom->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_MAGIC);		// 마방깎
 		iEffectNum = 1;
@@ -678,6 +809,27 @@ void CBoss_Alumon::Create_Heavy_Hit_Effect()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 	m_pEffectParts.push_back(pGameObject);
 
+	if (CCombatController::GetInstance()->Is_MissDebuff())
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.x -= 2.f;
+		vPos.y += 4.f;
+		_float4 vPos2;
+		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos2.y += 6.f;
+		vPos2.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Target0_Font(vPos2, _float3(1.f, 1.f, 1.f), TEXT("miss"));
+	
+		vPos.x -= 2.f;
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), 1);
+		m_pStatusCom->Take_Damage(1);
+		CCombatController::GetInstance()->Use_MissDebuff();
+		RELEASE_INSTANCE(CGameInstance);
+		return;
+	}
+
 
 	_int iRandom = rand() % 10 + m_iWideAttackDamgae;
 	_float4 vPos;
@@ -705,6 +857,84 @@ void CBoss_Alumon::Create_Move_Target_Effect()
 
 void CBoss_Alumon::Create_BuffEffect()
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(L"Texture_AlumonSkill_Buff_Effect_1", LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.5f, 1.f, 0.f, 1.f);
+	BuffDesc.vScale = _float3(12.f, 12.f, 12.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 3;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_AlumonSkill"), 7);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(6);
+
+	m_pEffectParts.push_back(pGameObject);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CBoss_Alumon::Create_Skill_UltimateTwo_FirstEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(TEXT("Texture_AlumonSkill_Effect_particle"), LEVEL_COMBAT, false);
+	BuffDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Alumon_Hand_R");
+	XMStoreFloat4x4(&BuffDesc.PivotMatrix, m_pModelCom->Get_PivotMatrix());
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(0.0f,-0.0f,1.4f,1.f);	// -0.9 정위치
+	BuffDesc.vScale = _float3(7.f, 7.f, 7.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	BuffDesc.bIsDown = true;
+
+	//static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc, BuffDesc.pSocket, BuffDesc.PivotMatrix);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_AlumonSkill"),6);
+
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(6);
+	m_pEffectParts.push_back(pGameObject);
+
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+
+
+void CBoss_Alumon::Create_Skill_UltimateTwo_Effect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	_uint			iEffectNum = 1;
+	CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
+	ZeroMemory(&EffectDesc, sizeof(EffectDesc));
+	CGameObject* pGameObject = nullptr;
+	pGameObject = pInstance->Load_Effect(TEXT("AlumonCrack_Base_Effect"), LEVEL_COMBAT, false);
+	assert(nullptr != pGameObject && "CBoss_Alumon::Create_Skill_UltimateTwo_Effect()");
+	EffectDesc.fCoolTime = 5.f;
+	EffectDesc.bIsMainTain = true;
+	EffectDesc.iFrameCnt = 8;
+	EffectDesc.iMaxTextureNum = 24;
+	EffectDesc.iShaderPass = 9;
+
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc, false);
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_AlumonCrack_Glow"), 0);
+
+	m_pEffectParts.push_back(pGameObject);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 void CBoss_Alumon::Create_Skill_Ultimate_Effect()
@@ -713,10 +943,173 @@ void CBoss_Alumon::Create_Skill_Ultimate_Effect()
 
 void CBoss_Alumon::Create_Test_MeshEffect()
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CMesh_Effect::MeshEffcet_Client MeshDesc;
+	ZeroMemory(&MeshDesc, sizeof(MeshDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	MeshDesc.ParentTransform = m_pTransformCom;
+	MeshDesc.vPosition = m_vSkill_Pos;
+	MeshDesc.vScale = m_vTestScale;
+	MeshDesc.vAngle = 0.f;
+	MeshDesc.iFrameCnt = m_iFrameCnt;
+	MeshDesc.iMaxNum = m_iMaxCnt;
+
+	/*MeshDesc.bIsMainTain = false;
+	MeshDesc.bIsStraight = false;
+	MeshDesc.bIsBack = false;
+	MeshDesc.bIsUp = false;*/
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Client_BuffDesc(MeshDesc);
+	static_cast<CMesh_Effect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_Slime_Ultimate_BubbleOrigin2"));
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CBoss_Alumon::Create_Ultimate_StartFog_CamEffect()
+{
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	m_pFog = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	m_pFog = pInstance->Load_Effect(TEXT("UltiCam_Sprites_Effect_Cloud"), LEVEL_COMBAT, false);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = _float4(7.3f, 3.1f, 28.f, 1.f);
+	BuffDesc.vScale = _float3(40.f, 30.f, 40.f);
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = true;
+	BuffDesc.iFrameCnt = 8;
+	BuffDesc.bIsUp = false;
+
+	static_cast<CBuff_Effect*>(m_pFog)->Set_CamEffect(BuffDesc);
+	static_cast<CBuff_Effect*>(m_pFog)->Set_ShaderPass(7);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CBoss_Alumon::Create_Whip_Trail()
+{
+	if (nullptr != m_pTrailEffect)
+	{
+		if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(3, 8))
+		{
+			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+			TrailDesc.pColider = static_cast<CWeapon*>(m_BossParts[1])->Get_Colider();
+			TrailDesc.pGameObject = m_BossParts[1];
+			TrailDesc.iDevideFixNum = 2;
+			TrailDesc.iMaxCenterCount = 10;
+			TrailDesc.fSize = 1.f;
+			TrailDesc.eType = CTrail_Effect::BOSS_WHIP;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 9, 18);
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(3, 20))
+		{
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+		
+		if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(40, 8))
+		{
+			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+			TrailDesc.pColider = static_cast<CWeapon*>(m_BossParts[1])->Get_Colider();
+			TrailDesc.pGameObject = m_BossParts[1];
+			TrailDesc.iDevideFixNum = 2;
+			TrailDesc.iMaxCenterCount = 10;
+			TrailDesc.fSize = 0.8f;
+			TrailDesc.eType = CTrail_Effect::BOSS_WHIP;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 9, 18);
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(40, 13))
+		{
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+
+		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(40, 15))
+		{
+			CTrail_Effect::tag_Trail_Effect_DESC TrailDesc;
+			ZeroMemory(&TrailDesc, sizeof(TrailDesc));
+			TrailDesc.pColider = static_cast<CWeapon*>(m_BossParts[1])->Get_Colider();
+			TrailDesc.pGameObject = m_BossParts[1];
+			TrailDesc.iDevideFixNum = 2;
+			TrailDesc.iMaxCenterCount = 18;
+			TrailDesc.fSize = 0.8f;
+			TrailDesc.eType = CTrail_Effect::BOSS_WHIP;
+			static_cast<CTrail_Effect*>(m_pTrailEffect)->Set_Desc(TrailDesc, 9, 34);
+		}
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(40, 25))
+		{
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+		/*
+		else if (!m_bTraillEffectStartCheck&& m_pModelCom->Control_KeyFrame_Create(19, 3))
+		{
+
+			CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+			_uint			iEffectNum = 1;
+			CBuff_Effect::BuffEffcet_Client BuffDesc;
+			ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+			CBone* pSocket = m_pModelCom->Get_BonePtr("Weapon_Sword_Classic");
+
+			m_pTrailUVMoveEffect = pInstance->Load_Effect(TEXT("Texture_garrison_burst_0_Effect"), LEVEL_COMBAT, false);
+			BuffDesc.ParentTransform = m_pTransformCom;
+			BuffDesc.vPosition = _float4(-0.5f, 0.1f, 2.0f, 1.f);
+			BuffDesc.vScale = _float3(8.f, 8.f, 8.f);
+			BuffDesc.vAngle = 90.f;
+			BuffDesc.fCoolTime = 4.f;
+			BuffDesc.bIsMainTain = false;
+			BuffDesc.iFrameCnt = 5;
+			BuffDesc.bIsUp = false;
+
+			static_cast<CBuff_Effect*>(m_pTrailUVMoveEffect)->Set_Client_BuffDesc(BuffDesc, pSocket, m_pModelCom->Get_PivotFloat4x4());
+			static_cast<CBuff_Effect*>(m_pTrailUVMoveEffect)->Set_ShaderPass(5);
+			RELEASE_INSTANCE(CGameInstance);
+
+			m_bTraillEffectStartCheck = true;
+			m_bTrailEndCheck = false;
+		}
+
+		else if (!m_bTrailEndCheck&& m_pModelCom->Control_KeyFrame_Create(19, 16))
+		{
+			m_bTrailEndCheck = true;
+			m_bTraillEffectStartCheck = false;
+		}
+*/
+		else
+			return;
+	}
+
+
 }
 
 void CBoss_Alumon::Create_Test_Effect()
 {
+	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = nullptr;
+	_uint			iEffectNum = 1;
+	CBuff_Effect::BuffEffcet_Client BuffDesc;
+	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
+	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+
+	BuffDesc.ParentTransform = m_pTransformCom;
+	BuffDesc.vPosition = m_vSkill_Pos;
+	BuffDesc.vScale = m_vTestScale;
+	BuffDesc.vAngle = 90.f;
+	BuffDesc.fCoolTime = 5.f;
+	BuffDesc.bIsMainTain = false;
+	BuffDesc.iFrameCnt = 5;
+	BuffDesc.bIsUp = false;
+	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 HRESULT CBoss_Alumon::SetUp_Components()
@@ -746,8 +1139,8 @@ HRESULT CBoss_Alumon::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 1000;
-	StatusDesc.iMp = 250;
+	StatusDesc.iHp = 400;
+	StatusDesc.iMp = 300;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;
@@ -786,8 +1179,8 @@ HRESULT CBoss_Alumon::Ready_Parts()
 	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Hero_Alumon_Shield_Model");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
-	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, 0.f, 0.f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.f, 2.5f, 0.f, 0.f));
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.f, +0.3f, 0.f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(3.f, 2.5f, 0.f, 0.f));
 	WeaponDesc.eType = WEAPON_SHILED;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_SHILED;
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
@@ -799,13 +1192,13 @@ HRESULT CBoss_Alumon::Ready_Parts()
 	Safe_AddRef(m_pTransformCom);
 	// ~1. 방패
 
-	// 2. 채찍
+	//// 2. 채찍
 	ZeroMemory(&WeaponDesc, sizeof(CWeapon::WEAPONDESC));
 	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
-	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Alumon_Weapon_Whip_Tip");
+	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Alumon_Tail_Whip_10");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
-	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(-1.f, 0.f, 0.f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.f, -4.f, -2.f, 0.f));
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.0f, 3.f, 0.f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.f, 5.f, 0.f, 0.f));
 	WeaponDesc.eType = WEAPON_WHIP;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP;
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
@@ -821,8 +1214,8 @@ HRESULT CBoss_Alumon::Ready_Parts()
 	WeaponDesc.PivotMatrix = m_pModelCom->Get_PivotFloat4x4();
 	WeaponDesc.pSocket = m_pModelCom->Get_BonePtr("Bone_Alumon_Hand_R");
 	WeaponDesc.pTargetTransform = m_pTransformCom;
-	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.5f, 0.5f, 0.3f, 1.f));
-	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(0.f, -2.5f, -2.f, 0.f));
+	XMStoreFloat4(&WeaponDesc.vPosition, XMVectorSet(0.5f, 0.4f, -1.9f, 1.f));
+	XMStoreFloat3(&WeaponDesc.vScale, XMVectorSet(1.f, 2.5f, 1.f, 0.f));
 	WeaponDesc.eType = WEAPON_SWORD;
 	WeaponDesc.iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND;
 	pPartObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Weapon"), &WeaponDesc);
@@ -833,6 +1226,19 @@ HRESULT CBoss_Alumon::Ready_Parts()
 	Safe_AddRef(m_pTransformCom);
 	// ~3. 단검
 
+
+	CHitBoxObject::HitBoxObject  hitBoxDesc;
+	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+	lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("WhipTrail"));
+
+	pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
+
+	m_pTrailEffect = pGameInstance->
+		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("WhipTrail"));
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -846,6 +1252,23 @@ void CBoss_Alumon::Calculator_HitDamage()
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
 	vPos.x -= 2.f;
 	vPos.y += 4.f;
+
+	if (CCombatController::GetInstance()->Is_MissDebuff())
+	{
+		_float4 vPos2;
+		XMStoreFloat4(&vPos2, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos2.y += 6.f;
+		vPos2.x -= 6.f;
+		CExplain_FontMgr::GetInstance()->Set_Debuff_Target0_Font(vPos2, _float3(1.f, 1.f, 1.f), TEXT("miss"));
+	
+		vPos.x -= 2.f;
+		vPos.y += 4.f;
+		CDamage_Font_Manager::GetInstance()->Set_Damage_Target0_Font(vPos, _float3(2.f, 2.f, 2.f), 1);
+		m_pStatusCom->Take_Damage(1);
+		CCombatController::GetInstance()->Use_MissDebuff();
+		return;
+	}
+
 
 	if (Is_DebuffBlend(m_pStatusCom, m_iHitWeaponOption, &m_iGetDamageNum, m_DebuffName))
 	{
@@ -882,24 +1305,24 @@ void CBoss_Alumon::Anim_Idle()
 
 void CBoss_Alumon::Anim_Intro()
 {
-	m_CurAnimqeue.push({ 24, 1.f });
+	m_CurAnimqeue.push({ 24, 1.f });			// 사운드
 	m_CurAnimqeue.push({ 1,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_NormalAttack()
+void CBoss_Alumon::Anim_NormalAttack()	//0
 {
-	m_iHitCount = 1;
+	m_iHitCount = 0;
 	m_eWeaponType = WEAPON_WHIP;
 	m_iStateDamage = rand() % 10 + 25 + m_iStage_Buff_DamgaeUP;
 	m_pMeHit_Player = nullptr;
-	m_iStage_Buff_DamgaeUP = 0;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP;
 	m_bRun = false;
 	m_bOnceCreate = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
-	m_LimitDistance = 14.f;
-
+	m_iStage_Buff_DamgaeUP = 0;
+	m_LimitDistance = 10.f;
+	m_bAttackColliderOn = false;
 
 	m_CurAnimqeue.push({ 4,  1.f });	// 4 앞으로 가는거
 	m_CurAnimqeue.push({ 3,  1.f });	// 짦은 채찍
@@ -909,9 +1332,9 @@ void CBoss_Alumon::Anim_NormalAttack()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_NormalAttack2()
+void CBoss_Alumon::Anim_NormalAttack2()//0
 {
-	m_iHitCount = 1;
+	m_iHitCount = 0;
 	m_eWeaponType = WEAPON_SHILED;
 	m_iStateDamage = rand() % 10 + 15 + m_iStage_Buff_DamgaeUP;
 	m_pMeHit_Player = nullptr;
@@ -920,8 +1343,9 @@ void CBoss_Alumon::Anim_NormalAttack2()
 	m_bRun = false;
 	m_bOnceCreate = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
-	m_LimitDistance = 6.5f;
-
+	m_SpeedRatio = 8.f;
+	m_LimitDistance = 10.f;
+	m_bAttackColliderOn = false;
 
 	m_CurAnimqeue.push({ 36,  1.f });	//방패들고 앞으로가기
 	m_CurAnimqeue.push({ 35,  1.f });	// 방패로 머리찍기
@@ -930,9 +1354,9 @@ void CBoss_Alumon::Anim_NormalAttack2()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_Skill1_Attack()
+void CBoss_Alumon::Anim_Skill1_Attack()//0
 {
-	m_iHitCount = 1;
+	m_iHitCount = 0;
 	m_eWeaponType = WEAPON_SWORD;
 	m_iStateDamage = rand() % 10 + 35 + m_iStage_Buff_DamgaeUP;
 	m_pMeHit_Player = nullptr;
@@ -941,8 +1365,10 @@ void CBoss_Alumon::Anim_Skill1_Attack()
 	m_bRun = false;
 	m_bOnceCreate = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
-	m_LimitDistance = 6.5f;
+	m_SpeedRatio = 8.f;
+	m_LimitDistance = 6.f;
 	m_pStatusCom->Use_SkillMp(30);
+	m_bAttackColliderOn = false;
 
 	m_CurAnimqeue.push({ 36,  1.f });
 	m_CurAnimqeue.push({ 9,  1.f });		// 영혼뽑기 , 마나 회복
@@ -951,7 +1377,7 @@ void CBoss_Alumon::Anim_Skill1_Attack()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_Skill2_Attack()
+void CBoss_Alumon::Anim_Skill2_Attack()//0
 {
 	m_iHitCount = 2;
 	m_eWeaponType = WEAPON_WHIP;
@@ -964,7 +1390,7 @@ void CBoss_Alumon::Anim_Skill2_Attack()
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_LimitDistance = 14.f;
 	m_pStatusCom->Use_SkillMp(30);
-
+	m_bAttackColliderOn = false;
 
 	m_CurAnimqeue.push({ 4,  1.f });
 	m_CurAnimqeue.push({ 40,  1.f });		// 채찍 두번 휘두르기
@@ -974,17 +1400,21 @@ void CBoss_Alumon::Anim_Skill2_Attack()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_Uitimate()
+void CBoss_Alumon::Anim_Uitimate()	
 {
+	
+
 	m_bUltimateSoundCheck = false;
 	m_bUltimateCam = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	m_iStage_Buff_DamgaeUP = 0;
 	m_pStatusCom->Use_SkillMp(50);
 	m_bRun = false;
 	m_bUltimateRun = true;
 	m_bOnceCreate = false;
 	m_SpeedRatio = 6.f;
-	m_LimitDistance = 3.f;
+	m_LimitDistance = 10.f;
+	m_bUltimateOneMoveTimer = 0.f;
 
 	m_setTickForSecond = 1.f;
 	m_pMeHit_Player = nullptr;
@@ -997,7 +1427,7 @@ void CBoss_Alumon::Anim_Uitimate()
 	m_eWeaponType = WEAPON_END;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE;
 
-
+	CCombatController::GetInstance()->Ultimate_Camera_OnBoss();
 	m_CurAnimqeue.push({ 31,  1.f });	//걸어가고 목적지에서 영혼흡수시작
 	//m_CurAnimqeue.push({ 32,  1.f });   //	대기시간
 	m_CurAnimqeue.push({ 33, 1.f });	//궁 끝내는 애님
@@ -1007,14 +1437,16 @@ void CBoss_Alumon::Anim_Uitimate()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
-void CBoss_Alumon::Anim_Uitimate2()
+void CBoss_Alumon::Anim_Uitimate2()	//WideAreaBuff // crack Effect
 {
 	// 뛰지않음
 	m_bUltimateSoundCheck = false;
 	m_bUltimateCam = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	m_iStage_Buff_DamgaeUP = 0;
 	m_pStatusCom->Use_SkillMp(50);
 	m_bOnceCreate = false;
+	m_bStunUltimate = true;
 
 	m_setTickForSecond = 1.f;
 	m_pMeHit_Player = nullptr;
@@ -1025,6 +1457,7 @@ void CBoss_Alumon::Anim_Uitimate2()
 	m_bUltiAttackStop = false;
 	m_fUltimateTimer = 0.f;
 	m_eWeaponType = WEAPON_END;
+	m_bUltimateFirstEffect = false;
 	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_TWO;
 
 
@@ -1044,6 +1477,11 @@ void CBoss_Alumon::Anim_Defence()
 
 void CBoss_Alumon::Anim_Buff()
 {
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(500.f, -245.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 0);
+	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, true);
+
 	m_iStage_Buff_DamgaeUP = 10;
 	m_bOnceCreate = false;
 	m_useBuff = true;
@@ -1140,6 +1578,7 @@ void CBoss_Alumon::Free()
 		Safe_Release(pPart);
 	m_BossParts.clear();
 
+	Safe_Release(m_pTrailEffect);
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

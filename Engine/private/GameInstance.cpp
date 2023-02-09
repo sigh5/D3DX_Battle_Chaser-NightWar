@@ -684,6 +684,14 @@ ID3D11ShaderResourceView * CGameInstance::Get_SpecularTargetSRV()
 	return m_pTarget_Manager->Get_SRV(TEXT("Target_Specular"));
 }
 
+ID3D11ShaderResourceView * CGameInstance::Get_ShadowTargetSRV()
+{
+	if (nullptr == m_pTarget_Manager)
+		return nullptr;
+
+	return m_pTarget_Manager->Get_SRV(TEXT("Target_ShadowDepth"));
+}
+
 void CGameInstance::Play_Sound(const _tchar * pSoundKey, _float fVolume, _bool bIsBGM, _int iManualChannelIndex)
 {
 	assert(nullptr != m_pSound_Manager && " CGameInstance::Play_Sound");

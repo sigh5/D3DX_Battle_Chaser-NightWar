@@ -29,6 +29,7 @@ public:
 		BUFF_TYPE			eBuffType;
 		_int				iFrameCnt;
 		_bool				bIsUp;
+		_bool				bIsDown;
 		_bool				bIsStraight;
 		_bool				bIsBack;
 	
@@ -94,6 +95,8 @@ private:
 	_float								m_fTick = 0.f;
 	_float								m_fIncraseX = 0.f;
 	_float								m_fIncraseY = 1.f;
+	_float								m_fMaxYDown = 0.f;
+	_int								m_iDownGlowTextureNum = 0;
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();

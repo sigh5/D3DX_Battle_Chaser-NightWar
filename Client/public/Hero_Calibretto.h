@@ -60,7 +60,8 @@ public:  /*For.Combat*/
 	virtual void	  Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
 	virtual		void  Calculator_HitDamage()override;	/*충돌시 함수*/
 	virtual void	  Initialize_CombatSound()override;
-
+	virtual		void		Set_StunState()override;
+	virtual		void		Set_Misstate()override;
 private: /*Create_Effect*/
 	void				Create_Test_Effect();		// Test
 	void				Create_Test_Rect_Effect();		// Test
@@ -102,6 +103,7 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
+	CTexture*				m_pTexturdissolveCom = nullptr;
 	class CAnimFsm*			m_pFsmCom = nullptr;
 	
 	CGameObject*			m_pFog = nullptr;
@@ -110,6 +112,10 @@ private:
 	CGameObject*			m_pLazorEffect = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
+	_float								m_fGlowStrength = 0.f;
+	_bool								m_bIsChange = false;
+
+	
 	_int					bResult = ANIM_EMD;
 	_int					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	
@@ -152,7 +158,7 @@ public:
 	void					Anim_Die();
 	void					Anim_Viroty();
 
-
+	virtual		void		Is_Stuning()override;
 private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_CALIBRETTO;

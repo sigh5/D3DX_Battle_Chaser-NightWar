@@ -137,7 +137,7 @@ void CCamera_Combat::Tick(_double TimeDelta)
 	
 #ifdef _DEBUG
 	
-	/*if (GetKeyState('W') & 0x8000)
+	if (GetKeyState('W') & 0x8000)
 	{
 		m_pTransformCom->Go_Straight(TimeDelta);
 	}
@@ -199,11 +199,29 @@ void CCamera_Combat::Tick(_double TimeDelta)
 		}
 	}
 
-	RELEASE_INSTANCE(CGameInstance);*/
+	RELEASE_INSTANCE(CGameInstance);
 
 
 
 #endif
+
+	if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSSREAL2])
+	{
+		CCombatController* pCombatCotroller = GET_INSTANCE(CCombatController);
+
+		CGameObject* pCurActor = pCombatCotroller->Get_CurActor();
+
+		_vector vTargetPos = pCurActor->Get_Transform()->Get_State(CTransform::STATE_TRANSLATION);
+		m_pTransformCom->LookAt(vTargetPos);
+
+		RELEASE_INSTANCE(CCombatController);
+
+		m_LeprFov += _float(TimeDelta * 2.f);
+
+	
+		m_fFov -= m_LeprFov;
+		
+	}
 
 	
 }
@@ -371,6 +389,10 @@ void CCamera_Combat::UltimateStart_CameraWork(CGameObject * pCurActor)
 	{
 		m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS] = true;
 	}
+	else if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Boss_Alumon")))
+	{
+		m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSSREAL] = true;
+	}
 	else
 		return;
 
@@ -392,7 +414,8 @@ void CCamera_Combat::Camera_UltiMate_ZoomTick(_double TimeDelta)
 	if (   !m_bUltimateCamWorkTick[UlTIMATE_TARGET_KNOLAN] 
 		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_ALUMON]
 		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_CALLIBRETTO]
-		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS])
+		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSS]
+		&& !m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSSREAL])
 		return;
 	
 	CGameObject* pPlayer = CCombatController::GetInstance()->Get_CurActor();
@@ -425,8 +448,21 @@ void CCamera_Combat::Camera_UltiMate_ZoomTick(_double TimeDelta)
 		vPos.x -= 3.f;
 		vRange = 15.f;
 	}
-	
+	else if (m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSSREAL])
+	{
+		vPos.x += 3.f;
+		vRange = 20.f;
+	}
 	m_pTransformCom->Chase(XMLoadFloat4(&vPos), TimeDelta* 20.f, vRange);
+}
+
+void CCamera_Combat::UltimateStart_BossUltimateCameraWork(CGameObject * pCurActor)
+{
+	if (!lstrcmp(pCurActor->Get_ObjectName(), TEXT("Boss_Alumon")))
+	{
+		m_bUltimateCamWorkTick[UlTIMATE_TARGET_BOSSREAL2] = true;
+	}
+	m_LeprFov = 0.f;
 }
 
 HRESULT CCamera_Combat::SetUp_Components()

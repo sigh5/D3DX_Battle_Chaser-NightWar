@@ -49,6 +49,7 @@ public:
 
 		HitBoxOriginDesc					HitBoxOrigin_Desc;
 		CVIBuffer_Point_Instancing::VIBUffer_Point_TextureDesc Poing_Desc;
+		_tchar			m_pTrailObjectName[MAX_PATH] = TEXT("");
 
 	}HitBoxObject;
 

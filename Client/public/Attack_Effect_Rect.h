@@ -20,7 +20,8 @@ public:
 		_float				fCoolTime;				// 몇초뒤에 삭제
 		_bool				bIsMainTain;			// 유지될지 유지가 안될지 결정
 		_int				iFrameCnt;
-
+		_int				iMaxTextureNum;
+		_int				iShaderPass;
 	}Attack_Effec_Client;
 
 
@@ -30,7 +31,7 @@ private:
 	virtual ~CAttack_Effect_Rect() = default;
 
 public:
-	void	Set_Client_BuffDesc(Attack_Effec_Client& Desc);
+	void	Set_Client_BuffDesc(Attack_Effec_Client& Desc, _bool bCalibretto = false);
 	
 	const	_bool	Get_IsFinish()const { return m_bIsFinsishBuffer; }
 	const   _bool  Get_MainTain()const { return m_Client_AttackEffect_Desc.bIsMainTain; }
@@ -71,6 +72,7 @@ private:
 
 	_int								m_iTextureNum = 0;
 	_bool								m_bGlowEnd = false;
+	_bool								m_bCalibretto = false;
 
 private:
 	HRESULT SetUp_Components();
@@ -78,7 +80,7 @@ private:
 
 private:
 	void	Reset_CurMartirx();
-
+	void	Reset_CurCrackMartirx();
 public:
 	static CAttack_Effect_Rect* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);

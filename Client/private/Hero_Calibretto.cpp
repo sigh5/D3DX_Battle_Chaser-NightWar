@@ -51,8 +51,11 @@ _bool CHero_Calibretto::Calculator_HitColl(CGameObject * pWeapon)
 		m_iHitWeaponOption = static_cast<CHitBoxObject::WEAPON_OPTIONAL>(pCurActorWepon->Get_WeaponOption());
 		m_iGetDamageNum = pCurActorWepon->Get_WeaponDamage();
 		
+		m_bMultiHitTickSecond = 1.f;
 		if (pCurActorWepon->Get_HitNum() > 1)
 		{
+			if (m_iHitWeaponOption == CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP)
+				m_bMultiHitTickSecond = 3.f;
 			m_bIs_Multi_Hit = true;
 			m_bOnceCreate = false;
 		}		
@@ -191,6 +194,16 @@ void CHero_Calibretto::Tick(_double TimeDelta)
 	
 	}
 
+	if (m_fGlowStrength >= 1.f)
+		m_bIsChange = true;
+	else if (m_fGlowStrength <= 0)
+		m_bIsChange = false;
+
+	if (m_bIsChange == true)
+		m_fGlowStrength += (_float)TimeDelta * -1.f;
+	else
+		m_fGlowStrength += (_float)TimeDelta;
+
 	m_pModelCom->Play_Animation(TimeDelta, m_bIsCombatScene);
 }
 
@@ -316,7 +329,7 @@ HRESULT CHero_Calibretto::Render()
 			if (i == 12)
 				continue;
 			m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-			m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+			m_pModelCom->Render(m_pShaderCom, i, m_iAnimMondeShaderPass, "g_BoneMatrices", "DN_FR_FishingRod");
 		}
 	}
 	else
@@ -514,7 +527,7 @@ void CHero_Calibretto::Anim_Frame_Create_Control()
 		_int iRandom = rand() % 5;
 		CDamage_Font_Manager::GetInstance()->Set_Damage_Target2_Font(vPos, _float3(2.f, 2.f, 2.f), iRandom + m_iGetDamageNum, 1.5f, 1.2f);
 		m_bOnceCreate = true;
-
+		m_bIs_Multi_Hit = false;
 		m_iMultiHitNum = 0;
 	}
 	else if (!m_bRun && m_pModelCom->Control_KeyFrame_Create(15, 1) )
@@ -692,6 +705,11 @@ HRESULT CHero_Calibretto::SetUp_Components()
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Dissoive"), TEXT("Com_Dissolve"),
+		(CComponent**)&m_pTexturdissolveCom)))
+		return E_FAIL;
+
+
 	CCollider::COLLIDERDESC			ColliderDesc;
 
 	/* For.Com_OBB */
@@ -745,6 +763,12 @@ HRESULT CHero_Calibretto::SetUp_ShaderResources()
 
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+
+	if (FAILED(m_pTexturdissolveCom->Bind_ShaderResource(m_pShaderCom, "g_DissolveTexture", 1)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength, sizeof(_float))))
+		return E_FAIL;
+
 
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -964,7 +988,7 @@ void CHero_Calibretto::Anim_Light_Hit()
 	}
 	else if (true == m_bIs_Multi_Hit)
 	{
-		m_CurAnimqeue.push({ 4,  1.f });
+		m_CurAnimqeue.push({ 4,  m_bMultiHitTickSecond });
 		m_CurAnimqeue.push({ 12,  1.f });
 		m_CurAnimqeue.push({ 1,  1.f });
 		m_bOnceCreate = false;
@@ -1075,6 +1099,17 @@ void CHero_Calibretto::Anim_Viroty()
 	Set_CombatAnim_Index(m_pModelCom);
 }
 
+void CHero_Calibretto::Is_Stuning()
+{
+	_float4 vPos;
+	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+	vPos.x -= 1.f;
+	vPos.y += 11.f;
+	CExplain_FontMgr::GetInstance()->Set_Explain_Target2_Font0(vPos,
+		_float3(2.f, 2.f, 2.f), TEXT("stun"));
+
+}
+
 CHero_Calibretto * CHero_Calibretto::Create(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 {
 	CHero_Calibretto*		pInstance = new CHero_Calibretto(pDevice, pContext);
@@ -1117,7 +1152,7 @@ void CHero_Calibretto::Free()
 	for (_uint i = 0; i < MAPTYPE_END; ++i)
 		Safe_Release(m_pStatusCom[i]);
 
-
+	Safe_Release(m_pTexturdissolveCom);
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);
@@ -1206,17 +1241,17 @@ void CHero_Calibretto::MovingAnimControl(_double TimeDelta)
 void CHero_Calibretto::Fsm_Exit()
 {
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
-
 	_bool	bRenderTrue = true;
 	m_Hero_CombatStateCanvasDelegeter.broadcast(bRenderTrue);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Camera_Zoom_Out();
-
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFF_MISS, false);
 }
 
 void CHero_Calibretto::Intro_Exit()
 {
 	m_iNonRenderMeshIndex = 8;
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFF_MISS, false);
 }
 
 void CHero_Calibretto::Create_Test_Effect()
@@ -1264,24 +1299,24 @@ void CHero_Calibretto::Create_Test_Effect()
 
 void CHero_Calibretto::Create_Test_Rect_Effect()
 {
-	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
+	//CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
-	CGameObject* pGameObject = nullptr;
-	_uint			iEffectNum = 1;
-	CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
-	ZeroMemory(&EffectDesc, sizeof(EffectDesc));
+	//CGameObject* pGameObject = nullptr;
+	//_uint			iEffectNum = 1;
+	//CAttack_Effect_Rect::Attack_Effec_Client EffectDesc;
+	//ZeroMemory(&EffectDesc, sizeof(EffectDesc));
 
-	pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
+	//pGameObject = pInstance->Load_Effect(m_TextureTag.c_str(), LEVEL_COMBAT, true);
 
-	EffectDesc.fCoolTime = 5.f;
-	EffectDesc.bIsMainTain = false;
-	EffectDesc.iFrameCnt = 5;
+	//EffectDesc.fCoolTime = 5.f;
+	//EffectDesc.bIsMainTain = false;
+	//EffectDesc.iFrameCnt = 5;
+	//EffectDesc.iMaxTextureNum = 7;
 
+	//static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc,true);
+	//static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true,TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"),0);
 
-	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc);
-	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true,TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"),0);
-
-	RELEASE_INSTANCE(CGameInstance);
+	//RELEASE_INSTANCE(CGameInstance);
 
 
 }
@@ -1602,9 +1637,10 @@ void CHero_Calibretto::Create_Skill_Ultimate_Effect0()
 	EffectDesc.fCoolTime = 5.f;
 	EffectDesc.bIsMainTain = true;
 	EffectDesc.iFrameCnt = 1;
+	EffectDesc.iMaxTextureNum = 7;
+	EffectDesc.iShaderPass = 4;
 
-
-	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc);
+	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Client_BuffDesc(EffectDesc,true);
 	static_cast<CAttack_Effect_Rect*>(pGameObject)->Set_Glow(true, TEXT("Prototype_Component_Texture_bretto_Lazer_Ultimate_Rect"), 0);
 
 	m_pEffectParts.push_back(pGameObject);
@@ -1796,7 +1832,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 	_uint			iEffectNum = 1;
 	CBuff_Effect::BuffEffcet_Client BuffDesc;
 	ZeroMemory(&BuffDesc, sizeof(BuffDesc));
-
+	_bool			IsDebuffing = false;
 	switch (WeaponOption)
 	{
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE:
@@ -1825,6 +1861,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_GREEN:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		BuffDesc.iFrameCnt = 4;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_ATTACK:
 		pGameObject = pInstance->Load_Effect(L"Texture_Bleeding_Effect_3", LEVEL_COMBAT, false);
@@ -1833,43 +1870,64 @@ void CHero_Calibretto::Create_Hit_Effect()
 		BuffDesc.vScale = _float3(13.f, 13.f, 13.f);
 		pInstance->Play_Sound(TEXT("Common_0047.wav"), 1.f, false, SOUND_TYPE_HIT);
 		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+		BuffDesc.iFrameCnt = 4;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SPIDER_HEAD:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_2", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		BuffDesc.iFrameCnt = 4;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_HEAD:
 		pGameObject = pInstance->Load_Effect(L"Texture_Monster_Bite_4", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		BuffDesc.iFrameCnt = 4;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_SLIME_KING_BREATH:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		BuffDesc.iFrameCnt = 4;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		pGameObject = pInstance->Load_Effect(L"Texture_AlumonSkill_0", LEVEL_COMBAT, false);
 		iEffectNum = 1;
-		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		BuffDesc.vPosition = _float4(1.f, 1.5f, 1.f, 1.f);
+		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+		BuffDesc.iFrameCnt = 2;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_MAGIC;
+		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_ARMOR;
+		
+		CClient_Manager::Create_BuffImage(m_vecBuffImage,
+			_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+			TEXT("Prototype_GameObject_BuffImage"), 4);
+		m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_ARMOR);
+		IsDebuffing = true;
+		m_DebuffName = TEXT("armor down");
+
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_SHILED:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
+		pGameObject = pInstance->Load_Effect(L"Texture_AlumonSkill_1", LEVEL_COMBAT, false);
 		iEffectNum = 1;
-		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		BuffDesc.vPosition = _float4(1.f, 2.5f, 1.f, 1.f);
+		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		BuffDesc.iFrameCnt = 5;
+		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
+
+		
+
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP:
-		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_10", LEVEL_COMBAT, false);
+		pGameObject = pInstance->Load_Effect(L"Texture_AlumonSkill_2", LEVEL_COMBAT, false);
 		iEffectNum = 1;
-		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
-		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
-
+		BuffDesc.vPosition = _float4(1.f, 1.5f, 1.f, 1.f);
+		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
+		BuffDesc.iFrameCnt = 2;
 		if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
 		{
 			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
@@ -1877,7 +1935,15 @@ void CHero_Calibretto::Create_Hit_Effect()
 		if (m_iMultiHitNum == 3)
 		{
 			pInstance->Play_Sound(TEXT("Common_0249.wav"), 1.f, false, SOUND_TYPE_HIT);
+			m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_BLEED;
+			CClient_Manager::Create_BuffImage(m_vecBuffImage,
+				_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+				TEXT("Prototype_GameObject_BuffImage"), 1);
+			m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFFTYPE::DEBUFF_BLEED);
+			IsDebuffing = true;
+			m_DebuffName = TEXT("bleeding");
 		}
+		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
 		m_iMultiHitNum++;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE:
@@ -1885,12 +1951,14 @@ void CHero_Calibretto::Create_Hit_Effect()
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		BuffDesc.iFrameCnt = 2;
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_TWO:
 		pGameObject = pInstance->Load_Effect(L"Texture_Common_Hit_Effect_9", LEVEL_COMBAT, false);
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.f, 1.f, 0.f, 1.f);
 		BuffDesc.vScale = _float3(5.f, 5.f, 5.f);
+		BuffDesc.iFrameCnt = 2;
 		break;
 
 
@@ -1903,6 +1971,18 @@ void CHero_Calibretto::Create_Hit_Effect()
 	if (pGameObject == nullptr)
 		RELEASE_INSTANCE(CGameInstance);
 
+	if (true == IsDebuffing)
+	{
+		_float4 vPos;
+		XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+		vPos.x -= 1.f;
+		vPos.y += 13.f;
+		CExplain_FontMgr::GetInstance()->
+			Set_Explain_Target2_Font0(vPos, _float3(1.f, 1.f, 1.f), m_DebuffName.c_str());
+		IsDebuffing = false;
+	}
+
+
 	if (iEffectNum == 1)
 	{
 		BuffDesc.ParentTransform = m_pTransformCom;
@@ -1910,7 +1990,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 		BuffDesc.vAngle = 90.f;
 		BuffDesc.fCoolTime = 2.f;
 		BuffDesc.bIsMainTain = false;
-		BuffDesc.iFrameCnt = 4;
+	
 		BuffDesc.bIsUp = false;
 		static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
 		m_pEffectParts.push_back(pGameObject);
@@ -2101,6 +2181,10 @@ void CHero_Calibretto::Calculator_HitDamage()
 		CCombatController::GetInstance()->Camera_Shaking();
 		m_bIsHeavyHit = true;
 	}
+	else if (FLOAT_EQ(m_bMultiHitTickSecond, 3.f) &&
+		m_iHitWeaponOption == CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP)
+		return;
+
 	else
 		CCombatController::GetInstance()->UI_Shaking(true);
 
@@ -2287,6 +2371,30 @@ void CHero_Calibretto::Initialize_CombatSound()
 	SoundDesc.iSoundChannel = SOUND_ULTIBGM;
 	lstrcpy(SoundDesc.pSoundTag, TEXT("Calibretto_Explosion_Ultimate_End.wav"));
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
+
+}
+
+void CHero_Calibretto::Set_StunState()
+{
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFF_TURNSKIP, true);
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 5);
+	
+	_int iRandomDamage = 70 + rand() % 10;
+
+	Set_FsmState(true, CGameObject::m_Heavy_Hit);
+	Set_WideAttackDamage(iRandomDamage);
+	
+}
+
+void CHero_Calibretto::Set_Misstate()
+{
+	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::DEBUFF_MISS, true);
+	CClient_Manager::Create_BuffImage(m_vecBuffImage,
+		_float4(-305.f, -330.f, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
+		TEXT("Prototype_GameObject_BuffImage"), 6);
+
 
 }
 

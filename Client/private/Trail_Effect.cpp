@@ -31,9 +31,19 @@ void CTrail_Effect::Set_Desc(tag_Trail_Effect_DESC & Desc, _int iTextureNum ,_in
 	m_iCUrCOunt = 0;
 	m_iDevide_Lerp_Num = 0;
 
-	_matrix  vMatirkx = m_Desc.pGameObject->Get_Transform()->Get_WorldMatrix();
-	memcpy(&vLook, &vMatirkx.r[2], sizeof(_vector));
-	vLook = XMVector3Normalize(vLook);
+	if (m_Desc.eType == CTrail_Effect::BOSS_WHIP)
+	{
+		_matrix  vMatirkx = m_Desc.pGameObject->Get_Transform()->Get_WorldMatrix();
+		memcpy(&vLook, &vMatirkx.r[1], sizeof(_vector));
+		vLook = XMVector3Normalize(vLook);
+	}
+	else
+	{
+		_matrix  vMatirkx = m_Desc.pGameObject->Get_Transform()->Get_WorldMatrix();
+		memcpy(&vLook, &vMatirkx.r[2], sizeof(_vector));
+		vLook = XMVector3Normalize(vLook);
+	}
+	
 }
 
 void CTrail_Effect::First_Edition()
@@ -84,13 +94,13 @@ HRESULT CTrail_Effect::Initialize_Prototype()
 
 HRESULT CTrail_Effect::Initialize(void * pArg)
 {
-	m_ObjectName = L"TestTrail";
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
+
+	m_ObjectName = m_HitBoxDesc.m_pTrailObjectName;
 
 
 	return S_OK;
@@ -173,10 +183,12 @@ void CTrail_Effect::Tick(_double TimeDelta)
 
 			XMStoreFloat3(&vCurCenterPos, m_Colider_Trail_Pos[m_iTraillPos_Index++]);
 
+
 			_float	fRadius;
 			fRadius = m_Desc.pColider->Get_Radius();
 			vTemp += vLook *fRadius *m_Desc.fSize;
 			vDest -= vLook *fRadius *m_Desc.fSize;
+
 
 			m_Trail_Pos[0] = m_Trail_Pos[1];
 			m_Trail_Pos[3] = m_Trail_Pos[2];
@@ -196,7 +208,9 @@ void CTrail_Effect::Tick(_double TimeDelta)
 				case GARRISON_SKILL1:
 					Garrison_Skill1_TrailTick();
 					break;
-		
+				case CTrail_Effect::BOSS_WHIP:
+					Garrison_Boss_TrailTick();
+					break;
 				default:
 					break;
 				}
@@ -278,6 +292,26 @@ void CTrail_Effect::Garrison_Normal_TrailTick()
 }
 
 void CTrail_Effect::Garrison_Skill1_TrailTick()
+{
+	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
+
+	CGameObject* pGameObject = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_Trail_Effect_Child"), &m_HitBoxDesc);
+	m_TrailEffectChild.push_back(static_cast<CTraile_Effect_Child*>(pGameObject));
+	CTraile_Effect_Child::Trail_Child_Pos_Desc ChildDesc;
+	ZeroMemory(&ChildDesc, sizeof(ChildDesc));
+	ChildDesc.m_Trail_Pos[0] = m_Trail_Pos[0];
+	ChildDesc.m_Trail_Pos[3] = m_Trail_Pos[3];
+	ChildDesc.m_Trail_Pos[1] = m_Trail_Pos[1];
+	ChildDesc.m_Trail_Pos[2] = m_Trail_Pos[2];
+	ChildDesc.iTextureNum = m_iTextureNum;
+	ChildDesc.fFixRatio = 1.f / m_CurPointNum;
+	ChildDesc.ColorTexture0Num = 5;
+	ChildDesc.ColorTexture1Num = 2;
+	static_cast<CTraile_Effect_Child*>(pGameObject)->Set_ChildDesc(ChildDesc);
+	RELEASE_INSTANCE(CGameInstance);
+}
+
+void CTrail_Effect::Garrison_Boss_TrailTick()
 {
 	CGameInstance* pGameInstance = GET_INSTANCE(CGameInstance);
 

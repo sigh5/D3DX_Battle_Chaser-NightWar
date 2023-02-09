@@ -54,9 +54,11 @@ public:  /*For.Combat*/
 	HRESULT			  Combat_Initialize();
 	virtual	  void	  Combat_Tick(_double TimeDelta)override;
 	virtual	  void	  Combat_DeadTick(_double TimeDelta)override;
+	virtual		void		Set_StunState()override;
+	virtual		void		Set_Misstate()override;
 
 	virtual void	  Initialize_CombatSound()override;
-
+	virtual		void		Is_Stuning()override;
 
 
 	void			  Create_SkillFire();		// Test_Texture용 나중에 삭제바람
@@ -97,14 +99,15 @@ private:
 	CCollider*				m_pColliderCom = nullptr;
 	CNavigation*			m_pNavigationCom = nullptr;
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
-
+	CTexture*				m_pTexturdissolveCom = nullptr;
 	class CAnimFsm*			m_pFsmCom = nullptr;
 	CGameObject*			m_pFog = nullptr;
 	CGameObject*			m_pFullscreenEffect = nullptr;
 
 private:
 	_bool					m_bCombat_LastInit = false;
-
+	_float								m_fGlowStrength = 0.f;
+	_bool								m_bIsChange = false;
 
 private:
 	HRESULT					SetUp_Components();

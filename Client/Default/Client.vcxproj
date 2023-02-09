@@ -189,6 +189,7 @@
     <ClInclude Include="..\Public\Client_Manager.h" />
     <ClInclude Include="..\Public\CombatController.h" />
     <ClInclude Include="..\Public\CombatMap.h" />
+    <ClInclude Include="..\Public\CombatMapBroken.h" />
     <ClInclude Include="..\Public\DamageFont.h" />
     <ClInclude Include="..\Public\Damage_Font_Manager.h" />
     <ClInclude Include="..\Public\Debuff_Font.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="..\Private\Client_Manager.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
     <ClCompile Include="..\Private\CombatMap.cpp" />
+    <ClCompile Include="..\Private\CombatMapBroken.cpp" />
     <ClCompile Include="..\Private\DamageFont.cpp" />
     <ClCompile Include="..\Private\Damage_Font_Manager.cpp" />
     <ClCompile Include="..\Private\Debuff_Font.cpp" />

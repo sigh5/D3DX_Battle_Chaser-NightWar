@@ -32,6 +32,12 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 		case Engine::CStatus::BUFF_DAMAGE:
 			m_StatusDesc.m_tagDesc.isBuff_Damage = true;
 			break;
+		case Engine::CStatus::DEBUFF_TURNSKIP:
+			m_StatusDesc.m_tagDesc.isDeBuff_TurnSkip = true;
+			break;
+		case Engine::CStatus::DEBUFF_MISS:
+			m_StatusDesc.m_tagDesc.isDeBuff_Miss = true;
+			break;
 		case Engine::CStatus::DEBUFF_NONE:
 			break;
 		default:
@@ -59,6 +65,14 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 		else if (CStatus::BUFF_DAMAGE == eType)
 		{
 			m_StatusDesc.m_tagDesc.isBuff_Damage = false;
+		}
+		else if (CStatus::DEBUFF_TURNSKIP == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDeBuff_TurnSkip = false;
+		}
+		else if (CStatus::DEBUFF_MISS == eType)
+		{
+			m_StatusDesc.m_tagDesc.isDeBuff_Miss = false;
 		}
 		else
 			return;

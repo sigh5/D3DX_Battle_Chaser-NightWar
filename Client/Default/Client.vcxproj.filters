@@ -480,6 +480,7 @@
     <ClInclude Include="..\Public\MeshGround.h" />
     <ClInclude Include="..\Public\Light_Pos.h" />
     <ClInclude Include="..\Public\BossFsm.h" />
+    <ClInclude Include="..\Public\CombatMapBroken.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -710,6 +711,7 @@
     <ClCompile Include="..\Private\MeshGround.cpp" />
     <ClCompile Include="..\Private\Light_Pos.cpp" />
     <ClCompile Include="..\private\BossFsm.cpp" />
+    <ClCompile Include="..\Private\CombatMapBroken.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

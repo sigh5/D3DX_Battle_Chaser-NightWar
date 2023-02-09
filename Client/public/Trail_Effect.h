@@ -18,7 +18,7 @@ class CTrail_Effect final : public CHitBoxObject
 {
 public:
 	enum TRAIL_OPTION {
-		GARRISON_NORMAL, GARRISON_SKILL1, GARRISON_ULTIMATE, TRAIL_OPTION_END
+		GARRISON_NORMAL, GARRISON_SKILL1, GARRISON_ULTIMATE, BOSS_WHIP,TRAIL_OPTION_END
 	};
 
 
@@ -54,6 +54,7 @@ public:
 public:
 	void	Garrison_Normal_TrailTick();
 	void	Garrison_Skill1_TrailTick();
+	void	Garrison_Boss_TrailTick();
 	
 private:
 	vector<class CTraile_Effect_Child*>	m_TrailEffectChild;

@@ -2,7 +2,6 @@
 #include "Client_Defines.h"
 #include "Environment_Object.h"
 
-
 BEGIN(Engine)
 class CShader;
 class CRenderer;
@@ -12,15 +11,19 @@ class CVIBuffer_Rect;
 END
 
 BEGIN(Client)
-class CBroken_Image : public CEnvironment_Object
+class CCombatMapBroken : public CEnvironment_Object
 {
 private:
-	CBroken_Image(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CBroken_Image(const CBroken_Image& rhs);
-	virtual ~CBroken_Image() = default;
+	CCombatMapBroken(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CCombatMapBroken(const CCombatMapBroken& rhs);
+	virtual ~CCombatMapBroken() = default;
 
 public:
 	void	Reset_Anim();
+
+	_bool	Is_Finish()const {
+		return m_bAnimChange[2];
+	}
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,6 +38,7 @@ private:
 	CRenderer*				m_pRendererCom = nullptr;
 	CModel*					m_pModelCom = nullptr;
 	CTexture*				m_pTextureCom = nullptr;
+
 private:
 	HRESULT SetUp_Components();
 	HRESULT SetUp_ShaderResources();
@@ -46,7 +50,7 @@ private:
 	_bool					m_bAnimChange[3] = { false };
 
 public:
-	static  CBroken_Image* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static  CCombatMapBroken* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr) override;
 	virtual void Free() override;
 

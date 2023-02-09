@@ -6,7 +6,7 @@ matrix			g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D		g_DiffuseTexture;
 texture2D		g_NormalTexture;
 texture2D		g_GlowTexture;
-
+texture2D		g_TestTexture;
 
 float				g_iUV_Max_Width_Num;
 float				g_iUV_Max_Height_Num;
@@ -112,8 +112,8 @@ PS_OUT PS_MAIN_MeshUvCut(PS_IN In)
 	PS_OUT			Out = (PS_OUT)0;
 
 	vector		vDiffuse = g_DiffuseTexture.Sample(LinearSampler, In.vTexUV);
-
-	Out.vDiffuse = vDiffuse;
+	vector		vTest = g_TestTexture.Sample(LinearSampler, In.vTexUV);
+	Out.vDiffuse = vDiffuse + vTest;
 
 	/* -1 ~ 1 => 0 ~ 1 */
 	vector vNormal = vector(-1.f, 1.f, -1.f, 0.f);

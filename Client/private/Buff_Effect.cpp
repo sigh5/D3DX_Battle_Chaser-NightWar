@@ -51,6 +51,15 @@ void CBuff_Effect::Set_Client_BuffDesc(BuffEffcet_Client & Desc, CBone * pSocket
 	m_vScale = m_Client_BuffEffect_Desc.vScale;
 	m_pVIBufferCom->Set_FrameCnt(m_Client_BuffEffect_Desc.iFrameCnt);
 
+	/*if (m_Client_BuffEffect_Desc.bIsDown)
+	{
+		__super::Add_Component(LEVEL_GAMEPLAY,TEXT("Prototype_Component_Texture_AlumonSkill"), TEXT("Com_GlowTexture"),
+			(CComponent**)&m_pGlowTextureCom);
+
+		m_iDownGlowTextureNum = 6;
+
+
+	}*/
 }
 
 
@@ -178,6 +187,22 @@ void CBuff_Effect::Tick(_double TimeDelta)
 			vPos.z += (_float)(10.f * TimeDelta);
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		}
+		if (m_Client_BuffEffect_Desc.bIsDown)
+		{
+			m_fMaxYDown += (_float)(7.f * TimeDelta);;
+			if (m_fMaxYDown <= 2.5f)
+			{
+				_float4 vPos;
+				XMStoreFloat4(&vPos, m_pTransformCom->Get_State(CTransform::STATE_TRANSLATION));
+				//vPos.x -= (_float)(10.f * TimeDelta);
+				vPos.y -= (_float)(7.f * TimeDelta);
+				
+
+				//vPos.z += (_float)(10.f * TimeDelta);
+				m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
+			}
+		}
+
 
 	}
 
@@ -187,9 +212,7 @@ void CBuff_Effect::Tick(_double TimeDelta)
 	}
 	
 	
-
-
-	if (m_bUseGlow)
+	if (m_bUseGlow && m_Client_BuffEffect_Desc.bIsDown==false)
 	{
 		m_fIncraseX +=  2.f*(_float)TimeDelta ;
 
@@ -212,7 +235,26 @@ void CBuff_Effect::Tick(_double TimeDelta)
 
 	}
 
+	if (m_Client_BuffEffect_Desc.bIsDown)
+	{
+		m_fIncraseX += 2.f*(_float)TimeDelta;
 
+		if (m_fIncraseX >= 1.f)
+			m_fIncraseX = 1.f;
+
+		if (m_fGlowStrength >= 0.5f)
+		{
+			m_bIsChange = true;
+			//return;
+		}
+		else if (m_fGlowStrength <= 0)
+			m_bIsChange = false;
+
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f *5.f;
+		else
+			m_fGlowStrength += (_float)TimeDelta * 5.f;
+	}
 
 
 
@@ -329,6 +371,15 @@ HRESULT CBuff_Effect::SetUp_ShaderResources()
 		}
 	
 	}
+
+	/*if (m_Client_BuffEffect_Desc.bIsDown)
+	{
+		if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength, sizeof(_float))))
+			return E_FAIL;
+		if (FAILED(m_pGlowTextureCom->Bind_ShaderResource(m_pShaderCom, "g_GlowTexture", 6)))
+			return E_FAIL;
+	}
+*/
 
 	if (FAILED(m_pShaderCom->Set_RawValue("g_iUVX_InCrease", &m_fIncraseX, sizeof(_float))))
 		return E_FAIL;
