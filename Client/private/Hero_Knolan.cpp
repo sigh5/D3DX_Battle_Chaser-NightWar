@@ -234,7 +234,6 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 				iter = m_pEffectParts.erase(iter);
 				m_bOriginBuff = false;
 			}
-
 			else
 				++iter;
 		}

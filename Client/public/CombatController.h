@@ -227,11 +227,6 @@ public:
 	virtual void	Free()override;
 
 
-#ifdef _DEBUG
-public: /*For_Imgui*/
-	void	Imgui_CharAnim();
-#endif // !DEBUG
-
 
 };
 

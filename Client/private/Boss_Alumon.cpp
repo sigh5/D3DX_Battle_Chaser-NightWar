@@ -579,8 +579,6 @@ void CBoss_Alumon::Anim_Frame_Create_Control()
 		Create_BuffEffect();
 		CCombatController::GetInstance()->Camera_Zoom_Out();
 		CCombatController::GetInstance()->Debuff_Miss();
-
-		//CCombatController::GetInstance()->Wide_Debuff(true,)
 	}
 	else if (!m_bAttackColliderOn && m_pModelCom->Control_KeyFrame_Create(35, 20))
 	{
@@ -602,7 +600,7 @@ void CBoss_Alumon::Fsm_UltimateOne_Exit()
 	m_Monster_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_pHitTarget = nullptr;
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
-	CCombatController::GetInstance()->Debuff_Stun();
+
 	m_iHitCount = 0;
 }
 
@@ -1578,7 +1576,8 @@ void CBoss_Alumon::Free()
 		Safe_Release(pPart);
 	m_BossParts.clear();
 
-	Safe_Release(m_pTrailEffect);
+	
+	m_pTrailEffect = nullptr;
 
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);

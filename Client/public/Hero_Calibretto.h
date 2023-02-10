@@ -112,10 +112,8 @@ private:
 	CGameObject*			m_pLazorEffect = nullptr;
 private:
 	_bool					m_bCombat_LastInit = false;
-	_float								m_fGlowStrength = 0.f;
-	_bool								m_bIsChange = false;
-
-	
+	_float					m_fGlowStrength = 0.f;
+	_bool					m_bIsChange = false;
 	_int					bResult = ANIM_EMD;
 	_int					m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_NONE;
 	
@@ -127,8 +125,6 @@ private:
 	_bool					m_bUltimateBuffRenderStop = false;
 	_bool					m_bFogStart = false;
 	_bool					m_bFullScreenEffect = false;
-
-
 
 private:
 	HRESULT					SetUp_Components();
@@ -162,29 +158,23 @@ public:
 private:
 	_uint			m_iTurnCanvasOption = 0;		// 0이면 턴끝남 1이면 죽음
 	UI_REPRESENT	m_Represnt = REPRESENT_CALIBRETTO;
-	_uint	m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
-	
+
+	WeaponType		m_eWeaponType = WEAPON_END;
 public:
 	static CHero_Calibretto* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
 
 public:
-	BaseDelegater<HIGHLIGHT_UIDESC> m_Hero_DungeonUIDelegeter;
-	
-	BaseDelegater<UI_REPRESENT, _uint> m_Hero_CombatTurnDelegeter;		//옆에 턴넘기는거
-	BaseDelegater<_bool> m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
+	BaseDelegater<HIGHLIGHT_UIDESC>		m_Hero_DungeonUIDelegeter;
+	BaseDelegater<UI_REPRESENT, _uint>	m_Hero_CombatTurnDelegeter;		//옆에 턴넘기는거
+	BaseDelegater<_bool>				m_Hero_CombatStateCanvasDelegeter;	// 밑에 상태캔버스 키는것
 
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
-
-
-
-	WeaponType		m_eWeaponType= WEAPON_END;
-
-
 private:
+	_uint		m_iNonRenderMeshIndex = 0;	// 0~7번까지 안그려야됌
 	_float		m_SpeedRatio	    = 8.f;
 	_float		m_LimitDistance     = 12.f;
 	_float		m_ReturnDistance    = 0.4f;

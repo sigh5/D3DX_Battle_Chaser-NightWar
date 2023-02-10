@@ -352,6 +352,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 
 	Safe_Release(m_pModelCom);
 	Remove_component(TEXT("Com_Model"));
+	m_pModelCom = nullptr;
 	if (LEVEL_GAMEPLAY == iLevleIdx)
 	{
 		_float3 vScale = m_pStatusCom[DUNGEON_PLAYER]->Get_DungeonScale();
@@ -359,8 +360,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 		m_pTransformCom->Set_Scaled(vScale);
 		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
-
-		Safe_Release(m_pTrailEffect);
+		
 		m_pTrailEffect = nullptr;
 
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
@@ -378,7 +378,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 		_float3 vScale = m_pTransformCom->Get_Scaled();
 		m_pStatusCom[DUNGEON_PLAYER]->Set_Dungeon_PosScale(vPos, vScale);
 		m_pTransformCom->Set_TransfromDesc(7.f, 90.f);
-
+	
 		if (m_bCombatInit)
 		{
 			m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(135.f));
@@ -387,8 +387,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 			m_pTransformCom->Set_Scaled(vScale);
 		}
-
-
+	
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonCombat"), TEXT("Com_Model"),
 			(CComponent**)&m_pModelCom)))
 			assert("CHero_Garrison Change_Level_Data : LEVEL_COMBAT ");
@@ -1722,8 +1721,9 @@ HRESULT CHero_Garrison::Combat_Init()
 
 	if (FAILED(Ready_CombatParts()))
 		return E_FAIL;
-
+#ifdef _DEBUG
 	m_pStatusCom[DUNGEON_PLAYER]->Add_ItemID(CStatus::ITEM_HP_POTION, 10);
+#endif
 	_float4 vPos;
 	XMStoreFloat4(&vPos, XMVectorSet(12.5f, 0.f, 22.5f, 1.f));
 	_float3 vScale = _float3(4.f, 4.f, 4.f);
@@ -1733,6 +1733,9 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_bDefence = true;
 	m_isWideBuff = false;
 	m_bCombatInit = true;
+
+	Create_Trail_Object();
+	
 
 	
 	return S_OK;
@@ -1776,26 +1779,22 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
 
-	_float3 vCenter = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider()->Get_Center();
+	//_float3 vCenter = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider()->Get_Center();
 
-	CHitBoxObject::HitBoxObject  hitBoxDesc;
-	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
-	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
-	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
-	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
-	lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
-	
+	//CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	//CHitBoxObject::HitBoxObject  hitBoxDesc;
+	//ZeroMemory(&hitBoxDesc, sizeof(hitBoxDesc));
+	//lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	//hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	//hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	//hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+	//lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
+	//
+	//pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+	//	TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
 
-	pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
-		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
-
-	m_pTrailEffect = pGameInstance->
-		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
-
-
-
-	
-
+	//m_pTrailEffect = pGameInstance->
+	//	Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
 
 	RELEASE_INSTANCE(CGameInstance);
 
@@ -2653,6 +2652,26 @@ void CHero_Garrison::Create_Test_Effect()
 	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(7);
 	RELEASE_INSTANCE(CGameInstance);
 
+}
+
+void CHero_Garrison::Create_Trail_Object()
+{
+	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
+	CHitBoxObject::HitBoxObject  hitBoxDesc;
+	ZeroMemory(&hitBoxDesc, sizeof(hitBoxDesc));
+	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+	lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
+
+	pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
+
+	m_pTrailEffect = pGameInstance->
+		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
+
+	RELEASE_INSTANCE(CGameInstance);
 }
 
 _bool CHero_Garrison::Is_Dead()

@@ -28,6 +28,7 @@ HRESULT CMapOne2D::Initialize(void * pArg)
 	CEnvironment_Object::ENVIRONMENTDESC Desc;
 
 	ZeroMemory(&Desc, sizeof(Desc));
+
 	lstrcpy(Desc.m_pModelTag, TEXT("Prototype_Component_MapOne"));
 
 	if (FAILED(__super::Initialize(&Desc)))

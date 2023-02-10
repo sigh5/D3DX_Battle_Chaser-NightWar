@@ -1177,12 +1177,12 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 #ifdef _DEBUG
 	if (m_iBossActiveOption == 0)
 	{
-		To_Buff();		//To_Uitimate();		// 보스는 노멀어택 2임
+		To_WideAreaBuff();		//To_Uitimate();		// 보스는 노멀어택 2임
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 1)
 	{
-		To_Use_NormalAttack2();
+		To_WideAreaBuff();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 2)

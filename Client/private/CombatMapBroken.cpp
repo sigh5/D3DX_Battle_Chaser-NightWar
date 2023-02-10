@@ -2,7 +2,7 @@
 #include "..\public\CombatMapBroken.h"
 #include "GameInstance.h"
 #include "CombatMap.h"
-
+#include "CombatController.h"
 
 CCombatMapBroken::CCombatMapBroken(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CEnvironment_Object(pDevice, pContext)
@@ -107,7 +107,10 @@ void CCombatMapBroken::Tick(_double TimeDelta)
 
 	if (!m_bAnimChange[2])
 		m_pModelCom->Play_Animation_2(TimeDelta);
-
+	else
+	{
+		CCombatController::GetInstance()->Debuff_Stun();
+	}
 	//m_pModelCom->Play_Animation(TimeDelta,false);
 }
 

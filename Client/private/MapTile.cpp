@@ -26,8 +26,7 @@ HRESULT CMapTile::Initialize_Prototype()
 
 HRESULT CMapTile::Initialize(void * pArg)
 {
-	m_ObjectName = TEXT("MapTile_MapOne");
-	m_ProtoName = TEXT("Prototype_GameObject_MapTile");
+	
 	
 	CEnvironment_Object::ENVIRONMENTDESC Desc;
 	ZeroMemory(&Desc, sizeof(Desc));
@@ -38,6 +37,9 @@ HRESULT CMapTile::Initialize(void * pArg)
 
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
+
+	m_ObjectName = TEXT("MapTile_MapOne");
+	m_ProtoName = TEXT("Prototype_GameObject_MapTile");
 
 	Ready_FilterBuffer();
 	return S_OK;
@@ -213,12 +215,6 @@ HRESULT CMapTile::Render()
 	m_pShaderCom->Begin(1);
 	m_pVIBufferCom->Render();
 
-
-
-//#ifdef _DEBUG
-//	m_pNavigationCom->Render();
-//#endif
-
 	return S_OK;
 }
 
@@ -371,7 +367,6 @@ HRESULT CMapTile::SetUp_Components()
 		(CComponent**)&m_pNavigationCom)))
 		return E_FAIL;
 
-
 	return S_OK;
 
 
@@ -443,11 +438,8 @@ void CMapTile::Free()
 	Safe_Delete_Array(m_pPixel);
 	m_FilterIndexSet.clear();
 
-	
-
 	for (auto& pTextureCom : m_pTextureCom)
 		Safe_Release(pTextureCom);
-
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pVIBufferCom);

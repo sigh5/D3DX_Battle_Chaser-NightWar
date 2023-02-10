@@ -370,7 +370,10 @@ void CTrail_Effect::Free()
 	__super::Free();
 
 	for (auto& pChild : m_TrailEffectChild)
-		Safe_Release(pChild);
+	{
+		if(pChild != nullptr)
+			Safe_Release(pChild);
+	}
 	m_TrailEffectChild.clear();
 
 }

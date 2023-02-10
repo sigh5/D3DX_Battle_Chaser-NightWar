@@ -650,6 +650,7 @@ CGameObject* CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCu
 
 	while (true)
 	{
+		pGameObject = nullptr;
 		_float4x4 Worldmatrix = _float4x4();
 		_tchar* LayerTag    = new _tchar[MAX_PATH];
 		_tchar* ProtoName  = new _tchar[MAX_PATH];
@@ -708,14 +709,14 @@ CGameObject* CObject_Manager::Load_Object(const _tchar *pDataFileName, _uint iCu
 			(pGameObject)->Set_ObjectName(ObjectName);
 			(pGameObject)->Get_Transform()->Set_WorldMatrix(Worldmatrix);
 		}
-
-
+		
 		if (!lstrcmp(LayerTag, TEXT("Layer_UI")))
 		{
+			
 			CUI::UIDESC UIDesc;
 			ZeroMemory(&UIDesc, sizeof(UIDesc));
 			lstrcpy(UIDesc.m_pTextureTag, TextureName);
-
+	
 			Clone_GameObject_UseImgui(iCurLevel, LayerTag, ProtoName, &pGameObject, &UIDesc);
 			if (pGameObject == nullptr)
 				assert(!"????");

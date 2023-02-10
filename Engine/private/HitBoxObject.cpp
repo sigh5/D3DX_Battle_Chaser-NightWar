@@ -31,11 +31,13 @@ HRESULT CHitBoxObject::Initialize_Prototype()
 
 HRESULT CHitBoxObject::Initialize(void * pArg)
 {
-	ZeroMemory(&m_HitBoxDesc, sizeof(HitBoxObject));
+	ZeroMemory(&m_HitBoxDesc, sizeof(m_HitBoxDesc));
 
 	if (pArg != nullptr)
-		memcpy(&m_HitBoxDesc, pArg, sizeof(HitBoxObject));
+		memcpy(&m_HitBoxDesc, pArg, sizeof(m_HitBoxDesc));
 
+	m_HitBoxDesc.TransformDesc.fRotationPerSec = 90.f;
+	m_HitBoxDesc.TransformDesc.fSpeedPerSec = 7.f;
 	if (FAILED(__super::Initialize(&m_HitBoxDesc.TransformDesc)))
 		return E_FAIL;
 

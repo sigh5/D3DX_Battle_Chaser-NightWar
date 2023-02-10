@@ -122,7 +122,7 @@ public:
 	virtual		void		Set_Misstate()override;
 private:
 	void				Create_Test_Effect();
-	
+	void				Create_Trail_Object();
 
 private:
 	_int			bResult = ANIM_EMD;

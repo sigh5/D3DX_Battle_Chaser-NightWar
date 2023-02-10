@@ -139,10 +139,10 @@ void CMapOneTree::Picking_pos()
 
 	if (m_iCreateRadioButton == 1)
 	{
-		CMapTile* pTile	=	dynamic_cast<CMapTile*>(pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, LAYER_ENVIRONMENT, TEXT("MapTile_MapOne")));
-	
+		CMapTile* pTile = dynamic_cast<CMapTile*>(pGameInstance->Get_GameObject(LEVEL_GAMEPLAY, LAYER_ENVIRONMENT, TEXT("MapTile_MapOne")));
+
 		if (pTile == nullptr)
-			assert(!"ERror");
+			assert(!" CMapOneTree::Picking_pos()");
 		_float4 vPos;
 		if (pTile->Tree_Instancing(vPos))
 		{

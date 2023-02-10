@@ -20,10 +20,10 @@ HRESULT CEnvironment_Object::Initialize_Prototype()
 
 HRESULT CEnvironment_Object::Initialize(void * pArg)
 {
-	ZeroMemory(&m_EnviromentDesc, sizeof(ENVIRONMENTDESC));
+	ZeroMemory(&m_EnviromentDesc, sizeof(m_EnviromentDesc));
 
 	if (pArg != nullptr)
-		memcpy(&m_EnviromentDesc, pArg,sizeof(ENVIRONMENTDESC));
+		memcpy(&m_EnviromentDesc, pArg,sizeof(m_EnviromentDesc));
 
 	if (FAILED(__super::Initialize(&m_EnviromentDesc.TransformDesc)))
 		return E_FAIL;
