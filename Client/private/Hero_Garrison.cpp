@@ -881,7 +881,7 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Garrsion_Fire_bot_Height_Effect_0", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
-	BuffDesc.vPosition = _float4(2.0f, 1.5f, -1.5f, 1.f);
+	BuffDesc.vPosition = _float4(0.5f, 1.0f, -1.0f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 14.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;

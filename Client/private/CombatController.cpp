@@ -1182,32 +1182,32 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 	}
 	else if (m_iBossActiveOption == 1)
 	{
-		To_Buff();  //To_Skill2_Attack();			//To_WideAreaBuff();
+		To_Use_NormalAttack2();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 2)
 	{
-		To_Buff();//To_Normal_Attack();
+		To_Normal_Attack();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 3)
 	{
-		To_Buff();
+		To_WideAreaBuff();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 4)
 	{
-		To_Buff();
+		To_Skill2_Attack();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 5)
 	{
-		To_Buff();
+		To_Skill1_Attack();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 6)
 	{
-		To_Buff();//To_Normal_Attack();
+		To_Uitimate();
 		m_iBossActiveOption = 0;
 	}
 	

@@ -194,9 +194,6 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);
 		/* ~Model */
 
-		
-
-
 #endif
 		if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_Light_Pos"),
 			CLight_Pos::Create(m_pDevice, m_pContext))))
@@ -248,8 +245,6 @@ HRESULT CLoader::Loading_Combat()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Alumon_Model"), LEVEL_COMBAT);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Ground_Model"), LEVEL_COMBAT); 
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("CombatMapBase"), LEVEL_COMBAT);
-
-
 		
 		lstrcpy(m_szLoadingText, TEXT("셰이더를 로딩중입니다. "));
 

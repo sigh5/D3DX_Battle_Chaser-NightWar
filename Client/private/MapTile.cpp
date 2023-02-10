@@ -343,29 +343,23 @@ HRESULT CMapTile::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Shader_TerrainTile"), TEXT("Com_Shader"),
 		(CComponent**)&m_pShaderCom)))
 		return E_FAIL;
-
 	/* For.Com_VIBuffer */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_VIBuffer_TerrainTile"), TEXT("Com_VIBuffer"),
 		(CComponent**)&m_pVIBufferCom)))
 		return E_FAIL;
-
 	/* For.Com_Texture */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Diffuse"), TEXT("Com_Texture"),
 		(CComponent**)&m_pTextureCom[TYPE_DIFFUSE])))
 		return E_FAIL;
-
 	/* For.Com_Brush*/
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Brush"), TEXT("Com_Brush"),
 		(CComponent**)&m_pTextureCom[TYPE_BRUSH])))
 		return E_FAIL;
-
 	/* For.Com_Filter */
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_Filter"), TEXT("Com_Filter"),
 		(CComponent**)&m_pTextureCom[TYPE_FILTER])))
 		return E_FAIL;
 
-	
-	
 	///* For.Prototype_Component_Texture_MapOneTile_FilterCanvas */
 	//if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_MapOneTile_FilterCanvas"), TEXT("Com_Filter"),
 	//	(CComponent**)&m_pTextureCom[TYPE_FILTER])))

@@ -48,6 +48,13 @@ HRESULT CCamera_Static::Initialize(void * pArg)
 	if (FAILED(SetUp_Components()))
 		return E_FAIL;
 
+#ifdef _DEBUG
+	m_bCameraActive = false;
+#else
+	m_bCameraActive = true;
+#endif // !_DEBUG
+	
+
 	return S_OK;
 }
 
