@@ -101,8 +101,7 @@ private:
 	CStatus*				m_pStatusCom[MAPTYPE_END] = { nullptr,nullptr };
 	CTexture*				m_pTexturdissolveCom = nullptr;
 	class CAnimFsm*			m_pFsmCom = nullptr;
-	CGameObject*			m_pFog = nullptr;
-	CGameObject*			m_pFullscreenEffect = nullptr;
+
 
 private:
 	_bool					m_bCombat_LastInit = false;
@@ -172,7 +171,8 @@ private:
 private:
 	vector<CGameObject*>	m_PlayerParts;
 	vector<CGameObject*>	m_pEffectParts;
-	
+	CGameObject*			m_pFog = nullptr;
+	CGameObject*			m_pFullscreenEffect = nullptr;
 
 
 private:/*For_Imgui*/

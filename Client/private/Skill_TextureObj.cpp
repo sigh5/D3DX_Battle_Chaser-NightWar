@@ -367,7 +367,7 @@ void CSkill_TextureObj::Set_Skill_Texture_Client(Skill_Texture_Client & Desc)
 	m_fIncrease = 6.f;
 	m_fDecreate = 7.f;
 	iChange_Sign = 1;
-
+	ZeroMemory(&m_SkillDesc, sizeof(Skill_Texture_Client));
 	memcpy(&m_SkillDesc, &Desc, sizeof(Skill_Texture_Client));
 	Set_Cur_Pos();
 }
@@ -379,6 +379,7 @@ void CSkill_TextureObj::Set_SKill_Texture_Client_Make_Hiter(Skill_Texture_Client
 	m_fIncrease = 6.f;
 	m_fDecreate = 7.f;
 	iChange_Sign = 1;
+	ZeroMemory(&m_SkillDesc, sizeof(Skill_Texture_Client));
 	memcpy(&m_SkillDesc, &Desc, sizeof(Skill_Texture_Client));
 	Set_Cur_Pos_On_Hiter();
 }

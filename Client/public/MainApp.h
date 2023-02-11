@@ -35,9 +35,8 @@ private:
 	CGameInstance*				m_pGameInstance = nullptr;
 	CRenderer*					m_pRenderer = nullptr;
 	class CPlayerController*	m_pPlayerController = nullptr;
-#ifdef _DEBUG
 	class CToolManager*			m_pToolManager = nullptr;
-#endif	
+
 
 private:
 	ID3D11Device*			m_pDevice = nullptr;

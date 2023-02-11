@@ -31,6 +31,7 @@ CToolManager::CToolManager()
 
 void CToolManager::Imgui_SelectParentViewer()
 {	
+#ifdef _DEBUG
 	ImGui::Begin("Select_ParentObject");
 	ImGui::NewLine();
 	bool bFound = false;
@@ -48,17 +49,10 @@ void CToolManager::Imgui_SelectParentViewer()
 	Imgui_Change_model();
 	Imgui_Change_Texture();
 	Imgui_Camera_Type();
-
-
 	Imgui_Create_NaviGator();
-	
-	
-
 	Imgui_Sound_Tool();
-
-
 	ImGui::End();
-	
+#endif // _DEBUG
 }
 
 void CToolManager::Imgui_Select_ParentCanvas_Button()

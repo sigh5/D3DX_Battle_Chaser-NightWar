@@ -107,7 +107,7 @@ HRESULT CSkeleton_Naked::Initialize(void * pArg)
 
 	m_pTransformCom->Rotation(m_pTransformCom->Get_State(CTransform::STATE_UP), XMConvertToRadians(-30.f));
 	m_pTransformCom->Set_Scaled(_float3(4.f, 4.f, 4.f));
-	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(28.f, 0.f, 1.f, 1.f));
+	m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(31.f, 0.f, 1.f, 1.f));
 	m_pModelCom->Set_AnimIndex(0);
 
 
@@ -914,8 +914,8 @@ HRESULT CSkeleton_Naked::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 500;
-	StatusDesc.iMp = 250;
+	StatusDesc.iHp = 400;
+	StatusDesc.iMp = 350;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;

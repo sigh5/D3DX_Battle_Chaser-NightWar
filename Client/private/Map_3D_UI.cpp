@@ -45,7 +45,7 @@ HRESULT CMap_3D_UI::Last_Initialize()
 #endif
 
 
-	m_pTransformCom->Set_TransfromDesc(0.5f, 90.f);
+	m_pTransformCom->Set_TransfromDesc(0.25f, 90.f);
 
 	m_bLast_Initlize = true;
 	return S_OK;
@@ -67,26 +67,47 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 	}
 
 	m_pTransformCom->Go_Left(TimeDelta);*/
+	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 #else
 	m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 	Coll_CaptinPlayer();
 	m_fMoveTimer += _float(TimeDelta);
 
-	if (m_fMoveTimer >= 1.f)
-	{
-		m_iLeft_Right *= -1;
-		m_fMoveTimer = 0;
-		m_pTransformCom->Set_TransfromDesc(0.1f*m_iLeft_Right, 90.f);
-	}
 
-	m_pTransformCom->Go_Left(TimeDelta);
+	//if ((lstrcmp(m_ObjectName, TEXT("Map_3D_UI4"))))
+	//{
+	//	if (m_fMoveTimer >= 1.f)
+	//	{
+	//		m_iLeft_Right *= -1;
+	//		m_fMoveTimer = 0;
+	//		m_pTransformCom->Set_TransfromDesc(0.1f*m_iLeft_Right, 90.f);
+	//	}
+
+	//	m_pTransformCom->Go_Left(TimeDelta);
+	//}
+
+
+#ifdef  _DEBUG
+	if ((!lstrcmp(m_ObjectName, TEXT("Map_3D_UI4"))))
+	{
+		m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(4.277f, 0.0f, 4.782f, 1.f));
+	}
+#else
+	if ((!lstrcmp(m_ObjectName, TEXT("Map_3D_UI4"))))
+	{
+		m_bRenderActive = true;
+	}
+#endif //  _DEBUG
+
+
 #endif
 	
 
 #ifdef NOMODLES
 
 #else
-	if (m_bOnce )
+
+	if (m_bOnce)
 	{
 		m_SceneChaneTimer += (_float)(TimeDelta);
 	}
@@ -98,6 +119,11 @@ void CMap_3D_UI::Tick(_double TimeDelta)
 
 	is_Cal_This_Delete();
 #endif
+
+
+
+
+
 }
 
 void CMap_3D_UI::Late_Tick(_double TimeDelta)
@@ -196,7 +222,8 @@ void CMap_3D_UI::Coll_CaptinPlayer()
 			CClient_Manager::bIsCollPlayerTo3DUI[4] = true;
 		}
 
-		pGameInstance->Stop_Sound(SOUND_BGM);
+		if( false==m_bRenderActive)
+			pGameInstance->Stop_Sound(SOUND_BGM);
 	}
 
 

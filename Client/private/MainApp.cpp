@@ -15,9 +15,7 @@
 #include "LoadingCircle.h"
 CMainApp::CMainApp()
 	: m_pGameInstance(CGameInstance::GetInstance())
-#ifdef _DEBUG
 	, m_pToolManager(CToolManager::GetInstance())
-#endif
 
 {
 	CSoundPlayer::GetInstance();
@@ -91,9 +89,8 @@ void CMainApp::Tick(_double TimeDelta)
 
 	m_pGameInstance->Tick_Engine(TimeDelta);
 	
-#ifdef _DEBUG
 	m_pToolManager->Imgui_SelectParentViewer();
-#endif // DEBUG
+
 
 
 
@@ -323,9 +320,7 @@ void CMainApp::Free()
 {
 	CCombatController::DestroyInstance();
 	CPlayerController::DestroyInstance();
-#ifdef _DEBUG
 	CToolManager::DestroyInstance();
-#endif
 	CDamage_Font_Manager::DestroyInstance();
 	CExplain_FontMgr::DestroyInstance();
 	CSoundPlayer::DestroyInstance();

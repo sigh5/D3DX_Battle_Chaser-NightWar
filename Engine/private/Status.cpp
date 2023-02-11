@@ -77,28 +77,6 @@ void CStatus::Set_DebuffOption(DEBUFFTYPE eType,_bool isFlase)
 		else
 			return;
 		
-		/*switch (eType)
-		{
-		case Engine::CStatus::DEBUFF_FIRE:
-			m_StatusDesc.m_tagDesc.isDebuff_FIRE = false;
-			break;
-		case Engine::CStatus::DEBUFF_BLEED:
-			m_StatusDesc.m_tagDesc.isDebuff_BLEED = false;
-			break;
-		case Engine::CStatus::DEBUFF_ARMOR:
-			m_StatusDesc.m_tagDesc.isDebuff_ARMOR = false;
-			break;
-		case Engine::CStatus::DEBUFF_MAGIC:
-			m_StatusDesc.m_tagDesc.isDebuff_MAGIC = false;
-			break;
-		case Engine::CStatus::BUFF_DAMAGE:
-			m_StatusDesc.m_tagDesc.isBuff_Damage = false;
-			break;
-		case Engine::CStatus::DEBUFF_NONE:
-			break;
-		default:
-			break;
-		}*/
 	}
 	
 
@@ -159,6 +137,11 @@ void CStatus::Set_Exp(_int iExp)
 	if (m_StatusDesc.iExp >= m_iMaxExp)
 	{
 		m_StatusDesc.iExp -= m_iMaxExp;
+
+		m_StatusDesc.iHp += 50;
+		m_StatusDesc.iMp += 50;
+		m_iMaxHp += 50;
+		m_iMaxMp += 50;
 
 		m_iMaxExp += 10;
 		++m_StatusDesc.iLevel;

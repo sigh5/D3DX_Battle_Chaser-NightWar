@@ -29,7 +29,7 @@ private:
 
 	
 	void Stop_SoundAuto();
-	void Stop_All();
+	
 
 public:
 	virtual void Free() override;
@@ -64,6 +64,6 @@ public:
 	void Set_SoundDesc(const _tchar *pSoundKey, CSound::SOUND_DESC& SoundDesc);
 
 	HRESULT Load_SoundFile(const char *pFilePath, const _tchar* pTag=nullptr);
-
+	void Stop_All();
 };
 END

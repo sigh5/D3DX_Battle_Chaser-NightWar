@@ -108,6 +108,18 @@ void CPlayerController::Player_Controll_Tick(_double TimeDelta)
 
 }
 
+void CPlayerController::Player_HP_MPUP()
+{
+	for (auto& pPlayer : m_pPlayerVec)
+	{
+		CStatus* pStatus = 		static_cast<CStatus*>(pPlayer->Get_Component(TEXT("Com_StatusCombat")));
+		assert(pStatus != nullptr && "CPlayerController::Player_HP_MPUP :: Issue");
+		pStatus->Incrase_Hp(2000);
+		pStatus->Incrase_Mp(2000);
+	}
+
+}
+
 void CPlayerController::Set_CaptinPlayer()
 {
 	/* 나중에는 클릭으로 바꾸는 기능도 추가해야함*/

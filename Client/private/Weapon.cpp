@@ -23,10 +23,12 @@ HRESULT CWeapon::Initialize_Prototype()
 
 HRESULT CWeapon::Initialize(void * pArg)
 {
+	ZeroMemory(&m_WeaponDesc, sizeof(m_WeaponDesc));
+
 	if (nullptr != pArg)
 		memcpy(&m_WeaponDesc, pArg, sizeof(m_WeaponDesc));
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(nullptr)))
 		return E_FAIL;
 
 	if (FAILED(SetUp_Components()))

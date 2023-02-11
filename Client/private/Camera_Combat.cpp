@@ -216,7 +216,7 @@ void CCamera_Combat::Tick(_double TimeDelta)
 
 		RELEASE_INSTANCE(CCombatController);
 
-		m_LeprFov += _float(TimeDelta * 2.f);
+		m_LeprFov += _float(TimeDelta * 1.5f);
 
 	
 		m_fFov -= m_LeprFov;

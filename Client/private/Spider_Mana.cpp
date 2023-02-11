@@ -390,7 +390,6 @@ void CSpider_Mana::Create_Hit_Effect()
 		m_DebuffName = TEXT("fire down");
 		IsDebuffing = true;
 		m_eCurDebuff = CStatus::DEBUFFTYPE::DEBUFF_FIRE;
-
 		CClient_Manager::Create_BuffImage(m_vecBuffImage,
 			_float4(500.f, m_fBuffImage_Height, 0.1f, 1.f), _float3(30.f, 30.f, 1.f),
 			TEXT("Prototype_GameObject_BuffImage"), 3);
@@ -980,7 +979,7 @@ HRESULT CSpider_Mana::SetUp_Components()
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
 	StatusDesc.iHp = 450;
-	StatusDesc.iMp = 300;
+	StatusDesc.iMp = 350;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;

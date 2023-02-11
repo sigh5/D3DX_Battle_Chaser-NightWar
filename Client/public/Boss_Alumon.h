@@ -9,6 +9,7 @@ class CRenderer;
 class CModel;
 class CCollider;
 class CStatus;
+class CTexture;
 END
 
 BEGIN(Client)
@@ -72,12 +73,23 @@ private:
 	CModel*					m_pModelCom = nullptr;
 	CCollider*				m_pColliderCom = nullptr;
 	CStatus*				m_pStatusCom = nullptr;
+	CTexture*				m_pTexturdissolveCom = nullptr;
 	class CBossFsm*			m_pFsmCom = nullptr;
 
 private:
 	HRESULT					SetUp_Components();
 	HRESULT					SetUp_ShaderResources();
 	HRESULT					Ready_Parts();
+
+private:
+	_float								m_fGlowStrength = 0.f;
+	_bool								m_bIsChange = false;
+	_float								m_bUltimateOneTimer = 0.f;
+
+	_bool								m_bUltimateActiveOne = false;
+	_bool								m_bUltimateActivetwo = false;
+	_bool								m_bUltimateActiveThree = false;
+
 
 private:
 	virtual		void		Calculator_HitDamage()override;	/*충돌시 함수*/

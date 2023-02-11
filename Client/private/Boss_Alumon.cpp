@@ -210,10 +210,75 @@ void CBoss_Alumon::Tick(_double TimeDelta)
 		//Create_Test_MeshEffect();
 	}
 
-
 	RELEASE_INSTANCE(CGameInstance);
-
 	m_pModelCom->Play_Animation(TimeDelta, true);
+
+	if (m_bUltiAttackStart)
+	{
+		_bool bCheck = false;
+		m_bUltimateOneTimer += (_float)TimeDelta;
+
+		if (m_bUltimateOneTimer >= 5.f && !m_bUltimateActiveOne)
+		{
+			m_bUltimateBuffRenderStop = false;
+			m_iAnimMondeShaderPass = 0;
+			m_bUltimateActiveOne = true;
+		}
+		else if (!m_bUltimateActivetwo && m_bUltimateOneTimer >= 7.4f)
+		{
+			if (m_pHitTarget != nullptr)
+				static_cast<CCombatActors*>(m_pHitTarget)->Set_AnimShaderPass(2);
+			m_bUltimateActivetwo = true;
+		}
+		else if (m_bUltimateOneTimer >= 8.3f)
+		{
+			if (m_pHitTarget != nullptr)
+			{
+				static_cast<CCombatActors*>(m_pHitTarget)->Set_WideAttackDamage(80);
+				static_cast<CCombatActors*>(m_pHitTarget)->Set_FsmState(true, m_Heavy_Hit);
+				static_cast<CCombatActors*>(m_pHitTarget)->Set_AnimShaderPass(0);
+			}
+			m_bUltimateOneTimer = 0.f;
+			m_bUltiAttackStart = false;
+			m_bUltimateActiveOne = false;
+			m_bUltimateActivetwo = false;
+			m_bUltimateActiveThree = true;
+			CCombatController::GetInstance()->UI_Shaking(true);
+		}
+	}
+	
+	if (m_bUltimateActiveThree)
+	{
+		Create_BuffEffect();
+		m_bUltimateActiveThree = false;
+		m_pStatusCom->Incrase_Hp(40);
+		m_pStatusCom->Incrase_Mp(40);
+		CCombatController::GetInstance()->HPMp_Update(this);
+	}
+	
+
+	if (m_bUltimateBuffRenderStop)
+	{
+		if (m_fGlowStrength >= 1.f)
+		{
+			m_bIsChange = true;
+		}
+		else if (m_fGlowStrength <= 0)
+		{
+			m_bIsChange = false;
+			//return;
+		}
+		if (m_bIsChange == true)
+			m_fGlowStrength += (_float)TimeDelta * -1.f * 0.22f;
+		else
+			m_fGlowStrength += (_float)TimeDelta * 0.22f;
+	}
+	
+	
+
+	
+
+	
 }
 
 void CBoss_Alumon::Late_Tick(_double TimeDelta)
@@ -313,7 +378,7 @@ HRESULT CBoss_Alumon::Render()
 	for (_uint i = 0; i < iNumMeshes; ++i)
 	{
 		m_pModelCom->Bind_Material(m_pShaderCom, i, aiTextureType_DIFFUSE, "g_DiffuseTexture");
-		m_pModelCom->Render(m_pShaderCom, i, 0, "g_BoneMatrices", "DN_FR_FishingRod");
+		m_pModelCom->Render(m_pShaderCom, i, m_iAnimMondeShaderPass, "g_BoneMatrices", "DN_FR_FishingRod");
 	}
 	return S_OK;
 }
@@ -346,6 +411,7 @@ void CBoss_Alumon::Fsm_Exit()
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 	CCombatController::GetInstance()->Camera_Zoom_Out();
 	m_iHitCount = 0;
+	m_bUltimateBuffRenderStop = false;
 }
 
 void CBoss_Alumon::UltiHeavyHitExit()
@@ -587,6 +653,13 @@ void CBoss_Alumon::Anim_Frame_Create_Control()
 		m_iHitCount = 1;		// 공격할때
 		m_bAttackColliderOn = true;
 	}
+	else if (!m_bOnceCreate && m_pModelCom->Get_AnimIndex() == 31)
+	{
+		m_iAnimMondeShaderPass = 3;
+		m_bUltiAttackStart = true;
+		m_bOnceCreate = true;
+	}
+
 	else
 		return;
 
@@ -604,6 +677,7 @@ void CBoss_Alumon::Fsm_UltimateOne_Exit()
 	CCombatController::GetInstance()->Set_MonsterSetTarget(false);
 	CCombatController::GetInstance()->Debuff_Stun();
 	m_iHitCount = 0;
+	m_bUltimateBuffRenderStop = false;
 }
 
 void CBoss_Alumon::Create_Hit_Effect()
@@ -1126,6 +1200,11 @@ HRESULT CBoss_Alumon::SetUp_Components()
 		(CComponent**)&m_pModelCom)))
 		return E_FAIL;
 
+
+	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Dissoive"), TEXT("Com_Dissolve"),
+		(CComponent**)&m_pTexturdissolveCom)))
+		return E_FAIL;
+
 	/* For.Com_AABB */
 	CCollider::COLLIDERDESC			ColliderDesc;
 	ZeroMemory(&ColliderDesc, sizeof(CCollider::COLLIDERDESC));
@@ -1135,12 +1214,11 @@ HRESULT CBoss_Alumon::SetUp_Components()
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Collider_AABB"), TEXT("Com_AABB"),
 		(CComponent**)&m_pColliderCom, &ColliderDesc)))
 		return E_FAIL;
-
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 400;
-	StatusDesc.iMp = 300;
+	StatusDesc.iHp = 700;
+	StatusDesc.iMp = 600;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;
@@ -1159,6 +1237,12 @@ HRESULT CBoss_Alumon::SetUp_ShaderResources()
 		return E_FAIL;
 	if (FAILED(m_pShaderCom->Set_Matrix("g_ProjMatrix", &pGameInstance->Get_TransformFloat4x4(CPipeLine::D3DTS_PROJ))))
 		return E_FAIL;
+	
+	if (FAILED(m_pTexturdissolveCom->Bind_ShaderResource(m_pShaderCom, "g_DissolveTexture", 6)))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Set_RawValue("G_Power", &m_fGlowStrength, sizeof(_float))))
+		return E_FAIL;
+
 
 	m_pShaderCom->Set_Matrix("g_matLightView", &pGameInstance->Get_Light_Matrix(TEXT("Level_Combat_Directional")));
 	m_pShaderCom->Set_Matrix("g_matLightProj", &pGameInstance->Get_Light_ProjMatrix(TEXT("Level_Combat_Directional")));
@@ -1402,8 +1486,7 @@ void CBoss_Alumon::Anim_Skill2_Attack()//0
 
 void CBoss_Alumon::Anim_Uitimate()	
 {
-	
-
+	m_fGlowStrength = 1.1f;
 	m_bUltimateSoundCheck = false;
 	m_bUltimateCam = false;
 	m_pStatusCom->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
@@ -1415,17 +1498,18 @@ void CBoss_Alumon::Anim_Uitimate()
 	m_SpeedRatio = 6.f;
 	m_LimitDistance = 10.f;
 	m_bUltimateOneMoveTimer = 0.f;
+	m_iStateDamage = rand() % 10 + 85 + m_iStage_Buff_DamgaeUP;
 
 	m_setTickForSecond = 1.f;
 	m_pMeHit_Player = nullptr;
 	m_bIsUseUltimate = false;
 	m_bUltimateBuffRenderStop = true;
-	m_bUltiWideAttack = false;
 	m_bUltiAttackStart = false;
 	m_bUltiAttackStop = false;
 	m_fUltimateTimer = 0.f;
-	m_eWeaponType = WEAPON_END;
-	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_ULTIMATE_ONE;
+	m_eWeaponType = WEAPON_SWORD;
+	m_iWeaponOption = CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_RIGHT_HAND;
+
 
 	CCombatController::GetInstance()->Ultimate_Camera_OnBoss();
 	m_CurAnimqeue.push({ 31,  1.f });	//걸어가고 목적지에서 영혼흡수시작
@@ -1578,8 +1662,7 @@ void CBoss_Alumon::Free()
 		Safe_Release(pPart);
 	m_BossParts.clear();
 
-	Safe_Release(m_pTrailEffect);
-
+	Safe_Release(m_pTexturdissolveCom);
 	Safe_Release(m_pStatusCom);
 	Safe_Release(m_pFsmCom);
 	Safe_Release(m_pColliderCom);

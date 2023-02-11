@@ -3,6 +3,9 @@
 #include "Client_Defines.h"
 #include "Level.h"
 
+BEGIN(Engine)
+class CGameObject;
+END
 BEGIN(Client)
 
 class CLevel_Logo final : public CLevel
@@ -21,7 +24,8 @@ private:
 	HRESULT Ready_Layer_BackGround(const wstring& pLayerTag);
 	HRESULT Ready_Layer_Logo(const wstring& pLayerTag);
 
-
+private:
+	class CGameObject*		pGameStartButton = nullptr;
 
 
 public:

@@ -187,6 +187,7 @@
     <ClInclude Include="..\Public\ClientBaseCanvas.h" />
     <ClInclude Include="..\public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Manager.h" />
+    <ClInclude Include="..\Public\CollObject.h" />
     <ClInclude Include="..\Public\CombatController.h" />
     <ClInclude Include="..\Public\CombatMap.h" />
     <ClInclude Include="..\Public\CombatMapBroken.h" />
@@ -217,6 +218,7 @@
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\Public\LoadingCircle.h" />
     <ClInclude Include="..\Public\LoadingImage.h" />
+    <ClInclude Include="..\Public\Logo_Button.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\MainLogo.h" />
     <ClInclude Include="..\Public\MapOne2D.h" />
@@ -229,6 +231,8 @@
     <ClInclude Include="..\Public\Mouse.h" />
     <ClInclude Include="..\Public\MyImage.h" />
     <ClInclude Include="..\public\NoneAnim_BG.h" />
+    <ClInclude Include="..\Public\NpcCanvas.h" />
+    <ClInclude Include="..\Public\OnlyFontUI.h" />
     <ClInclude Include="..\public\PlayerController.h" />
     <ClInclude Include="..\Public\Skeleton_Naked.h" />
     <ClInclude Include="..\Public\Skill_Object.h" />
@@ -271,6 +275,7 @@
     <ClCompile Include="..\Private\ChestBox.cpp" />
     <ClCompile Include="..\Private\ClientBaseCanvas.cpp" />
     <ClCompile Include="..\Private\Client_Manager.cpp" />
+    <ClCompile Include="..\Private\CollObject.cpp" />
     <ClCompile Include="..\Private\CombatController.cpp" />
     <ClCompile Include="..\Private\CombatMap.cpp" />
     <ClCompile Include="..\Private\CombatMapBroken.cpp" />
@@ -300,6 +305,7 @@
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\Private\LoadingCircle.cpp" />
     <ClCompile Include="..\Private\LoadingImage.cpp" />
+    <ClCompile Include="..\Private\Logo_Button.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\Private\MainLogo.cpp" />
     <ClCompile Include="..\Private\MapOne2D.cpp" />
@@ -312,6 +318,8 @@
     <ClCompile Include="..\Private\Mouse.cpp" />
     <ClCompile Include="..\Private\MyImage.cpp" />
     <ClCompile Include="..\Private\NoneAnim_BG.cpp" />
+    <ClCompile Include="..\Private\NpcCanvas.cpp" />
+    <ClCompile Include="..\Private\OnlyFontUI.cpp" />
     <ClCompile Include="..\private\PlayerController.cpp" />
     <ClCompile Include="..\Private\Skeleton_Naked.cpp" />
     <ClCompile Include="..\Private\Skill_Object.cpp" />

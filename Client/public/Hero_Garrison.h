@@ -59,7 +59,9 @@ public:  /*For.Combat*/
 	virtual	  void		Defence_Exit()override;
 	void				MovingAnimControl(_double TimeDelta);
 	virtual void		Create_Wide_Debuff(CStatus::DEBUFFTYPE eDebuffOption)override;
-	virtual void				Initialize_CombatSound()override;
+	virtual void		Initialize_CombatSound()override;
+	void				Create_Trail_Object();
+
 
 public:	 /*Create_Effect*/
 	virtual void		Create_Hit_Effect()override;
@@ -197,6 +199,7 @@ private:
 	_float3			m_vTestPos;
 	_float3			m_vTestScale;
 
+	
 
 };
 

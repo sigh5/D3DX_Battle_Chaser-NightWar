@@ -294,6 +294,23 @@ void CHero_Garrison::Late_Tick(_double TimeDelta)
 			
 
 	}
+
+	if (m_bSceneChangeDeleteData)
+	{
+		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		{
+		Safe_Release(*iter);
+		iter = m_pEffectParts.erase(iter);
+		}
+		m_pEffectParts.clear();
+
+
+		for (auto& pBuffImage : m_vecBuffImage)
+		Safe_Release(pBuffImage);
+		m_vecBuffImage.clear();
+		m_bSceneChangeDeleteData = false;
+	}
+
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -360,7 +377,6 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 		m_pTransformCom->Set_Scaled(vScale);
 		m_pTransformCom->Set_TransfromDesc(1.5f, 90.f);
 
-		Safe_Release(m_pTrailEffect);
 		m_pTrailEffect = nullptr;
 
 		if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Model_GarrisonDungeon"), TEXT("Com_Model"),
@@ -386,6 +402,7 @@ void CHero_Garrison::Change_Level_Data(_uint iLevleIdx)
 			vScale = m_pStatusCom[COMBAT_PLAYER]->Get_CombatScale();
 			m_pTransformCom->Set_State(CTransform::STATE_TRANSLATION, XMLoadFloat4(&vPos));
 			m_pTransformCom->Set_Scaled(vScale);
+			Create_Trail_Object();
 		}
 
 
@@ -442,10 +459,14 @@ void CHero_Garrison::NormalLightCharUI()
 
 void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
+	_bool bDungeonWalk = CPlayer::KeyInput(TimeDelta, m_pNavigationCom);
+
+	if (IsCaptin() && !bDungeonWalk)
 		m_iAnimIndex = 0;
+
 	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
-	if (false == m_bIsWalk && m_bRun == true)
+
+	if (bDungeonWalk)
 	{
 		m_fWalkSoundTimer += (_float)TimeDelta;
 		if (m_fWalkSoundTimer >= 0.3f)
@@ -457,12 +478,10 @@ void CHero_Garrison::Dungeon_Tick(_double TimeDelta)
 	}
 	else
 		pGameInstance->Stop_Sound(SOUND_GARRISON_EFFECT);
-	
-	RELEASE_INSTANCE(CGameInstance);
 
+	RELEASE_INSTANCE(CGameInstance);
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
-
 }
 
 void CHero_Garrison::Combat_Tick(_double TimeDelta)
@@ -872,6 +891,7 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 {
 	if (m_pHitTarget == nullptr)
 		return;
+	m_iHitCount = 1;
 	CGameInstance* pInstance = GET_INSTANCE(CGameInstance);
 
 	CGameObject* pGameObject = nullptr;
@@ -881,7 +901,7 @@ void CHero_Garrison::Create_Skill1_Attack_Effect()
 	pGameObject = pInstance->Load_Effect(L"Texture_Garrsion_Fire_bot_Height_Effect_0", LEVEL_COMBAT, false);
 
 	BuffDesc.ParentTransform = m_pHitTarget->Get_Transform();
-	BuffDesc.vPosition = _float4(2.0f, 1.5f, -1.5f, 1.f);
+	BuffDesc.vPosition = _float4(1.0f, 1.0f, -1.0f, 1.f);
 	BuffDesc.vScale = _float3(10.f, 14.f, 10.f);
 	BuffDesc.vAngle = 90.f;
 	BuffDesc.fCoolTime = 5.f;
@@ -913,6 +933,7 @@ void CHero_Garrison::Create_Skill2_Attack_Effect()
 	BuffDesc.iFrameCnt = 5;
 	BuffDesc.bIsUp = false;
 	static_cast<CBuff_Effect*>(pGameObject)->Set_Client_BuffDesc(BuffDesc);
+	static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
 	m_pEffectParts.push_back(pGameObject);
 
 	RELEASE_INSTANCE(CGameInstance);
@@ -1620,7 +1641,23 @@ void CHero_Garrison::Initialize_CombatSound()
 	CSoundPlayer::GetInstance()->Add_SoundEffect_Model(m_pModelCom, SoundDesc);
 }
 
+void CHero_Garrison::Create_Trail_Object()
+{
+	 
+	CHitBoxObject::HitBoxObject  hitBoxDesc;
+	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+	lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
 
+
+	CGameInstance::GetInstance()->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
+
+	m_pTrailEffect = CGameInstance::GetInstance()->
+		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
+}
 
 HRESULT CHero_Garrison::SetUp_Components()
 {
@@ -1734,6 +1771,8 @@ HRESULT CHero_Garrison::Combat_Init()
 	m_isWideBuff = false;
 	m_bCombatInit = true;
 
+	Create_Trail_Object();
+
 	
 	return S_OK;
 }
@@ -1776,21 +1815,20 @@ HRESULT CHero_Garrison::Ready_CombatParts()
 		(CComponent**)&m_pStatusCom[COMBAT_PLAYER], &StatusDesc)))
 		return E_FAIL;
 
-	_float3 vCenter = static_cast<CWeapon*>(m_PlayerParts[0])->Get_Colider()->Get_Center();
 
-	CHitBoxObject::HitBoxObject  hitBoxDesc;
-	lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
-	hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
-	hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
-	hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
-	lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
-	
+	//CHitBoxObject::HitBoxObject  hitBoxDesc;
+	//lstrcpy(hitBoxDesc.HitBoxOrigin_Desc.m_pTextureTag, TEXT("Prototype_Component_Texture_Trail"));
+	//hitBoxDesc.Poing_Desc.m_iFrameCnt = 2;
+	//hitBoxDesc.Poing_Desc.m_iTextureMax_Height_Cnt = 1;
+	//hitBoxDesc.Poing_Desc.m_iTextureMax_Width_Cnt = 1;
+	//lstrcpy(hitBoxDesc.m_pTrailObjectName, TEXT("TestTrail"));
+	//
 
-	pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
-		TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
+	//pGameInstance->Clone_GameObject(LEVEL_COMBAT, LAYER_EFFECT,
+	//	TEXT("Prototype_GameObject_Trail_Effect"), &hitBoxDesc);
 
-	m_pTrailEffect = pGameInstance->
-		Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
+	//m_pTrailEffect = pGameInstance->
+	//	Get_GameObject(LEVEL_COMBAT, LAYER_EFFECT, TEXT("TestTrail"));
 
 
 
@@ -2346,7 +2384,7 @@ void CHero_Garrison::Anim_Skill1_Attack()
 	m_pStatusCom[COMBAT_PLAYER]->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
 	m_bOnceCreate = false;
 	m_bRun = false;
-	m_iHitCount = 1;
+	m_iHitCount = 0;
 	m_eWeaponType = WEAPON_SWORD;
 	m_iStateDamage = rand() % 10 + 40 + m_iStage_Buff_DamgaeUP;
 	m_pStatusCom[COMBAT_PLAYER]->Use_SkillMp(30);
@@ -2512,19 +2550,7 @@ void CHero_Garrison::Anim_Heavy_Hit()
 
 void CHero_Garrison::Anim_Flee()
 {
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
-
+	m_bSceneChangeDeleteData = true;
 
 	m_CurAnimqeue.push({ 48,  1.f });
 	m_CurAnimqeue.push({ 47,  1.f });
@@ -2533,27 +2559,19 @@ void CHero_Garrison::Anim_Flee()
 
 void CHero_Garrison::Anim_Die()
 {
+	m_bSceneChangeDeleteData = true;
 	m_iTurnCanvasOption = 1;
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 7,  1.f });
 	m_CurAnimqeue.push({ 33,  1.f });
 	Set_CombatAnim_Index(m_pModelCom);
 
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
 
 }
 
 void CHero_Garrison::Anim_Viroty()
 {
+	m_bSceneChangeDeleteData = true;
 	_int iRandHp = rand() % 3 + 1;
 	_int iRandMp = rand() % 2 + 1;
 
@@ -2577,17 +2595,7 @@ void CHero_Garrison::Anim_Viroty()
 		m_CurAnimqeue.push({ 43, 1.f });
 	}
 
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
+	
 
 
 	Set_CombatAnim_Index(m_pModelCom);

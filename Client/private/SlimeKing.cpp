@@ -1078,8 +1078,8 @@ HRESULT CSlimeKing::SetUp_Components()
 	/* For.Prototype_Component_Status */
 	CStatus::StatusDesc			StatusDesc;
 	ZeroMemory(&StatusDesc, sizeof(CStatus::StatusDesc));
-	StatusDesc.iHp = 1000;
-	StatusDesc.iMp = 300;
+	StatusDesc.iHp = 550;
+	StatusDesc.iMp = 500;
 	if (FAILED(__super::Add_Component(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Status"), TEXT("Com_StatusCombat"),
 		(CComponent**)&m_pStatusCom, &StatusDesc)))
 		return E_FAIL;

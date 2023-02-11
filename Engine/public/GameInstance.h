@@ -153,7 +153,7 @@ public: /* For.Sound_Manager */
 	void Set_SoundDesc(const _tchar *pSoundKey, CSound::SOUND_DESC& SoundDesc);
 	HRESULT Load_SoundFile(const char *pFilePath, const _tchar* pTag = nullptr);
 	map<const _tchar*, CSound*>& Get_Sound();
-
+	void Stop_All();
 
 private:
 	static				_uint		m_iStaticLevelIndex;

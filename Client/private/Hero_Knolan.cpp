@@ -17,6 +17,7 @@
 #include "Damage_Font_Manager.h"
 #include "Explain_FontMgr.h"
 #include "SoundPlayer.h"
+
 CHero_Knolan::CHero_Knolan(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	:CPlayer(pDevice, pContext)
 {
@@ -277,6 +278,22 @@ void CHero_Knolan::Late_Tick(_double TimeDelta)
 		}
 	}
 
+	if (m_bSceneChangeDeleteData)
+	{
+		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+		}
+		m_pEffectParts.clear();
+
+
+		for (auto& pBuffImage : m_vecBuffImage)
+			Safe_Release(pBuffImage);
+		m_vecBuffImage.clear();
+		m_bSceneChangeDeleteData = false;
+	}
+
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
 		m_pRendererCom->Add_RenderGroup(CRenderer::RENDER_NONALPHABLEND, this);
@@ -451,13 +468,16 @@ void CHero_Knolan::NormalLightCharUI()
 
 void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 {
+
+	_bool bDungeonWalk = CPlayer::KeyInput(TimeDelta, m_pNavigationCom);
 	
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
+	if (IsCaptin() && !bDungeonWalk)
 		m_iAnimIndex = 0;
 	
-	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (false == m_bIsWalk && m_bRun==true)
+	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
+	
+	if (bDungeonWalk)
 	{
 		m_fWalkSoundTimer += (_float)TimeDelta;
 		if (m_fWalkSoundTimer >= 0.3f)
@@ -469,6 +489,18 @@ void CHero_Knolan::Dungeon_Tick(_double TimeDelta)
 	}
 	else
 		pGameInstance->Stop_Sound(SOUND_TYPE_KNOLAN_EFFECT);
+	/*if (false == m_bIsWalk && m_bRun==true)
+	{
+		m_fWalkSoundTimer += (_float)TimeDelta;
+		if (m_fWalkSoundTimer >= 0.3f)
+		{
+			pGameInstance->Stop_Sound(SOUND_TYPE_KNOLAN_EFFECT);
+			pGameInstance->Play_Sound(TEXT("Knolan_Walk.wav"), 0.6f, false, SOUND_TYPE_KNOLAN_EFFECT);
+			m_fWalkSoundTimer = 0.f;
+		}
+	}
+	else
+		pGameInstance->Stop_Sound(SOUND_TYPE_KNOLAN_EFFECT);*/
 
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -2077,18 +2109,7 @@ void CHero_Knolan::Anim_Heavy_Hit()
 
 void CHero_Knolan::Anim_Flee()
 {
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-
+	m_bSceneChangeDeleteData = true;
 	m_CurAnimqeue.push({ 32, 1.f });
 	m_CurAnimqeue.push({ 31, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
@@ -2096,27 +2117,18 @@ void CHero_Knolan::Anim_Flee()
 
 void CHero_Knolan::Anim_Die()
 {
+	m_bSceneChangeDeleteData = true;
 	m_iTurnCanvasOption = 1;
 	m_bIsDead = true;
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 5,  1.f });
 	m_CurAnimqeue.push({ 23, 1.f });
 	Set_CombatAnim_Index(m_pModelCom);
-
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-	CCombatController::GetInstance()->Camera_Shaking();
-
-
 }
 
 void CHero_Knolan::Anim_Viroty()
 {
+	m_bSceneChangeDeleteData = true;
 	_int iRandHp = rand() % 3 + 1;
 	_int iRandMp = rand() % 2 + 1;
 
@@ -2141,19 +2153,6 @@ void CHero_Knolan::Anim_Viroty()
 		m_CurAnimqeue.push({ 37,  1.f });
 		m_CurAnimqeue.push({ 36, 1.f });
 	}
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
-
 	Set_CombatAnim_Index(m_pModelCom);
 }
 

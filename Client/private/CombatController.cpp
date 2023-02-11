@@ -816,7 +816,8 @@ _bool CCombatController::Is_MissDebuff()
 void CCombatController::Use_MissDebuff()
 {
 	CStatus* pStatus = Get_CurActorStatus();
-	pStatus->Set_DebuffOption(CStatus::BUFF_DAMAGE, false);
+	pStatus->Set_DebuffOption(CStatus::DEBUFF_MISS, false);
+
 }
 
 void CCombatController::ResetState()
@@ -1182,12 +1183,12 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 	}
 	else if (m_iBossActiveOption == 1)
 	{
-		To_Buff();  //To_Skill2_Attack();			//To_WideAreaBuff();
+		To_Buff();	  //To_Uitimate();			//To_WideAreaBuff();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 2)
 	{
-		To_Buff();//To_Normal_Attack();
+		To_Buff();	//To_Uitimate();
 		++m_iBossActiveOption;
 	}
 	else if (m_iBossActiveOption == 3)
@@ -1207,7 +1208,7 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 	}
 	else if (m_iBossActiveOption == 6)
 	{
-		To_Buff();//To_Normal_Attack();
+		To_Uitimate();//To_Normal_Attack();
 		m_iBossActiveOption = 0;
 	}
 	
@@ -1282,9 +1283,15 @@ void CCombatController::Cal_MapTwoMonsterFsm()
 				else if (m_iBossActiveOption == 2)
 				{
 					To_Skill1_Attack();
+					++m_iBossActiveOption;
+				}
+				else if (m_iBossActiveOption == 3)
+				{
+					To_Buff();
 					m_bMonsterUseUltimate = false;
 					m_iBossActiveOption = 0;
 				}
+				
 			}
 			else //마나가 50퍼이하 공격 스킬사용
 			{

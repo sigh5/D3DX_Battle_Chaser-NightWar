@@ -39,7 +39,7 @@ public:
 
 
 	void			Player_Controll_Tick(_double TimeDelta);
-
+	void			Player_HP_MPUP();
 
 
 public: /* For.Dungeon*/

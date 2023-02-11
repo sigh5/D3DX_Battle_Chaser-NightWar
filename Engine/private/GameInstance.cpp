@@ -734,6 +734,12 @@ map<const _tchar*, CSound*>& CGameInstance::Get_Sound()
 	return m_pSound_Manager->Get_Sound();
 }
 
+void CGameInstance::Stop_All()
+{
+	assert(nullptr != m_pSound_Manager && " CGameInstance::Stop_All");
+	return m_pSound_Manager->Stop_All();
+}
+
 void CGameInstance::Release_Engine()
 {
 	CImgui_Manager::GetInstance()->DestroyInstance();

@@ -51,8 +51,8 @@ HRESULT CLevel_Combat::Initialize()
 	m_pCombatController->Initialize(LEVEL_COMBAT);
 	
 
-
-	//CGameInstance::GetInstance()->Play_Sound(TEXT("02_Nights_Curse.wav"), 0.2f, true, SOUND_BGM);
+	CGameInstance::GetInstance()->Stop_All();
+	CGameInstance::GetInstance()->Play_Sound(TEXT("02_Nights_Curse.wav"), 0.2f, true, SOUND_BGM);
 
 
 
@@ -281,7 +281,8 @@ HRESULT CLevel_Combat::Ready_Layer_Monster(const wstring & pLayerTag)
 			return E_FAIL;
 		pGameInstance->
 			Get_GameObject(LEVEL_COMBAT,
-				pLayerTag, TEXT("Spider_Mana"))->Get_Transform()->Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(25.84f, 0.f, -4.28f, 1.f));
+				pLayerTag, TEXT("Spider_Mana"))->Get_Transform()->
+			Set_State(CTransform::STATE_TRANSLATION, XMVectorSet(31.f, 0.f, 1.f, 1.f));
 
 		static_cast<CSpider_Mana*>(pGameInstance->
 			Get_GameObject(LEVEL_COMBAT,

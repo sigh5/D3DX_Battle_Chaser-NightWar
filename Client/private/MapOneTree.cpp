@@ -53,17 +53,27 @@ HRESULT CMapOneTree::Last_Initialize()
 		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Birch_A"));
 	}
 
-	if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A")))
+	else if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A")))
 	{
 		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Mid_A"));
 	}
 
-	/*if (!lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Front_A")))
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_Tree_Cluster_Back_A")))
 	{
-		m_pModelCom->Load_TreePos(TEXT("Tree_Cluster_Front_A"));
-	}*/
-
-	
+		m_pModelCom->Load_TreePos(TEXT("Map_Tree_Cluster_Back_A"));
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_Tree_Cluster_Back_C")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Map_Tree_Cluster_Back_C"));
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_Tree_Dead_Bush_A")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Map_Tree_Dead_Bush_A"));
+	}
+	else if (!lstrcmp(m_ObjectName, TEXT("Map_Tree_Cluster_Birch_B")))
+	{
+		m_pModelCom->Load_TreePos(TEXT("Map_Tree_Cluster_Birch_B"));
+	}
 
 	m_bLast_Initlize = true;
 
@@ -75,28 +85,29 @@ void CMapOneTree::Tick(_double TimeDelta)
 	Last_Initialize();
 	__super::Tick(TimeDelta);
 	
-	/*static char Name[MAX_PATH] = "";
-	WideCharToMultiByte(CP_ACP, 0, m_ObjectName, MAX_PATH, Name, MAX_PATH, NULL, NULL);
+	//static char Name[MAX_PATH] = "";
+	//WideCharToMultiByte(CP_ACP, 0, m_ObjectName, MAX_PATH, Name, MAX_PATH, NULL, NULL);
 
-	if (lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Birch_A")) && lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A")))
-	{
+	//if (lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Birch_A")) && lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Mid_A"))
+	//	&& lstrcmp(m_ObjectName, TEXT("Tree_Cluster_Front_A")) && lstrcmp(m_ObjectName, TEXT("Map_Tree_Cluster_Back_A"))
+	//	&& lstrcmp(m_ObjectName, TEXT("Map_Tree_Cluster_Back_C")) && lstrcmp(m_ObjectName, TEXT("Map_Tree_Dead_Bush_A")))
+	//{
+	//	ImGui::Text("%s", Name);
 
-		ImGui::Text("%s", Name);
+	//	if (m_iCreateRadioButton == 1)
+	//	{
+	//		ImGui::InputText("Text", szName, MAX_PATH);
 
-		if (m_iCreateRadioButton == 1)
-		{
-			ImGui::InputText("Text", szName, MAX_PATH);
-
-			Save_TreePos();
-			Load_TreePos();
-		}
+	//		Save_TreePos();
+	//		Load_TreePos();
+	//	}
 
 
-		ImGui::RadioButton("None_Create_PickPos", &m_iCreateRadioButton, 0);
-		ImGui::RadioButton("Create_PickPos", &m_iCreateRadioButton, 1);
+	//	ImGui::RadioButton("None_Create_PickPos", &m_iCreateRadioButton, 0);
+	//	ImGui::RadioButton("Create_PickPos", &m_iCreateRadioButton, 1);
 
-		Picking_pos();
-	}*/
+	//	Picking_pos();
+	//}
 
 }
 
@@ -179,8 +190,6 @@ void CMapOneTree::Load_TreePos()
 {
 	if (m_iCreateRadioButton == 0)
 		return;
-
-
 
 	if (ImGui::Button("TreePos Load"))
 	{

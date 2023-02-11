@@ -477,10 +477,20 @@
     <ClInclude Include="..\Public\Boss_Alumon.h">
       <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MeshGround.h" />
     <ClInclude Include="..\Public\Light_Pos.h" />
-    <ClInclude Include="..\Public\BossFsm.h" />
-    <ClInclude Include="..\Public\CombatMapBroken.h" />
+    <ClInclude Include="..\Public\Logo_Button.h" />
+    <ClInclude Include="..\Public\NpcCanvas.h" />
+    <ClInclude Include="..\Public\BossFsm.h">
+      <Filter>02.GameObjects\Monster\Boss_Alumon\Fsm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CombatMapBroken.h">
+      <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshGround.h">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CollObject.h" />
+    <ClInclude Include="..\Public\OnlyFontUI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -708,10 +718,20 @@
     <ClCompile Include="..\Private\Boss_Alumon.cpp">
       <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MeshGround.cpp" />
     <ClCompile Include="..\Private\Light_Pos.cpp" />
-    <ClCompile Include="..\private\BossFsm.cpp" />
-    <ClCompile Include="..\Private\CombatMapBroken.cpp" />
+    <ClCompile Include="..\Private\Logo_Button.cpp" />
+    <ClCompile Include="..\Private\NpcCanvas.cpp" />
+    <ClCompile Include="..\private\BossFsm.cpp">
+      <Filter>02.GameObjects\Monster\Boss_Alumon\Fsm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CombatMapBroken.cpp">
+      <Filter>02.GameObjects\Monster\Boss_Alumon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshGround.cpp">
+      <Filter>02.GameObjects\MapOne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CollObject.cpp" />
+    <ClCompile Include="..\Private\OnlyFontUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

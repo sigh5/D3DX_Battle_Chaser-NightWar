@@ -128,7 +128,7 @@ void CTrail_Effect::Tick(_double TimeDelta)
 	}
 
 
-	if (ImGui::Button("Clear"))
+	/*if (ImGui::Button("Clear"))
 	{
 		for (auto& pChild : m_TrailEffectChild)
 		{
@@ -138,7 +138,7 @@ void CTrail_Effect::Tick(_double TimeDelta)
 		m_iCenterCount = 0;
 		m_iCUrCOunt = 0;
 		m_iDevide_Lerp_Num = 0;
-	}
+	}*/
 
 	if (m_bIsTrailStartCheck)
 	{

@@ -296,6 +296,22 @@ void CHero_Calibretto::Late_Tick(_double TimeDelta)
 			}
 		}
 	}
+	if (m_bSceneChangeDeleteData)
+	{
+		for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+		{
+			Safe_Release(*iter);
+			iter = m_pEffectParts.erase(iter);
+		}
+		m_pEffectParts.clear();
+
+
+		for (auto& pBuffImage : m_vecBuffImage)
+			Safe_Release(pBuffImage);
+		m_vecBuffImage.clear();
+		m_bSceneChangeDeleteData = false;
+	}
+
 
 	if (m_bModelRender	&& nullptr != m_pRendererCom)
 	{
@@ -469,14 +485,17 @@ void CHero_Calibretto::NormalLightCharUI()
 
 void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 {
-	if (IsCaptin() && !CPlayer::KeyInput(TimeDelta, m_pNavigationCom))
+	_bool bDungeonWalk = CPlayer::KeyInput(TimeDelta, m_pNavigationCom);
+
+	if (IsCaptin() && !bDungeonWalk)
 		m_iAnimIndex = 0;
+
 	CGameInstance*pGameInstance = GET_INSTANCE(CGameInstance);
 
-	if (false == m_bIsWalk && m_bRun == true)
+	if (bDungeonWalk)
 	{
 		m_fWalkSoundTimer += (_float)TimeDelta;
-		if (m_fWalkSoundTimer >= 0.3f)
+		if (m_fWalkSoundTimer >= 0.4f)
 		{
 			pGameInstance->Stop_Sound(SOUND_CALIBRETTO_EFFECT);
 			pGameInstance->Play_Sound(TEXT("Calibretto_0020.wav"), 0.6f, false, SOUND_CALIBRETTO_EFFECT);
@@ -485,6 +504,7 @@ void CHero_Calibretto::Dungeon_Tick(_double TimeDelta)
 	}
 	else
 		pGameInstance->Stop_Sound(SOUND_CALIBRETTO_EFFECT);
+
 	
 	AnimMove();
 	CClient_Manager::CaptinPlayer_ColiderUpdate(this, m_pColliderCom, m_pTransformCom);
@@ -1019,17 +1039,7 @@ void CHero_Calibretto::Anim_Heavy_Hit()
 
 void CHero_Calibretto::Anim_Flee()
 {
-
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
-
-
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
+	m_bSceneChangeDeleteData = true;
 
 	m_CurAnimqeue.push({ 43, 1.f });
 	m_CurAnimqeue.push({ 42, 1.f });
@@ -1038,6 +1048,7 @@ void CHero_Calibretto::Anim_Flee()
 
 void CHero_Calibretto::Anim_Die()
 {
+	m_bSceneChangeDeleteData = true;
 	m_iTurnCanvasOption = 1;
 	m_Hero_CombatTurnDelegeter.broadcast(m_Represnt, m_iTurnCanvasOption);
 	m_CurAnimqeue.push({ 6,  1.f });
@@ -1046,21 +1057,22 @@ void CHero_Calibretto::Anim_Die()
 
 	Set_CombatAnim_Index(m_pModelCom);
 
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
+	//for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	//{
+	//	Safe_Release(*iter);
+	//	iter = m_pEffectParts.erase(iter);
+	//}
+	//m_pEffectParts.clear();
 
 
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
+	//for (auto& pBuffImage : m_vecBuffImage)
+	//	Safe_Release(pBuffImage);
+	//m_vecBuffImage.clear();
 }
 
 void CHero_Calibretto::Anim_Viroty()
 {
+	m_bSceneChangeDeleteData = true;
 	_int iRandHp = rand() % 3 + 1;
 	_int iRandMp = rand() % 2 + 1;
 
@@ -1083,17 +1095,17 @@ void CHero_Calibretto::Anim_Viroty()
 		m_CurAnimqeue.push({ 37, 1.f });
 	}
 	
-	for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
-	{
-		Safe_Release(*iter);
-		iter = m_pEffectParts.erase(iter);
-	}
-	m_pEffectParts.clear();
+	//for (auto iter = m_pEffectParts.begin(); iter != m_pEffectParts.end();)
+	//{
+	//	Safe_Release(*iter);
+	//	iter = m_pEffectParts.erase(iter);
+	//}
+	//m_pEffectParts.clear();
 
 
-	for (auto& pBuffImage : m_vecBuffImage)
-		Safe_Release(pBuffImage);
-	m_vecBuffImage.clear();
+	//for (auto& pBuffImage : m_vecBuffImage)
+	//	Safe_Release(pBuffImage);
+	//m_vecBuffImage.clear();
 
 
 	Set_CombatAnim_Index(m_pModelCom);
@@ -1848,7 +1860,7 @@ void CHero_Calibretto::Create_Hit_Effect()
 		iEffectNum = 1;
 		BuffDesc.vPosition = _float4(0.5f, 1.5f, 1.f, 1.f);
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
-		
+		BuffDesc.iFrameCnt = 4;
 		if (m_iMultiHitNum == 2 || m_iMultiHitNum == 0)
 		{
 			pInstance->Play_Sound(TEXT("Common_0059.wav"), 1.f, false, SOUND_TYPE_HIT);
@@ -1918,9 +1930,6 @@ void CHero_Calibretto::Create_Hit_Effect()
 		BuffDesc.vScale = _float3(10.f, 10.f, 10.f);
 		BuffDesc.iFrameCnt = 5;
 		static_cast<CBuff_Effect*>(pGameObject)->Set_ShaderPass(5);
-
-		
-
 		break;
 	case CHitBoxObject::WEAPON_OPTIONAL::WEAPON_OPTIONAL_BOSS_WHIP:
 		pGameObject = pInstance->Load_Effect(L"Texture_AlumonSkill_2", LEVEL_COMBAT, false);

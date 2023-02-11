@@ -133,7 +133,7 @@ protected:
 	_bool							m_bDefence = false;			//스킬에 디펜스가있냐?
 	_bool							m_isWideBuff = false;
 	_bool							m_bModelRender = true;
-	
+	_bool							m_bSceneChangeDeleteData = false;
 	_int							m_iWideAttackDamgae = 0;
 	wstring							m_DebuffName = TEXT("");
 	_uint							m_iMultiHitNum = 0;

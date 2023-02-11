@@ -55,6 +55,7 @@ HRESULT CLevel_GamePlay::Initialize()
 #ifdef NOMODLES
 
 #else
+	CGameInstance::GetInstance()->Stop_All();
 	CGameInstance::GetInstance()->Play_Sound(TEXT("01_Level_GamePlay.wav"), 0.5f, true, SOUND_BGM);
 	
 #endif // NOMODLES
@@ -157,7 +158,6 @@ void CLevel_GamePlay::Late_Tick(_double TimeDelta)
 
 		static_cast<CBroken_Image*>(pBroken_Image)->Reset_Anim();
 
-
 		CGameObject* pCam = nullptr;
 		pCam = pGameInstance->Get_GameObject(pGameInstance->GetCurLevelIdx(), TEXT("Layer_Camera"), TEXT("Static_Camera"));
 		CClient_Manager::m_StaticCameraMatrix =pCam->Get_Transform()->Get_WorldMatrix();
@@ -239,9 +239,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const wstring & pLayerTag)
 {
 	CGameInstance*		pGameInstance = GET_INSTANCE(CGameInstance);
 
+#ifdef _DEBUG
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_Camera_Dynamic"))))
 		return E_FAIL;
-
+#endif
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_CCamera_Static"))))
 		return E_FAIL;
 
@@ -257,7 +258,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Environment(const wstring & pLayerTag)
 #ifdef NOMODLES
 	/*if (FAILED(pGameInstance->Clone_GameObject(LEVEL_GAMEPLAY, pLayerTag, TEXT("Prototype_GameObject_MapTile"))))
 		return E_FAIL;*/
-
+	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
 #else
 	pGameInstance->Load_Object(TEXT("Map_oneData"), LEVEL_GAMEPLAY);
 
@@ -314,7 +315,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_UI(const wstring & pLayerTag)
 #else
 	pGameInstance->Load_Object(TEXT("DungeonUI"),LEVEL_GAMEPLAY);
 	pGameInstance->Load_Object(TEXT("Inventory"), LEVEL_GAMEPLAY);
-	
+	pGameInstance->Load_Object(TEXT("Npc_UI_0"), LEVEL_GAMEPLAY);
 
 #endif
 

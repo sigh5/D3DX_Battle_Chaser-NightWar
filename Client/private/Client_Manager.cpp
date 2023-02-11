@@ -321,6 +321,8 @@ vector<CGameObject*>::iterator CClient_Manager::Delete_BuffImage(vector<CGameObj
 		iIndexs.push_back(0);
 	if (Desc.isDeBuff_TurnSkip == false)
 		iIndexs.push_back(5);
+	if (Desc.isDeBuff_Miss == false)
+		iIndexs.push_back(6);
 
 	for (_uint i = 0; i < iIndexs.size(); ++i)
 	{

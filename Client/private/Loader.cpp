@@ -57,7 +57,10 @@
 #include "MeshGround.h"
 #include "Light_Pos.h"
 #include "CombatMapBroken.h"
-
+#include "Logo_Button.h"
+#include "NpcCanvas.h"
+#include "CollObject.h"
+#include "OnlyFontUI.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice(pDevice)
@@ -125,7 +128,7 @@ HRESULT CLoader::Loading_ForLogo()
 	
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_LOGO, TEXT("Prototype_Component_Texture_MouseCusor"),
-		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Mouse_Cusor/CombatCusor_%d.png"), CTexture::TYPE_DIFFUSE, 5))))
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/UI_TurnBattle/Mouse_Cusor/CombatCusor_%d.png"), CTexture::TYPE_DIFFUSE, 6))))
 		return E_FAIL;
 	
 
@@ -154,6 +157,10 @@ HRESULT CLoader::Loading_ForLogo()
 		CMouse::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_LogoButton"),
+		CLogo_Button::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
 
 	lstrcpy(m_szLoadingText, TEXT("로딩끝. "));
 
@@ -180,8 +187,11 @@ HRESULT CLoader::Loading_ForGamePlay()
 		lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다. "));
 		/* Model */
 #ifdef NOMODLES
+		//CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
+		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("ChestModel_Anim"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
-	
 #else  
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Battle_Start_Anim_Real"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Polygon_Models"), LEVEL_GAMEPLAY);
@@ -191,7 +201,7 @@ HRESULT CLoader::Loading_ForGamePlay()
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("MapArts"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load_2(m_pDevice, m_pContext, TEXT("MapTree"), LEVEL_GAMEPLAY);
 		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Monsters"), LEVEL_COMBAT);
-		CClient_Manager::Model_Load(m_pDevice, m_pContext, TEXT("Missile_Model"), LEVEL_GAMEPLAY);
+	
 		/* ~Model */
 
 		
@@ -509,12 +519,18 @@ HRESULT CLoader::ForGamePlay_Texture(CGameInstance* pGameInstance)
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_Dissoive"),
 		CTexture::Create(m_pDevice, m_pContext,
 			TEXT("../Bin/Resources/Textures2D/dissolve/dissolve_%d.png"),		//exp bar 가지고있음
-			CTexture::TYPE_END, 5))))
+			CTexture::TYPE_END, 7))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_CombatMapTwo"),
 		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Map2/Map2_%d.png"), CTexture::TYPE_DIFFUSE, 9))))
 		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(LEVEL_GAMEPLAY, TEXT("Prototype_Component_Texture_NPC"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures2D/Npc/NPC_%d.png"), CTexture::TYPE_DIFFUSE, 6))))
+		return E_FAIL;
+
+
 
 
 	if (FAILED(ForGamePlay_Skill_and_Effect(pGameInstance)))
@@ -701,7 +717,18 @@ HRESULT CLoader::ForGamePlay_GameObjects(CGameInstance * pGameInstance)
 		CInventory_Button::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_NpcCanvas"),
+		CNpcCanvas::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_CollObject"),
+		CCollObject::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(TEXT("Prototype_GameObject_OnlyFontUI"),
+		COnlyFontUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 
 	/* For.Prototype_GameObject_EffectFrame */

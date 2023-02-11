@@ -28,8 +28,6 @@ public:
 	void	Set_Garrison(CGameObject* pPlayer);
 	void	Set_Calibretto(CGameObject* pPlayer);
 
-
-
 public:
 	virtual HRESULT Initialize_Prototype()override;
 	virtual HRESULT Initialize(void* pArg)override;
@@ -92,11 +90,6 @@ private:
 	_bool					m_bLoseRender = false;
 	InventoryOwner			m_iImageOption = INVEN_KNOLAN;	//18 Gully 17 Garrison 16 Calibretto
 	InventoryOwnerWeapon	m_iWeaponOption = IV_KNOLAN_W;
-
-	
-
-
-	
 
 public:
 	static CInventory* Create(ID3D11Device*	pDevice, ID3D11DeviceContext* pContext);

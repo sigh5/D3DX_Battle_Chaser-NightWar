@@ -4,6 +4,7 @@
 #include "Level_Loading.h"
 #include "GameInstance.h"
 #include "Imgui_PropertyEditor.h"
+#include "Logo_Button.h"
 
 CLevel_Logo::CLevel_Logo(ID3D11Device * pDevice, ID3D11DeviceContext * pContext)
 	: CLevel(pDevice, pContext)
@@ -44,13 +45,16 @@ HRESULT CLevel_Logo::Initialize()
 void CLevel_Logo::Tick(_double TimeDelta)
 {
 	__super::Tick(TimeDelta);
+	pGameStartButton->Tick((TimeDelta));
 		
 }
 
 void CLevel_Logo::Late_Tick(_double TimeDelta)
 {
 	__super::Late_Tick(TimeDelta);
+	pGameStartButton->Late_Tick((TimeDelta));
 
+#ifdef _DEBUG
 	if (GetKeyState(VK_SPACE) & 0x8000)
 	{
 		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
@@ -62,6 +66,25 @@ void CLevel_Logo::Late_Tick(_double TimeDelta)
 		Safe_Release(pGameInstance);
 
 	}
+#else
+	if (static_cast<CLogo_Button*>(pGameStartButton)->Get_GameStart())
+	{
+		CGameInstance*		pGameInstance = CGameInstance::GetInstance();
+		Safe_AddRef(pGameInstance);
+		pGameInstance->Stop_Sound(SOUND_BGM);
+		if (FAILED(pGameInstance->Open_Level(LEVEL_LOADING, CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL_GAMEPLAY))))
+			return;
+
+		Safe_Release(pGameInstance);
+}
+
+#endif // _DEBUG
+
+
+
+
+
+
 
 }
 
@@ -99,6 +122,11 @@ HRESULT CLevel_Logo::Ready_Layer_Logo(const wstring & pLayerTag)
 	if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_Mouse"))))
 		return E_FAIL;
 
+	//if (FAILED(pGameInstance->Clone_GameObject(LEVEL_LOGO, pLayerTag, TEXT("Prototype_GameObject_LogoButton"))))
+	//	return E_FAIL;
+
+	pGameStartButton = pGameInstance->Clone_GameObject(TEXT("Prototype_GameObject_LogoButton"));
+
 
 	Safe_Release(pGameInstance);
 
@@ -122,4 +150,5 @@ CLevel_Logo * CLevel_Logo::Create(ID3D11Device * pDevice, ID3D11DeviceContext * 
 void CLevel_Logo::Free()
 {
 	__super::Free();
+	Safe_Release(pGameStartButton);
 }
